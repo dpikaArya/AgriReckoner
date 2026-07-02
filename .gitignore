@@ -1,0 +1,114 @@
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# -------------------------
+# Virtual Environments
+# -------------------------
+.venv/
+venv/
+env/
+
+# -------------------------
+# IDE
+# -------------------------
+.vscode/
+.idea/
+*.swp
+
+# -------------------------
+# Operating System
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Logs
+# -------------------------
+logs/
+*.log
+
+# -------------------------
+# Cache
+# -------------------------
+.cache/
+tmp/
+temp/
+
+# -------------------------
+# Build
+# -------------------------
+build/
+dist/
+artifacts/
+
+# -------------------------
+# Generated Outputs
+# -------------------------
+output/
+outputs/
+results/
+reports/
+exports/
+generated/
+merged/
+
+# -------------------------
+# Datasets (privacy)
+# -------------------------
+data/
+dataset/
+datasets/
+input/
+inputs/
+sample_data/
+samples/
+test_data/
+
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.ods
+*.parquet
+*.feather
+*.db
+*.sqlite
+*.sqlite3
+
+# Ignore only DATA json files
+data/**/*.json
+dataset/**/*.json
+datasets/**/*.json
+input/**/*.json
+inputs/**/*.json
+
+# Ignore JSONL datasets
+*.jsonl
+
+# -------------------------
+# Secrets
+# -------------------------
+.env
+.env.*
+*.key
+*.pem
+credentials.*
+token.*
+secrets.*
+
+# -------------------------
+# Local AI caches
+# -------------------------
+models/
+model_cache/
+ollama/
