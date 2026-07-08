@@ -1,0 +1,2 @@
+[console_scripts]
+ades = ades.cli:main

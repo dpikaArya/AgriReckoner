@@ -1,88 +1,88 @@
-# Universal Agricultural Schema Generator (Merge Agent)
+# Agricultural Data Engineering System (ADES)
 
-An AI-powered pipeline component that reads multiple crop master datasets, standardizes column names into a single unified schema, and produces ready-to-use machine learning datasets.
+An Agentic AI pipeline that transforms heterogeneous agricultural datasets into the **Universal Agricultural Machine Learning Schema (UAMS) v1.0** - production-ready for regression, ensemble, deep learning, time series, explainable AI, causal inference, and future agentic systems.
 
-Part of an Agentic AI pipeline for **Crop Recommendation and Yield Prediction**.
+## Architecture
 
-## Features
+ADES decomposes the original monolithic merge agent into **12 specialized autonomous agents** coordinated by an **Orchestrator Agent**:
 
-- **Automatic schema alignment** — maps disparate column names (e.g. `Tmax_C`, `Available_N`, `PlantHeight_120_cm`) to a standardized 105-column universal schema
-- **Multi-timepoint handling** — intermediate growth stages (30/60/90 DAS) are preserved in timepoint-specific columns; final stage maps to the base column
-- **Duplicate resolution** — when multiple source columns map to the same standard name, the last/highest timepoint is retained
-- **Missing data preserved** — unavailable values remain `NaN` (not zero-filled)
-- **Data validation** — checks for impossible values (negative biomass, out-of-range pH, etc.)
-- **Future-proof** — any new `.xlsx` dataset placed in `data/master_datasets/` is merged automatically without code changes
+| # | Agent | Responsibility |
+|---|-------|---------------|
+| 1 | **Dataset Ingestion Agent** | Read Excel, CSV, TSV, Parquet, JSON, SQLite, DuckDB; auto-detect encoding, delimiter, worksheet |
+| 2 | **Schema Mapping Agent** | Map columns to UAMS v1.0; identify duplicates, synonyms, aliases |
+| 3 | **Ontology Mapping Agent** | Map variables to AGROVOC, Crop Ontology, Plant Ontology, ENVO, FAO |
+| 4 | **Unit Harmonization Agent** | Convert acre/ha, kg/acre→kg/ha, inch→cm, ppm, etc. |
+| 5 | **Quality Assurance Agent** | Detect duplicates, impossible values, outliers, mixed types |
+| 6 | **Feature Engineering Agent** | GDD, Heat Units, Harvest Index, NUE, WUE, interaction features |
+| 7 | **Leakage Detection Agent** | Flag post-harvest variables; set `Feature_Available_Before_Prediction` |
+| 8 | **Encoding Agent** | Crop_Code, Season_Code, Variety_Code, Fertilizer_Code, etc. |
+| 9 | **Statistical Diagnostics Agent** | Mean, median, skewness, kurtosis, correlation, VIF, normality tests |
+| 10 | **Model Readiness Agent** | Evaluate compatibility with 20+ model families |
+| 11 | **Documentation Agent** | Generate README, Dataset Card, Feature Dictionary, reports |
+| 12 | **Export Agent** | CSV, Parquet, SQLite, DuckDB, 15-sheet Excel workbook |
 
-## Requirements
-
-- Python 3.9+
-- pandas >= 2.0
-- numpy >= 1.24
-- openpyxl >= 3.1
-
-## Installation
+## Quick Start
 
 ```bash
 pip install -r requirements.txt
-```
 
-## Usage
+# Run via CLI
+python -m ades run input_dataset.xlsx
 
-1. Place crop master dataset Excel files in `data/master_datasets/`
-2. Run the generator:
+# Or using the ades command (after setup)
+ades run input_dataset.xlsx
 
-```bash
+# Legacy entry point (backward compatible)
 python universal_schema_generator.py
 ```
 
-Output files are written to `outputs/`:
+## Outputs
+
+All outputs written to `outputs/`:
 
 | File | Description |
-|---|---|
-| `Universal_Agricultural_Schema.xlsx` | Merged dataset with all standardized columns |
-| `MachineLearning_Dataset.csv` | Ready-to-use CSV for ML model training |
-| `Schema_Metadata.json` | Full schema definition, column groups, and mapping history |
-| `Validation_Report.xlsx` | Validation check results |
+|------|-------------|
+| `Universal_Agricultural_ML_Master.csv` | Full ML-ready dataset |
+| `Universal_Agricultural_ML_Master.parquet` | Columnar storage format |
+| `Universal_Agricultural_ML_Master.sqlite` | SQLite database |
+| `Universal_Agricultural_ML_Master.duckdb` | DuckDB database (if duckdb installed) |
+| `Universal_Agricultural_Machine_Learning_Schema_v1.xlsx` | 15-sheet Excel workbook |
+| `Variable_Mapping.csv` | Column mapping history |
+| `Ontology_Mapping.csv` | Ontology term mappings |
+| `Quality_Report.md` | Data quality findings |
+| `Model_Readiness_Report.md` | Model compatibility report |
+| Various reports | Statistics, VIF, missing data, validation |
 
-## Schema Overview (105 columns)
+## Architecture Details
 
-| Group | Columns |
-|---|---|
-| A. Paper Metadata | Paper_ID, DOI, Journal, Year, Authors, Country |
-| B. Crop Information | Crop, Scientific_Name, Variety, Season, Growth_Duration_Days |
-| C. Experimental Design | Design, Replications, Plot_Size, Spacing_Row, Spacing_Plant, Sample_Size, Location, State, Site |
-| D. Environment | Latitude, Longitude, Altitude, Temperature_Max/Min/Avg, Rainfall, Humidity |
-| E. Soil Properties | Soil_pH, EC, Organic_Carbon/Matter, N, P, K, S, Fe, Cu, Mn, Zn, Ca, Mg, B, Mo |
-| F. Fertilizer | Treatment, Fertilizer_Name, Organic_Fertilizer, Biofertilizer, Dose, Application_Method/Interval |
-| G. Growth Parameters | Shoot/Root Length, Plant Height, Biomass, Leaf Area, Leaf Number, Tillers, SPAD, Dry Matter, Branches, Flowers |
-| H. Yield | Yield_per_Plot/Acre/Hectare, Fruit Number/Weight/Diameter, Spike Length, Seeds/Spike, 100-Seed Weight |
-| I. Grain Quality | Protein, Ash, Gluten, Fiber, Carbohydrates, Fat, N/P/K/Fe/Cu/Zn Content |
-| J. ML Targets | Target_Yield, Target_Fertilizer, Target_N/P/K |
+- **Plugin-based**: each agent is independent with its own prompts, config, tests, logging, and retry logic
+- **JSON contracts**: agents communicate only through structured `AgentContract` objects via `ades/contracts/messages.py`
+- **Checkpoint recovery**: orchestrator saves parquet checkpoints per step; supports `--incremental` mode
+- **Provenance**: full pipeline execution log written to `Pipeline_Provenance.json`
 
-## Column Name Standardization
+## Running Tests
 
-The mapper recognises hundreds of synonymous column name variants:
+```bash
+pytest tests/ -v
+pytest tests/ --cov=ades --cov-report=term
+```
 
-| Source examples | Standard name |
-|---|---|
-| `Tmax_C`, `Temp_Max`, `Max_Temperature` | `Temperature_Max` |
-| `Available_N`, `Nitrogen`, `N`, `Nitrogen_kg_ha` | `Nitrogen` |
-| `PlantHeight_120_cm`, `Plant_Height`, `Plant_height_cm` | `Plant_Height_cm` |
-| `Chlorophyll_SPAD`, `SPAD`, `Chlorophyll_Content` | `SPAD` |
-| `Organic_C`, `Organic_Carbon`, `Organic_Carbon_%` | `Organic_Carbon` |
-| `Yield_Plot`, `Yield_per_Plot_g`, `Fresh_Weight_g` | `Yield_per_Plot` |
+## Project Structure
 
-## Adding a New Crop Dataset
+```
+├── ades/                      # Core ADES package
+│   ├── agents/                # 12 specialized agents
+│   ├── config/                # UAMS schema + settings
+│   ├── contracts/             # JSON inter-agent contracts
+│   ├── utils/                 # Logging + IO utilities
+│   ├── orchestrator.py        # Orchestrator Agent
+│   └── cli.py                # CLI entry point
+├── tests/                     # Automated tests
+├── data/master_datasets/      # Input Excel files (gitignored)
+├── outputs/                   # Generated outputs (gitignored)
+└── universal_schema_generator.py  # Backward-compatible wrapper
+```
 
-Simply drop an `.xlsx` file into `data/master_datasets/` and re-run the script. The generator will:
+## License
 
-1. Auto-detect the crop name from the filename or data
-2. Map its columns via the pattern-and-dictionary matcher
-3. Add any new standard columns automatically
-4. Merge into the existing schema
-
-No code changes required.
-
-## Privacy
-
-This repository contains **only** reusable source code and configuration. Actual crop datasets, generated outputs, and experimental results must be placed in `data/` and `outputs/` which are excluded by `.gitignore`.
+See repository license.
