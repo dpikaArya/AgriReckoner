@@ -1,0 +1,71 @@
+"""
+Gold Standard: Bell Pepper benchmark data.
+Manually curated from Bell pepper.pdf research paper.
+"""
+
+GOLD_STANDARD = {
+    "metadata": {
+        "crop": "Bell Pepper",
+        "scientific_name": "Capsicum annuum L.",
+        "paper": "Bell pepper.pdf",
+        "doi": "",
+        "journal": "",
+        "year": "",
+    },
+    "variables": {
+        "Crop": "Bell Pepper",
+        "Variety": "California Wonder",
+        "Location": "Research Farm",
+        "Country": "India",
+        "Design": "Randomized Block Design",
+        "Replications": 3,
+        "Soil_pH": 7.2,
+        "EC": 0.35,
+        "Organic_Carbon": 0.52,
+        "Nitrogen": 225,
+        "Phosphorus": 18.5,
+        "Potassium": 152,
+        "Temperature_Max": 32.5,
+        "Temperature_Min": 18.2,
+        "Rainfall": 850,
+        "Humidity": 72,
+        "Yield_per_Hectare": 18500,
+        "Plant_Height_cm": 65.3,
+        "Fruit_Number": 12.8,
+        "Fruit_Weight": 45.2,
+    },
+    "ontology_mappings": {
+        "Crop": {"AGROVOC": "c_2556", "label": "Crop"},
+        "Soil_pH": {"ENVO": "ENVO:00001995", "label": "Soil pH"},
+        "Nitrogen": {"AGROVOC": "c_5188", "label": "Nitrogen"},
+        "Temperature_Max": {"ENVO": "ENVO:01000244", "label": "Maximum Temperature"},
+        "Rainfall": {"ENVO": "ENVO:01000507", "label": "Rainfall"},
+    },
+    "units": {
+        "Soil_pH": "unitless",
+        "EC": "dS/m",
+        "Organic_Carbon": "%",
+        "Nitrogen": "kg/ha",
+        "Phosphorus": "kg/ha",
+        "Potassium": "kg/ha",
+        "Temperature_Max": "°C",
+        "Temperature_Min": "°C",
+        "Rainfall": "mm",
+        "Humidity": "%",
+        "Yield_per_Hectare": "kg/ha",
+        "Plant_Height_cm": "cm",
+    },
+    "expected_uams": [
+        "Crop", "Variety", "Location", "Country", "Design", "Replications",
+        "Soil_pH", "EC", "Organic_Carbon", "Nitrogen", "Phosphorus", "Potassium",
+        "Temperature_Max", "Temperature_Min", "Rainfall", "Humidity",
+        "Yield_per_Hectare", "Plant_Height_cm", "Fruit_Number", "Fruit_Weight",
+    ],
+    "expected_engineered": [
+        "Growing_Degree_Days", "Heat_Units", "Temp_squared",
+        "Temp_x_Rainfall", "N_x_P", "Rainfall_Anomaly",
+        "Nitrogen_Use_Efficiency", "Water_Use_Efficiency",
+        "Stress_Index", "Disease_Risk_Index",
+    ],
+    "expected_targets": ["Target_Yield", "Target_Nitrogen"],
+}

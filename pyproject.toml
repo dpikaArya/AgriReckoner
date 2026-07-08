@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ades"
+version = "1.0.0"
+description = "Agricultural Data Engineering System - Agentic AI pipeline for agricultural ML datasets"
+requires-python = ">=3.9"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "openpyxl>=3.1",
+    "scikit-learn>=1.3",
+    "scipy>=1.10",
+    "pyarrow>=10.0",
+]
+
+[project.scripts]
+ades = "ades.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["ades*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,305 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "description": "Fuzzy expert rules for agronomist-style fertilizer recommendations",
+    "inference": "Mamdani + symbolic rule evaluation",
+    "defuzzification": "centroid"
+  },
+  "variables": {
+    "input": ["Nitrogen", "Phosphorus", "Potassium", "Zinc", "Soil_pH", "Rainfall", "Temperature_Max", "Organic_Carbon", "Growth_Stage", "Yield_Prediction"],
+    "output_numeric": ["Nitrogen_Adjustment", "Potash_Adjustment", "Irrigation_Adjustment", "Dose_Adjustment"],
+    "output_symbolic": ["N_Action", "P_Action", "K_Action", "Zinc_Action", "Risk", "Confidence"]
+  },
+  "rules": [
+    {
+      "name": "LowN_HighRain_LowOC",
+      "description": "Nitrogen deficient, heavy rain, low organic carbon: boost N",
+      "priority": 10,
+      "antecedents": [
+        {"var": "Nitrogen", "set": "low"},
+        {"var": "Rainfall", "set": "high"},
+        {"var": "Organic_Carbon", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "increase", "amount": 20, "unit": "%"},
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "high"},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "low"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "high"},
+        {"type": "risk", "level": "medium"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "HighpH_LowZinc",
+      "description": "Alkaline soil with low zinc: recommend zinc foliar spray",
+      "priority": 9,
+      "antecedents": [
+        {"var": "Soil_pH", "set": "alkaline"},
+        {"var": "Zinc", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Zinc", "action": "apply_foliar_spray", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "medium"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "HighYield_MediumK",
+      "description": "High yield prediction with medium potassium: maintain schedule",
+      "priority": 8,
+      "antecedents": [
+        {"var": "Yield_Prediction", "set": "high"},
+        {"var": "Potassium", "set": "medium"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Potash_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "LowN_LowRain",
+      "description": "Nitrogen deficient, dry conditions: boost N and increase irrigation",
+      "priority": 8,
+      "antecedents": [
+        {"var": "Nitrogen", "set": "low"},
+        {"var": "Rainfall", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "increase", "amount": 25, "unit": "%"},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "high"},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "high"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "high"},
+        {"type": "confidence", "level": "medium"}
+      ]
+    },
+    {
+      "name": "LowP_Acidic",
+      "description": "Phosphorus deficient in acidic soil: increase P",
+      "priority": 9,
+      "antecedents": [
+        {"var": "Phosphorus", "set": "low"},
+        {"var": "Soil_pH", "set": "acidic"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Phosphorus", "action": "increase", "amount": 15, "unit": "%"},
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "high"},
+        {"type": "risk", "level": "high"},
+        {"type": "confidence", "level": "medium"}
+      ]
+    },
+    {
+      "name": "LowK_SandySoil",
+      "description": "Potassium deficient: boost potash application",
+      "priority": 7,
+      "antecedents": [
+        {"var": "Potassium", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Potassium", "action": "increase", "amount": 20, "unit": "%"},
+        {"type": "adjustment", "var": "Potash_Adjustment", "set": "high"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "high"},
+        {"type": "risk", "level": "medium"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "Hot_Dry",
+      "description": "High temperature and low rainfall: increase irrigation",
+      "priority": 9,
+      "antecedents": [
+        {"var": "Temperature_Max", "set": "hot"},
+        {"var": "Rainfall", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "high"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "low"},
+        {"type": "risk", "level": "high"},
+        {"type": "confidence", "level": "medium"}
+      ]
+    },
+    {
+      "name": "Cool_Wet",
+      "description": "Cool and wet: reduce irrigation, maintain nutrition",
+      "priority": 6,
+      "antecedents": [
+        {"var": "Temperature_Max", "set": "cool"},
+        {"var": "Rainfall", "set": "high"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "low"},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "LowOC_AnyRain",
+      "description": "Low organic carbon: increase organic matter inputs",
+      "priority": 7,
+      "antecedents": [
+        {"var": "Organic_Carbon", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "increase", "amount": 10, "unit": "%"},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "medium"},
+        {"type": "confidence", "level": "medium"}
+      ]
+    },
+    {
+      "name": "Alkaline_HighN",
+      "description": "Alkaline soil with sufficient N: maintain, monitor micronutrients",
+      "priority": 5,
+      "antecedents": [
+        {"var": "Soil_pH", "set": "alkaline"},
+        {"var": "Nitrogen", "set": "high"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Zinc", "action": "monitor", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "AllOptimal",
+      "description": "All conditions optimal: maintain current program",
+      "priority": 3,
+      "antecedents": [
+        {"var": "Nitrogen", "set": "medium"},
+        {"var": "Phosphorus", "set": "medium"},
+        {"var": "Potassium", "set": "medium"},
+        {"var": "Soil_pH", "set": "neutral"},
+        {"var": "Rainfall", "set": "medium"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Phosphorus", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Potash_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "LowYield_HighN",
+      "description": "Low yield prediction despite high nitrogen: review N program",
+      "priority": 7,
+      "antecedents": [
+        {"var": "Yield_Prediction", "set": "low"},
+        {"var": "Nitrogen", "set": "high"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "review", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "low"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "low"},
+        {"type": "risk", "level": "high"},
+        {"type": "confidence", "level": "medium"}
+      ]
+    },
+    {
+      "name": "LowZinc_Sandy_HighRain",
+      "description": "Low zinc in sandy soil with heavy rain: zinc deficiency likely",
+      "priority": 8,
+      "antecedents": [
+        {"var": "Zinc", "set": "low"},
+        {"var": "Rainfall", "set": "high"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Zinc", "action": "apply_foliar_spray", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "high"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "HighYield_AllOptimal",
+      "description": "High yield prediction with all nutrients optimal: minimal intervention",
+      "priority": 4,
+      "antecedents": [
+        {"var": "Yield_Prediction", "set": "high"},
+        {"var": "Nitrogen", "set": "medium"},
+        {"var": "Phosphorus", "set": "medium"},
+        {"var": "Potassium", "set": "medium"},
+        {"var": "Soil_pH", "set": "neutral"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Phosphorus", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Potash_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "AllMedium_HighRain",
+      "description": "All nutrients medium, high rainfall: maintain schedule, increase irrigation interval",
+      "priority": 4,
+      "antecedents": [
+        {"var": "Nitrogen", "set": "medium"},
+        {"var": "Phosphorus", "set": "medium"},
+        {"var": "Potassium", "set": "medium"},
+        {"var": "Soil_pH", "set": "neutral"},
+        {"var": "Rainfall", "set": "high"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Phosphorus", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Potash_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "low"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    },
+    {
+      "name": "AllMedium_LowRain",
+      "description": "All nutrients medium, low rainfall: maintain nutrients, increase irrigation",
+      "priority": 4,
+      "antecedents": [
+        {"var": "Nitrogen", "set": "medium"},
+        {"var": "Phosphorus", "set": "medium"},
+        {"var": "Potassium", "set": "medium"},
+        {"var": "Soil_pH", "set": "neutral"},
+        {"var": "Rainfall", "set": "low"}
+      ],
+      "consequents": [
+        {"type": "nutrient", "nutrient": "Nitrogen", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Phosphorus", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "nutrient", "nutrient": "Potassium", "action": "maintain", "amount": 0, "unit": ""},
+        {"type": "adjustment", "var": "Nitrogen_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Potash_Adjustment", "set": "medium"},
+        {"type": "adjustment", "var": "Irrigation_Adjustment", "set": "high"},
+        {"type": "adjustment", "var": "Dose_Adjustment", "set": "medium"},
+        {"type": "risk", "level": "low"},
+        {"type": "confidence", "level": "high"}
+      ]
+    }
+  ]
+}
