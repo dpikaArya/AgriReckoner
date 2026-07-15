@@ -15,6 +15,28 @@ import pandas as pd
 import numpy as np
 
 
+def _find_poppler_pdftotext() -> Optional[str]:
+    """Locate pdftotext binary from common install locations."""
+    import shutil
+    found = shutil.which("pdftotext")
+    if found:
+        return found
+    for d in [
+        r"C:\poppler\poppler-24.08.0\Library\bin",
+        r"C:\poppler\Library\bin",
+        r"C:\poppler\bin",
+        r"C:\Program Files\poppler\Library\bin",
+        "/usr/local/bin",
+        "/usr/bin",
+        "/opt/homebrew/bin",
+    ]:
+        for name in ("pdftotext", "pdftotext.exe"):
+            candidate = os.path.join(d, name)
+            if os.path.isfile(candidate):
+                return candidate
+    return None
+
+
 BASE_DIR = Path(__file__).parent.parent.resolve()
 OUTPUT_DIR = BASE_DIR / "outputs"
 EVAL_DIR = BASE_DIR / "evaluation"
@@ -104,7 +126,7 @@ def get_uams_cols() -> list:
     try:
         import sys
         sys.path.insert(0, str(BASE_DIR))
-        from ades.config.schema import UAMS_COLUMNS
+        from agri_ai_agent.config.schema import UAMS_COLUMNS
         return UAMS_COLUMNS
     except ImportError:
         return []
@@ -123,13 +145,17 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         return pdfminer_extract(pdf_path)
     except ImportError:
         pass
+    # Try Poppler (pdftotext)
     try:
-        result = subprocess.run(
-            ["pdftotext", pdf_path, "-"],
-            capture_output=True, text=True, timeout=30
-        )
-        if result.returncode == 0:
-            return result.stdout
+        poppler_bin = _find_poppler_pdftotext()
+        if poppler_bin:
+            result = subprocess.run(
+                [poppler_bin, "-layout", pdf_path, "-"],
+                capture_output=True, text=True, timeout=30,
+                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
+            )
+            if result.returncode == 0 and result.stdout.strip():
+                return result.stdout
     except Exception:
         pass
     try:

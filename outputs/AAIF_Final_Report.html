@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AAIF Final Report</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #f5f7fa; color: #2c3e50; line-height: 1.6; }
+.header { background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; padding: 32px; }
+.header h1 { font-size: 28px; }
+.header p { opacity: 0.85; margin-top: 4px; }
+.container { max-width: 1000px; margin: 0 auto; padding: 24px; }
+.card { background: white; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 24px; margin-bottom: 20px; }
+.card h2 { font-size: 18px; color: #27ae60; margin-bottom: 16px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+.stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+.stat { background: white; border-radius: 10px; padding: 20px; flex: 1; min-width: 150px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); text-align: center; }
+.stat .value { font-size: 32px; font-weight: 700; color: #27ae60; }
+.stat .label { font-size: 13px; color: #7f8c8d; margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
+th { background: #f8f9fa; font-weight: 600; color: #555; }
+tr:hover { background: #f0faf4; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.badge-success { background: #d4efdf; color: #1e8449; }
+.badge-warning { background: #fdebd0; color: #b9770e; }
+.badge-danger { background: #fadbd8; color: #c0392b; }
+.footer { text-align: center; padding: 24px; color: #95a5a6; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Agentic Agricultural Intelligence Framework</h1>
+<p>Final Execution Report — Generated: 2026-07-15 14:20:28</p>
+</div>
+<div class="container">
+
+<div class="stats">
+<div class="stat"><div class="value">24</div><div class="label">Papers Processed</div></div>
+<div class="stat"><div class="value">23</div><div class="label">Crops Detected</div></div>
+<div class="stat"><div class="value">21</div><div class="label">Rows Extracted</div></div>
+<div class="stat"><div class="value">8</div><div class="label">Features Created</div></div>
+<div class="stat"><div class="value">3</div><div class="label">Models Trained</div></div>
+</div>
+
+<div class="card">
+<h2>Phase 1 — Ingestion</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Total PDFs found</td><td>24</td></tr>
+<tr><td>New papers</td><td>21</td></tr>
+<tr><td>Duplicates</td><td>3</td></tr>
+<tr><td>Ingestion report</td><td>outputs/ingestion_report.xlsx</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 2-3 — AI Extraction &amp; Universal Schema</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Variables extracted</td><td>21</td></tr>
+<tr><td>Schema columns</td><td>138</td></tr>
+<tr><td>Universal Schema XLSX</td><td>outputs/Universal_Agricultural_Schema.xlsx</td></tr>
+<tr><td>Universal Schema CSV</td><td>outputs/Universal_Agricultural_Schema.csv</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 4 — Validation</h2>
+<table>
+<tr><th>Issue</th><th>Count</th></tr>
+<tr><td>Missing Values</td><td>131</td></tr>
+<tr><td>Duplicate Records</td><td>0</td></tr>
+<tr><td>Impossible Values</td><td>4</td></tr>
+<tr><td>Outliers</td><td>0</td></tr>
+<tr><td>Ocr Mistakes</td><td>0</td></tr>
+<tr><td>Unit Inconsistencies</td><td>0</td></tr>
+<tr><td>Column Consistency</td><td>1</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 5 — Feature Engineering</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Features created</td><td>8</td></tr>
+<tr><td>Feature dataset</td><td>outputs/features_dataset.csv</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 6 — Model Training</h2>
+<table>
+<tr><th>Model</th><th>R²</th><th>RMSE</th><th>MAE</th><th>MAPE</th></tr>
+<tr><td>Multiple_Linear_Regression</td><td>nan</td><td>28.4525</td><td>28.4525</td><td>85.69%</td></tr>
+<tr><td>XGBoost</td><td>nan</td><td>28.4525</td><td>28.4525</td><td>85.69%</td></tr>
+<tr><td>Random_Forest</td><td>nan</td><td>28.4525</td><td>28.4525</td><td>85.69%</td></tr>
+</table>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Best model</td><td>nan (Multiple_Linear_Regression)</td></tr>
+<tr><td>Samples trained</td><td>2</td></tr>
+<tr><td>Features used</td><td>26</td></tr>
+<tr><td>XGBoost model</td><td>models/xgboost_model.pkl</td></tr>
+<tr><td>Regression model</td><td>models/regression_model.pkl</td></tr>
+<tr><td>Model metrics</td><td>outputs/model_metrics.xlsx</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 7 — Fuzzy Logic</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Rules</td><td>14</td></tr>
+<tr><td>Input variables</td><td>10</td></tr>
+<tr><td>Rules file</td><td>fuzzy_logic/fertilizer_rules.yaml</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 8 — Recommendations</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Recommendations generated</td><td>21</td></tr>
+<tr><td>Recommendations file</td><td>outputs/recommendations/fertilizer_recommendations.xlsx</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 9 — Ready Reckoner</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Entries</td><td>21</td></tr>
+<tr><td>Ready Reckoner XLSX</td><td>outputs/Ready_Reckoner.xlsx</td></tr>
+<tr><td>Ready Reckoner PDF</td><td>outputs/Ready_Reckoner.pdf</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Phase 10 — Continuous Learning</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Database</td><td>database/paper_registry.sqlite</td></tr>
+<tr><td>Papers registered</td><td>24</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h2>Failed Stages</h2>
+<p><span class="badge badge-success">All stages completed successfully</span></p>
+
+</div>
+</div>
+<div class="footer">Agentic Agricultural Intelligence Framework (AAIF) v1.0</div>
+</body>
+</html>

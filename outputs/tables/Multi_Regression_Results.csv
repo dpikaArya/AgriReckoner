@@ -1,0 +1,4 @@
+﻿Variable,Coefficient,Std_Error,t_value,p_value,Significance,CI_Lower,CI_Upper,Std_Coefficient
+const,33.2025,0.95789,34.6621,0.0,***,31.035602,35.369398,33.2025
+Spike_Length,-22.008851,1.849073,-11.9026,1e-06,***,-26.191744,-17.825958,-22.008851
+Table_Row,6.730868,1.849073,3.6401,0.0054,**,2.547975,10.913761,6.730868

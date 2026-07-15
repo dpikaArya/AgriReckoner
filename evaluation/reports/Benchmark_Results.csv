@@ -1,0 +1,13 @@
+crop,metric,value
+Bell Pepper,variable_precision,1.0
+Bell Pepper,variable_recall,1.0
+Bell Pepper,variable_f1,1.0
+Bell Pepper,schema_f1,1.0
+Bell Pepper,ontology_coverage,0.4
+Bell Pepper,extraction_accuracy,1.0
+Black Wheat,variable_precision,1.0
+Black Wheat,variable_recall,1.0
+Black Wheat,variable_f1,1.0
+Black Wheat,schema_f1,1.0
+Black Wheat,ontology_coverage,0.4
+Black Wheat,extraction_accuracy,1.0

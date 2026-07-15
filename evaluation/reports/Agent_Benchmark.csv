@@ -1,0 +1,13 @@
+﻿agent,execution_time_sec,execution_time_formatted,input_size_bytes,output_size_bytes,success,retry_count,exceptions,warnings,avg_latency_sec,memory_usage_mb,status
+ingestion,0.0042,0.00s,0,0,1,0,0,0,0.0042,0,success
+schema_mapping,0.0536,0.05s,0,0,1,0,0,0,0.0536,0,success
+ontology_mapping,0.0047,0.00s,0,0,1,0,0,0,0.0047,0,success
+unit_harmonization,0.0033,0.00s,0,0,1,0,0,0,0.0033,0,success
+quality_assurance,0.1293,0.13s,0,0,1,0,0,0,0.1293,0,success
+feature_engineering,0.0331,0.03s,0,0,1,0,0,0,0.0331,0,success
+leakage_detection,0.0358,0.04s,0,0,1,0,0,0,0.0358,0,success
+encoding,0.0369,0.04s,0,0,1,0,0,0,0.0369,0,success
+statistical_diagnostics,0.6239,0.62s,0,0,1,0,0,0,0.6239,0,success
+model_readiness,0.0068,0.01s,0,0,1,0,0,0,0.0068,0,success
+documentation,0.3966,0.40s,0,0,1,0,0,0,0.3966,0,success
+export,0.6622,0.66s,0,0,1,0,0,0,0.6622,0,success

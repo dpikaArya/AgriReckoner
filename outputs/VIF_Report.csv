@@ -1,0 +1,8 @@
+﻿Variable,VIF
+Temperature_Max,inf
+Rainfall,inf
+Dose,inf
+Temp_squared,inf
+Temperature_Max_7d_MA,inf
+Temperature_Min_7d_MA,inf
+Average_Temperature_7d_MA,inf

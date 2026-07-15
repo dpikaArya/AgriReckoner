@@ -1,103 +1,121 @@
-# -------------------------
+# ===========================
 # Python
-# -------------------------
+# ===========================
 __pycache__/
 *.py[cod]
+*$py.class
 *.pyo
 *.pyd
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
 
-# -------------------------
+# ===========================
 # Virtual Environments
-# -------------------------
+# ===========================
 .venv/
 venv/
 env/
+ENV/
 
-# -------------------------
-# IDE
-# -------------------------
+# ===========================
+# Testing / Coverage
+# ===========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ===========================
+# Type Checking / Linting
+# ===========================
+.mypy_cache/
+.ruff_cache/
+.pytype/
+
+# ===========================
+# IDE / Editor
+# ===========================
 .vscode/
 .idea/
 *.swp
+*.swo
+*~
+.project
+.settings/
 
-# -------------------------
-# Operating System
-# -------------------------
+# ===========================
+# OS Files
+# ===========================
 .DS_Store
 Thumbs.db
+Desktop.ini
+ehthumbs.db
 
-# -------------------------
-# Logs
-# -------------------------
-logs/
-*.log
+# ===========================
+# Source PDFs (too large for git)
+# ===========================
+Data ADES/*.pdf
 
-# -------------------------
-# Cache
-# -------------------------
-.cache/
-tmp/
-temp/
-
-# -------------------------
-# Build
-# -------------------------
-build/
-dist/
-artifacts/
-
-# -------------------------
-# Generated Outputs
-# -------------------------
-output/
-outputs/
-results/
-reports/
-exports/
-generated/
-merged/
-
-# -------------------------
-# Datasets (privacy)
-# -------------------------
-data/
-dataset/
-datasets/
-input/
-inputs/
-sample_data/
-samples/
-test_data/
-
-*.csv
-*.tsv
-*.xlsx
-*.xls
-*.ods
+# ===========================
+# Large Binary Data
+# ===========================
 *.parquet
 *.feather
-*.db
-*.sqlite
-*.sqlite3
+*.duckdb
 
-# Ignore only DATA json files
-data/**/*.json
-dataset/**/*.json
-datasets/**/*.json
-input/**/*.json
-inputs/**/*.json
+# ===========================
+# Master Dataset Excel files (large)
+# ===========================
+*_Master_Dataset.xlsx
+*_Master dataset.xlsx
+data/master_datasets/
 
-# Ignore JSONL datasets
-*.jsonl
+# ===========================
+# Large Excel files (schema copies)
+# ===========================
+*_Master_Learning_Schema*.xlsx
+*_Agricultural_Schema.xlsx
+outputs/Universal_Agricultural_Machine_Learning_Schema_v1.xlsx
+outputs/Universal_Agricultural_Schema.xlsx
+outputs/hybrid/Universal_Agricultural_Schema.xlsx
+Data ADES/*.xlsx
 
-# -------------------------
+# ===========================
+# Generated outputs at runtime
+# ===========================
+agri_ai_agent/outputs/
+outputs/*.sqlite
+
+# ===========================
+# Logs & Temp
+# ===========================
+logs/
+*.log
+tmp/
+temp/
+.cache/
+
+# ===========================
+# Jupyter
+# ===========================
+.ipynb_checkpoints/
+
+# ===========================
+# Model cache / Downloads
+# ===========================
+model_cache/
+ollama/
+.cache/
+sentence_transformers/
+
+# ===========================
 # Secrets
-# -------------------------
+# ===========================
 .env
 .env.*
 *.key
@@ -105,10 +123,3 @@ inputs/**/*.json
 credentials.*
 token.*
 secrets.*
-
-# -------------------------
-# Local AI caches
-# -------------------------
-models/
-model_cache/
-ollama/

@@ -40,9 +40,9 @@ def run_pipeline(input_path=None):
     -------
     pd.DataFrame : the final merged & engineered dataset.
     """
-    from ades.config.settings import ADESSettings
-    from ades.orchestrator import Orchestrator
-    from ades.utils.logging_utils import setup_logging
+    from agri_ai_agent.config.settings import AgriAISettings as ADESSettings
+    from agri_ai_agent.orchestrator import Orchestrator
+    from agri_ai_agent.utils.logging_utils import setup_logging
 
     settings = ADESSettings()
     setup_logging(level=settings.LOG_LEVEL, log_dir=settings.LOG_DIR)

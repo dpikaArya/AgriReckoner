@@ -1,0 +1,217 @@
+{
+  "pipeline_id": "ADES_20260707_220132",
+  "pipeline_version": "2.0.0",
+  "status": "completed",
+  "started_at": "2026-07-07 22:01:32.066078",
+  "completed_at": "2026-07-07 22:01:32.602660",
+  "completed_agents": [
+    "ingestion",
+    "document_understanding",
+    "scientific_extraction",
+    "evidence_validation",
+    "evidence_traceability",
+    "ontology_mapping",
+    "schema_mapping",
+    "unit_harmonization",
+    "quality_assurance",
+    "feature_engineering",
+    "leakage_detection",
+    "encoding",
+    "statistical_diagnostics",
+    "model_readiness",
+    "documentation",
+    "export",
+    "training",
+    "prediction",
+    "fuzzy"
+  ],
+  "failed_agents": [],
+  "results": {
+    "ingestion": {
+      "status": "success",
+      "execution_time_sec": 0.000314,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    },
+    "document_understanding": {
+      "status": "success",
+      "execution_time_sec": 0.001977,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Document_Structures.json"
+      ]
+    },
+    "scientific_extraction": {
+      "status": "success",
+      "execution_time_sec": 0.001162,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Scientific_Extractions.json",
+        "/Users/deepika/Desktop/UAS folder/outputs/Extraction_Report.md"
+      ]
+    },
+    "evidence_validation": {
+      "status": "success",
+      "execution_time_sec": 0.001224,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Validated_Extractions.json",
+        "/Users/deepika/Desktop/UAS folder/outputs/Evidence_Validation_Report.md"
+      ]
+    },
+    "evidence_traceability": {
+      "status": "success",
+      "execution_time_sec": 0.002085,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Evidence_Traceability.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Provenance_Registry.json"
+      ]
+    },
+    "ontology_mapping": {
+      "status": "success",
+      "execution_time_sec": 0.00346,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Ontology_Mapping.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Ontology_Coverage_Report.md"
+      ]
+    },
+    "schema_mapping": {
+      "status": "success",
+      "execution_time_sec": 0.05591,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Variable_Mapping.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Schema_Mapping_Report.md"
+      ]
+    },
+    "unit_harmonization": {
+      "status": "success",
+      "execution_time_sec": 0.003915,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Unit_Conversion_Report.md"
+      ]
+    },
+    "quality_assurance": {
+      "status": "success",
+      "execution_time_sec": 0.090726,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Quality_Report.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Validation_Report.csv"
+      ]
+    },
+    "feature_engineering": {
+      "status": "success",
+      "execution_time_sec": 0.006275,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Feature_Engineering_Report.md"
+      ]
+    },
+    "leakage_detection": {
+      "status": "success",
+      "execution_time_sec": 0.005469,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Leakage_Report.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Feature_Availability_Check.csv"
+      ]
+    },
+    "encoding": {
+      "status": "success",
+      "execution_time_sec": 0.006584,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    },
+    "statistical_diagnostics": {
+      "status": "success",
+      "execution_time_sec": 0.050456,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Statistical_Profile.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Correlation_Matrix.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/VIF_Report.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Missing_Value_Profile.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Outlier_Profile.csv"
+      ]
+    },
+    "model_readiness": {
+      "status": "success",
+      "execution_time_sec": 0.015316,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Model_Readiness_Report.md"
+      ]
+    },
+    "documentation": {
+      "status": "success",
+      "execution_time_sec": 0.115767,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Feature_Dictionary.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Missing_Data_Report.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Data_Validation_Report.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Pipeline_Log.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Dataset_Card.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Ontology_Dictionary.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/FAIR_Compliance_Report.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Reproducibility_Report.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Publication_Checklist.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Architecture.md",
+        "/Users/deepika/Desktop/UAS folder/outputs/Developer_Guide.md"
+      ]
+    },
+    "export": {
+      "status": "success",
+      "execution_time_sec": 0.170335,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": [
+        "/Users/deepika/Desktop/UAS folder/outputs/Universal_Agricultural_ML_Master.csv",
+        "/Users/deepika/Desktop/UAS folder/outputs/Universal_Agricultural_ML_Master.parquet",
+        "/Users/deepika/Desktop/UAS folder/outputs/recommendation_dashboard.html",
+        "/Users/deepika/Desktop/UAS folder/outputs/recommendation_report.html",
+        "/Users/deepika/Desktop/UAS folder/outputs/recommendations/recommendation_report.csv"
+      ]
+    },
+    "training": {
+      "status": "success",
+      "execution_time_sec": 0.00184,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    },
+    "prediction": {
+      "status": "success",
+      "execution_time_sec": 0.000228,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    },
+    "fuzzy": {
+      "status": "success",
+      "execution_time_sec": 0.000847,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    }
+  }
+}

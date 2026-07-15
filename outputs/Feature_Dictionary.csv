@@ -1,0 +1,143 @@
+﻿Column,Data_Type,Unique_Values,Missing_Count,Missing_Pct,Sample_Values,Schema_Group,Role,Description
+Paper_ID,object,0,1,100.0,[],Metadata,metadata,Unique identifier for the source research paper
+DOI,object,0,1,100.0,[],Metadata,metadata,Digital Object Identifier of the source paper
+Journal,object,0,1,100.0,[],Other,metadata,Agricultural variable: Journal
+Year,object,0,1,100.0,[],Other,metadata,Agricultural variable: Year
+Authors,object,0,1,100.0,[],Other,metadata,Agricultural variable: Authors
+Country,object,0,1,100.0,[],Other,feature,Agricultural variable: Country
+Crop,object,0,1,100.0,[],Crop Info,feature,Common name of the crop species
+Scientific_Name,object,0,1,100.0,[],Other,feature,Agricultural variable: Scientific_Name
+Variety,object,0,1,100.0,[],Crop Info,feature,Cultivar or variety name
+Season,object,0,1,100.0,[],Other,feature,Agricultural variable: Season
+Growth_Duration_Days,object,0,1,100.0,[],Other,feature,Agricultural variable: Growth_Duration_Days
+Growth_Stage,object,0,1,100.0,[],Other,feature,Agricultural variable: Growth_Stage
+Design,object,0,1,100.0,[],Other,feature,Agricultural variable: Design
+Replications,object,0,1,100.0,[],Other,feature,Agricultural variable: Replications
+Plot_Size,object,0,1,100.0,[],Other,feature,Agricultural variable: Plot_Size
+Spacing_Row,object,0,1,100.0,[],Other,feature,Agricultural variable: Spacing_Row
+Spacing_Plant,object,0,1,100.0,[],Other,feature,Agricultural variable: Spacing_Plant
+Sample_Size,object,0,1,100.0,[],Other,feature,Agricultural variable: Sample_Size
+Location,object,0,1,100.0,[],Other,feature,Agricultural variable: Location
+State,object,0,1,100.0,[],Other,feature,Agricultural variable: State
+Site,object,0,1,100.0,[],Other,feature,Agricultural variable: Site
+Latitude,object,0,1,100.0,[],Other,feature,Agricultural variable: Latitude
+Longitude,object,0,1,100.0,[],Other,feature,Agricultural variable: Longitude
+Altitude,object,0,1,100.0,[],Other,feature,Agricultural variable: Altitude
+Temperature_Max,float64,1,0,0.0,[30.0],Weather,feature,Maximum temperature during growing season (°C)
+Temperature_Min,object,0,1,100.0,[],Weather,feature,Minimum temperature during growing season (°C)
+Average_Temperature,object,0,1,100.0,[],Weather,feature,Agricultural variable: Average_Temperature
+Rainfall,int64,1,0,0.0,[100],Weather,feature,Total rainfall during growing season (mm)
+Humidity,object,0,1,100.0,[],Other,feature,Agricultural variable: Humidity
+Soil_pH,object,0,1,100.0,[],Soil,feature,Soil pH value (0-14 scale)
+EC,object,0,1,100.0,[],Other,feature,Electrical conductivity of soil (dS/m)
+Organic_Carbon,object,0,1,100.0,[],Soil,feature,Soil organic carbon content (%)
+Organic_Matter,object,0,1,100.0,[],Other,feature,Agricultural variable: Organic_Matter
+Nitrogen,object,0,1,100.0,[],Fertilizer,feature,Available nitrogen in soil (kg/ha)
+Phosphorus,object,0,1,100.0,[],Fertilizer,feature,Available phosphorus in soil (kg/ha)
+Potassium,object,0,1,100.0,[],Other,feature,Available potassium in soil (kg/ha)
+Sulphur,object,0,1,100.0,[],Other,feature,Agricultural variable: Sulphur
+Iron,object,0,1,100.0,[],Other,feature,Agricultural variable: Iron
+Copper,object,0,1,100.0,[],Other,feature,Agricultural variable: Copper
+Manganese,object,0,1,100.0,[],Other,feature,Agricultural variable: Manganese
+Zinc,object,0,1,100.0,[],Other,feature,Agricultural variable: Zinc
+Calcium,object,0,1,100.0,[],Other,feature,Agricultural variable: Calcium
+Magnesium,object,0,1,100.0,[],Other,feature,Agricultural variable: Magnesium
+Boron,object,0,1,100.0,[],Other,feature,Agricultural variable: Boron
+Molybdenum,object,0,1,100.0,[],Other,feature,Agricultural variable: Molybdenum
+Treatment,object,0,1,100.0,[],Other,feature,Agricultural variable: Treatment
+Fertilizer_Name,object,0,1,100.0,[],Other,feature,Agricultural variable: Fertilizer_Name
+Organic_Fertilizer,object,0,1,100.0,[],Other,feature,Agricultural variable: Organic_Fertilizer
+Biofertilizer,object,0,1,100.0,[],Other,feature,Agricultural variable: Biofertilizer
+Dose,float64,0,1,100.0,[],Other,feature,Agricultural variable: Dose
+Application_Method,object,0,1,100.0,[],Other,feature,Agricultural variable: Application_Method
+Application_Interval,object,0,1,100.0,[],Other,feature,Agricultural variable: Application_Interval
+Shoot_Length_cm,object,0,1,100.0,[],Other,feature,Agricultural variable: Shoot_Length_cm
+Root_Length_cm,object,0,1,100.0,[],Other,feature,Agricultural variable: Root_Length_cm
+Plant_Height_cm,object,0,1,100.0,[],Other,feature,Agricultural variable: Plant_Height_cm
+Shoot_Biomass_g,object,0,1,100.0,[],Other,feature,Agricultural variable: Shoot_Biomass_g
+Root_Biomass_g,object,0,1,100.0,[],Other,feature,Agricultural variable: Root_Biomass_g
+Leaf_Area_cm2,object,0,1,100.0,[],Other,feature,Agricultural variable: Leaf_Area_cm2
+Leaf_Number,object,0,1,100.0,[],Other,feature,Agricultural variable: Leaf_Number
+Tillers,object,0,1,100.0,[],Other,feature,Agricultural variable: Tillers
+Root_Diameter_mm,object,0,1,100.0,[],Other,feature,Agricultural variable: Root_Diameter_mm
+SPAD,object,0,1,100.0,[],Other,feature,Agricultural variable: SPAD
+Moisture_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Moisture_Content
+Dry_Matter,object,0,1,100.0,[],Other,feature,Agricultural variable: Dry_Matter
+Stem_Diameter_mm,object,0,1,100.0,[],Other,feature,Agricultural variable: Stem_Diameter_mm
+Branches,object,0,1,100.0,[],Other,feature,Agricultural variable: Branches
+Nodes,object,0,1,100.0,[],Other,feature,Agricultural variable: Nodes
+Flowers,object,0,1,100.0,[],Other,feature,Agricultural variable: Flowers
+Plant_Height_30_cm,object,0,1,100.0,[],Other,feature,Agricultural variable: Plant_Height_30_cm
+Plant_Height_60_cm,object,0,1,100.0,[],Other,feature,Agricultural variable: Plant_Height_60_cm
+Plant_Height_90_cm,object,0,1,100.0,[],Other,feature,Agricultural variable: Plant_Height_90_cm
+Leaf_Area_30_cm2,object,0,1,100.0,[],Other,feature,Agricultural variable: Leaf_Area_30_cm2
+Leaf_Area_60_cm2,object,0,1,100.0,[],Other,feature,Agricultural variable: Leaf_Area_60_cm2
+Leaf_Area_90_cm2,object,0,1,100.0,[],Other,feature,Agricultural variable: Leaf_Area_90_cm2
+Yield_per_Plot,object,0,1,100.0,[],Yield,feature,Agricultural variable: Yield_per_Plot
+Yield_per_Acre,object,0,1,100.0,[],Yield,feature,Agricultural variable: Yield_per_Acre
+Yield_per_Hectare,object,0,1,100.0,[],Yield,feature,Grain/crop yield per hectare (kg/ha)
+Fruit_Number,object,0,1,100.0,[],Other,feature,Agricultural variable: Fruit_Number
+Fruit_Weight,object,0,1,100.0,[],Other,feature,Agricultural variable: Fruit_Weight
+Fruit_Diameter_mm,object,0,1,100.0,[],Other,feature,Agricultural variable: Fruit_Diameter_mm
+Spike_Length,object,0,1,100.0,[],Other,feature,Agricultural variable: Spike_Length
+Seeds_per_Spike,object,0,1,100.0,[],Other,feature,Agricultural variable: Seeds_per_Spike
+100_Seed_Weight,object,0,1,100.0,[],Other,feature,Agricultural variable: 100_Seed_Weight
+Root_Weight,object,0,1,100.0,[],Other,feature,Agricultural variable: Root_Weight
+Pod_Weight,object,0,1,100.0,[],Other,feature,Agricultural variable: Pod_Weight
+Harvest_Index,object,0,1,100.0,[],Yield,feature,Agricultural variable: Harvest_Index
+Biomass_Yield,object,0,1,100.0,[],Yield,feature,Agricultural variable: Biomass_Yield
+Protein,object,0,1,100.0,[],Quality,feature,Agricultural variable: Protein
+Ash,object,0,1,100.0,[],Quality,feature,Agricultural variable: Ash
+Gluten,object,0,1,100.0,[],Other,feature,Agricultural variable: Gluten
+Fiber,object,0,1,100.0,[],Other,feature,Agricultural variable: Fiber
+Carbohydrates,object,0,1,100.0,[],Other,feature,Agricultural variable: Carbohydrates
+Fat,object,0,1,100.0,[],Other,feature,Agricultural variable: Fat
+Nitrogen_Content,object,0,1,100.0,[],Fertilizer,feature,Agricultural variable: Nitrogen_Content
+Phosphorus_Content,object,0,1,100.0,[],Fertilizer,feature,Agricultural variable: Phosphorus_Content
+Potassium_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Potassium_Content
+Iron_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Iron_Content
+Copper_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Copper_Content
+Zinc_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Zinc_Content
+Manganese_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Manganese_Content
+Sulphur_Content,object,0,1,100.0,[],Other,feature,Agricultural variable: Sulphur_Content
+Target_Yield,object,0,1,100.0,[],Yield,target,Agricultural variable: Target_Yield
+Target_Fertilizer,object,0,1,100.0,[],Other,target,Agricultural variable: Target_Fertilizer
+Target_Nitrogen,object,0,1,100.0,[],Fertilizer,target,Agricultural variable: Target_Nitrogen
+Target_Phosphorus,object,0,1,100.0,[],Fertilizer,target,Agricultural variable: Target_Phosphorus
+Target_Potassium,object,0,1,100.0,[],Other,target,Agricultural variable: Target_Potassium
+Growing_Degree_Days,object,0,1,100.0,[],Engineered,feature,Thermal time above 10°C base temperature
+Heat_Units,object,0,1,100.0,[],Other,feature,Agricultural variable: Heat_Units
+Harvest_Index_Calc,object,0,1,100.0,[],Yield,feature,Agricultural variable: Harvest_Index_Calc
+Nitrogen_Use_Efficiency,object,0,1,100.0,[],Fertilizer,feature,Yield per unit of nitrogen applied
+Water_Use_Efficiency,object,0,1,100.0,[],Other,feature,Agricultural variable: Water_Use_Efficiency
+Rainfall_Anomaly,object,0,1,100.0,[],Weather,feature,Agricultural variable: Rainfall_Anomaly
+Stress_Index,object,0,1,100.0,[],Other,feature,Agricultural variable: Stress_Index
+Disease_Risk_Index,object,0,1,100.0,[],Other,feature,Agricultural variable: Disease_Risk_Index
+Yield_per_Plant,object,0,1,100.0,[],Yield,feature,Agricultural variable: Yield_per_Plant
+Yield_per_Plot_Calc,object,0,1,100.0,[],Yield,feature,Agricultural variable: Yield_per_Plot_Calc
+Yield_per_Hectare_Calc,object,0,1,100.0,[],Yield,feature,Agricultural variable: Yield_per_Hectare_Calc
+Temp_x_Rainfall,object,0,1,100.0,[],Weather,feature,Agricultural variable: Temp_x_Rainfall
+N_x_P,object,0,1,100.0,[],Other,feature,Agricultural variable: N_x_P
+Temp_ squared,object,0,1,100.0,[],Other,feature,Agricultural variable: Temp_ squared
+Rainfall_7d_MA,object,0,1,100.0,[],Weather,feature,Agricultural variable: Rainfall_7d_MA
+Temp_7d_MA,object,0,1,100.0,[],Other,feature,Agricultural variable: Temp_7d_MA
+Feature_Available_Before_Prediction,object,0,1,100.0,[],Leakage,metadata,Flag indicating if feature is available at prediction time
+Crop_Code,object,0,1,100.0,[],Crop Info,encoded_feature,Agricultural variable: Crop_Code
+Season_Code,object,0,1,100.0,[],Encoded,encoded_feature,Agricultural variable: Season_Code
+Variety_Code,object,0,1,100.0,[],Crop Info,encoded_feature,Agricultural variable: Variety_Code
+Fertilizer_Code,object,0,1,100.0,[],Other,encoded_feature,Agricultural variable: Fertilizer_Code
+Soil_Texture_Code,object,0,1,100.0,[],Other,encoded_feature,Agricultural variable: Soil_Texture_Code
+Country_Code,object,0,1,100.0,[],Other,encoded_feature,Agricultural variable: Country_Code
+Predicted_Yield,object,0,1,100.0,[],Yield,feature,Agricultural variable: Predicted_Yield
+Expected_Biomass,object,0,1,100.0,[],Other,feature,Agricultural variable: Expected_Biomass
+Expected_Plant_Height,object,0,1,100.0,[],Other,feature,Agricultural variable: Expected_Plant_Height
+Recommended_Fertilizer,object,0,1,100.0,[],Other,feature,Agricultural variable: Recommended_Fertilizer
+Recommended_Dose,object,0,1,100.0,[],Other,feature,Agricultural variable: Recommended_Dose
+Recommended_Application_Interval,object,0,1,100.0,[],Other,feature,Agricultural variable: Recommended_Application_Interval
+Expected_Yield_Increase,object,0,1,100.0,[],Yield,feature,Agricultural variable: Expected_Yield_Increase
+Confidence_Score,object,0,1,100.0,[],Other,feature,Agricultural variable: Confidence_Score
+Recommendation_Summary,object,0,1,100.0,[],Other,feature,Agricultural variable: Recommendation_Summary
+Temp_squared,float64,0,1,100.0,[],Other,feature,Agricultural variable: Temp_squared
+Temperature_Max_7d_MA,float64,1,0,0.0,[30.0],Weather,feature,Agricultural variable: Temperature_Max_7d_MA
+Temperature_Min_7d_MA,float64,0,1,100.0,[],Weather,feature,Agricultural variable: Temperature_Min_7d_MA
+Average_Temperature_7d_MA,float64,0,1,100.0,[],Weather,feature,Agricultural variable: Average_Temperature_7d_MA

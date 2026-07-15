@@ -1,0 +1,3 @@
+﻿paper,doi,variable,value,unit,page,table,row,column,figure,caption,extraction_timestamp,agent_version,extraction_method,confidence,validation,source_text,char_start,char_end
+pipeline_input,,tmax_c,,,0,,,,,Column from pipeline input dataset,2026-07-07T22:01:32.072121,1.0.0,dataset_import,high,ACCEPTED,,0,0
+pipeline_input,,rainfall_mm,,,0,,,,,Column from pipeline input dataset,2026-07-07T22:01:32.072144,1.0.0,dataset_import,high,ACCEPTED,,0,0
