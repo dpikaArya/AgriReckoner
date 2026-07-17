@@ -129,7 +129,8 @@ class BaseAgent(ABC):
             df.to_json(path, orient="records", indent=2)
         else:
             df.to_csv(path, index=False, encoding="utf-8-sig")
-        self.contract.artifacts.append(str(path))
+        if self.contract is not None:
+            self.contract.artifacts.append(str(path))
         return path
 
     def save_text_artifact(self, text: str, filename: str, subdir: str = "") -> Path:
@@ -139,5 +140,6 @@ class BaseAgent(ABC):
         out.mkdir(parents=True, exist_ok=True)
         path = out / filename
         path.write_text(text, encoding="utf-8")
-        self.contract.artifacts.append(str(path))
+        if self.contract is not None:
+            self.contract.artifacts.append(str(path))
         return path

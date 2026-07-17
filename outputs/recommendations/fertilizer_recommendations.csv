@@ -1,22 +1,78 @@
-Crop,Paper_ID,Best_Treatment,Expected_Yield_kg_ha,Yield_Increase_kg_ha,Confidence_Score,Confidence_Label,Alternative_Treatments,Recommendation,Application_Interval
-Chickpea,PAPER_1_s2_0_S0016706120325842_main,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
-Barley,PAPER_1_s2_0_S0048969721016284_main,MOP (Potassium-rich),,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,Increase potassium,Every 25-30 days
-Black Wheat,PAPER_agronomy_15_00961_v2,Ammonium Sulphate + Gypsum,,,0.75,High,Balanced NPK (15-15-15); Organic compost,Apply sulfur-based amendments to reduce pH,Every 15-20 days
-Barley,PAPER_Bedada_2014,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Split application (3-4 splits)
-Chickpea,PAPER_Behera_2009,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Split application (3-4 splits)
-Bell Pepper,PAPER_Bell_pepper,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
-Black Wheat,PAPER_Black_wheat,Balanced NPK (15-15-15),5.46,0.71,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
-Barley,PAPER_Cai_2006,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
-Black Wheat,PAPER_Carrot,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
-Black Wheat,PAPER_fpls_12_748523,MOP (Potassium-rich),,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,Increase potassium,Every 15-20 days
-Black Wheat,PAPER_fpls_16_1521113,Dolomite + Bio NPK,38.18,4.98,0.75,High,Balanced NPK (15-15-15); Organic compost,"Apply lime to correct pH, then balanced NPK",Every 25-30 days
-Barley,PAPER_Gardner_2009,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
-Barley,PAPER_Katterer_2011,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
-Black Wheat,PAPER_Land_Degrad_Dev___2021___Yadav___Sustain,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
-Barley,PAPER_Maltas_2015,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
-Barley,PAPER_Maltas_2018,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
-Chickpea,PAPER_s41477_021_01001_0,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
-Chickpea,PAPER_s41598_017_03539_6,Dolomite + Bio NPK,,,0.75,High,Balanced NPK (15-15-15); Organic compost,"Apply lime to correct pH, then balanced NPK",Every 15-20 days
-Black Wheat,PAPER_s42106_025_00391_x,MOP (Potassium-rich),,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,Increase potassium,Every 15-20 days
-Barley,PAPER_Spinach,Balanced NPK (15-15-15),,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
-Barley,PAPER_Wang_2015,Dolomite + Bio NPK,,,0.75,High,Balanced NPK (15-15-15); Organic compost,"Apply lime to correct pH, then balanced NPK",Every 15-20 days
+Crop,Paper_ID,Treatment,Best_Treatment,Predicted_Yield,Expected_Yield_kg_ha,Yield_Increase_kg_ha,Confidence_Score,Confidence_Label,Alternative_Treatments,Recommendation,Application_Interval
+Bell pepper,Paper002,T0,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T1,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T2,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T3,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T4,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T5,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T6,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Bell pepper,Paper002,T7,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Black Wheat,,T0,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T1,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T2,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T3,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T4,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T5,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T6,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T7,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T8,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,,T9,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Carrot,Paper003,T0,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T1,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T2,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T3,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T4,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T5,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T6,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Carrot,Paper003,T7,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Gram,,ST0,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST1,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST2,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST3,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST4,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST5,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST6,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST7,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST8,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST9,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Gram,,ST10,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Spinach,Paper001,T0,DAP (Phosphorus-rich),,,,0.65,Medium,Balanced NPK (15-15-15); SSP + Urea; Organic compost,Increase phosphorus,Every 25-30 days
+Spinach,Paper001,T1,SSP (Low nitrogen),,,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,"Reduce nitrogen, apply phosphorus",Every 25-30 days
+Spinach,Paper001,T2,SSP (Low nitrogen),,,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,"Reduce nitrogen, apply phosphorus",Every 25-30 days
+Spinach,Paper001,T3,DAP (Phosphorus-rich),,,,0.65,Medium,Balanced NPK (15-15-15); SSP + Urea; Organic compost,Increase phosphorus,Every 25-30 days
+Spinach,Paper001,T4,DAP (Phosphorus-rich),,,,0.65,Medium,Balanced NPK (15-15-15); SSP + Urea; Organic compost,Increase phosphorus,Every 25-30 days
+Spinach,Paper001,T5,DAP (Phosphorus-rich),,,,0.65,Medium,Balanced NPK (15-15-15); SSP + Urea; Organic compost,Increase phosphorus,Every 25-30 days
+Spinach,Paper001,T6,SSP (Low nitrogen),,,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,"Reduce nitrogen, apply phosphorus",Every 25-30 days
+Spinach,Paper001,T7,SSP (Low nitrogen),,,,0.85,High,Balanced NPK (15-15-15); Organic compost,"Reduce nitrogen, apply phosphorus",Every 25-30 days
+Chickpea,PAPER_1_s2_0_S0016706120325842_main,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_1_s2_0_S0048969721016284_main,,MOP (Potassium-rich),,,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,Increase potassium,Every 25-30 days
+Barley,PAPER_27,t32,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_28,"T1, T2, T3",Balanced NPK (15-15-15),,37.95,5.69,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_29,"T0, T1, T2, T3, T4, T5, t33, t35, t40, t50, t9",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_30,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,PAPER_31,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,PAPER_32,"T25, treatment 180",Balanced NPK (15-15-15),,0.87,0.13,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,PAPER_agronomy_15_00961_v2,,Ammonium Sulphate + Gypsum,,,,0.75,High,Balanced NPK (15-15-15); Organic compost,Apply sulfur-based amendments to reduce pH,Every 15-20 days
+Barley,PAPER_Bedada_2014,"treatment
+  0",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Split application (3-4 splits)
+Chickpea,PAPER_Behera_2009,"T00010001, t1, t2",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Split application (3-4 splits)
+Bell Pepper,PAPER_Bell_pepper,"T0, T1, T2, T3, T4, T5, T6, T7",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Black Wheat,PAPER_Black_wheat,"T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, t1, t2",Balanced NPK (15-15-15),,5.46,0.82,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Barley,PAPER_Cai_2006,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Black Wheat,PAPER_Carrot,"T0, T1, T2, T3, T4, T5, T6, T7",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,PAPER_fpls_12_748523,"T0, T1, T2, T3, T4",MOP (Potassium-rich),,,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,Increase potassium,Every 15-20 days
+Black Wheat,PAPER_fpls_16_1521113,T2,Dolomite + Bio NPK,,38.18,5.73,0.75,High,Balanced NPK (15-15-15); Organic compost,"Apply lime to correct pH, then balanced NPK",Every 25-30 days
+Barley,PAPER_Gardner_2009,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_Katterer_2011,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Black Wheat,PAPER_Land_Degrad_Dev___2021___Yadav___Sustain,"T1, T2, T3, T4, t4, t41, t45",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Barley,PAPER_Maltas_2015,"treatment 
+
+100",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_Maltas_2018,,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Chickpea,PAPER_s41477_021_01001_0,t3,Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 15-20 days
+Chickpea,PAPER_s41598_017_03539_6,,Dolomite + Bio NPK,,,,0.75,High,Balanced NPK (15-15-15); Organic compost,"Apply lime to correct pH, then balanced NPK",Every 15-20 days
+Black Wheat,PAPER_s42106_025_00391_x,"Treatment
+
+2020",MOP (Potassium-rich),,,,0.65,Medium,Balanced NPK (15-15-15); Organic compost,Increase potassium,Every 15-20 days
+Barley,PAPER_Spinach,"T0, T1, T2, T3, T4, T5, T6, T7, t1",Balanced NPK (15-15-15),,,,0.75,High,Organic compost,Maintain current balanced fertilization,Every 25-30 days
+Barley,PAPER_Wang_2015,,Dolomite + Bio NPK,,,,0.75,High,Balanced NPK (15-15-15); Organic compost,"Apply lime to correct pH, then balanced NPK",Every 15-20 days

@@ -41,6 +41,9 @@ class AgriAISettings:
 
     EXPORT_FORMATS: list[str] = ["csv", "parquet", "xlsx", "html"]
 
+    BENCHMARK_DIR: Path = OUTPUT_DIR / "benchmark"
+    EXPLAINABILITY_DIR: Path = REPORTS_DIR / "explainability"
+
     CHECKPOINT_ENABLED: bool = True
     INCREMENTAL_MODE: bool = False
 
@@ -49,5 +52,6 @@ class AgriAISettings:
                   self.REPORTS_DIR, self.LOG_DIR, self.CONTRACTS_DIR,
                   self.CHECKPOINT_DIR, self.MODELS_DIR, self.XGBOOST_DIR,
                   self.REGRESSION_DIR, self.FUZZY_MODELS_DIR,
-                  self.MEMORY_DIR, self.MODEL_VERSIONS_DIR]:
+                  self.MEMORY_DIR, self.MODEL_VERSIONS_DIR,
+                  self.BENCHMARK_DIR, self.EXPLAINABILITY_DIR]:
             d.mkdir(parents=True, exist_ok=True)

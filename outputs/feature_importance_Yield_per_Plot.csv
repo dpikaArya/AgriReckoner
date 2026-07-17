@@ -1,0 +1,4 @@
+Feature,Importance,Target
+Leaf_Area_30_cm2,0.4547,Yield_per_Plot
+Plant_Height_60_cm,0.3218,Yield_per_Plot
+Leaf_Area_90_cm2,0.2235,Yield_per_Plot

@@ -96,6 +96,7 @@ VARIANT_MAP = {
     "growth_duration": "Growth_Duration_Days",
     "growth_duration_days": "Growth_Duration_Days",
     "days_to_maturity": "Growth_Duration_Days",
+    "growth_stage": "Growth_Stage", "phenological_stage": "Growth_Stage",
     "design": "Design", "experimental_design": "Design",
     "exp_design": "Design",
     "replications": "Replications", "replicates": "Replications",
@@ -190,12 +191,14 @@ VARIANT_MAP = {
     "weight_100_seeds_g": "100_Seed_Weight",
     "hundred_seed_weight": "100_Seed_Weight", "test_weight": "100_Seed_Weight",
     "root_weight": "Root_Weight", "root_weight_g": "Root_Weight",
-    "pod_weight": "Pod_Weight",
+    "pod_weight": "Pod_Weight", "pod_weight_g": "Pod_Weight",
+    "fruit_diameter": "Fruit_Diameter_mm", "fruit_diameter_mm": "Fruit_Diameter_mm",
     "harvest_index": "Harvest_Index", "biomass_yield": "Biomass_Yield",
     "protein": "Protein", "protein_%": "Protein", "protein_content": "Protein",
     "ash": "Ash", "ash_%": "Ash", "ash_pct": "Ash",
-    "gluten": "Gluten", "fiber": "Fiber",
-    "carbohydrates": "Carbohydrates", "fat": "Fat", "oil": "Fat",
+    "gluten": "Gluten", "fiber": "Fiber", "crude_fiber": "Fiber",
+    "carbohydrates": "Carbohydrates", "carbs": "Carbohydrates",
+    "fat": "Fat", "oil": "Fat", "crude_fat": "Fat",
     "nitrogen_content": "Nitrogen_Content",
     "phosphorus_content": "Phosphorus_Content",
     "potassium_content": "Potassium_Content",
@@ -219,3 +222,39 @@ VARIANT_MAP = {
     "confidence": "Confidence_Score",
     "confidence_score": "Confidence_Score",
 }
+
+NON_FEATURE_COLS = frozenset({
+    "Treatment", "Table_Row", "Row_Index", "_source_page", "_reader",
+    "_confidence", "Source_File", "Paper_ID", "DOI", "Journal",
+    "Authors", "Country", "Location", "State", "Site",
+    "Feature_Available_Before_Prediction",
+    "Crop_Code", "Season_Code", "Variety_Code", "Fertilizer_Code",
+    "Soil_Texture_Code", "Country_Code",
+})
+
+POST_HARVEST_VARIABLES = frozenset({
+    "Protein", "Ash", "Gluten", "Fiber", "Carbohydrates", "Fat",
+    "Nitrogen_Content", "Phosphorus_Content", "Potassium_Content",
+    "Iron_Content", "Copper_Content", "Zinc_Content",
+    "Manganese_Content", "Sulphur_Content",
+    "100_Seed_Weight", "Root_Weight", "Pod_Weight",
+    "Harvest_Index", "Biomass_Yield",
+    "Yield_per_Plot", "Yield_per_Acre", "Yield_per_Hectare",
+    "Fruit_Number", "Fruit_Weight", "Fruit_Diameter_mm",
+    "Spike_Length", "Seeds_per_Spike",
+    "Target_Yield", "Target_Fertilizer",
+    "Target_Nitrogen", "Target_Phosphorus", "Target_Potassium",
+    "Yield_per_Plant", "Yield_per_Plot_Calc", "Yield_per_Hectare_Calc",
+    "Nitrogen_Use_Efficiency", "Water_Use_Efficiency",
+    "Harvest_Index_Calc",
+})
+
+PRE_HARVEST_MEASUREMENTS = frozenset({
+    "Leaf_Number", "Tillers", "Branches", "Nodes", "Flowers",
+    "Plant_Height_30_cm", "Plant_Height_60_cm", "Plant_Height_90_cm",
+    "Leaf_Area_30_cm2", "Leaf_Area_60_cm2", "Leaf_Area_90_cm2",
+    "SPAD", "Moisture_Content", "Dry_Matter",
+    "Shoot_Length_cm", "Root_Length_cm",
+    "Stem_Diameter_mm", "Root_Diameter_mm",
+    "Plant_Height_cm",
+})

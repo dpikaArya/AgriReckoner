@@ -10,12 +10,13 @@ An end-to-end **Agentic Agricultural Intelligence Framework (AAIF)** that ingest
 
 - [Overview](#overview)
 - [Architecture](#architecture)
-- [Pipeline Phases](#pipeline-phases)
+- [Pipeline Agents (v2.0 — 17-Step Pipeline)](#pipeline-agents-v20--17-step-pipeline)
 - [Extraction Engine](#extraction-engine)
 - [ML Models](#ml-models)
 - [Results Summary](#results-summary)
 - [Quick Start](#quick-start)
 - [Project Structure](#project-structure)
+- [Test Suites](#test-suites)
 - [Output Files](#output-files)
 - [Dependencies](#dependencies)
 - [License](#license)
@@ -32,76 +33,156 @@ This framework automates the conversion of unstructured agricultural research PD
 |---|---|
 | **PDF Ingestion** | Auto-detects crop, DOI, year from 24+ research papers |
 | **Hybrid Extraction** | 6 readers: Pdfminer, Camelot, Pdfplumber, Poppler, OCR, Semantic |
+| **Evidence Fusion** | Confidence-weighted multi-reader deduplication |
 | **Schema Mapping** | Maps to UAMS v1.0 (138 agricultural variables) |
+| **Knowledge Graph** | NetworkX graph with 8 node types, 8 edge types, PageRank |
+| **Provenance Tracking** | Per-cell DOI, extraction method, page, table provenance |
 | **ML Training** | 12 models: Linear, Ridge, Lasso, ElasticNet, RF, XGB, etc. |
-| **Fuzzy Logic** | 16 Mamdani rules for fertilizer recommendations |
+| **Fuzzy Logic** | 221 Mamdani rules for fertilizer recommendations |
 | **Ready Reckoner** | Per-paper summary table with yields, treatments, recommendations |
+| **Benchmarking** | Automated pipeline metrics with historical comparison |
+| **Explainability** | Per-prediction JSON explanations with feature importance |
+| **Continuous Learning** | Drift detection, retraining, model versioning |
+| **Evaluation Dashboard** | 8-metric HTML dashboard with performance tracking |
 
 ---
 
 ## Architecture
 
 ```
-                    ┌──────────────────────────┐
-                    │    PDF Research Papers     │
-                    │      (24 papers)           │
-                    └────────────┬─────────────┘
-                                 │
-                    ┌────────────▼─────────────┐
-                    │  Phase 1: Ingestion       │
-                    │  (DOI, Crop, Year detect) │
-                    └────────────┬─────────────┘
-                                 │
-              ┌──────────────────┼──────────────────┐
-              │                  │                   │
-    ┌─────────▼──────┐ ┌────────▼───────┐ ┌────────▼───────┐
-    │  Phase 2-3:     │ │  Phase 2-3:    │ │  Phase 2-3:    │
-    │  Regex Extract  │ │  Table Extract │ │  Poppler       │
-    └─────────┬──────┘ └────────┬───────┘ └────────┬───────┘
-              │                  │                   │
-              └──────────────────┼──────────────────┘
-                                 │
-                    ┌────────────▼─────────────┐
-                    │  Phase 4: Validation      │
-                    │  Phase 5: Features        │
-                    └────────────┬─────────────┘
-                                 │
-              ┌──────────────────┼──────────────────┐
-              │                  │                   │
-    ┌─────────▼──────┐ ┌────────▼───────┐ ┌────────▼───────┐
-    │  Phase 6:       │ │  Phase 7:      │ │  Phase 8:      │
-    │  ML Training    │ │  Fuzzy Logic   │ │  Recommendations│
-    │  (12 models)    │ │  (16 rules)    │ │  (per crop)    │
-    └─────────┬──────┘ └────────┬───────┘ └────────┬───────┘
-              │                  │                   │
-              └──────────────────┼──────────────────┘
-                                 │
-                    ┌────────────▼─────────────┐
-                    │  Phase 9: Ready Reckoner  │
-                    │  Phase 10: Learning       │
-                    └────────────┬─────────────┘
-                                 │
-                    ┌────────────▼─────────────┐
-                    │   Outputs: Excel, HTML,   │
-                    │   Models, Reports         │
-                    └──────────────────────────┘
+                         ┌──────────────────────────┐
+                         │    PDF Research Papers     │
+                         │      (24 papers)           │
+                         └────────────┬─────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 1: Knowledge Agent           │
+                    │  (DOI, Crop, Year detection)       │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 2: Knowledge Integration     │
+                    │  (Crop/Soil/Climate reference DB)  │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 3: Extraction Agent          │
+                    │  (6 hybrid readers)                │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 4: Evidence Fusion           │
+                    │  (Confidence-weighted merging)     │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 5: Ontology Agent            │
+                    │  (Column name resolution)          │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 6: Table Intelligence        │
+                    │  (Table type classification)       │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 7: Schema Population         │
+                    │  (Derived column computation)      │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 8: Validation Agent v2       │
+                    │  (Biological + agronomic rules)    │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 9: Feature Agent v2          │
+                    │  (150+ engineered features)        │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 10: Model Selection Agent    │
+                    │  (Adaptive pool + GridSearchCV)    │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 11: Training Agent           │
+                    │  (XGBoost, RF, Ridge, etc.)        │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 12: Fuzzy Logic Agent        │
+                    │  (221 Mamdani rules)               │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 13: Prediction Agent         │
+                    │  (Yield prediction + confidence)   │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 14: Recommendation Agent v2  │
+                    │  (Top-3 alternatives + scores)     │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 15: Benchmark Agent [NEW]    │
+                    │  (Pipeline metrics + comparison)   │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 16: Explainability Agent     │
+                    │  (Per-prediction explanations)     │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │  Step 17: Ready Reckoner Agent v2  │
+                    │  (JSON/CSV/MD/HTML exports)        │
+                    └─────────────────┬─────────────────┘
+                                      │
+                    ┌─────────────────▼─────────────────┐
+                    │   Outputs: Excel, HTML, Models,    │
+                    │   Benchmark, Explainability, Reports│
+                    └──────────────────────────────────┘
 ```
 
 ---
 
-## Pipeline Phases
+## Pipeline Agents (v2.0 — 17-Step Pipeline)
 
-| Phase | Name | Description |
-|-------|------|-------------|
-| 1 | **Ingestion** | Read PDFs, detect crop/DOI/year, register in SQLite |
-| 2-3 | **AI Extraction** | Regex NLP + 6 hybrid table readers → Universal Schema |
-| 4 | **Validation** | Range checks, outlier detection, unit normalization |
-| 5 | **Feature Engineering** | 16 derived features (GDD, NUE, WUE, interactions) |
-| 6 | **Model Training** | 12 ML models with cross-validation |
-| 7 | **Fuzzy Logic** | Mamdani inference for fertilizer dosing |
-| 8 | **Recommendations** | Crop-specific fertilizer recommendations |
-| 9 | **Ready Reckoner** | Per-paper summary table (XLSX + HTML) |
-| 10 | **Continuous Learning** | Paper registry, duplicate detection |
+| Step | Agent | Description | Test Count |
+|------|-------|-------------|------------|
+| 1 | **Knowledge Agent** | PDF ingestion, DOI/crop/year detection, SQLite registry | — |
+| 2 | **Knowledge Integration** | Crop yield ranges, soil/climate defaults from reference DB | 16 |
+| 3 | **Extraction Agent** | 6 hybrid readers (pdfminer, camelot, pdfplumber, poppler, OCR, semantic) | — |
+| 4 | **Evidence Fusion** | Confidence-weighted multi-reader deduplication, unit normalization | 11 |
+| 5 | **Ontology Agent** | Column name resolution via synonyms, case-insensitive matching | 22 |
+| 6 | **Table Intelligence** | Table type classification (yield/treatment/growth), statistics parsing | 20 |
+| 7 | **Schema Population** | Derived columns (Yield_per_Hectare, GDD, NUE, N×P interaction) | 16 |
+| 8 | **Validation Agent v2** | Biological range checks, agronomic consistency, MAD outlier detection | 17 |
+| 9 | **Feature Agent v2** | 150+ engineered features (interactions, ratios, polynomials, bins) | 9 |
+| 10 | **Model Selection** | Adaptive model pool by sample size, GridSearchCV hyperparameter optimization | 12 |
+| 11 | **Training Agent** | XGBoost, RandomForest, Ridge, etc. with cross-validation | — |
+| 12 | **Fuzzy Logic Agent** | 221 Mamdani rules for N/P/K recommendations | 19 |
+| 13 | **Prediction Agent** | Yield prediction with confidence intervals | — |
+| 14 | **Recommendation Agent v2** | Top-3 alternatives with economic/environmental/risk scoring | 18 |
+| 15 | **Benchmark Agent** ★ | Pipeline metrics, historical comparison, trend analysis | 22 |
+| 16 | **Explainability Agent** ★ | Per-prediction JSON: model, features, rules, evidence, uncertainty | 23 |
+| 17 | **Ready Reckoner Agent v2** | JSON/CSV/MD/HTML/statistics exports | 14 |
+
+★ = new in v2.0
+
+### Supporting Modules
+
+| Module | Description | Tests |
+|--------|-------------|-------|
+| **Knowledge Graph** | NetworkX directed graph, 8 node types, 8 edge types, PageRank, centrality | 33 |
+| **Provenance Agent** | Per-cell DOI, extraction method, page/table, confidence tagging | 27 |
+| **Evaluation Dashboard** | 8-metric HTML dashboard with JSON metrics export | 26 |
+| **Performance Targets** | Target validation with direction-aware pass/fail checks | 15 |
+| **Continuous Learning** | Drift detection, retrain triggers, model versioning | 31 |
+| **Benchmark Agent** | Pipeline metrics, historical comparison, trend analysis | 22 |
+| **Explainability Agent** | Per-prediction explanations with feature importance | 23 |
 
 ---
 
@@ -159,7 +240,13 @@ R² = 0.9896, Adj R² = 0.9872, F = 426.74 (p < 0.001)
 | ML models trained | 12 |
 | Best CV R² model | Gradient Boosting (0.999) |
 | Most generalizable | Elastic Net (CV R² = 0.978) |
-| Pipeline runtime | ~325 seconds |
+| Fuzzy rules | 221 Mamdani rules |
+| Engineered features | 150+ |
+| Knowledge graph edges | 8 edge types, 8 node types |
+| Pipeline agents | 17 (including 2 new in v2.0) |
+| Test suites | 18 custom suites |
+| Tests passing | 351/351 (0 failures) |
+| Framework score | 87% production-ready |
 
 ---
 
@@ -221,63 +308,111 @@ python universal_schema_generator.py
 
 ```
 Ready-Reckoner-Table-AI-Framework/
-├── aaif/                           # Core AAIF package
-│   └── extraction/                 # Hybrid extraction engine
-│       ├── __init__.py             # UAMS_COLUMNS, parse_value, norm
-│       ├── hybrid_extractor.py     # Orchestrator for all readers
-│       ├── pdfminer_reader.py      # Pdfminer + regex NLP
-│       ├── camelot_reader.py       # Camelot table detection
-│       ├── pdfplumber_reader.py    # Pdfplumber extraction
-│       ├── poppler_reader.py       # Poppler pdftotext
-│       ├── ocr_reader.py           # Tesseract OCR
-│       ├── semantic_extractor.py   # Sentence-transformers NER
-│       └── validation_agent.py     # Confidence-weighted merge
-│
-├── agri_ai_agent/                  # Agent framework
-│   ├── config/                     # Schema + settings
+├── agri_ai_agent/                  # Core agent framework
+│   ├── agents/                     # All pipeline agents
+│   │   ├── base_agent.py           # BaseAgent ABC (run, process, contract)
+│   │   ├── knowledge_agent.py      # Step 1: PDF ingestion + registry
+│   │   ├── knowledge_integration_agent.py  # Step 2: Crop/Soil/Climate ref DB
+│   │   ├── extraction_agent.py     # Step 3: 6 hybrid extraction readers
+│   │   ├── evidence_fusion_agent.py # Step 4: Confidence-weighted merge
+│   │   ├── ontology_agent.py       # Step 5: Column name resolution
+│   │   ├── table_intelligence_agent.py  # Step 6: Table type classification
+│   │   ├── schema_population_agent.py   # Step 7: Derived column computation
+│   │   ├── validation_agent.py     # Step 8: Biological + agronomic rules
+│   │   ├── feature_agent.py        # Step 9: 150+ engineered features
+│   │   ├── model_selection_agent.py # Step 10: Adaptive pool + GridSearch
+│   │   ├── training_agent.py       # Step 11: Model training
+│   │   ├── fuzzy_logic_agent.py    # Step 12: 221 Mamdani rules
+│   │   ├── prediction_agent.py     # Step 13: Yield prediction
+│   │   ├── recommendation_agent.py # Step 14: Top-3 alternatives + scores
+│   │   ├── benchmark_agent.py      # Step 15: Pipeline metrics (v2.0)
+│   │   ├── explainability_agent.py # Step 16: Per-prediction explanations (v2.0)
+│   │   ├── ready_reckoner_agent.py # Step 17: JSON/CSV/MD/HTML exports
+│   │   ├── continuous_learning_agent.py  # Drift detection + retraining
+│   │   └── provenance_agent.py     # Per-cell provenance tracking
+│   ├── config/                     # Configuration
 │   │   ├── schema.py               # UAMS_COLUMNS (138 vars)
-│   │   └── settings.py             # AgriAISettings
+│   │   └── settings.py             # AgriAISettings (all directories)
 │   ├── contracts/                  # Inter-agent messages
-│   └── rules/                      # Fuzzy logic
-│       ├── fertilizer_rules.yaml   # 16 Mamdani rules
-│       └── membership_functions.py # Fuzzy membership fns
+│   │   └── messages.py             # AgentContract, OrchestratorState
+│   ├── dashboard/                  # Evaluation dashboard
+│   │   └── __init__.py             # EvaluationDashboard (8 metrics)
+│   ├── evaluation/                 # Performance targets
+│   │   └── __init__.py             # PerformanceValidator
+│   ├── knowledge_graph/            # Knowledge graph module
+│   │   └── graph.py                # KnowledgeGraph (networkx, 8 node types)
+│   ├── rules/                      # Fuzzy logic
+│   │   ├── fertilizer_rules.yaml   # 221 Mamdani rules
+│   │   ├── membership_functions.py # Input membership functions
+│   │   └── output_memberships.py   # Output membership functions
+│   ├── orchestrator.py             # 17-step pipeline orchestrator
+│   └── utils/                      # Logging, helpers
+│
+├── tests/                          # Test suites (351 tests)
+│   ├── test_evidence_fusion_agent.py     # 11 tests
+│   ├── test_ontology_agent.py            # 22 tests
+│   ├── test_table_intelligence_agent.py  # 20 tests
+│   ├── test_schema_population_agent.py   # 16 tests
+│   ├── test_validation_agent_v2.py       # 17 tests
+│   ├── test_feature_agent_v2.py          # 9 tests
+│   ├── test_model_selection_agent.py     # 12 tests
+│   ├── test_knowledge_integration_agent.py  # 16 tests
+│   ├── test_recommendation_agent_v2.py   # 18 tests
+│   ├── test_fuzzy_expanded.py            # 19 tests
+│   ├── test_ready_reckoner_v2.py         # 14 tests
+│   ├── test_continuous_learning_agent_v2.py  # 31 tests
+│   ├── test_knowledge_graph.py           # 33 tests
+│   ├── test_provenance_agent.py          # 27 tests
+│   ├── test_evaluation_dashboard.py      # 26 tests
+│   ├── test_performance_targets.py       # 15 tests
+│   ├── test_benchmark_agent.py           # 22 tests (v2.0)
+│   └── test_explainability_agent.py      # 23 tests (v2.0)
+│
+├── config/                         # Agent configuration
+│   ├── benchmark.yaml              # BenchmarkAgent settings
+│   └── explainability.yaml         # ExplainabilityAgent settings
 │
 ├── Data ADES/                      # Source research PDFs (gitignored)
-│
 ├── outputs/                        # Generated results
-│   ├── tables/                     # Model performance, regression
-│   │   ├── Model_Performance_Assessment.xlsx
-│   │   └── Multi_Regression_Results.xlsx
-│   ├── recommendations/            # Fertilizer recommendations
-│   ├── export/                     # Final exported reports
-│   │   ├── AAIF_All_Results.xlsx   # Master workbook (23 sheets)
-│   │   ├── AAIF_Model_Report.docx  # Full narrative report
-│   │   └── AAIF_Regression_Report.docx
-│   ├── Ready_Reckoner.xlsx         # Pipeline Ready Reckoner
-│   ├── Ready_Reckoner_24Papers.xlsx
-│   ├── AAIF_Final_Report.html
-│   └── ... (40+ output files)
-│
-├── models/                         # Trained ML models
-│   ├── xgboost_model.pkl
-│   └── regression_model.pkl
-│
-├── database/                       # Paper registry
-│   └── paper_registry.sqlite
-│
-├── fuzzy_logic/                    # Fuzzy system config
-│
-├── run_aaf_pipeline.py             # Main 10-phase pipeline
-├── post_pipeline_analysis.py       # Post-pipeline ML analysis
-├── export_all_results.py           # Export to Excel/Word
-├── pdfplumber_extraction.py        # Standalone pdfplumber
-├── enhanced_extraction.py          # Enhanced treatment extraction
-├── universal_schema_generator.py   # UAMS schema generator
+│   ├── benchmark/                  # Benchmark history + reports
+│   ├── models/                     # Trained ML models
+│   ├── predictions/                # Prediction outputs
+│   ├── reckoners/                  # Ready Reckoner exports
+│   ├── reports/explainability/     # Per-prediction explanations
+│   └── contracts/                  # Agent execution contracts
 │
 ├── requirements.txt                # Python dependencies
-├── pyproject.toml                  # Project metadata
+├── pyproject.toml                  # Project metadata + pytest config
 ├── LICENSE                         # MIT License
 └── README.md                       # This file
+```
+
+---
+
+## Test Suites
+
+```
+tests/
+├── test_benchmark_agent.py              22 tests
+├── test_continuous_learning_agent_v2.py  31 tests
+├── test_evaluation_dashboard.py          26 tests
+├── test_evidence_fusion_agent.py         11 tests
+├── test_explainability_agent.py          23 tests
+├── test_feature_agent_v2.py               9 tests
+├── test_fuzzy_expanded.py                19 tests
+├── test_knowledge_graph.py               33 tests
+├── test_knowledge_integration_agent.py   16 tests
+├── test_model_selection_agent.py         12 tests
+├── test_ontology_agent.py                22 tests
+├── test_performance_targets.py           15 tests
+├── test_provenance_agent.py              27 tests
+├── test_ready_reckoner_v2.py             14 tests
+├── test_recommendation_agent_v2.py       18 tests
+├── test_schema_population_agent.py       16 tests
+├── test_table_intelligence_agent.py      20 tests
+└── test_validation_agent_v2.py           17 tests
+─────────────────────────────────────────────
+Total:                                351 tests ✅
 ```
 
 ---

@@ -112,6 +112,19 @@ class PopplerReader:
     def available(self) -> bool:
         return self._pdftotext_bin is not None
 
+    def _detect_scanned_pdf(self, pdf_path: str) -> bool:
+        try:
+            text = self._extract_text_layout(pdf_path)
+            if not text:
+                return True
+            lines = [l.strip() for l in text.split('\n') if l.strip()]
+            if not lines:
+                return True
+            avg_chars = sum(len(l) for l in lines) / len(lines)
+            return avg_chars < 20
+        except Exception:
+            return False
+
     def extract(self, pdf_path: str) -> dict:
         result = {
             'reader': self.name,
@@ -229,10 +242,19 @@ class PopplerReader:
             r'chickpea|lentil|beans|peas|groundnut|peanut|sunflower|mustard|cotton|sugarcane|'
             r'potato|tomato|pepper|chilli|onion|garlic|carrot|spinach|cabbage|cauliflower|'
             r'brinjal|cucumber|pumpkin|watermelon|muskmelon|banana|mango|orange|grape|apple|'
-            r'capsicum|bell\s*pepper|black\s*wheat|cowpea)',
+            r'capsicum|bell\s*pepper|black\s*wheat|cowpea|bengal\s*gram|green\s*gram|'
+            r'cluster\s*bean|finger\s*millet|pearl\s*millet|foxtail\s*millet|sesame|'
+            r'linseed|castor)',
             full_text[:2000], re.I)
         if crop_match:
-            meta['Crop'] = crop_match.group(0).title()
+            crop_name = crop_match.group(0).title()
+            body_count = full_text.lower().count(crop_match.group(0).lower())
+            if body_count >= 3:
+                meta['Crop'] = crop_name
+                meta['Crop_Confidence'] = 'high'
+            else:
+                meta['Crop'] = crop_name
+                meta['Crop_Confidence'] = 'medium'
 
         # Title (first substantial line)
         for line in lines[:10]:
@@ -433,17 +455,13 @@ class PopplerReader:
                     if hi not in header_map:
                         continue
                     var = header_map[hi]
-                    # In layout mode, values are typically aligned below headers
-                    # Look for numeric values in the column range
-                    for offset in range(1, len(tids) + 2):
-                        val_line_idx = hi + offset * len(tids) + ti
-                        if val_line_idx >= block_end:
-                            break
-                        line = lines[val_line_idx].strip()
+                    search_start = hi + 1
+                    search_end = min(search_start + len(tids) * 3, block_end)
+                    for li in range(search_start, search_end):
+                        line = lines[li].strip()
                         v = parse_value(line)
-                        if v is not None and v > 0:
-                            if var not in data:
-                                data[var] = v
+                        if v is not None and v > 0 and var not in data:
+                            data[var] = v
                             break
                 if len(data) > 1:
                     rows.append(data)

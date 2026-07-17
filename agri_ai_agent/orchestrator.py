@@ -23,24 +23,40 @@ from agri_ai_agent.agents import (
     KnowledgeAgent,
     ExtractionAgent,
     ValidationAgent,
+    EvidenceFusionAgent,
+    OntologyAgent,
+    TableIntelligenceAgent,
+    SchemaPopulationAgent,
     FeatureAgent,
+    ModelSelectionAgent,
     TrainingAgent,
     PredictionAgent,
     FuzzyAgent,
     RecommendationAgent,
+    BenchmarkAgent,
+    ExplainabilityAgent,
     ReadyReckonerAgent,
     ContinuousLearningAgent,
+    KnowledgeIntegrationAgent,
 )
 
 PIPELINE_STEPS = [
     ("knowledge", KnowledgeAgent, "Domain Knowledge"),
+    ("knowledge_integration", KnowledgeIntegrationAgent, "Knowledge Integration & Missing Value Fill"),
     ("extraction", ExtractionAgent, "Extract & Schema"),
+    ("evidence_fusion", EvidenceFusionAgent, "Evidence Fusion & Provenance"),
+    ("ontology", OntologyAgent, "Ontology Mapping & Normalization"),
+    ("table_intelligence", TableIntelligenceAgent, "Table Intelligence & Statistics"),
+    ("schema_population", SchemaPopulationAgent, "Schema Population & Inference"),
     ("validation", ValidationAgent, "Validate & Harmonize"),
     ("feature", FeatureAgent, "Feature Engineering"),
+    ("model_selection", ModelSelectionAgent, "Adaptive Model Selection & CV"),
     ("training", TrainingAgent, "Model Training"),
     ("fuzzy", FuzzyAgent, "Fuzzy Expert System"),
     ("prediction", PredictionAgent, "ML Prediction"),
     ("recommendation", RecommendationAgent, "Generate Recommendations"),
+    ("benchmark", BenchmarkAgent, "Pipeline Benchmarking"),
+    ("explainability", ExplainabilityAgent, "Prediction Explainability"),
     ("ready_reckoner", ReadyReckonerAgent, "Ready Reckoner & Exports"),
 ]
 
@@ -85,6 +101,10 @@ class Orchestrator:
 
                 if step_key == "extraction":
                     contract = agent.run(df=self.dataframe, filepath=filepath, papers_dir=papers_dir)
+                elif step_key == "benchmark":
+                    contract = agent.run(df=self.dataframe, pipeline_results=self.results)
+                elif step_key == "explainability":
+                    contract = agent.run(df=self.dataframe, pipeline_results=self.results)
                 else:
                     contract = agent.run(df=self.dataframe)
 

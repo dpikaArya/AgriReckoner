@@ -31,6 +31,12 @@ KNOWN_CROPS = {
     "chickpea", "cicer arietinum", "pigeonpea", "cajanus cajan", "groundnut", "arachis hypogaea",
     "mustard", "brassica juncea", "sunflower", "helianthus annuus", "sugarcane", "saccharum",
     "cotton", "gossypium", "onion", "allium cepa", "chilli", "capsicum frutescens",
+    "bengal gram", "green gram", "black gram", "cluster bean", "horse gram",
+    "fenugreek", "cumin", "coriander", "fennel", "sesame", "linseed", "castor",
+    "jute", "tea", "coffee", "finger millet", "pearl millet", "foxtail millet",
+    "sorghum", "millet", "barley", "oat", "lentil", "peas", "cabbage", "cauliflower",
+    "broccoli", "brinjal", "eggplant", "cucumber", "pumpkin", "watermelon", "muskmelon",
+    "banana", "mango", "orange", "grape", "apple", "strawberry",
 }
 
 DESIGN_KEYWORDS = [

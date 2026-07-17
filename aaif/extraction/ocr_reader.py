@@ -85,6 +85,26 @@ class OcrReader:
             except Exception:
                 pass
         try:
+            from .poppler_reader import _find_poppler_bin
+            pdftoppm = _find_poppler_bin('pdftoppm')
+            if pdftoppm:
+                import subprocess
+                with tempfile.TemporaryDirectory() as tmpdir:
+                    prefix = os.path.join(tmpdir, 'page')
+                    subprocess.run(
+                        [pdftoppm, '-r', '300', '-png', pdf_path, prefix],
+                        capture_output=True, timeout=60,
+                    )
+                    images = []
+                    for f in sorted(os.listdir(tmpdir)):
+                        if f.endswith('.png'):
+                            from PIL import Image
+                            images.append(Image.open(os.path.join(tmpdir, f)).convert('RGB'))
+                    if images:
+                        return images
+        except Exception:
+            pass
+        try:
             from PIL import Image
             imgs = []
             try:

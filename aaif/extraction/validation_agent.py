@@ -1,7 +1,7 @@
 import os, re, json
 import pandas as pd
 from collections import defaultdict
-from . import norm, parse_value, is_treatment, UAMS_COLUMNS, YIELD_COLS
+from . import norm, parse_value, is_treatment, UAMS_COLUMNS, YIELD_COLS, TREATMENT_RE
 from .pdfminer_reader import HEADER_MAP
 
 UNIT_CONVERSIONS = {
@@ -170,3 +170,57 @@ class ValidationAgent:
             df.to_excel(output_path, index=False)
 
         return df
+
+    def validate_duplicates(self, rows):
+        if not rows:
+            return rows
+        seen = {}
+        duplicates = []
+        clean_rows = []
+        for r in rows:
+            key = (r.get('Source_File', ''), r.get('Treatment', ''))
+            if key in seen:
+                prev = seen[key]
+                n_new = sum(1 for k, v in r.items() if v is not None and k not in ('Treatment', 'Source_File', '_reader', '_confidence'))
+                n_prev = sum(1 for k, v in prev.items() if v is not None and k not in ('Treatment', 'Source_File', '_reader', '_confidence'))
+                if n_new > n_prev:
+                    seen[key] = r
+                    duplicates.append(key)
+                else:
+                    duplicates.append(key)
+            else:
+                seen[key] = r
+        clean_rows = list(seen.values())
+        if duplicates:
+            self.report['duplicate_treatments'] = len(duplicates)
+        return clean_rows
+
+    def validate_crop_consistency(self, rows):
+        if not rows:
+            return rows
+        paper_crops = defaultdict(set)
+        for r in rows:
+            src = r.get('Source_File', '')
+            crop = r.get('Crop', '')
+            if src and crop:
+                paper_crops[src].add(crop)
+        inconsistent = {src: crops for src, crops in paper_crops.items() if len(crops) > 1}
+        if inconsistent:
+            for src, crops in inconsistent.items():
+                majority_crop = max(crops, key=lambda c: sum(1 for r in rows if r.get('Source_File') == src and r.get('Crop') == c))
+                for r in rows:
+                    if r.get('Source_File') == src and r.get('Crop') in crops - {majority_crop}:
+                        r['Crop'] = majority_crop
+                        r['_crop_corrected'] = True
+            self.report['crop_inconsistencies_fixed'] = len(inconsistent)
+        return rows
+
+    def validate_treatment_ids(self, rows):
+        invalid = []
+        for r in rows:
+            tid = r.get('Treatment', '')
+            if tid and not is_treatment(tid):
+                invalid.append(tid)
+        if invalid:
+            self.report['invalid_treatment_ids'] = invalid
+        return rows

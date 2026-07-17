@@ -63,8 +63,9 @@ class SemanticExtractor:
             from sentence_transformers import SentenceTransformer
             self.model = SentenceTransformer('all-MiniLM-L6-v2')
         except Exception as e:
-            result['error'] = f'sentence-transformers load failed: {e}'
-            return result
+            self.model = None
+
+        try:
             text = self._read_text(pdf_path)
             if not text:
                 result['error'] = 'no text extracted'

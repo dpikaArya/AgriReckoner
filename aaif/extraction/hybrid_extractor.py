@@ -12,7 +12,11 @@ from .pdfplumber_reader import PdfplumberReader
 from .poppler_reader import PopplerReader
 from .ocr_reader import OcrReader
 from .semantic_extractor import SemanticExtractor
-from .validation_agent import ValidationAgent
+
+try:
+    from agri_ai_agent.agents.evidence_fusion_agent import EvidenceFusionAgent as ValidationAgent
+except ImportError:
+    from .validation_agent import ValidationAgent
 
 class HybridExtractor:
     def __init__(self, output_dir=None):
@@ -68,7 +72,28 @@ class HybridExtractor:
 
         stage_results = []
 
-        for reader in self.readers:
+        is_scanned = False
+        poppler_reader = next((r for r in self.readers if r.name == 'poppler'), None)
+        if poppler_reader and poppler_reader.available:
+            try:
+                is_scanned = poppler_reader._detect_scanned_pdf(pdf_path)
+                if is_scanned:
+                    print(f"    {'SCANNED PDF DETECTED':20s} -- routing to OCR first")
+            except Exception:
+                pass
+
+        ordered_readers = self.readers[:]
+        if is_scanned:
+            ocr_idx = next((i for i, r in enumerate(self.readers) if r.name == 'ocr'), None)
+            poppler_idx = next((i for i, r in enumerate(self.readers) if r.name == 'poppler'), None)
+            if ocr_idx is not None:
+                ordered_readers.remove(self.readers[ocr_idx])
+                ordered_readers.insert(0, self.readers[ocr_idx])
+            if poppler_idx is not None:
+                ordered_readers.remove(self.readers[poppler_idx])
+                ordered_readers.insert(1, self.readers[poppler_idx])
+
+        for reader in ordered_readers:
             t0 = time.time()
             try:
                 result = reader.extract(pdf_path)
@@ -93,8 +118,22 @@ class HybridExtractor:
                     if 'Source_File' not in r or not r['Source_File']:
                         r['Source_File'] = pdf_name
 
-        merged = self.validator.merge(stage_results, source_file=pdf_path)
-        merged['rows'] = self.validator.normalize_units(merged.get('rows', []))
+        if hasattr(self.validator, 'process'):
+            result_df = self.validator.process(
+                pd.DataFrame(), stage_results=stage_results, source_file=pdf_path
+            )
+            merged_rows = result_df.to_dict('records') if not result_df.empty else []
+            merged = {
+                'success': True,
+                'rows': merged_rows,
+                'confidence': float(result_df['_fused_confidence'].mean()) if '_fused_confidence' in result_df.columns and not result_df.empty else 0.0,
+            }
+        else:
+            merged = self.validator.merge(stage_results, source_file=pdf_path)
+            merged['rows'] = self.validator.normalize_units(merged.get('rows', []))
+            merged['rows'] = self.validator.validate_duplicates(merged.get('rows', []))
+            merged['rows'] = self.validator.validate_crop_consistency(merged.get('rows', []))
+            merged['rows'] = self.validator.validate_treatment_ids(merged.get('rows', []))
 
         n_yield = sum(1 for r in merged.get('rows', [])
                      if any(r.get(yc) is not None for yc in

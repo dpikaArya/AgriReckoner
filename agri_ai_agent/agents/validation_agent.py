@@ -71,6 +71,83 @@ RANGE_CONSTRAINTS = {
     "Boron": (0, 100),
 }
 
+BIOLOGICAL_RULES: dict[str, dict] = {
+    "Plant_Height_cm": {"min": 1, "max": 800, "unit": "cm", "crop_ranges": {
+        "wheat": (20, 120), "rice": (50, 150), "maize": (100, 400),
+        "bell pepper": (30, 150), "carrot": (15, 40), "spinach": (15, 50),
+    }},
+    "Yield_per_Hectare": {"min": 100, "max": 20000, "unit": "kg/ha", "crop_ranges": {
+        "wheat": (1000, 8000), "rice": (1500, 10000), "maize": (2000, 12000),
+        "bell pepper": (5000, 80000), "carrot": (10000, 60000),
+        "spinach": (5000, 30000), "chickpea": (800, 3000),
+    }},
+    "Soil_pH": {"min": 3.0, "max": 10.0, "unit": "pH"},
+    "Nitrogen": {"min": 10, "max": 500, "unit": "kg/ha"},
+    "Phosphorus": {"min": 5, "max": 200, "unit": "kg/ha"},
+    "Potassium": {"min": 10, "max": 400, "unit": "kg/ha"},
+    "Harvest_Index": {"min": 0.1, "max": 0.7, "unit": "ratio"},
+    "SPAD": {"min": 10, "max": 80, "unit": "SPAD units"},
+    "Leaf_Number": {"min": 2, "max": 100, "unit": "count"},
+    "Tillers": {"min": 1, "max": 50, "unit": "count"},
+    "Fruit_Weight": {"min": 0.5, "max": 2000, "unit": "g"},
+    "100_Seed_Weight": {"min": 1, "max": 500, "unit": "g"},
+}
+
+AGRONOMIC_RULES: list[dict] = [
+    {
+        "name": "yield_biomass_ratio",
+        "condition": lambda r: (
+            r.get("Yield_per_Hectare") is not None and r.get("Biomass_Yield") is not None
+            and r["Biomass_Yield"] > 0
+        ),
+        "check": lambda r: 0.1 <= (r["Yield_per_Hectare"] / r["Biomass_Yield"]) <= 0.8,
+        "message": "Yield/Biomass ratio outside 0.1-0.8",
+        "severity": "warning",
+    },
+    {
+        "name": "temperature_consistency",
+        "condition": lambda r: (
+            r.get("Temperature_Max") is not None and r.get("Temperature_Min") is not None
+        ),
+        "check": lambda r: r["Temperature_Max"] >= r["Temperature_Min"],
+        "message": "Tmax < Tmin",
+        "severity": "error",
+    },
+    {
+        "name": "height_leaf_area_correlation",
+        "condition": lambda r: (
+            r.get("Plant_Height_cm") is not None and r.get("Leaf_Area_cm2") is not None
+        ),
+        "check": lambda r: not (r["Plant_Height_cm"] < 5 and r["Leaf_Area_cm2"] > 100),
+        "message": "Suspicious height-leaf area combination",
+        "severity": "warning",
+    },
+    {
+        "name": "organic_matter_carbon_ratio",
+        "condition": lambda r: (
+            r.get("Organic_Matter") is not None and r.get("Organic_Carbon") is not None
+            and r["Organic_Carbon"] > 0
+        ),
+        "check": lambda r: 1.0 <= (r["Organic_Matter"] / r["Organic_Carbon"]) <= 2.5,
+        "message": "OM/OC ratio outside 1.0-2.5 (expected ~1.724)",
+        "severity": "warning",
+    },
+    {
+        "name": "fertilizer_rate_sanity",
+        "condition": lambda r: r.get("Nitrogen") is not None,
+        "check": lambda r: r["Nitrogen"] <= 300,
+        "message": "N rate > 300 kg/ha is unusually high",
+        "severity": "warning",
+    },
+    {
+        "name": "harvest_index_plausibility",
+        "condition": lambda r: r.get("Harvest_Index") is not None,
+        "check": lambda r: 0.15 <= r["Harvest_Index"] <= 0.65,
+        "message": "Harvest index outside 0.15-0.65 range",
+        "severity": "warning",
+    },
+]
+
 
 class ValidationAgent(BaseAgent):
     """Validates evidence, traces provenance, harmonises units, and runs quality checks."""
@@ -108,12 +185,13 @@ class ValidationAgent(BaseAgent):
         issues = self._quality_checks(df)
         self._save_quality_reports(issues, df)
 
-        self.contract.metadata = {
-            "facts_validated": len(extraction_records),
-            "provenance_records": len(provenance),
-            "conversions": len(conversions),
-            "quality_issues": {k: len(v) if isinstance(v, list) else v for k, v in issues.items()},
-        }
+        if self.contract is not None:
+            self.contract.metadata = {
+                "facts_validated": len(extraction_records),
+                "provenance_records": len(provenance),
+                "conversions": len(conversions),
+                "quality_issues": {k: len(v) if isinstance(v, list) else v for k, v in issues.items()},
+            }
         return df
 
     # ── Evidence validation ──────────────────────────────────────────────
@@ -283,6 +361,9 @@ class ValidationAgent(BaseAgent):
             "outliers": [], "missing_identifiers": [], "negative_values": [],
             "range_violations": [], "unit_inconsistencies": [],
             "ontology_inconsistencies": [],
+            "biological_violations": [],
+            "agronomic_violations": [],
+            "outliers_mad": [],
         }
         issues["duplicate_rows"] = int(df.duplicated().sum())
         dup_cols = df.columns[df.columns.duplicated()].tolist()
@@ -319,9 +400,61 @@ class ValidationAgent(BaseAgent):
                     if outliers > 0:
                         issues["outliers"].append(f"{col}: {outliers} outlier(s)")
 
+        issues["biological_violations"] = self._validate_biological_rules(df)
+        issues["agronomic_violations"] = self._validate_agronomic_rules(df)
+        issues["outliers_mad"] = self._detect_outliers_mad(df)
         issues["unit_inconsistencies"] = self._check_unit_consistency(df)
         issues["ontology_inconsistencies"] = self._check_ontology_consistency(df)
         return issues
+
+    def _validate_biological_rules(self, df: pd.DataFrame) -> list:
+        violations = []
+        for col, rules in BIOLOGICAL_RULES.items():
+            if col not in df.columns:
+                continue
+            vals = pd.to_numeric(df[col], errors="coerce").dropna()
+            if vals.empty:
+                continue
+            lo, hi = rules["min"], rules["max"]
+            n_outside = int(((vals < lo) | (vals > hi)).sum())
+            if n_outside > 0:
+                violations.append(
+                    f"{col}: {n_outside} values outside biological range "
+                    f"[{lo}, {hi}] {rules['unit']}"
+                )
+        return violations
+
+    def _validate_agronomic_rules(self, df: pd.DataFrame) -> list:
+        violations = []
+        for _, row in df.iterrows():
+            for rule in AGRONOMIC_RULES:
+                try:
+                    if rule["condition"](row) and not rule["check"](row):
+                        violations.append(
+                            f"Row {row.name}: {rule['message']} [{rule['severity']}]"
+                        )
+                except Exception:
+                    continue
+        if len(violations) > 50:
+            violations = violations[:50] + [f"... and {len(violations) - 50} more"]
+        return violations
+
+    def _detect_outliers_mad(self, df: pd.DataFrame, threshold: float = 3.5) -> list:
+        outliers = []
+        num_cols = df.select_dtypes(include=[np.number]).columns
+        for col in num_cols:
+            vals = df[col].dropna()
+            if len(vals) < 5:
+                continue
+            median = vals.median()
+            mad = np.median(np.abs(vals - median))
+            if mad == 0:
+                continue
+            modified_z = 0.6745 * (vals - median) / mad
+            n_outliers = int((np.abs(modified_z) > threshold).sum())
+            if n_outliers > 0:
+                outliers.append(f"{col}: {n_outliers} MAD outliers (z>{threshold})")
+        return outliers
 
     def _check_unit_consistency(self, df: pd.DataFrame) -> list:
         issues = []
@@ -366,7 +499,8 @@ class ValidationAgent(BaseAgent):
     def _save_validated(self, validated: list):
         path = self.settings.OUTPUT_DIR / "Validated_Extractions.json"
         path.write_text(json.dumps(validated, indent=2, default=str), encoding="utf-8")
-        self.contract.artifacts.append(str(path))
+        if self.contract is not None:
+            self.contract.artifacts.append(str(path))
         counts = {"accepted": 0, "rejected": 0}
         for v in validated:
             counts["rejected" if v.get("validation") == "REJECTED" else "accepted"] += 1
@@ -395,7 +529,8 @@ class ValidationAgent(BaseAgent):
                         "provenance_records": records}, indent=2, default=str),
             encoding="utf-8",
         )
-        self.contract.artifacts.append(str(path))
+        if self.contract is not None:
+            self.contract.artifacts.append(str(path))
 
     def _save_unit_report(self, conversions: list):
         if not conversions:
@@ -412,8 +547,9 @@ class ValidationAgent(BaseAgent):
             f"Rows: {len(df)} | Cols: {len(df.columns)}",
             f"Duplicates: {issues['duplicate_rows']} rows, {len(issues['duplicate_columns'])} cols",
         ]
-        for key in ("impossible_values", "outliers", "missing_identifiers", "negative_values",
-                     "unit_inconsistencies", "ontology_inconsistencies"):
+        for key in ("impossible_values", "outliers", "outliers_mad", "missing_identifiers",
+                     "negative_values", "unit_inconsistencies", "ontology_inconsistencies",
+                     "biological_violations", "agronomic_violations"):
             items = issues.get(key, [])
             if items:
                 lines.append(f"")

@@ -23,7 +23,7 @@ sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(BASE_DIR / "agri_ai_agent"))
 
 from agri_ai_agent.config.settings import AgriAISettings
-from agri_ai_agent.config.schema import UAMS_COLUMNS
+from agri_ai_agent.config.schema import UAMS_COLUMNS, POST_HARVEST_VARIABLES, NON_FEATURE_COLS
 from agri_ai_agent.contracts.messages import AgentContract
 
 settings = AgriAISettings()
@@ -60,6 +60,61 @@ DESIGN_KEYWORDS = [
     "latin square", "factorial", "nested design", "strip plot",
     "augmented design", "alpha lattice", "row column design",
 ]
+
+MASTER_COLUMN_MAP = {
+    "Paper_ID": "Paper_ID", "Crop": "Crop", "Variety": "Variety",
+    "Treatment": "Treatment", "Fertilizer": "Fertilizer_Name",
+    "Amendment": "Fertilizer_Name",
+    "Dose_kg_acre": "Dose", "Location": "Location", "Country": "Country",
+    "State": "State", "Latitude": "Latitude", "Longitude": "Longitude",
+    "Season": "Season", "Design": "Design", "Experimental_Design": "Design",
+    "Replications": "Replications", "Replicate": "Replications",
+    "Plot_Size_m2": "Plot_Size", "Row_Spacing_cm": "Spacing_Row",
+    "Plant_Spacing_cm": "Spacing_Plant",
+    "Harvest_Stage": "Growth_Duration_Days", "Harvest_DAS": "Growth_Duration_Days",
+    "Harvest_Days": "Growth_Duration_Days",
+    "Rainfall_mm": "Rainfall", "Tmax_C": "Temperature_Max",
+    "Tmin_C": "Temperature_Min",
+    "Soil_pH": "Soil_pH", "pH": "Soil_pH",
+    "EC": "EC", "EC_dS_m": "EC",
+    "Organic_Carbon": "Organic_Carbon", "Organic_C": "Organic_Carbon",
+    "Organic_Carbon_%": "Organic_Carbon", "Organic_Matter_%": "Organic_Matter",
+    "Available_N": "Nitrogen", "Nitrogen_kg_ha": "Nitrogen",
+    "Available_P": "Phosphorus", "P2O5_kg_ha": "Phosphorus",
+    "Available_K": "Potassium", "K2O_kg_ha": "Potassium",
+    "Sulphur_ppm": "Sulphur", "Zn_ppm": "Zinc", "Iron_ppm": "Iron",
+    "Mn_ppm": "Manganese", "Cu_ppm": "Copper",
+    "PlantHeight_30_cm": "Plant_Height_30_cm",
+    "PlantHeight_60_cm": "Plant_Height_60_cm",
+    "PlantHeight_90_cm": "Plant_Height_90_cm",
+    "PlantHeight_120_cm": "Plant_Height_cm",
+    "Plant_Height_cm": "Plant_Height_cm",
+    "LeafArea_30_cm2": "Leaf_Area_30_cm2",
+    "LeafArea_60_cm2": "Leaf_Area_60_cm2",
+    "LeafArea_90_cm2": "Leaf_Area_90_cm2",
+    "LeafArea_120_cm2": "Leaf_Area_cm2",
+    "Leaf_Area_cm2": "Leaf_Area_cm2",
+    "Branches_60": "Branches", "Branches_90": "Branches",
+    "Flowers_60": "Flowers",
+    "FruitWeight_90_g": "Fruit_Weight", "FruitWeight_120_g": "Fruit_Weight",
+    "FruitDiameter_90_mm": "Fruit_Diameter_mm",
+    "FruitDiameter_120_mm": "Fruit_Diameter_mm",
+    "YieldPlot_90_g": "Yield_per_Plot", "YieldPlot_120_g": "Yield_per_Plot",
+    "Fresh_Weight_g": "Yield_per_Plot",
+    "Shoot_Biomass_g": "Shoot_Biomass_g", "Root_Biomass_g": "Root_Biomass_g",
+    "Shoot_Length_cm": "Shoot_Length_cm", "Root_Length_cm": "Root_Length_cm",
+    "Leaf_Area_cm2": "Leaf_Area_cm2", "No_Leaves": "Leaf_Number",
+    "Root_Diameter_mm": "Root_Diameter_mm",
+    "Chlorophyll_SPAD": "SPAD", "SPAD": "SPAD",
+    "Tillers": "Tillers", "Spike_Length_cm": "Spike_Length",
+    "Seeds_per_Spike": "Seeds_per_Spike",
+    "Weight_100_Seeds_g": "100_Seed_Weight",
+    "Yield_per_Plot_g": "Yield_per_Plot",
+    "Dry_Matter_pct": "Dry_Matter", "Ash_pct": "Ash",
+    "Iron_mgkg": "Iron",
+}
+
+MASTER_DATASETS_DIR = BASE_DIR / "data" / "master_datasets"
 
 
 def log(msg: str):
@@ -246,6 +301,59 @@ def normalize_title(t: str) -> str:
 
 
 # =====================================================================
+# PHASE 0 — LOAD MASTER DATASETS
+# =====================================================================
+def phase0_load_master_datasets() -> pd.DataFrame:
+    log("\n" + "=" * 60)
+    log("PHASE 0: LOAD MASTER DATASETS")
+    log("=" * 60)
+
+    if not MASTER_DATASETS_DIR.exists():
+        log(f"Master datasets directory not found: {MASTER_DATASETS_DIR}")
+        return pd.DataFrame()
+
+    xlsx_files = sorted(MASTER_DATASETS_DIR.glob("*.xlsx"))
+    log(f"Found {len(xlsx_files)} master dataset files")
+
+    all_dfs = []
+    for xlsx_path in xlsx_files:
+        try:
+            df = pd.read_excel(xlsx_path, engine="openpyxl")
+            log(f"  {xlsx_path.name}: {len(df)} rows, {len(df.columns)} cols")
+            df["_source_file"] = xlsx_path.name
+            all_dfs.append(df)
+        except Exception as e:
+            log(f"  ERROR reading {xlsx_path.name}: {e}")
+
+    if not all_dfs:
+        log("No master datasets loaded")
+        return pd.DataFrame()
+
+    combined = pd.concat(all_dfs, ignore_index=True)
+    log(f"Combined master datasets: {len(combined)} rows, {len(combined.columns)} cols")
+
+    mapped = combined.rename(columns=MASTER_COLUMN_MAP)
+    mapped = mapped.loc[:, ~mapped.columns.duplicated()]
+
+    for col in UAMS_COLUMNS:
+        if col not in mapped.columns:
+            mapped[col] = pd.NA
+
+    ordered = [c for c in UAMS_COLUMNS if c in mapped.columns]
+    extra = [c for c in mapped.columns if c not in UAMS_COLUMNS and c != "_source_file"]
+    mapped = mapped[ordered + extra + ["_source_file"]]
+
+    n_filled = sum(1 for c in ordered if mapped[c].notna().any())
+    log(f"Schema columns with data: {n_filled}/{len(ordered)}")
+
+    csv_path = OUTPUTS_DIR / "master_datasets_combined.csv"
+    mapped.to_csv(csv_path, index=False)
+    log(f"Combined master datasets saved: {csv_path}")
+
+    return mapped
+
+
+# =====================================================================
 # PHASE 1 — INGESTION
 # =====================================================================
 def phase1_ingestion() -> pd.DataFrame:
@@ -333,6 +441,16 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
     log("\n" + "=" * 60)
     log("PHASE 2-3: AI EXTRACTION + UNIVERSAL SCHEMA")
     log("=" * 60)
+
+    cached_csv = OUTPUTS_DIR / "Universal_Agricultural_Schema.csv"
+    if cached_csv.exists():
+        try:
+            cached_df = pd.read_csv(cached_csv)
+            if len(cached_df) > 0:
+                log(f"Loading cached extraction: {cached_csv} ({len(cached_df)} rows)")
+                return cached_df
+        except Exception:
+            pass
 
     pdf_files = sorted(PAPERS_DIR.glob("*.pdf"))
     all_rows = []
@@ -748,173 +866,237 @@ def phase5_features(df: pd.DataFrame) -> pd.DataFrame:
 
 
 # =====================================================================
-# PHASE 6 — MODEL TRAINING
+# PHASE 6 — MODEL TRAINING (Enhanced with CV, tuning, multi-model)
 # =====================================================================
-def phase6_training(df: pd.DataFrame) -> dict:
+def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
     log("\n" + "=" * 60)
     log("PHASE 6: MODEL TRAINING")
     log("=" * 60)
 
-    results = {}
+    if master_df is not None and not master_df.empty:
+        combine_cols = [c for c in df.columns if c in master_df.columns or c in UAMS_COLUMNS]
+        all_data = pd.concat([master_df[combine_cols], df[combine_cols]], ignore_index=True)
+        all_data = all_data.loc[:, ~all_data.columns.duplicated()]
+        log(f"Merged dataset: {len(all_data)} rows (master={len(master_df)}, pdf={len(df)})")
+    else:
+        all_data = df.copy()
 
-    target = "Yield_per_Hectare"
-    if target not in df.columns:
-        for alt in ["Target_Yield", "Yield_per_Plot", "Yield_per_Hectare_Calc"]:
-            if alt in df.columns:
-                target = alt
+    targets = ["Yield_per_Plot", "Yield_per_Hectare", "Plant_Height_cm", "SPAD", "Shoot_Biomass_g"]
+    available_targets = [t for t in targets if t in all_data.columns and all_data[t].notna().sum() >= 5]
+    if not available_targets:
+        for alt in ["Target_Yield", "Yield_per_Plot", "Yield_per_Hectare"]:
+            if alt in all_data.columns and all_data[alt].notna().sum() >= 3:
+                available_targets = [alt]
                 break
-        else:
-            log(f"WARNING: No target yield column found")
-            return {"error": "No target column"}
+    if not available_targets:
+        log("WARNING: No target columns with sufficient data")
+        return {"error": "No targets"}
+
+    log(f"Training targets: {available_targets}")
 
     exclude = {"Paper_ID", "DOI", "Crop", "Treatment", "Fertilizer_Name",
-               "Season", "Variety", "Location", "Site", "State",
-               "Recommendation_Summary", "Fuzzy_Summary"}
+               "Season", "Variety", "Location", "Site", "State", "Country",
+               "Recommendation_Summary", "Fuzzy_Summary", "_source_file",
+               "Source_File", "Paper_Name", "Title", "Status", "Duplicate_Flag",
+               "Duplicate_With", "Processing_Time_s"}
 
-    numeric_df = df.select_dtypes(include=[np.number])
-    feature_cols = [c for c in numeric_df.columns if c not in exclude and c != target]
-
-    if not feature_cols:
-        log("WARNING: No feature columns found")
-        return {"error": "No features"}
-
-    X = numeric_df[feature_cols].copy()
-    y = numeric_df[target].copy()
-
-    X = X.replace([np.inf, -np.inf], np.nan)
-
-    for col in X.columns:
-        if X[col].isna().sum() < len(X):
-            X[col] = X[col].fillna(X[col].median())
-
-    non_null_features = [c for c in X.columns if X[c].notna().any()]
-    if not non_null_features:
-        log("WARNING: All features are null")
-        return {"error": "All features null"}
-
-    X = X[non_null_features]
-
-    valid = y.notna()
-    X = X[valid]
-    y = y[valid]
-
-    if len(X) < 2:
-        log(f"WARNING: Insufficient samples: {len(X)}")
-        return {"error": f"Insufficient samples: {len(X)}"}
-
-    log(f"Training data: {X.shape[0]} samples, {X.shape[1]} features")
-    if len(X) < 10:
-        log(f"WARNING: Very small dataset ({len(X)} samples) — results may not be reliable")
-
-    from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
-    from sklearn.linear_model import LinearRegression
-    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold
+    from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
+    from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+    from sklearn.svm import SVR
+    from sklearn.preprocessing import StandardScaler
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-    models_dict = {}
-
-    log("Training Linear Regression...")
-    lr = LinearRegression()
-    lr.fit(X_train, y_train)
-    models_dict["Multiple_Linear_Regression"] = lr
 
     try:
         from xgboost import XGBRegressor
-        log("Training XGBoost...")
-        xgb = XGBRegressor(n_estimators=100, random_state=42, verbosity=0, n_jobs=1)
-        xgb.fit(X_train, y_train)
-        models_dict["XGBoost"] = xgb
-    except Exception as e:
-        log(f"XGBoost not available: {e}")
-        log("Falling back to Random Forest...")
-        xgb = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-        xgb.fit(X_train, y_train)
-        models_dict["XGBoost_Alternative"] = xgb
+        has_xgb = True
+    except ImportError:
+        has_xgb = False
 
-    log("Training Random Forest...")
-    rf = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
-    rf.fit(X_train, y_train)
-    models_dict["Random_Forest"] = rf
+    all_results = {}
+    all_cv = {}
+    all_feature_importance = {}
+    all_models = {}
 
-    training_results = []
-    for name, model in models_dict.items():
-        y_pred = model.predict(X_test)
-        mae = mean_absolute_error(y_test, y_pred)
-        mse = mean_squared_error(y_test, y_pred)
-        rmse = float(np.sqrt(mse))
-        r2 = r2_score(y_test, y_pred)
-        mape = float(np.mean(np.abs((y_test - y_pred) / (y_test + 1e-10))) * 100)
+    for target in available_targets:
+        log(f"\n  --- Target: {target} ---")
+        numeric_df = all_data.select_dtypes(include=[np.number])
+        feature_cols = [c for c in numeric_df.columns
+                       if c not in exclude and c != target
+                       and not c.startswith("Target_")
+                       and c not in POST_HARVEST_VARIABLES
+                       and c not in NON_FEATURE_COLS]
 
-        log(f"  {name}: MAE={mae:.2f}, RMSE={rmse:.2f}, R2={r2:.4f}, MAPE={mape:.2f}%")
-        training_results.append({
-            "Model": name, "Target": target,
-            "MAE": round(mae, 4), "RMSE": round(rmse, 4),
-            "R2": round(r2, 4), "MAPE": round(mape, 2),
-        })
+        X = numeric_df[feature_cols].copy()
+        y = all_data[target].copy()
+        X = X.replace([np.inf, -np.inf], np.nan)
 
-    cv_scores = {}
-    for name, model in models_dict.items():
-        try:
-            scores = cross_val_score(model, X, y, cv=min(5, len(X)), scoring="r2")
-            cv_scores[name] = {
-                "mean_r2": round(scores.mean(), 4),
-                "std_r2": round(scores.std(), 4),
-            }
-            log(f"  {name} CV R2: {scores.mean():.4f} +/- {scores.std():.4f}")
-        except Exception as e:
-            log(f"  {name} CV failed: {e}")
+        for col in X.columns:
+            if X[col].isna().sum() < len(X):
+                X[col] = X[col].fillna(X[col].median())
 
-    best_model_name = max(training_results, key=lambda r: r["R2"])["Model"]
-    best_model = models_dict[best_model_name]
-    best_model.fit(X, y)
+        non_null = [c for c in X.columns if X[c].notna().any()]
+        X = X[non_null]
+        valid = y.notna()
+        X, y = X[valid], y[valid]
 
-    import joblib
-    xgb_path = MODELS_DIR / "xgboost_model.pkl"
-    if "XGBoost" in models_dict:
-        joblib.dump(models_dict["XGBoost"], xgb_path)
-    elif "XGBoost_Alternative" in models_dict:
-        joblib.dump(models_dict["XGBoost_Alternative"], xgb_path)
-    log(f"XGBoost model saved: {xgb_path}")
+        if len(X) < 5:
+            log(f"  Insufficient samples ({len(X)}) for {target}")
+            continue
 
-    reg_path = MODELS_DIR / "regression_model.pkl"
-    joblib.dump(lr, reg_path)
-    log(f"Regression model saved: {reg_path}")
+        log(f"  Data: {X.shape[0]} samples, {X.shape[1]} features")
 
-    feature_importance = []
-    if hasattr(best_model, "feature_importances_"):
-        for feat, imp in zip(feature_cols, best_model.feature_importances_):
-            feature_importance.append({"Feature": feat, "Importance": round(imp, 4)})
-        fi_df = pd.DataFrame(feature_importance).sort_values("Importance", ascending=False)
-        fi_df.to_csv(OUTPUTS_DIR / "feature_importance.csv", index=False)
-    elif hasattr(best_model, "coef_"):
-        for feat, coef in zip(feature_cols, best_model.coef_):
-            feature_importance.append({"Feature": feat, "Coefficient": round(coef, 4)})
-        fi_df = pd.DataFrame(feature_importance)
-        fi_df.to_csv(OUTPUTS_DIR / "feature_importance.csv", index=False)
+        if X.shape[1] > X.shape[0] // 2:
+            from sklearn.feature_selection import SelectKBest, f_regression
+            k = max(3, X.shape[0] // 3)
+            selector = SelectKBest(f_regression, k=min(k, X.shape[1]))
+            X_arr = selector.fit_transform(X.values, y.values)
+            selected_mask = selector.get_support()
+            selected_features = [f for f, m in zip(X.columns, selected_mask) if m]
+            X = pd.DataFrame(X_arr, columns=selected_features, index=X.index)
+            log(f"  Feature selection: {len(selected_features)}/{len(non_null)} features retained")
 
-    results_df = pd.DataFrame(training_results)
-    results_df["CV_Mean_R2"] = results_df["Model"].map(
-        lambda m: cv_scores.get(m, {}).get("mean_r2", "")
-    )
-    results_df["CV_Std_R2"] = results_df["Model"].map(
-        lambda m: cv_scores.get(m, {}).get("std_r2", "")
-    )
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    r_xlsx = OUTPUTS_DIR / "model_metrics.xlsx"
-    results_df.to_excel(r_xlsx, index=False, engine="openpyxl")
-    log(f"Model metrics saved: {r_xlsx}")
+        models_dict = {}
+        param_grids = {}
 
-    metrics = {
-        "training_results": training_results,
-        "cv_scores": cv_scores,
-        "best_model": best_model_name,
-        "target": target,
-        "n_features": len(feature_cols),
-        "n_samples": len(X),
+        models_dict["LinearRegression"] = LinearRegression()
+        models_dict["Ridge"] = Ridge(alpha=1.0)
+        models_dict["Lasso"] = Lasso(alpha=0.1, max_iter=5000)
+        models_dict["ElasticNet"] = ElasticNet(alpha=0.1, l1_ratio=0.5, max_iter=5000)
+        models_dict["RandomForest"] = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42, n_jobs=-1)
+        models_dict["GradientBoosting"] = GradientBoostingRegressor(n_estimators=100, max_depth=3, random_state=42)
+
+        param_grids["Ridge"] = {"alpha": [0.01, 0.1, 1.0, 10.0]}
+        param_grids["Lasso"] = {"alpha": [0.001, 0.01, 0.1, 1.0]}
+        param_grids["ElasticNet"] = {"alpha": [0.01, 0.1, 1.0], "l1_ratio": [0.2, 0.5, 0.8]}
+        param_grids["RandomForest"] = {"n_estimators": [50, 100], "max_depth": [3, 5, 7]}
+        param_grids["GradientBoosting"] = {"n_estimators": [50, 100], "max_depth": [2, 3, 4]}
+
+        if has_xgb:
+            models_dict["XGBoost"] = XGBRegressor(n_estimators=100, max_depth=3, random_state=42, verbosity=0, n_jobs=1)
+            param_grids["XGBoost"] = {"n_estimators": [50, 100, 200], "max_depth": [2, 3, 5]}
+
+        if len(X) >= 10:
+            try:
+                models_dict["SVR"] = SVR(kernel="rbf", C=1.0)
+                param_grids["SVR"] = {"C": [0.1, 1.0, 10.0], "epsilon": [0.01, 0.1]}
+            except Exception:
+                pass
+
+        target_results = []
+        target_cv = {}
+        target_fi = {}
+        target_models = {}
+
+        for name, model in models_dict.items():
+            try:
+                model.fit(X_train, y_train)
+                fitted = True
+            except Exception as e:
+                log(f"    {name} FIT FAILED: {e}")
+                fitted = False
+                continue
+
+            try:
+                y_pred = model.predict(X_test)
+                mae = mean_absolute_error(y_test, y_pred)
+                rmse = float(np.sqrt(mean_squared_error(y_test, y_pred)))
+                r2 = r2_score(y_test, y_pred)
+                mape = float(np.mean(np.abs((y_test - y_pred) / (y_test + 1e-10))) * 100)
+
+                n_cv = min(5, len(X))
+                cv_scores = cross_val_score(model, X, y, cv=n_cv, scoring="r2")
+                cv_mean = round(float(cv_scores.mean()), 4)
+                cv_std = round(float(cv_scores.std()), 4)
+
+                if name in param_grids and len(X) >= 10:
+                    try:
+                        gs = GridSearchCV(model, param_grids[name], cv=min(3, len(X_train)),
+                                         scoring="r2", n_jobs=-1, error_score="raise")
+                        gs.fit(X_train, y_train)
+                        best_params = gs.best_params_
+                        best_score = round(float(gs.best_score_), 4)
+                    except Exception:
+                        best_params = {}
+                        best_score = cv_mean
+                else:
+                    best_params = {}
+                    best_score = cv_mean
+
+                fi = {}
+                if hasattr(model, "feature_importances_"):
+                    fi = dict(zip(list(X.columns), [round(float(x), 4) for x in model.feature_importances_]))
+                elif hasattr(model, "coef_"):
+                    fi = dict(zip(list(X.columns), [round(float(x), 4) for x in model.coef_]))
+
+                target_results.append({
+                    "Model": name, "Target": target,
+                    "MAE": round(mae, 4), "RMSE": round(rmse, 4),
+                    "R2": round(r2, 4), "MAPE": round(mape, 2),
+                    "CV_Mean_R2": cv_mean, "CV_Std_R2": cv_std,
+                    "Best_CV_R2": best_score, "Best_Params": str(best_params),
+                })
+                target_cv[name] = {"mean_r2": cv_mean, "std_r2": cv_std}
+                target_fi[name] = fi
+                target_models[name] = model
+
+                log(f"    {name}: R2={r2:.4f}, RMSE={rmse:.2f}, CV_R2={cv_mean:.4f}+/-{cv_std:.4f}")
+            except Exception as e:
+                log(f"    {name} FAILED: {e}")
+
+        if target_results:
+            def _best_score(r):
+                cv = r.get("CV_Mean_R2", -999)
+                return cv if cv == cv else r.get("R2", -999)  # NaN check
+            best = max(target_results, key=_best_score)
+            best_name = best["Model"]
+            best_model = target_models.get(best_name)
+            if best_model:
+                best_model.fit(X, y)
+
+            fi_df = pd.DataFrame([
+                {"Feature": k, "Importance": v, "Target": target}
+                for k, v in sorted(target_fi.get(best_name, {}).items(), key=lambda x: -abs(x[1]))
+            ])
+            fi_df.to_csv(OUTPUTS_DIR / f"feature_importance_{target}.csv", index=False)
+
+            all_results[target] = target_results
+            all_cv[target] = target_cv
+            all_feature_importance[target] = target_fi.get(best_name, {})
+            all_models[target] = target_models
+
+    results_flat = []
+    for target, results in all_results.items():
+        results_flat.extend(results)
+
+    if results_flat:
+        results_df = pd.DataFrame(results_flat)
+        r_xlsx = OUTPUTS_DIR / "model_metrics.xlsx"
+        results_df.to_excel(r_xlsx, index=False, engine="openpyxl")
+        log(f"Model metrics saved: {r_xlsx}")
+
+        best_overall = max(results_flat, key=lambda r: r.get("CV_Mean_R2", 0))
+        log(f"\n  BEST MODEL: {best_overall['Model']} on {best_overall['Target']} "
+            f"(CV R2={best_overall['CV_Mean_R2']})")
+
+        import joblib
+        for target, models in all_models.items():
+            best_name = max(all_results[target], key=lambda r: r.get("CV_Mean_R2", 0))["Model"]
+            if best_name in models:
+                path = MODELS_DIR / f"best_model_{target}.pkl"
+                joblib.dump(models[best_name], path)
+                log(f"  Saved: {path}")
+
+    return {
+        "training_results": results_flat,
+        "cv_scores": all_cv,
+        "feature_importance": all_feature_importance,
+        "targets_trained": available_targets,
+        "n_samples": len(all_data),
+        "models": {t: m for t, m in all_models.items()},
     }
-    return metrics
 
 
 # =====================================================================
@@ -998,12 +1180,23 @@ def phase7_fuzzy(df: pd.DataFrame) -> bool:
 
 
 # =====================================================================
-# PHASE 8 — RECOMMENDATION AGENT
+# PHASE 8 — RECOMMENDATION AGENT (Enhanced with model predictions)
 # =====================================================================
-def phase8_recommendations(df: pd.DataFrame) -> pd.DataFrame:
+def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> pd.DataFrame:
     log("\n" + "=" * 60)
     log("PHASE 8: RECOMMENDATION AGENT")
     log("=" * 60)
+
+    import joblib
+
+    trained_models = {}
+    if training_metrics and "models" in training_metrics:
+        for target, model_dict in training_metrics["models"].items():
+            target_results = [r for r in training_metrics.get("training_results", []) if r.get("Target") == target]
+            if target_results:
+                best_name = max(target_results, key=lambda r: r.get("CV_Mean_R2", -999) if not np.isnan(r.get("CV_Mean_R2", -999)) else r.get("R2", -999))["Model"]
+                if best_name in model_dict:
+                    trained_models[target] = model_dict[best_name]
 
     rdf = df.copy()
     recs = []
@@ -1019,14 +1212,23 @@ def phase8_recommendations(df: pd.DataFrame) -> pd.DataFrame:
         yield_val = pd.to_numeric(row.get("Yield_per_Hectare"), errors="coerce") if pd.notna(row.get("Yield_per_Hectare")) else None
         oc = pd.to_numeric(row.get("Organic_Carbon"), errors="coerce") if pd.notna(row.get("Organic_Carbon")) else None
         zn = pd.to_numeric(row.get("Zinc"), errors="coerce") if pd.notna(row.get("Zinc")) else None
-        crop = str(row.get("Crop", ""))
+        crop = str(row.get("Crop", "Unknown"))
 
-        if n is not None and pd.isna(n):
-            n = None
-        if p is not None and pd.isna(p):
-            p = None
-        if k is not None and pd.isna(k):
-            k = None
+        predicted_yield = None
+        if trained_models:
+            for target_name, model in trained_models.items():
+                try:
+                    feature_names = model.feature_names_in_ if hasattr(model, "feature_names_in_") else None
+                    if feature_names:
+                        feat_vals = []
+                        for fn in feature_names:
+                            val = row.get(fn)
+                            feat_vals.append(pd.to_numeric(val, errors="coerce") if pd.notna(val) else 0)
+                        if any(v != 0 for v in feat_vals):
+                            predicted_yield = round(float(model.predict([feat_vals])[0]), 2)
+                            break
+                except Exception:
+                    pass
 
         if n is not None and n < 50:
             best_fert = "Urea (Nitrogen-rich)"
@@ -1063,15 +1265,13 @@ def phase8_recommendations(df: pd.DataFrame) -> pd.DataFrame:
         else:
             interval = "Every 25-30 days"
 
-        if yield_val is not None:
-            expected_yield = round(yield_val * 1.15, 2)
-            expected_increase = round(yield_val * 0.15, 2)
-        else:
-            expected_yield = None
-            expected_increase = None
+        expected_yield = predicted_yield if predicted_yield else (round(yield_val * 1.15, 2) if yield_val else None)
+        expected_increase = round(expected_yield * 0.15, 2) if expected_yield else None
 
         conf_score = 0.75
-        if n is not None and p is not None and k is not None and ph is not None:
+        if predicted_yield:
+            conf_score = 0.90
+        elif n is not None and p is not None and k is not None and ph is not None:
             conf_score = 0.85
         elif n is not None or p is not None or k is not None:
             conf_score = 0.65
@@ -1090,7 +1290,9 @@ def phase8_recommendations(df: pd.DataFrame) -> pd.DataFrame:
         recs.append({
             "Crop": crop,
             "Paper_ID": row.get("Paper_ID", ""),
+            "Treatment": row.get("Treatment", ""),
             "Best_Treatment": best_fert,
+            "Predicted_Yield": predicted_yield,
             "Expected_Yield_kg_ha": expected_yield,
             "Yield_Increase_kg_ha": expected_increase,
             "Confidence_Score": conf_score,
@@ -1111,8 +1313,8 @@ def phase8_recommendations(df: pd.DataFrame) -> pd.DataFrame:
     log(f"Recommendations CSV saved: {rec_csv}")
 
     best_by_crop = rec_df.groupby("Crop").first().reset_index()
-    for _, row in best_by_crop.iterrows():
-        log(f"  {row['Crop']}: {row['Best_Treatment']} (Conf: {row['Confidence_Label']})")
+    for _, brow in best_by_crop.iterrows():
+        log(f"  {brow['Crop']}: {brow['Best_Treatment']} (Conf: {brow['Confidence_Label']})")
 
     return rec_df
 
@@ -1529,7 +1731,16 @@ def main():
         "n_registered": 0, "fuzzy_rules": 0, "fuzzy_inputs": 0,
     }
 
-    # Phase 1
+    master_df = pd.DataFrame()
+    try:
+        master_df = phase0_load_master_datasets()
+        if not master_df.empty:
+            phases_state["n_master_rows"] = len(master_df)
+    except Exception as e:
+        log(f"PHASE 0 FAILED: {traceback.format_exc()}")
+        phases_state["failures"].append(f"Phase 0 (Master Datasets): {str(e)}")
+
+    ingestion_df = pd.DataFrame()
     try:
         ingestion_df = phase1_ingestion()
         phases_state["ingestion_df"] = {
@@ -1542,7 +1753,6 @@ def main():
         log(f"PHASE 1 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 1 (Ingestion): {str(e)}")
 
-    # Phase 2-3
     extract_df = pd.DataFrame()
     rec_df = pd.DataFrame()
     try:
@@ -1557,7 +1767,6 @@ def main():
         log(f"PHASE 2-3 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 2-3 (Extraction): {str(e)}")
 
-    # Phase 4
     try:
         if extract_df is not None and not extract_df.empty:
             val_issues = phase4_validation(extract_df)
@@ -1566,7 +1775,19 @@ def main():
         log(f"PHASE 4 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 4 (Validation): {str(e)}")
 
-    # Phase 5
+    try:
+        validated_data = []
+        if not master_df.empty:
+            validated_data.extend(master_df.to_dict(orient="records"))
+        if extract_df is not None and not extract_df.empty:
+            validated_data.extend(extract_df.to_dict(orient="records"))
+        val_path = OUTPUTS_DIR / "Validated_Extractions.json"
+        with open(val_path, "w", encoding="utf-8") as f:
+            json.dump(validated_data, f, indent=2, default=str)
+        log(f"Validated extractions saved: {val_path} ({len(validated_data)} records)")
+    except Exception as e:
+        log(f"WARNING: Could not save Validated_Extractions.json: {e}")
+
     feature_df = pd.DataFrame()
     try:
         if extract_df is not None and not extract_df.empty:
@@ -1577,16 +1798,16 @@ def main():
         log(f"PHASE 5 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 5 (Features): {str(e)}")
 
-    # Phase 6
+    training_metrics = {}
     try:
-        if feature_df is not None and not feature_df.empty:
-            train_results = phase6_training(feature_df)
-            phases_state["training"] = train_results
+        train_data = feature_df if feature_df is not None and not feature_df.empty else extract_df
+        if train_data is not None and not train_data.empty:
+            training_metrics = phase6_training(train_data, master_df)
+            phases_state["training"] = training_metrics
     except Exception as e:
         log(f"PHASE 6 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 6 (Training): {str(e)}")
 
-    # Phase 7
     try:
         if feature_df is not None and not feature_df.empty:
             fuzzy_ok = phase7_fuzzy(feature_df)
@@ -1597,17 +1818,20 @@ def main():
         log(f"PHASE 7 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 7 (Fuzzy): {str(e)}")
 
-    # Phase 8
     try:
         combined_df = feature_df if feature_df is not None and not feature_df.empty else extract_df
+        if not master_df.empty:
+            combine_cols = [c for c in combined_df.columns if c in master_df.columns]
+            if combine_cols:
+                combined_df = pd.concat([master_df[combine_cols], combined_df[combine_cols]], ignore_index=True)
+                combined_df = combined_df.loc[:, ~combined_df.columns.duplicated()]
         if combined_df is not None and not combined_df.empty:
-            rec_df = phase8_recommendations(combined_df)
+            rec_df = phase8_recommendations(combined_df, training_metrics)
             phases_state["n_recommendations"] = len(rec_df) if rec_df is not None else 0
     except Exception as e:
         log(f"PHASE 8 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 8 (Recommendations): {str(e)}")
 
-    # Phase 9
     try:
         if rec_df is not None and not rec_df.empty:
             combined_df2 = feature_df if feature_df is not None and not feature_df.empty else extract_df
@@ -1618,7 +1842,6 @@ def main():
         log(f"PHASE 9 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 9 (Ready Reckoner): {str(e)}")
 
-    # Phase 10
     try:
         cl_ok = phase10_continuous_learning(ingestion_df)
         if cl_ok:
@@ -1627,7 +1850,6 @@ def main():
         log(f"PHASE 10 FAILED: {traceback.format_exc()}")
         phases_state["failures"].append(f"Phase 10 (Continuous Learning): {str(e)}")
 
-    # Final Report
     try:
         generate_final_report(phases_state)
     except Exception as e:
@@ -1645,4 +1867,12 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--force" in sys.argv:
+        for f in ["Universal_Agricultural_Schema.csv", "Universal_Agricultural_Schema.xlsx",
+                   "Validated_Extractions.json", "features_dataset.csv",
+                   "model_metrics.xlsx", "feature_importance_Yield_per_Plot.csv"]:
+            p = OUTPUTS_DIR / f
+            if p.exists():
+                p.unlink()
+                log(f"Removed cached: {p.name}")
     main()

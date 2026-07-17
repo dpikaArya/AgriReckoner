@@ -13,6 +13,9 @@ import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.settings import AgriAISettings
+from agri_ai_agent.config.schema import (
+    NON_FEATURE_COLS, POST_HARVEST_VARIABLES,
+)
 
 TARGET_COLUMNS = [
     "Target_Yield", "Target_Fertilizer",
@@ -25,7 +28,9 @@ EXCLUDE_COLS = {
     "Location", "State", "Site", "Treatment", "Fertilizer_Name",
     "Organic_Fertilizer", "Biofertilizer", "Application_Method",
     "Application_Interval", "Feature_Available_Before_Prediction",
-}
+    "Table_Row", "Row_Index", "_source_page", "_reader", "_confidence",
+    "Source_File",
+} | NON_FEATURE_COLS | {v for v in POST_HARVEST_VARIABLES}
 
 MIN_SAMPLES_FOR_TRAINING = 50
 
@@ -69,6 +74,7 @@ class TrainingAgent(BaseAgent):
 
         results = []
         artifacts = []
+        all_importances = []
 
         models = self._get_models()
         for name, model in models.items():
@@ -83,6 +89,9 @@ class TrainingAgent(BaseAgent):
                 joblib.dump(model, model_path)
                 artifacts.append(str(model_path))
 
+                importances = self._extract_feature_importance(model, name, feature_list)
+                all_importances.extend(importances)
+
                 results.append({
                     "model": name,
                     "target": target_col,
@@ -93,6 +102,12 @@ class TrainingAgent(BaseAgent):
             except Exception as e:
                 self.log.warning("Failed to train %s: %s", name, e)
                 results.append({"model": name, "target": target_col, "error": str(e)})
+
+        if all_importances:
+            fi_df = pd.DataFrame(all_importances)
+            fi_df = fi_df.sort_values(["model", "importance"], ascending=[True, False])
+            self.save_artifact(fi_df, "feature_importance.csv")
+            self.log.info("Saved feature_importance.csv (%d entries)", len(all_importances))
 
         self._save_results(results, target_col)
         self._generate_documentation(df, results)
@@ -129,6 +144,27 @@ class TrainingAgent(BaseAgent):
         models["Random Forest"] = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
         models["Linear Regression"] = LinearRegression()
         return models
+
+    def _extract_feature_importance(self, model, model_name, feature_names):
+        importances = []
+        try:
+            if hasattr(model, 'feature_importances_'):
+                vals = model.feature_importances_
+                for feat, imp in zip(feature_names, vals):
+                    importances.append({
+                        "feature": feat, "importance": float(imp),
+                        "model": model_name, "direction": 0,
+                    })
+            elif hasattr(model, 'coef_'):
+                coefs = model.coef_ if hasattr(model.coef_, '__iter__') else [model.coef_]
+                for feat, coef in zip(feature_names, coefs):
+                    importances.append({
+                        "feature": feat, "importance": float(abs(coef)),
+                        "model": model_name, "direction": 1 if coef > 0 else -1,
+                    })
+        except Exception as e:
+            self.log.warning("Could not extract importances from %s: %s", model_name, e)
+        return importances
 
     def _check_readiness(self, df: pd.DataFrame):
         n_rows = len(df)
@@ -282,6 +318,32 @@ tr:nth-child(even) {{ background-color: #f2f2f2; }}
 </tbody>
 </table>
 """
+
+        fi_path = self.settings.OUTPUT_DIR / "feature_importance.csv"
+        if fi_path.exists():
+            try:
+                fi_df = pd.read_csv(fi_path)
+                fi_top = fi_df.groupby("model").head(10)
+                fi_rows = ""
+                for _, r in fi_top.iterrows():
+                    bar_width = int(r["importance"] * 200) if r["importance"] > 0 else 1
+                    direction = "+" if r.get("direction", 0) > 0 else "-" if r.get("direction", 0) < 0 else ""
+                    fi_rows += (
+                        f"<tr><td>{r['model']}</td><td>{r['feature']}</td>"
+                        f"<td>{r['importance']:.4f}</td><td>{direction}</td>"
+                        f"<td><div style='background:#3498db;width:{bar_width}px;height:12px'></div></td></tr>\n"
+                    )
+                html += f"""<h2>Feature Importance</h2>
+<table>
+<thead><tr><th>Model</th><th>Feature</th><th>Importance</th><th>Direction</th><th>Bar</th></tr></thead>
+<tbody>
+{fi_rows}
+</tbody>
+</table>
+"""
+            except Exception:
+                pass
+
         if failed_rows:
             html += f"""<h2>Failed Models</h2>
 <table>

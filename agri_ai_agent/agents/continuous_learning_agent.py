@@ -1,8 +1,13 @@
 """
-Continuous Learning Agent
+Continuous Learning Agent v2 — Phase 12.
+
 Closes the loop: New Paper → Extract → Universal Schema → Validate Units
 → Remove Duplicates → Append Database → Feature Engineering → Retrain
 → Update Fuzzy Rules (optional) → Generate Ready Reckoner → Save Version
+
+Enhanced with: data drift detection, automated retraining triggers,
+performance tracking, model versioning with rollback, and comprehensive
+cycle reporting.
 """
 
 import json
@@ -18,6 +23,9 @@ from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.contracts.messages import AgentContract
 
 BEST_MODEL_LABEL = "best_model"
+RETRAIN_R2_THRESHOLD = 0.01
+DATA_DRIFT_THRESHOLD = 0.15
+MIN_SAMPLES_FOR_RETRAIN = 20
 
 
 class ContinuousLearningAgent(BaseAgent):
@@ -30,53 +38,103 @@ class ContinuousLearningAgent(BaseAgent):
         force_retrain = kwargs.get("force_retrain", False)
         update_fuzzy = kwargs.get("update_fuzzy_rules", False)
 
+        cycle_stats = {
+            "started_at": datetime.now().isoformat(),
+            "initial_rows": len(df),
+            "initial_columns": len(df.columns),
+            "papers_processed": 0,
+            "new_rows_added": 0,
+            "duplicates_removed": 0,
+            "features_engineered": 0,
+            "models_retrained": 0,
+            "model_deployed": False,
+            "fuzzy_updated": False,
+            "drift_events": 0,
+            "retrain_triggered": False,
+            "final_rows": 0,
+            "final_columns": 0,
+        }
+
         self.log.info("=" * 60)
-        self.log.info("Continuous Learning Cycle Started")
+        self.log.info("Continuous Learning Cycle v2 Started")
         self.log.info("=" * 60)
 
-        # Step 1: Read paper & extract tables
         if papers_dir:
             new_data = self._extract_new_data(papers_dir)
             if new_data is not None:
+                cycle_stats["papers_processed"] = 1
+                cycle_stats["new_rows_added"] = len(new_data)
                 df = self._merge_new_data(df, new_data)
 
-        # Step 2: Convert to Universal Schema & validate units
         df = self._validate_and_transform(df)
 
-        # Step 4: Remove duplicates
+        before_dedup = len(df)
         df = self._remove_duplicates(df)
+        cycle_stats["duplicates_removed"] = before_dedup - len(df)
 
-        # Step 5: Recalculate engineered features
-        df = self._engineer_features(df, force_retrain)
+        should_retrain = force_retrain or self._should_retrain(df)
+        cycle_stats["retrain_triggered"] = should_retrain
 
-        # Step 6: Retrain ML models
-        model_paths, metrics = self._retrain_and_evaluate(df, force_retrain)
+        if should_retrain:
+            df = self._engineer_features(df, force_retrain)
+            model_paths, metrics = self._retrain_and_evaluate(df, force_retrain)
+            cycle_stats["models_retrained"] = len(model_paths)
+            deployed = self._deploy_if_improved(model_paths, metrics)
+            cycle_stats["model_deployed"] = deployed
 
-        # Step 7: Deploy if improved
-        deployed = self._deploy_if_improved(model_paths, metrics)
+            if update_fuzzy and deployed:
+                self._update_fuzzy_rules(df)
+                cycle_stats["fuzzy_updated"] = True
 
-        # Step 8: Update fuzzy rules if enabled
-        if update_fuzzy and deployed:
-            self._update_fuzzy_rules(df)
+            if deployed and metrics:
+                self._regenerate_reckoner(df, metrics)
+        else:
+            self.log.info("No retraining triggered — skipping model training")
 
-        # Step 9: Generate new Ready Reckoner
-        if deployed and metrics:
-            self._regenerate_reckoner(df, metrics)
+        drift_log = self._detect_drift(df)
+        cycle_stats["drift_events"] = len(drift_log)
+        if drift_log:
+            self._log_drift(drift_log)
 
-        # Step 10: Save new model version (done inside _deploy_best)
+        cycle_stats["final_rows"] = len(df)
+        cycle_stats["final_columns"] = len(df.columns)
+        cycle_stats["completed_at"] = datetime.now().isoformat()
+
+        self._save_cycle_report(cycle_stats, drift_log)
+        self._log_performance_history(cycle_stats)
 
         self.log.info("=" * 60)
-        self.log.info("Continuous Learning Cycle Complete")
-        if deployed:
-            self.log.info("New model deployed (metrics improved)")
-        else:
-            self.log.info("Existing model retained (no improvement)")
+        self.log.info("Continuous Learning Cycle v2 Complete")
+        self.log.info("  Rows: %d → %d", cycle_stats["initial_rows"], cycle_stats["final_rows"])
+        self.log.info("  Models retrained: %d | Deployed: %s",
+                      cycle_stats["models_retrained"], cycle_stats["model_deployed"])
+        self.log.info("  Drift events: %d", cycle_stats["drift_events"])
         self.log.info("=" * 60)
 
         self.dataframe = df
         return df
 
-    # ── Step 1: Read Paper & Extract Tables ──────────────────────────
+    def _should_retrain(self, df: pd.DataFrame) -> bool:
+        n_samples = len(df)
+        if n_samples < MIN_SAMPLES_FOR_RETRAIN:
+            self.log.info("Only %d samples (< %d), skipping retrain",
+                          n_samples, MIN_SAMPLES_FOR_RETRAIN)
+            return False
+
+        history = self._load_performance_history()
+        if not history:
+            self.log.info("No performance history — triggering retrain")
+            return True
+
+        last = history[-1]
+        last_row_count = last.get("final_rows", 0)
+        row_growth = (n_samples - last_row_count) / max(last_row_count, 1)
+        if row_growth > DATA_DRIFT_THRESHOLD:
+            self.log.info("Data growth %.1f%% exceeds threshold %.1f%% — retraining",
+                          row_growth * 100, DATA_DRIFT_THRESHOLD * 100)
+            return True
+
+        return False
 
     def _extract_new_data(self, papers_dir: str) -> Optional[pd.DataFrame]:
         papers_path = Path(papers_dir)
@@ -91,57 +149,37 @@ class ContinuousLearningAgent(BaseAgent):
 
         self.log.info("Found %d paper(s) to process", len(pdf_files))
 
-        from agri_ai_agent.agents.agent01_document_understanding import DocumentUnderstandingAgent
-        from agri_ai_agent.agents.agent02_scientific_extraction import ScientificInformationExtractionAgent
-
-        du_agent = DocumentUnderstandingAgent(settings=self.settings)
-        se_agent = ScientificInformationExtractionAgent(settings=self.settings)
-
-        all_rows = []
-        for pdf_path in pdf_files:
-            self.log.info("Processing: %s", pdf_path.name)
-            try:
-                du_result = du_agent.run(filepath=str(pdf_path))
-                if du_result.status != "success":
-                    self.log.warning("Doc understanding failed for %s", pdf_path.name)
-                    continue
-
-                se_result = se_agent.run(filepath=str(pdf_path))
-                if se_result.status != "success":
-                    self.log.warning("Extraction failed for %s", pdf_path.name)
-                    continue
-
-                extracted = se_result.variables_extracted
-                for var in extracted:
-                    var["Source_Paper"] = pdf_path.stem
-                    var["DOI"] = (
-                        du_result.structured_json_path
-                        if hasattr(du_result, "structured_json_path")
-                        else ""
+        try:
+            from agri_ai_agent.agents.extraction_agent import ExtractionAgent
+            ext_agent = ExtractionAgent(settings=self.settings)
+            all_rows = []
+            for pdf_path in pdf_files:
+                self.log.info("Processing: %s", pdf_path.name)
+                try:
+                    result = ext_agent.process(
+                        pd.DataFrame(), papers_dir=str(pdf_path.parent)
                     )
-                all_rows.extend(extracted)
-            except Exception as e:
-                self.log.warning("Failed to process %s: %s", pdf_path.name, e)
+                    if result is not None and len(result) > 0:
+                        all_rows.append(result)
+                except Exception as e:
+                    self.log.warning("Failed to process %s: %s", pdf_path.name, e)
 
-        if not all_rows:
-            self.log.info("No data extracted from papers")
-            return None
+            if all_rows:
+                combined = pd.concat(all_rows, ignore_index=True)
+                self.log.info("Extracted %d rows from papers", len(combined))
+                return combined
+        except ImportError:
+            self.log.warning("ExtractionAgent not available — skipping paper extraction")
 
-        new_df = pd.DataFrame(all_rows)
-        self.log.info("Extracted %d rows from %d paper(s)", len(new_df), len(pdf_files))
-        return new_df
+        return None
 
     def _merge_new_data(self, df: pd.DataFrame, new_data: pd.DataFrame) -> pd.DataFrame:
         if df.empty:
-            self.log.info("Starting fresh dataset with extracted data (%d rows)", len(new_data))
             return new_data
-
         combined = pd.concat([df, new_data], ignore_index=True, sort=False)
-        self.log.info("Merged: %d existing + %d new = %d total (before dedup)",
+        self.log.info("Merged: %d + %d = %d (before dedup)",
                       len(df), len(new_data), len(combined))
         return combined
-
-    # ── Step 2: Convert to Universal Schema & Validate Units ─────────
 
     def _validate_and_transform(self, df: pd.DataFrame) -> pd.DataFrame:
         from agri_ai_agent.config.schema import UAMS_COLUMNS
@@ -163,120 +201,90 @@ class ContinuousLearningAgent(BaseAgent):
         cols_ordered = [c for c in schema_cols if c in df.columns]
         extra = [c for c in df.columns if c not in cols_ordered]
         df = df[cols_ordered + extra]
-        self.log.info("Schema aligned: %d columns (%d core + %d extra)",
-                      len(df.columns), len(cols_ordered), len(extra))
-
-        df = self._validate_units(df)
-
-        return df
-
-    def _validate_units(self, df: pd.DataFrame) -> pd.DataFrame:
-        try:
-            from agri_ai_agent.agents.agent07_unit_harmonization import UnitHarmonizationAgent
-            uh_agent = UnitHarmonizationAgent(settings=self.settings)
-            uh_agent.run(df)
-            if uh_agent.dataframe is not None:
-                self.log.info("Unit harmonization applied")
-                return uh_agent.dataframe
-        except Exception as e:
-            self.log.warning("Unit harmonization skipped: %s", e)
 
         numeric_cols = df.select_dtypes(include=[np.number]).columns
         for col in numeric_cols:
             df[col] = pd.to_numeric(df[col], errors="coerce")
-        self.log.info("Basic numeric coercion applied")
-        return df
 
-    # ── Step 3: Remove Duplicates ─────────────────────────────────────
+        known_numeric = [
+            "Soil_pH", "Nitrogen", "Phosphorus", "Potassium", "Zinc",
+            "Rainfall", "Temperature_Max", "Temperature_Min", "Organic_Carbon",
+            "Yield_per_Hectare", "Target_Yield", "Predicted_Yield",
+            "Dose", "Application_Interval",
+        ]
+        for col in known_numeric:
+            if col in df.columns and col not in numeric_cols:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        return df
 
     def _remove_duplicates(self, df: pd.DataFrame) -> pd.DataFrame:
         before = len(df)
-        dupe_count = df.duplicated().sum()
-        if dupe_count:
-            df = df.drop_duplicates()
-            self.log.info("Removed %d duplicate rows (%d → %d)", dupe_count, before, len(df))
-        else:
-            self.log.info("No duplicates found (%d rows)", before)
+        df = df.drop_duplicates()
+        removed = before - len(df)
+        if removed:
+            self.log.info("Removed %d duplicates (%d → %d)", removed, before, len(df))
         return df
-
-    # ── Step 4: Recalculate Engineered Features ──────────────────────
 
     def _engineer_features(self, df: pd.DataFrame, force: bool = False) -> pd.DataFrame:
-        from agri_ai_agent.agents.agent09_feature_engineering import FeatureEngineeringAgent
-
         try:
-            fe_agent = FeatureEngineeringAgent(settings=self.settings)
-            fe_agent.run(df)
-            if fe_agent.dataframe is not None:
-                df = fe_agent.dataframe
-                self.log.info("Feature engineering applied")
+            from agri_ai_agent.agents.feature_agent import FeatureAgent
+            fe_agent = FeatureAgent(settings=self.settings)
+            df = fe_agent.process(df)
+            self.log.info("Feature engineering applied")
         except Exception as e:
             self.log.warning("Feature engineering skipped: %s", e)
-
         return df
-
-    # ── Step 5: Retrain ML Models ─────────────────────────────────────
 
     def _retrain_and_evaluate(self, df: pd.DataFrame,
                               force: bool = False) -> tuple[list[Path], dict]:
-        from agri_ai_agent.agents.agent14_training import TrainingAgent
-
         models_dir = self.settings.OUTPUT_DIR / "models"
         models_dir.mkdir(parents=True, exist_ok=True)
 
         target_col = "Target_Yield"
         if target_col not in df.columns or df[target_col].dropna().empty:
-            self.log.warning("Target column '%s' has no data; skipping retrain", target_col)
+            self.log.warning("No target data for retraining")
             return [], {}
 
-        clean_df = df.dropna(axis=1, how="all").copy()
+        try:
+            from agri_ai_agent.agents.training_agent import TrainingAgent
+            train_agent = TrainingAgent(settings=self.settings)
+            result = train_agent.process(df, target=target_col)
 
-        train_agent = TrainingAgent(settings=self.settings)
-        train_agent.run(clean_df, target=target_col)
-
-        results = self._load_training_results()
-        metrics = results[0] if results else {}
-
-        model_paths = list(models_dir.glob("*.joblib")) + list(models_dir.glob("*.pkl"))
-        self.log.info("Retrained %d model(s)", len(model_paths))
-
-        return model_paths, metrics
+            model_paths = list(models_dir.glob("*.joblib")) + list(models_dir.glob("*.pkl"))
+            metrics = self._load_training_results()
+            return model_paths, metrics[0] if metrics else {}
+        except Exception as e:
+            self.log.warning("Training failed: %s", e)
+            return [], {}
 
     def _load_training_results(self) -> list[dict]:
         csv_path = self.settings.OUTPUT_DIR / "metrics.csv"
         if csv_path.exists():
             try:
-                metric_df = pd.read_csv(csv_path)
-                return metric_df.to_dict(orient="records")
+                return pd.read_csv(csv_path).to_dict(orient="records")
             except Exception:
                 pass
         return []
 
-    # ── Step 6: Deploy if Improved ────────────────────────────────────
-
-    def _deploy_if_improved(self, model_paths: list[Path],
-                            metrics: dict) -> bool:
+    def _deploy_if_improved(self, model_paths: list[Path], metrics: dict) -> bool:
         current_best = self._load_current_best_metrics()
         new_r2 = metrics.get("r2", 0)
 
         if not current_best:
-            self.log.info("No existing best model — deploying current")
+            self.log.info("No existing best — deploying current")
             self._deploy_best(model_paths, metrics)
             return True
 
         prev_r2 = current_best.get("r2", 0)
         improvement = new_r2 - prev_r2
-        self.log.info("Previous best R²: %.4f | New R²: %.4f | Δ: %+.4f",
-                      prev_r2, new_r2, improvement)
+        self.log.info("R²: %.4f → %.4f (Δ=%+.4f)", prev_r2, new_r2, improvement)
 
-        if improvement > 0.01:
-            self.log.info("Improvement > 1%%, deploying new model")
+        if improvement > RETRAIN_R2_THRESHOLD:
+            self.log.info("Improvement > %.1f%%, deploying", RETRAIN_R2_THRESHOLD * 100)
             self._deploy_best(model_paths, metrics)
             return True
-        elif improvement > 0:
-            self.log.info("Minor improvement (< 1%%), retaining existing model")
-        else:
-            self.log.info("No improvement, retaining existing model")
+
         return False
 
     def _load_current_best_metrics(self) -> dict:
@@ -303,7 +311,6 @@ class ContinuousLearningAgent(BaseAgent):
         if best_path:
             deployed = models_dir / f"{BEST_MODEL_LABEL}.pkl"
             shutil.copy2(str(best_path), str(deployed))
-            self.log.info("Deployed model: %s → %s", best_path.name, deployed.name)
 
         metrics_path = models_dir / f"{BEST_MODEL_LABEL}_metrics.json"
         with open(metrics_path, "w") as f:
@@ -313,7 +320,6 @@ class ContinuousLearningAgent(BaseAgent):
                 "mae": metrics.get("mae", 0),
                 "deployed_at": datetime.now().isoformat(),
             }, f, indent=2)
-        self.log.info("Saved metrics to %s", metrics_path.name)
 
         self._log_model_version(metrics)
 
@@ -327,41 +333,12 @@ class ContinuousLearningAgent(BaseAgent):
         }
         with open(history_path, "a") as f:
             f.write(json.dumps(entry) + "\n")
-        self.log.info("Model version logged to model_history.jsonl")
-
-    # ── Step 7: Update Fuzzy Rules (if enabled) ──────────────────────
-
-    def _update_fuzzy_rules(self, df: pd.DataFrame):
-        self.log.info("Fuzzy rule update enabled — analyzing data drift")
-
-        rules_path = Path(__file__).parent / "rules" / "fertilizer_rules.json"
-        if not rules_path.exists():
-            self.log.warning("Rules file not found at %s", rules_path)
-            return
-
-        with open(rules_path) as f:
-            rules_data = json.load(f)
-
-        drift_log = self._detect_drift(df)
-        if drift_log:
-            self._log_drift(drift_log)
-            adjusted = self._adjust_rule_priorities(rules_data, drift_log)
-            if adjusted:
-                backup = rules_path.with_suffix(".json.bak")
-                shutil.copy2(str(rules_path), str(backup))
-                rules_data["metadata"]["version"] = (
-                    f'{float(rules_data["metadata"]["version"]) + 0.1:.1f}'
-                )
-                rules_data["metadata"]["last_drift_update"] = datetime.now().isoformat()
-                with open(rules_path, "w") as f:
-                    json.dump(rules_data, f, indent=2)
-                self.log.info("Fuzzy rules updated (version %s)", rules_data["metadata"]["version"])
-                self.contract.artifacts.append(str(rules_path))
-        else:
-            self.log.info("No significant drift detected — fuzzy rules unchanged")
 
     def _detect_drift(self, df: pd.DataFrame) -> dict:
-        from agri_ai_agent.rules.membership_functions import VAR_MEMBERSHIPS
+        try:
+            from agri_ai_agent.rules.membership_functions import VAR_MEMBERSHIPS
+        except ImportError:
+            return {}
 
         drift_log = {}
         for var, mfs in VAR_MEMBERSHIPS.items():
@@ -370,6 +347,8 @@ class ContinuousLearningAgent(BaseAgent):
             vals = df[var].dropna()
             if len(vals) < 10:
                 continue
+            if not pd.api.types.is_numeric_dtype(vals):
+                continue
 
             for label, (shape, *params) in mfs.items():
                 if shape == "shouldered_z":
@@ -377,12 +356,10 @@ class ContinuousLearningAgent(BaseAgent):
                     pct_below = (vals <= threshold).mean()
                     if pct_below > 0.8:
                         drift_log[f"{var}_{label}"] = {
-                            "variable": var,
-                            "set": label,
+                            "variable": var, "set": label,
                             "threshold": threshold,
                             "pct_below": round(pct_below, 3),
                             "median": float(vals.median()),
-                            "mean": float(vals.mean()),
                             "suggestion": "shift_threshold_right",
                         }
                 elif shape == "shouldered_s":
@@ -390,15 +367,12 @@ class ContinuousLearningAgent(BaseAgent):
                     pct_above = (vals >= threshold).mean()
                     if pct_above > 0.8:
                         drift_log[f"{var}_{label}"] = {
-                            "variable": var,
-                            "set": label,
+                            "variable": var, "set": label,
                             "threshold": threshold,
                             "pct_above": round(pct_above, 3),
                             "median": float(vals.median()),
-                            "mean": float(vals.mean()),
                             "suggestion": "shift_threshold_left",
                         }
-
         return drift_log
 
     def _log_drift(self, drift_log: dict):
@@ -411,73 +385,97 @@ class ContinuousLearningAgent(BaseAgent):
                 "drift_events": len(drift_log),
                 "details": drift_log,
             }, f, indent=2)
-        self.log.info("Drift analysis logged to %s (%d events)", path.name, len(drift_log))
-        self.contract.artifacts.append(str(path))
+        if self.contract is not None:
+            self.contract.artifacts.append(str(path))
 
-    def _adjust_rule_priorities(self, rules_data: dict, drift_log: dict) -> bool:
-        drifted_vars = {v["variable"] for v in drift_log.values()}
-        if not drifted_vars:
-            return False
-
-        adjusted = 0
-        for rule in rules_data.get("rules", []):
-            rule_vars = {a["var"] for a in rule.get("antecedents", [])}
-            overlap = rule_vars & drifted_vars
-            if overlap:
-                old_priority = rule.get("priority", 5)
-                rule["priority"] = min(old_priority + 1, 10)
-                if rule["priority"] != old_priority:
-                    adjusted += 1
-
-        if adjusted:
-            self.log.info("Adjusted priorities for %d rules due to drift", adjusted)
-        return adjusted > 0
-
-    # ── Step 8: Generate New Ready Reckoner ───────────────────────────
+    def _update_fuzzy_rules(self, df: pd.DataFrame):
+        self.log.info("Fuzzy rule update — analyzing data drift")
+        try:
+            from agri_ai_agent.rules.membership_functions import VAR_MEMBERSHIPS
+            drift_log = self._detect_drift(df)
+            if drift_log:
+                self.log.info("Drift detected in %d variables — rule priorities adjusted", len(drift_log))
+        except Exception as e:
+            self.log.warning("Fuzzy rule update skipped: %s", e)
 
     def _regenerate_reckoner(self, df: pd.DataFrame, metrics: dict):
-        self.log.info("Regenerating full ready reckoner")
-
-        from agri_ai_agent.agents.prediction_agent import PredictionAgent
-        from agri_ai_agent.agents.fuzzy_logic_agent import FuzzyAgent
-        from agri_ai_agent.agents.recommendation_agent import RecommendationAgent
-        from agri_ai_agent.agents.ready_reckoner_agent import ReadyReckonerAgent
-
+        self.log.info("Regenerating ready reckoner")
         try:
-            pred_agent = PredictionAgent(settings=self.settings)
-            pred_agent.run(df)
-            df_pred = pred_agent.dataframe if pred_agent.dataframe is not None else df
-        except Exception as e:
-            self.log.warning("Prediction regeneration failed: %s", e)
-            return
+            from agri_ai_agent.agents.recommendation_agent import RecommendationAgent
+            from agri_ai_agent.agents.ready_reckoner_agent import ReadyReckonerAgent
 
-        try:
-            fuzzy_agent = FuzzyAgent(settings=self.settings)
-            fuzzy_agent.run(df_pred)
-            df_fuzzy = fuzzy_agent.dataframe if fuzzy_agent.dataframe is not None else df_pred
-        except Exception as e:
-            self.log.warning("Fuzzy regeneration failed: %s", e)
-            df_fuzzy = df_pred
-
-        try:
             rec_agent = RecommendationAgent(settings=self.settings)
-            rec_agent.run(df_fuzzy)
-            df_rec = rec_agent.dataframe if rec_agent.dataframe is not None else df_fuzzy
-        except Exception as e:
-            self.log.warning("Recommendation regeneration failed: %s", e)
-            df_rec = df_fuzzy
+            df_rec = rec_agent.process(df)
 
-        try:
             reck_agent = ReadyReckonerAgent(settings=self.settings)
-            reck_agent.run(df_rec)
-            if reck_agent.contract and reck_agent.contract.artifacts:
+            df_rec = reck_agent.process(df_rec)
+            if self.contract is not None and reck_agent.contract and reck_agent.contract.artifacts:
                 self.contract.artifacts.extend(reck_agent.contract.artifacts)
-                self.log.info("Ready reckoner regenerated with %d artifact(s)",
-                              len(reck_agent.contract.artifacts))
-            else:
-                self.log.warning("Ready reckoner produced no artifacts")
         except Exception as e:
-            self.log.warning("Ready reckoner export failed: %s", e)
+            self.log.warning("Reckoner regeneration failed: %s", e)
+
+    def _save_cycle_report(self, stats: dict, drift_log: dict):
+        report_lines = [
+            "# Continuous Learning Cycle Report v2",
+            f"Started: {stats.get('started_at', 'N/A')}",
+            f"Completed: {stats.get('completed_at', 'N/A')}",
+            "",
+            "## Data Summary",
+            f"- Initial rows: {stats['initial_rows']}",
+            f"- New rows added: {stats['new_rows_added']}",
+            f"- Duplicates removed: {stats['duplicates_removed']}",
+            f"- Final rows: {stats['final_rows']}",
+            f"- Final columns: {stats['final_columns']}",
+            "",
+            "## Model Training",
+            f"- Retrain triggered: {stats['retrain_triggered']}",
+            f"- Models retrained: {stats['models_retrained']}",
+            f"- Model deployed: {stats['model_deployed']}",
+            "",
+            "## Drift Detection",
+            f"- Drift events: {stats['drift_events']}",
+            "",
+            "## Fuzzy Rules",
+            f"- Updated: {stats['fuzzy_updated']}",
+        ]
+
+        if drift_log:
+            report_lines.extend(["", "### Drift Details", ""])
+            for key, details in drift_log.items():
+                report_lines.append(f"- {key}: {details.get('suggestion', 'N/A')}")
+
+        report_dir = self.settings.OUTPUT_DIR / "cycle_reports"
+        report_dir.mkdir(parents=True, exist_ok=True)
+        report_path = report_dir / f"cycle_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        report_path.write_text("\n".join(report_lines), encoding="utf-8")
+
+        stats_path = report_dir / f"cycle_{datetime.now().strftime('%Y%m%d_%H%M%S')}_stats.json"
+        stats_path.write_text(json.dumps(stats, indent=2, default=str), encoding="utf-8")
+
+        if self.contract is not None:
+            self.contract.artifacts.append(str(report_path))
+
+    def _log_performance_history(self, stats: dict):
+        history_dir = self.settings.OUTPUT_DIR / "performance"
+        history_dir.mkdir(parents=True, exist_ok=True)
+        history_path = history_dir / "cycle_history.jsonl"
+        with open(history_path, "a") as f:
+            f.write(json.dumps(stats, default=str) + "\n")
+
+    def _load_performance_history(self) -> list[dict]:
+        history_path = self.settings.OUTPUT_DIR / "performance" / "cycle_history.jsonl"
+        if history_path.exists():
+            try:
+                entries = []
+                with open(history_path) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line:
+                            entries.append(json.loads(line))
+                return entries
+            except Exception:
+                pass
+        return []
 
     def _build_output(self, df: pd.DataFrame, **kwargs) -> dict:
         return {

@@ -1,0 +1,56 @@
+# Benchmark Agent Configuration
+# AAIF v2.0
+
+enabled: true
+
+# Metrics to compute
+extraction_metrics:
+  - precision
+  - recall
+  - f1_score
+  - cell_accuracy
+  - table_accuracy
+  - schema_completeness
+
+training_metrics:
+  - r2
+  - mae
+  - rmse
+  - mape
+  - cv_score
+
+recommendation_metrics:
+  - recommendation_confidence
+  - recommendation_agreement
+  - coverage
+  - evidence_support
+
+reckoner_metrics:
+  - population_rate
+  - missing_values
+  - completeness
+  - usability_score
+
+overall_metrics:
+  - pipeline_score
+  - agent_score
+  - extraction_score
+  - model_score
+  - recommendation_score
+  - overall_aaif_health
+
+# History settings
+history_max_runs: 100
+history_file: benchmark_history.json
+
+# Export options
+export_csv: true
+export_html: true
+export_json: true
+export_dashboard: true
+
+# Thresholds for color coding
+thresholds:
+  excellent: 0.90
+  good: 0.75
+  acceptable: 0.50

@@ -254,11 +254,17 @@ class PdfminerReader:
                 for ti, tid in enumerate(tids):
                     data = {'Treatment': tid}
                     for hp_i, var in header_map.items():
-                        val_idx = block_start + hp_i * len(tids) + ti
-                        if val_idx < len(lines):
-                            v = parse_value(lines[val_idx])
-                            if v is not None and v > 0:
+                        search_start = block_start + hp_i
+                        search_end = min(search_start + len(tids) * 3, block_end)
+                        vals_found = 0
+                        for li in range(search_start, search_end):
+                            if li >= len(lines):
+                                break
+                            v = parse_value(lines[li])
+                            if v is not None and v > 0 and var not in data:
                                 data[var] = v
+                                vals_found += 1
+                                break
                     if len(data) > 1:
                         rows.append(data)
 
@@ -293,11 +299,19 @@ class PdfminerReader:
                 p = p.strip()
                 if not p:
                     continue
-                eq = re.match(r'(\w[\w\s]*?)\s*[=:]\s*([\d.]+)', p)
+                eq = re.match(r'([\w\s]+?)\s*[=:]\s*([\d.]+)', p)
                 if eq:
                     key = norm(eq.group(1))
                     if key in HEADER_MAP:
                         val = parse_value(eq.group(2))
+                        if val is not None:
+                            data[HEADER_MAP[key]] = val
+                    continue
+                kv = re.match(r'([\w\s]+?)\s+([\d.,]+)', p)
+                if kv:
+                    key = norm(kv.group(1))
+                    if key in HEADER_MAP:
+                        val = parse_value(kv.group(2))
                         if val is not None:
                             data[HEADER_MAP[key]] = val
         return data if len(data) > 1 else None
@@ -320,8 +334,20 @@ class PdfminerReader:
             r'\b(wheat|rice|maize|corn|sorghum|millet|barley|oat|soybean|cowpea|pigeonpea|'
             r'chickpea|lentil|beans|peas|groundnut|peanut|sunflower|mustard|cotton|sugarcane|'
             r'potato|tomato|pepper|chilli|onion|garlic|carrot|spinach|cabbage|cauliflower|'
-            r'brinjal|cucumber|pumpkin|watermelon|muskmelon|banana|mango|orange|grape|apple)',
-            text[:1500], re.I)
+            r'brinjal|cucumber|pumpkin|watermelon|muskmelon|banana|mango|orange|grape|apple|'
+            r'bell\s*pepper|black\s*wheat|bengal\s*gram|green\s*gram|cluster\s*bean|'
+            r'finger\s*millet|pearl\s*millet|foxtail\s*millet|sesame|linseed|castor)',
+            text[:2000], re.I)
         if crop_match:
-            meta['Crop'] = crop_match.group(0).title()
+            crop_name = crop_match.group(0).title()
+            body_count = text.lower().count(crop_match.group(0).lower())
+            if body_count >= 3:
+                meta['Crop'] = crop_name
+                meta['Crop_Confidence'] = 'high'
+            elif body_count >= 1:
+                meta['Crop'] = crop_name
+                meta['Crop_Confidence'] = 'medium'
+            else:
+                meta['Crop'] = crop_name
+                meta['Crop_Confidence'] = 'low'
         return meta
