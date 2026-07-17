@@ -62,6 +62,11 @@ ehthumbs.db
 Data ADES/*.pdf
 
 # ===========================
+# Source Data Directory (large, not needed in repo)
+# ===========================
+data/
+
+# ===========================
 # Large Binary Data
 # ===========================
 *.parquet
