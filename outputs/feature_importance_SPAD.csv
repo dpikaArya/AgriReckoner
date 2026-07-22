@@ -1,1 +1,4 @@
-
+Feature,Importance,Target
+Shoot_Length_cm,0.3574,SPAD
+Iron,0.3304,SPAD
+Shoot_Biomass_g,0.3123,SPAD

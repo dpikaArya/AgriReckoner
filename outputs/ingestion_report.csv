@@ -1,31 +1,92 @@
 Paper_ID,Paper_Name,Title,Crop,DOI,Pages,Words,Status,Duplicate_Flag,Duplicate_With,Processing_Time_s
-PAPER_1_s2_0_S0016706120325842_main,1-s2.0-S0016706120325842-main.pdf,Contents lists available at ScienceDirect,"Chickpea, Maize, Soybean, Wheat",10.1016/j.geoderma.2020.114829,23,8500,New,No,,2.77
-PAPER_1_s2_0_S0048969721016284_main,1-s2.0-S0048969721016284-main.pdf,Science of the Total Environment 780 (2021) 146560,"Barley, Black Wheat, Chickpea, Cotton, Maize, Oat, Rice, Soybean, Spinach, Wheat",10.1016/j.scitotenv.2021.146560,31,11376,New,No,,1.43
-PAPER_1_s2_0_S0167880922002316_main,1-s2.0-S0167880922002316-main.pdf,Contents lists available at ScienceDirect,"Chickpea, Cotton, Maize, Rice, Soybean, Tomato, Wheat",10.1016/j.agee.2022.108082,27,10065,Duplicate,Yes,PAPER_1_s2_0_S0016706120325842_main,2.61
-PAPER_1_s2_0_S0301479721013128_main,1-s2.0-S0301479721013128-main.pdf,Contents lists available at ScienceDirect,"Barley, Black Wheat, Maize, Rice, Tomato, Wheat",10.1016/j.jenvman.2021.113250,35,9010,Duplicate,Yes,PAPER_1_s2_0_S0016706120325842_main,5.04
-PAPER_27,27.pdf,Journal of the Science of Food and Agriculture,"Barley, Black Wheat, Cabbage, Chickpea, Potato, Rice, Wheat",10.1002/jsfa.2866,43,8218,New,No,,1.05
-PAPER_28,28.pdf,Europ.  J.  Agronomy  51 (2013) 71–  80,"Barley, Chickpea, Oat, Potato, Rice, Wheat",10.1016/j.eja.2013.06.003,55,10103,New,No,,3.77
-PAPER_29,29.pdf,Zinc use efficiency is enhanced in,"Barley, Black Wheat, Chickpea, Groundnut, Maize, Oat, Rice, Wheat",10.1038/s41598-018-25247-5,22,6240,New,No,,1.07
-PAPER_30,30.pdf,"Plant Pathology (2001) 50, 190–205","Barley, Chickpea, Cotton, Oat, Potato, Wheat",10.1046/j.1365-3059.2001.00545.x,41,12042,New,No,,1.8
-PAPER_31,31.pdf,Plant Soil (2010) 331:413–425,"Black Wheat, Chickpea, Maize, Pearl Millet, Soybean, Tomato, Wheat",10.1007/s11104-009-0262-0,57,9535,New,No,,1.5
-PAPER_32,32.pdf,Plant and Soil (2006) 284: 73–84,"Black Wheat, Chickpea, Maize, Rice, Wheat",10.1007/s11104-006-0030-3,29,6702,New,No,,0.92
-PAPER_agronomy_15_00961_v2,agronomy-15-00961-v2.pdf,"Impact of Organic Amendments on Black Wheat Yield, Grain","Black Wheat, Chickpea, Cotton, Cowpea, Maize, Oat, Rice, Sorghum, Soybean, Wheat",10.3390/agronomy15040961,34,11224,New,No,,1.65
-PAPER_Bedada_2014,Bedada 2014.pdf,"Agriculture,  Ecosystems  and  Environment  195  (2014)  193–201","Barley, Chickpea, Maize, Potato, Rice, Sorghum, Wheat",10.1016/j.agee.2014.06.017,31,8931,New,No,,3.13
-PAPER_Behera_2009,Behera 2009.pdf,Agricultural Water Management 96 (2009) 1532–1540,"Chickpea, Cotton, Groundnut, Maize, Rice, Wheat",10.1016/j.agwat.2009.06.016,35,7592,New,No,,1.15
-PAPER_Bell_pepper,Bell pepper.pdf,ASIAN JOURNAL OF AGRICULTURE,"Bell Pepper, Black Wheat, Chilli, Maize, Oat, Spinach, Wheat",10.13057/asianjagric/g080103,20,5182,New,No,,1.61
-PAPER_Black_wheat,Black wheat.pdf,doi: 10.2478/cag-2025-0012,"Black Wheat, Cabbage, Chickpea, Cowpea, Finger Millet, Maize, Pearl Millet, Rice, Tomato, Wheat",10.2478/cag-2025-0012,30,6671,New,No,,1.24
-PAPER_Cai_2006,Cai 2006.pdf,Geoderma 136 (2006) 708 – 715,"Barley, Chickpea, Cotton, Cowpea, Maize, Rice, Soybean, Sugarcane, Wheat",10.1016/j.geoderma.2006.05.008,17,5758,New,No,,0.63
-PAPER_Carrot,Carrot.pdf,Biological Forum – An International Journal             16(3): 175-180(2024),"Black Wheat, Carrot, Cowpea, Maize, Oat, Onion, Potato, Spinach, Wheat",,20,5077,New,No,,1.3
-PAPER_Cowpea_paper_publish,Cowpea paper publish.pdf,ASIAN JOURNAL OF AGRICULTURE,"Bell Pepper, Carrot, Chickpea, Cowpea, Groundnut, Maize, Oat, Potato, Rice, Spinach, Tomato, Wheat",10.13057/asianjagric/g080105,25,5757,Duplicate,Yes,PAPER_Bell_pepper,1.92
-PAPER_fpls_12_748523,fpls-12-748523.pdf,published: 18 October 2021,"Black Wheat, Chickpea, Groundnut, Maize, Potato, Rice, Soybean, Wheat",10.3389/fpls.2021.748523,50,11900,New,No,,2.03
-PAPER_fpls_16_1521113,fpls-16-1521113.pdf,"University of Florida, United States","Black Wheat, Cabbage, Carrot, Chickpea, Groundnut, Maize, Potato, Rice, Soybean, Tomato, Wheat",10.3389/fpls.2025.1521113,56,11956,New,No,,1.82
-PAPER_Gardner_2009,Gardner 2009.pdf,"Ecological Applications, 19(8), 2009, pp. 2167–2184","Barley, Black Wheat, Chickpea, Cotton, Maize, Onion, Potato, Rice, Soybean, Wheat",10.1890/08-1122.1,41,13806,New,No,,1.38
-PAPER_Katterer_2011,Katterer 2011.pdf,"Agriculture, Ecosystems and Environment 141 (2011) 184–192","Barley, Chickpea, Maize, Mustard, Oat, Wheat",10.1016/j.agee.2011.02.029,37,10095,New,No,,2.41
-PAPER_Land_Degrad_Dev___2021___Yadav___Sustain,Land Degrad Dev - 2021 - Yadav - Sustaining the properties of black soil in Central India through crop residue management.pdf,Received: 8 January 2020,"Black Wheat, Chickpea, Maize, Potato, Rice, Soybean, Wheat",10.1002/ldr.3891,58,11387,New,No,,2.81
-PAPER_Maltas_2015,Maltas 2015.pdf,Soil  &  Tillage  Research  126  (2013)  11–18,"Barley, Chickpea, Cotton, Maize, Oat, Rice, Sorghum, Soybean, Wheat",10.1016/j.still.2012.07.012,38,8408,New,No,,2.86
-PAPER_Maltas_2018,Maltas 2018.pdf,Received: 31 May 2017,"Barley, Chickpea, Maize, Mustard, Oat, Wheat",10.1002/ldr.2913,52,10297,New,No,,2.04
-PAPER_s41477_021_01001_0,s41477-021-01001-0.pdf,Explainable machine learning models of,"Chickpea, Cotton, Maize, Oat, Wheat",10.1038/s41477-021-01001-0,38,9529,New,No,,10.7
-PAPER_s41598_017_03539_6,s41598-017-03539-6.pdf,Received: 22 February 2017,"Chickpea, Maize, Potato, Rice, Soybean, Sugarcane, Wheat",10.1038/s41598-017-03539-6,15,6930,New,No,,1.35
-PAPER_s42106_025_00391_x,s42106-025-00391-x.pdf,International Journal of Plant Production (2026) 20:3,"Black Wheat, Chickpea, Groundnut, Maize, Oat, Rice, Wheat",10.1007/s42106-025-00391-x,34,11623,New,No,,2.07
-PAPER_Spinach,Spinach.pdf,"(Published by Research Trend, Website: www.agribioinnovations.com)","Barley, Brinjal, Carrot, Chickpea, Cotton, Maize, Rice, Sorghum, Spinach, Tomato, Wheat",10.65041/AgriBioInnovations.2026.3.1.1,24,4794,New,No,,1.45
-PAPER_Wang_2015,Wang 2015.pdf,J Soils Sediments (2015) 15:260–270,"Barley, Black Wheat, Chickpea, Maize, Sorghum, Soybean, Wheat",10.1007/s11368-014-0989-y,30,7929,New,No,,1.39
+PAPER_1_s2_0_S0016706106001686_main,1-s2.0-S0016706106001686-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0016706120325842_main,1-s2.0-S0016706120325842-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0016706123001490_main,1-s2.0-S0016706123001490-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0038071716300761_main,1-s2.0-S0038071716300761-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0038071719300793_main,1-s2.0-S0038071719300793-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0045653522010621_main,1-s2.0-S0045653522010621-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0048969720328382_main,1-s2.0-S0048969720328382-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0048969721016284_main,1-s2.0-S0048969721016284-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S004896972105542X_main,1-s2.0-S004896972105542X-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167198712001547_main,1-s2.0-S0167198712001547-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167198718300722_main,1-s2.0-S0167198718300722-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167198720305808_main,1-s2.0-S0167198720305808-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167880911000818_main,1-s2.0-S0167880911000818-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167880914003375_main,1-s2.0-S0167880914003375-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167880916301980_main,1-s2.0-S0167880916301980-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0167880922002316_main,1-s2.0-S0167880922002316-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0269749121013233_main,1-s2.0-S0269749121013233-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0301479721013128_main,1-s2.0-S0301479721013128-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0304387821001450_main,1-s2.0-S0304387821001450-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0378377409001681_main,1-s2.0-S0378377409001681-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0378377420321028_main,1-s2.0-S0378377420321028-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0378377421004911_main,1-s2.0-S0378377421004911-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0378377423001919_main,1-s2.0-S0378377423001919-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0378429017309723_main,1-s2.0-S0378429017309723-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0925857415001810_main,1-s2.0-S0925857415001810-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0929139316302864_main,1-s2.0-S0929139316302864-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S0929139321000974_main,1-s2.0-S0929139321000974-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1_s2_0_S1161030122001897_main,1-s2.0-S1161030122001897-main.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_10july22,10july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_14july22,14july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_15july22,15july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_17july22,17july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_18july22,18july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_19july22,19july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1July20,1July20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_1july22,1july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_20july22,20july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_24july22,24july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_25july22,25july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_26july22,26july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_27july22,27july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_28july22,28july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_29july22,29july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_2July20,2July20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_2july22,2july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_30july22,30july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_31july22,31july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_32july22,32july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_33july22,33july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_34july22,34july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_35july22,35july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_36july22,36july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_37july22,37july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_38july22,38july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_39july22,39july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_3july20,3july20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_3july22,3july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_4july20,4july20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_4july22,4july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_5july20,5july20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_5july22,5july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_6july20,6july20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_6july22,6july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_7july20,7july20.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_7july22,7july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_8july22,8july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_9july22,9july22.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_agronomy_09_00776_v2,agronomy-09-00776-v2.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_agronomy_11_00636_v2,agronomy-11-00636-v2.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_agronomy_15_00961_v2,agronomy-15-00961-v2.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Bell_pepper,Bell pepper.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Black_wheat,Black wheat.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Carrot,Carrot.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Cowpea_paper_publish,Cowpea paper publish.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_fagro_04_848621,fagro-04-848621.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_fpls_12_748523,fpls-12-748523.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_fpls_16_1521113,fpls-16-1521113.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_J_Sci_Food_Agric___2020___Singh___Agricu,J Sci Food Agric - 2020 - Singh - Agricultural practices modulate the bacterial communities  and nitrogen cycling bacterial.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Land_Degrad_Dev___2018___Maltas___The_ef,Land Degrad Dev - 2018 - Maltas - The effects of organic and mineral fertilizers on carbon sequestration  soil properties .pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Land_Degrad_Dev___2021___Yadav___Sustain,Land Degrad Dev - 2021 - Yadav - Sustaining the properties of black soil in Central India through crop residue management.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s11368_014_0989_y,s11368-014-0989-y.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s11368_018_1933_3,s11368-018-1933-3.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s13593_023_00923_7,s13593-023-00923-7.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s41477_021_01001_0,s41477-021-01001-0.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s41598_017_03539_6,s41598-017-03539-6.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s41893_020_0569_7,s41893-020-0569-7.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s42106_025_00391_x,s42106-025-00391-x.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_s42773_024_00332_3,s42773-024-00332-3.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Soil_Use_and_Management___2019___Ye___Bi,Soil Use and Management - 2019 - Ye - Biochar effects on crop yields with and without fertilizer  A metaΓÇÉanalysis of field.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_Spinach,Spinach.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
+PAPER_sustainability_07_13713,sustainability-07-13713.pdf,(Previously processed),,,0,0,Previously Processed,No,,0
