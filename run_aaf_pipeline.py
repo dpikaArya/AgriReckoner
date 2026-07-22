@@ -22,6 +22,11 @@ BASE_DIR = Path(__file__).parent.resolve()
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(BASE_DIR / "agri_ai_agent"))
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.config.schema import UAMS_COLUMNS, POST_HARVEST_VARIABLES, NON_FEATURE_COLS
 from agri_ai_agent.contracts.messages import AgentContract
@@ -117,9 +122,28 @@ MASTER_COLUMN_MAP = {
 MASTER_DATASETS_DIR = BASE_DIR / "data" / "master_datasets"
 
 
+def load_registered_papers() -> set:
+    """Load paper names already registered in the paper_registry.sqlite."""
+    db_path = DB_DIR / "paper_registry.sqlite"
+    registered = set()
+    if db_path.exists():
+        try:
+            import sqlite3
+            conn = sqlite3.connect(str(db_path))
+            for row in conn.execute("SELECT paper_name FROM paper_registry").fetchall():
+                registered.add(row[0])
+            conn.close()
+        except Exception:
+            pass
+    return registered
+
+
 def log(msg: str):
     ts = datetime.now().strftime("%H:%M:%S")
-    print(f"[{ts}] {msg}")
+    try:
+        print(f"[{ts}] {msg}")
+    except UnicodeEncodeError:
+        print(f"[{ts}] {msg.encode('utf-8', errors='replace').decode('utf-8')}")
 
 
 def extract_text_from_pdf(path: Path) -> str:
@@ -358,8 +382,11 @@ def phase0_load_master_datasets() -> pd.DataFrame:
 # =====================================================================
 def phase1_ingestion() -> pd.DataFrame:
     log("=" * 60)
-    log("PHASE 1: INGESTION")
+    log("PHASE 1: INGESTION (Incremental)")
     log("=" * 60)
+
+    registered_names = load_registered_papers()
+    log(f"Previously registered papers in DB: {len(registered_names)}")
 
     pdf_files = sorted(PAPERS_DIR.glob("*.pdf"))
     log(f"Found {len(pdf_files)} PDF files in {PAPERS_DIR}")
@@ -367,10 +394,29 @@ def phase1_ingestion() -> pd.DataFrame:
     records = []
     all_dois = {}
     all_titles = {}
+    skipped_previously = 0
 
     for pdf_path in pdf_files:
         start = time.time()
         paper_id = generate_paper_id(pdf_path.name)
+
+        if pdf_path.name in registered_names:
+            records.append({
+                "Paper_ID": paper_id,
+                "Paper_Name": pdf_path.name,
+                "Title": "(Previously processed)",
+                "Crop": "",
+                "DOI": "",
+                "Pages": 0,
+                "Words": 0,
+                "Status": "Previously Processed",
+                "Duplicate_Flag": "No",
+                "Duplicate_With": "",
+                "Processing_Time_s": 0,
+            })
+            skipped_previously += 1
+            continue
+
         log(f"  Processing: {pdf_path.name} -> {paper_id}")
 
         text = extract_text_from_pdf(pdf_path)
@@ -428,8 +474,10 @@ def phase1_ingestion() -> pd.DataFrame:
     log(f"Ingestion report CSV saved: {csv_path}")
 
     new_papers = ingestion_df[ingestion_df["Status"] == "New"]["Paper_ID"].tolist()
-    log(f"New papers to process: {len(new_papers)}")
-    log(f"Duplicate/Ignored: {len(ingestion_df) - len(new_papers)}")
+    prev_processed = int((ingestion_df["Status"] == "Previously Processed").sum())
+    log(f"New papers to extract: {len(new_papers)}")
+    log(f"Previously processed (skipped extraction): {prev_processed}")
+    log(f"Duplicate/intra-run: {len(ingestion_df) - len(new_papers) - prev_processed}")
 
     return ingestion_df
 
@@ -439,18 +487,28 @@ def phase1_ingestion() -> pd.DataFrame:
 # =====================================================================
 def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
     log("\n" + "=" * 60)
-    log("PHASE 2-3: AI EXTRACTION + UNIVERSAL SCHEMA")
+    log("PHASE 2-3: AI EXTRACTION + UNIVERSAL SCHEMA (Incremental)")
     log("=" * 60)
 
     cached_csv = OUTPUTS_DIR / "Universal_Agricultural_Schema.csv"
+    existing_df = None
     if cached_csv.exists():
         try:
-            cached_df = pd.read_csv(cached_csv)
-            if len(cached_df) > 0:
-                log(f"Loading cached extraction: {cached_csv} ({len(cached_df)} rows)")
-                return cached_df
+            existing_df = pd.read_csv(cached_csv)
+            if len(existing_df) > 0:
+                log(f"Loaded existing schema: {len(existing_df)} rows from cache")
         except Exception:
-            pass
+            existing_df = None
+
+    new_papers_mask = ingestion_df["Status"] == "New"
+    new_papers_df = ingestion_df[new_papers_mask]
+    log(f"Papers to extract: {len(new_papers_df)} new")
+
+    if len(new_papers_df) == 0:
+        log("No new papers to extract. Using cached schema.")
+        if existing_df is not None:
+            return existing_df
+        return pd.DataFrame()
 
     pdf_files = sorted(PAPERS_DIR.glob("*.pdf"))
     all_rows = []
@@ -461,8 +519,7 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         if len(row) == 0:
             continue
         status = row.iloc[0]["Status"]
-        if status == "Duplicate":
-            log(f"  Skipping (duplicate): {pdf_path.name}")
+        if status != "New":
             continue
 
         log(f"  Extracting: {pdf_path.name}")
@@ -569,18 +626,19 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
             f"Yield={base_row['Yield_per_Hectare']}, Fert={len(fertilizers_detected)}")
 
     if not all_rows:
-        log("WARNING: No data extracted from any paper")
+        log("WARNING: No data extracted from new papers")
+        if existing_df is not None:
+            return existing_df
         return pd.DataFrame()
 
-    extract_df = pd.DataFrame(all_rows)
+    new_extract_df = pd.DataFrame(all_rows)
 
-    # Phase 2b: Attempt pdfplumber table extraction to enrich data
-    log("\n  Attempting pdfplumber table extraction...")
+    log("\n  Attempting pdfplumber table extraction for new papers...")
     table_enrichment_rows = []
     for pdf_path in sorted(PAPERS_DIR.glob("*.pdf")):
         paper_id = generate_paper_id(pdf_path.name)
         row = ingestion_df[ingestion_df["Paper_ID"] == paper_id]
-        if len(row) > 0 and row.iloc[0]["Status"] == "Duplicate":
+        if len(row) == 0 or row.iloc[0]["Status"] != "New":
             continue
         try:
             table_rows = extract_tables_from_pdf(pdf_path)
@@ -597,8 +655,6 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         table_df = pd.DataFrame(table_enrichment_rows)
         log(f"  Total table rows from pdfplumber: {len(table_df)}")
 
-        # Merge table data with regex-extracted data on Paper_ID
-        # For each paper, if pdfplumber has Yield_per_Hectare and regex doesn't, use pdfplumber value
         for col in ["Yield_per_Hectare", "Yield_per_Plot", "Plant_Height_cm", "SPAD",
                      "Soil_pH", "Nitrogen", "Phosphorus", "Potassium", "Zinc", "Iron",
                      "Protein", "Organic_Carbon", "EC", "Rainfall",
@@ -607,49 +663,55 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
                      "100_Seed_Weight", "Biomass_Yield", "Harvest_Index"]:
             if col in table_df.columns:
                 for paper_id in table_df["Paper_ID"].unique():
-                    if paper_id in extract_df["Paper_ID"].values:
-                        mask_reg = extract_df["Paper_ID"] == paper_id
+                    if paper_id in new_extract_df["Paper_ID"].values:
+                        mask_reg = new_extract_df["Paper_ID"] == paper_id
                         mask_tbl = table_df["Paper_ID"] == paper_id
-                        if col in extract_df.columns:
-                            reg_val = extract_df.loc[mask_reg, col].iloc[0] if mask_reg.any() else None
+                        if col in new_extract_df.columns:
+                            reg_val = new_extract_df.loc[mask_reg, col].iloc[0] if mask_reg.any() else None
                         else:
                             reg_val = None
                         tbl_vals = table_df.loc[mask_tbl, col].dropna()
                         if (pd.isna(reg_val) or reg_val is None) and len(tbl_vals) > 0:
-                            # Use mean of table values for this paper
-                            if col in extract_df.columns:
-                                extract_df.loc[mask_reg, col] = tbl_vals.mean()
+                            if col in new_extract_df.columns:
+                                new_extract_df.loc[mask_reg, col] = tbl_vals.mean()
                             log(f"    Enriched {paper_id}.{col} = {tbl_vals.mean():.2f} (from table)")
 
-        # Add Treatment and Fertilizer info from table extraction if not already present
         if "Treatment" in table_df.columns:
             for paper_id in table_df["Paper_ID"].unique():
-                if paper_id in extract_df["Paper_ID"].values:
+                if paper_id in new_extract_df["Paper_ID"].values:
                     treatments = table_df.loc[table_df["Paper_ID"] == paper_id, "Treatment"].dropna().astype(str).unique()
-                    mask = extract_df["Paper_ID"] == paper_id
-                    if "Treatment" in extract_df.columns:
-                        existing = str(extract_df.loc[mask, "Treatment"].iloc[0]) if mask.any() else ""
+                    mask = new_extract_df["Paper_ID"] == paper_id
+                    if "Treatment" in new_extract_df.columns:
+                        existing = str(new_extract_df.loc[mask, "Treatment"].iloc[0]) if mask.any() else ""
                         if not existing or existing == "Control" or existing == "nan":
-                            extract_df.loc[mask, "Treatment"] = ", ".join(sorted(treatments)[:5])
+                            new_extract_df.loc[mask, "Treatment"] = ", ".join(sorted(treatments)[:5])
+
+    if existing_df is not None and not existing_df.empty:
+        combined = pd.concat([existing_df, new_extract_df], ignore_index=True)
+        combined = combined.drop_duplicates(subset=["Paper_ID"], keep="last")
+        log(f"Merged: {len(existing_df)} existing + {len(new_extract_df)} new = {len(combined)} total")
+    else:
+        combined = new_extract_df
+        log(f"No existing cache. Created schema with {len(combined)} rows")
 
     for col in UAMS_COLUMNS:
-        if col not in extract_df.columns:
-            extract_df[col] = pd.NA
+        if col not in combined.columns:
+            combined[col] = pd.NA
 
-    ordered = [c for c in UAMS_COLUMNS if c in extract_df.columns]
-    extra = [c for c in extract_df.columns if c not in UAMS_COLUMNS]
-    extract_df = extract_df[ordered + extra]
+    ordered = [c for c in UAMS_COLUMNS if c in combined.columns]
+    extra = [c for c in combined.columns if c not in UAMS_COLUMNS]
+    combined = combined[ordered + extra]
 
     xlsx_path = OUTPUTS_DIR / "Universal_Agricultural_Schema.xlsx"
-    extract_df.to_excel(xlsx_path, index=False, engine="openpyxl")
+    combined.to_excel(xlsx_path, index=False, engine="openpyxl")
     log(f"Universal Schema XLSX saved: {xlsx_path}")
 
     csv_path = OUTPUTS_DIR / "Universal_Agricultural_Schema.csv"
-    extract_df.to_csv(csv_path, index=False)
+    combined.to_csv(csv_path, index=False)
     log(f"Universal Schema CSV saved: {csv_path}")
 
-    log(f"Extraction complete: {len(extract_df)} rows, {len(extract_df.columns)} columns")
-    return extract_df
+    log(f"Extraction complete: {len(combined)} rows, {len(combined.columns)} columns")
+    return combined
 
 
 # =====================================================================
@@ -948,13 +1010,24 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
 
         if X.shape[1] > X.shape[0] // 2:
             from sklearn.feature_selection import SelectKBest, f_regression
-            k = max(3, X.shape[0] // 3)
-            selector = SelectKBest(f_regression, k=min(k, X.shape[1]))
-            X_arr = selector.fit_transform(X.values, y.values)
-            selected_mask = selector.get_support()
-            selected_features = [f for f, m in zip(X.columns, selected_mask) if m]
-            X = pd.DataFrame(X_arr, columns=selected_features, index=X.index)
-            log(f"  Feature selection: {len(selected_features)}/{len(non_null)} features retained")
+            zero_var = [c for c in X.columns if X[c].std() == 0]
+            if zero_var:
+                X = X.drop(columns=zero_var)
+                log(f"  Dropped {len(zero_var)} zero-variance features")
+            if X.shape[1] > 0:
+                k = max(2, X.shape[0] // 3)
+                selector = SelectKBest(f_regression, k=min(k, X.shape[1]))
+                try:
+                    X_arr = selector.fit_transform(X.values, y.values)
+                    selected_mask = selector.get_support()
+                    selected_features = [f for f, m in zip(X.columns, selected_mask) if m]
+                    X = pd.DataFrame(X_arr, columns=selected_features, index=X.index)
+                    log(f"  Feature selection: {len(selected_features)}/{len(non_null)} features retained")
+                except Exception as e:
+                    log(f"  Feature selection failed ({e}), using top {min(k, X.shape[1])} features by variance")
+                    variances = X.var().sort_values(ascending=False)
+                    keep = variances.head(min(k, X.shape[1])).index.tolist()
+                    X = X[keep]
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
@@ -1575,34 +1648,37 @@ tr:hover {{ background: #f0faf4; }}
 <body>
 <div class="header">
 <h1>Agentic Agricultural Intelligence Framework</h1>
-<p>Final Execution Report — Generated: {now}</p>
+<p>Final Execution Report — Incremental Mode — Generated: {now}</p>
 </div>
 <div class="container">
 
 <div class="stats">
-<div class="stat"><div class="value">{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else len(p.get('ingestion_df', []))}</div><div class="label">Papers Processed</div></div>
-<div class="stat"><div class="value">{p.get('n_crops', 0)}</div><div class="label">Crops Detected</div></div>
-<div class="stat"><div class="value">{p.get('n_rows_extracted', 0)}</div><div class="label">Rows Extracted</div></div>
+<div class="stat"><div class="value">{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else len(p.get('ingestion_df', []))}</div><div class="label">Total PDFs</div></div>
+<div class="stat"><div class="value">{p.get('n_newly_extracted', 0)}</div><div class="label">New Papers Extracted</div></div>
+<div class="stat"><div class="value">{p.get('n_previously_processed', 0)}</div><div class="label">Previously Processed (Skipped)</div></div>
+<div class="stat"><div class="value">{p.get('n_rows_extracted', 0)}</div><div class="label">Total Schema Rows</div></div>
 <div class="stat"><div class="value">{p.get('n_features', 0)}</div><div class="label">Features Created</div></div>
 <div class="stat"><div class="value">{n_models}</div><div class="label">Models Trained</div></div>
 </div>
 
 <div class="card">
-<h2>Phase 1 — Ingestion</h2>
+<h2>Phase 1 — Ingestion (Incremental)</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
 <tr><td>Total PDFs found</td><td>{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else len(p.get('ingestion_df', []))}</td></tr>
-<tr><td>New papers</td><td>{p['ingestion_df']['new'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
-<tr><td>Duplicates</td><td>{p['ingestion_df']['dups'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
+<tr><td>New papers (to extract)</td><td>{p['ingestion_df']['new'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
+<tr><td>Previously processed (skipped)</td><td>{p['ingestion_df'].get('prev_processed', 0) if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
+<tr><td>Duplicates (intra-run)</td><td>{p['ingestion_df']['dups'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
 <tr><td>Ingestion report</td><td>outputs/ingestion_report.xlsx</td></tr>
 </table>
 </div>
 
 <div class="card">
-<h2>Phase 2-3 — AI Extraction &amp; Universal Schema</h2>
+<h2>Phase 2-3 — AI Extraction &amp; Universal Schema (Incremental)</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Variables extracted</td><td>{p.get('n_rows_extracted', 0)}</td></tr>
+<tr><td>New rows extracted</td><td>{p.get('n_newly_extracted', 0)}</td></tr>
+<tr><td>Total schema rows (merged)</td><td>{p.get('n_rows_extracted', 0)}</td></tr>
 <tr><td>Schema columns</td><td>{p.get('n_schema_cols', 0)}</td></tr>
 <tr><td>Universal Schema XLSX</td><td>outputs/Universal_Agricultural_Schema.xlsx</td></tr>
 <tr><td>Universal Schema CSV</td><td>outputs/Universal_Agricultural_Schema.csv</td></tr>
@@ -1689,6 +1765,20 @@ tr:hover {{ background: #f0faf4; }}
 </table>
 </div>
 
+<div class="card" style="border-left: 4px solid #2980b9;">
+<h2>Efficiency Improvement Summary</h2>
+<table>
+<tr><th>Metric</th><th>Value</th></tr>
+<tr><td>Total PDFs in folder</td><td>{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
+<tr><td>Previously processed (skipped)</td><td>{p.get('n_previously_processed', 0)}</td></tr>
+<tr><td>New papers extracted this run</td><td>{p.get('n_newly_extracted', 0)}</td></tr>
+<tr><td>Skipped ratio</td><td>{round(p.get('n_previously_processed', 0) / max(1, (p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 1)) * 100, 1)}%</td></tr>
+<tr><td>PDF extraction avoided</td><td>{p.get('n_previously_processed', 0)} PDFs x ~30s avg = ~{round(p.get('n_previously_processed', 0) * 30 / 60, 1)} min saved</td></tr>
+<tr><td>Time efficiency gain</td><td>Only {p.get('n_newly_extracted', 0)} of {p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 0} PDFs required extraction ({round(p.get('n_newly_extracted', 0) / max(1, (p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 1)) * 100, 1)}% of total)</td></tr>
+<tr><td>Schema growth</td><td>{p.get('n_rows_extracted', 0)} total rows (incremental merge)</td></tr>
+</table>
+</div>
+
 <div class="card">
 <h2>Failed Stages</h2>
 """
@@ -1702,7 +1792,7 @@ tr:hover {{ background: #f0faf4; }}
     html += """
 </div>
 </div>
-<div class="footer">Agentic Agricultural Intelligence Framework (AAIF) v1.0</div>
+<div class="footer">Agentic Agricultural Intelligence Framework (AAIF) v2.0 — Incremental Processing Enabled</div>
 </body>
 </html>"""
 
@@ -1717,18 +1807,21 @@ tr:hover {{ background: #f0faf4; }}
 # =====================================================================
 def main():
     log("=" * 60)
-    log("AAIF PIPELINE STARTED")
+    log("AAIF PIPELINE STARTED (Incremental Mode)")
     log("=" * 60)
     overall_start = time.time()
 
+    registered_before = load_registered_papers()
+
     phases_state = {
-        "ingestion_df": {"total": 0, "new": 0, "dups": 0},
+        "ingestion_df": {"total": 0, "new": 0, "dups": 0, "prev_processed": 0},
         "validation": {},
         "training": {},
         "failures": [],
         "n_crops": 0, "n_rows_extracted": 0, "n_schema_cols": 0,
         "n_features": 0, "n_recommendations": 0, "n_reckoner_entries": 0,
         "n_registered": 0, "fuzzy_rules": 0, "fuzzy_inputs": 0,
+        "n_previously_processed": 0, "n_newly_extracted": 0,
     }
 
     master_df = pd.DataFrame()
@@ -1743,11 +1836,16 @@ def main():
     ingestion_df = pd.DataFrame()
     try:
         ingestion_df = phase1_ingestion()
+        prev_proc = int((ingestion_df["Status"] == "Previously Processed").sum())
+        new_count = int((ingestion_df["Status"] == "New").sum())
         phases_state["ingestion_df"] = {
             "total": len(ingestion_df),
-            "new": int((ingestion_df["Status"] == "New").sum()),
+            "new": new_count,
             "dups": int((ingestion_df["Duplicate_Flag"] == "Yes").sum()),
+            "prev_processed": prev_proc,
         }
+        phases_state["n_previously_processed"] = prev_proc
+        phases_state["n_newly_extracted"] = new_count
         phases_state["n_crops"] = ingestion_df["Crop"].nunique()
     except Exception as e:
         log(f"PHASE 1 FAILED: {traceback.format_exc()}")
@@ -1856,9 +1954,21 @@ def main():
         log(f"FINAL REPORT FAILED: {traceback.format_exc()}")
 
     elapsed = time.time() - overall_start
+    prev = phases_state.get("n_previously_processed", 0)
+    new_ext = phases_state.get("n_newly_extracted", 0)
+    total_pdfs = phases_state["ingestion_df"]["total"] if isinstance(phases_state.get("ingestion_df"), dict) else 0
+    skip_pct = round(prev / max(1, total_pdfs) * 100, 1)
+
     log("\n" + "=" * 60)
     log(f"AAIF PIPELINE COMPLETE ({elapsed:.1f}s)")
     log("=" * 60)
+    log(f"\n  EFFICIENCY SUMMARY:")
+    log(f"    Total PDFs scanned:     {total_pdfs}")
+    log(f"    Previously processed:   {prev} (skipped extraction)")
+    log(f"    New papers extracted:   {new_ext}")
+    log(f"    Skipped ratio:          {skip_pct}%")
+    log(f"    Time saved (est.):      ~{prev * 30 / 60:.1f} min (PDF extraction avoided)")
+    log(f"    Schema rows (merged):   {phases_state.get('n_rows_extracted', 0)}")
     log(f"\n  Outputs directory: {OUTPUTS_DIR}")
     log(f"  Final report: {OUTPUTS_DIR / 'AAIF_Final_Report.html'}")
     log(f"  Failures: {len(phases_state['failures'])}")
@@ -1867,7 +1977,23 @@ def main():
 
 
 if __name__ == "__main__":
-    if "--force" in sys.argv:
+    import argparse
+    parser = argparse.ArgumentParser(description="AAIF Complete Pipeline Runner")
+    parser.add_argument("--papers", "-p", type=str, default=None,
+                        help="Directory containing research papers (PDFs). Default: Data ADES")
+    parser.add_argument("--force", action="store_true",
+                        help="Force re-extraction by removing cached outputs")
+    args, _ = parser.parse_known_args()
+
+    if args.papers:
+        _cli_papers_dir = Path(args.papers).resolve()
+        if not _cli_papers_dir.exists():
+            log(f"ERROR: Papers directory not found: {_cli_papers_dir}")
+            sys.exit(1)
+        PAPERS_DIR = _cli_papers_dir
+        log(f"Using papers directory: {PAPERS_DIR}")
+
+    if args.force:
         for f in ["Universal_Agricultural_Schema.csv", "Universal_Agricultural_Schema.xlsx",
                    "Validated_Extractions.json", "features_dataset.csv",
                    "model_metrics.xlsx", "feature_importance_Yield_per_Plot.csv"]:

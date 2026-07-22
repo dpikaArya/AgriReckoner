@@ -42,7 +42,7 @@ OUTPUT_DIR = BASE_DIR / "outputs"
 EVAL_DIR = BASE_DIR / "evaluation"
 REPORTS_DIR = EVAL_DIR / "reports"
 
-PAPERS_DIR = Path("/Users/deepika/Desktop/Ready_Reckoner Table/RPa")
+PAPERS_DIR = BASE_DIR / "Data ADES"
 
 PIPELINE_AGENTS = [
     "ingestion", "schema_mapping", "ontology_mapping",
@@ -51,19 +51,13 @@ PIPELINE_AGENTS = [
     "model_readiness", "documentation", "export",
 ]
 
-PAPER_FILES = [
-    "Bell pepper.pdf",
-    "Black wheat.pdf",
-    "Carrot.pdf",
-    "Cowpea paper publish.pdf",
-    "Spinach.pdf",
-]
+PAPER_FILES = sorted([p.name for p in PAPERS_DIR.glob("*.pdf")]) if PAPERS_DIR.exists() else []
 
 CROP_FROM_PAPER = {
     "Bell pepper.pdf": "Bell Pepper",
     "Black wheat.pdf": "Black Wheat",
     "Carrot.pdf": "Carrot",
-    "Cowpea paper publish.pdf": "Gram",
+    "Cowpea paper publish.pdf": "Cowpea",
     "Spinach.pdf": "Spinach",
 }
 

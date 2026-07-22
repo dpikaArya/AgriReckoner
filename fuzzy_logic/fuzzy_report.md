@@ -1,7 +1,7 @@
 # Fuzzy Logic System
-Generated: 2026-07-16T13:46:16.268189
+Generated: 2026-07-22T14:48:54.045903
 Input variables: 10
-Rules: 16
+Rules: 221
 
 ## Membership Functions
 
@@ -41,19 +41,224 @@ Rules: 16
   - high: (0.8, 1.2)
 
 ## Rules
-  - [10] IF Nitrogen=low; Rainfall=high; Organic_Carbon=low THEN Nitrogen: increase, Potassium: maintain
-  - [9] IF Soil_pH=alkaline; Zinc=low THEN Zinc: apply_foliar_spray, Nitrogen: maintain
-  - [8] IF Yield_Prediction=high; Potassium=medium THEN Potassium: maintain, Nitrogen: maintain
-  - [8] IF Nitrogen=low; Rainfall=low THEN Nitrogen: increase
-  - [9] IF Phosphorus=low; Soil_pH=acidic THEN Phosphorus: increase, Nitrogen: maintain
-  - [7] IF Potassium=low THEN Potassium: increase
-  - [9] IF Temperature_Max=hot; Rainfall=low THEN Nitrogen: maintain, Potassium: maintain
-  - [6] IF Temperature_Max=cool; Rainfall=high THEN Nitrogen: maintain
-  - [7] IF Organic_Carbon=low THEN Nitrogen: increase
-  - [5] IF Soil_pH=alkaline; Nitrogen=high THEN Nitrogen: maintain, Zinc: monitor
-  - [3] IF Nitrogen=medium; Phosphorus=medium; Potassium=medium; Soil_pH=neutral; Rainfall=medium THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Soil_pH=acidic THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Soil_pH=neutral THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Soil_pH=alkaline THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Rainfall=low THEN Nitrogen: increase
+  - [10] IF Nitrogen=low; Rainfall=medium THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Rainfall=high THEN Nitrogen: increase
+  - [10] IF Nitrogen=low; Organic_Carbon=low THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Organic_Carbon=medium THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Organic_Carbon=high THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Temperature_Max=cool THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Temperature_Max=moderate THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [10] IF Nitrogen=low; Temperature_Max=hot THEN Nitrogen: increase
+  - [9] IF Phosphorus=low; Soil_pH=acidic THEN Phosphorus: increase
+  - [9] IF Phosphorus=low; Soil_pH=neutral THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Soil_pH=alkaline THEN Phosphorus: apply_soil, Zinc: apply_foliar_spray
+  - [9] IF Phosphorus=low; Rainfall=low THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Rainfall=medium THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Rainfall=high THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Organic_Carbon=low THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Organic_Carbon=medium THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Organic_Carbon=high THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Temperature_Max=cool THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Temperature_Max=moderate THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Phosphorus=low; Temperature_Max=hot THEN Phosphorus: increase, Nitrogen: maintain, Potassium: maintain
+  - [9] IF Potassium=low; Soil_pH=acidic THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Soil_pH=neutral THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Soil_pH=alkaline THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Rainfall=low THEN Potassium: increase
+  - [9] IF Potassium=low; Rainfall=medium THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Rainfall=high THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Organic_Carbon=low THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Organic_Carbon=medium THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Organic_Carbon=high THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Temperature_Max=cool THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Temperature_Max=moderate THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Potassium=low; Temperature_Max=hot THEN Potassium: increase, Nitrogen: maintain
+  - [9] IF Nitrogen=low; Phosphorus=low; Rainfall=low THEN Nitrogen: increase, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=low; Rainfall=medium THEN Nitrogen: increase, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=low; Soil_pH=acidic THEN Nitrogen: increase, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=low; Soil_pH=neutral THEN Nitrogen: increase, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=medium; Rainfall=low THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=medium; Rainfall=medium THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=medium; Soil_pH=acidic THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [9] IF Nitrogen=low; Phosphorus=medium; Soil_pH=neutral THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [9] IF Nitrogen=medium; Phosphorus=low; Rainfall=low THEN Nitrogen: maintain, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=medium; Phosphorus=low; Rainfall=medium THEN Nitrogen: maintain, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=medium; Phosphorus=low; Soil_pH=acidic THEN Nitrogen: maintain, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=medium; Phosphorus=low; Soil_pH=neutral THEN Nitrogen: maintain, Phosphorus: increase, Potassium: maintain
+  - [9] IF Nitrogen=low; Potassium=low; Rainfall=low THEN Nitrogen: increase, Potassium: increase, Phosphorus: maintain
+  - [9] IF Nitrogen=low; Potassium=low; Rainfall=medium THEN Nitrogen: increase, Potassium: increase, Phosphorus: maintain
+  - [9] IF Nitrogen=low; Potassium=medium; Rainfall=low THEN Nitrogen: increase, Potassium: maintain, Phosphorus: maintain
+  - [9] IF Nitrogen=low; Potassium=medium; Rainfall=medium THEN Nitrogen: increase, Potassium: maintain, Phosphorus: maintain
+  - [9] IF Nitrogen=medium; Potassium=low; Rainfall=low THEN Nitrogen: maintain, Potassium: increase, Phosphorus: maintain
+  - [9] IF Nitrogen=medium; Potassium=low; Rainfall=medium THEN Nitrogen: maintain, Potassium: increase, Phosphorus: maintain
+  - [9] IF Phosphorus=low; Potassium=low THEN Phosphorus: increase, Potassium: increase, Nitrogen: maintain
+  - [9] IF Phosphorus=low; Potassium=medium THEN Phosphorus: increase, Potassium: maintain, Nitrogen: maintain
+  - [7] IF Temperature_Max=cool; Rainfall=low THEN Nitrogen: maintain
+  - [7] IF Temperature_Max=cool; Rainfall=high THEN Nitrogen: maintain
+  - [6] IF Temperature_Max=moderate; Rainfall=low THEN Nitrogen: maintain
+  - [5] IF Temperature_Max=moderate; Rainfall=medium THEN Nitrogen: maintain
+  - [6] IF Temperature_Max=moderate; Rainfall=high THEN Nitrogen: maintain
+  - [9] IF Temperature_Max=hot; Rainfall=low THEN Nitrogen: maintain, Potassium: increase
+  - [8] IF Temperature_Max=hot; Rainfall=high THEN Nitrogen: reduce, Phosphorus: maintain
+  - [8] IF Soil_pH=acidic; Nitrogen=low THEN Nitrogen: increase
+  - [8] IF Soil_pH=acidic; Nitrogen=medium THEN Nitrogen: maintain
+  - [8] IF Soil_pH=acidic; Nitrogen=high THEN Nitrogen: reduce
+  - [8] IF Soil_pH=neutral; Nitrogen=low THEN Nitrogen: maintain
+  - [8] IF Soil_pH=neutral; Nitrogen=medium THEN Nitrogen: maintain
+  - [8] IF Soil_pH=neutral; Nitrogen=high THEN Nitrogen: maintain
+  - [8] IF Soil_pH=alkaline; Nitrogen=low THEN Nitrogen: increase, Zinc: apply_foliar_spray
+  - [8] IF Soil_pH=alkaline; Nitrogen=medium THEN Nitrogen: maintain
+  - [8] IF Soil_pH=alkaline; Nitrogen=high THEN Nitrogen: reduce, Zinc: monitor
+  - [7] IF Organic_Carbon=low; Nitrogen=low THEN Nitrogen: increase
+  - [7] IF Organic_Carbon=low; Nitrogen=medium THEN Nitrogen: increase
+  - [7] IF Organic_Carbon=low; Nitrogen=high THEN Nitrogen: maintain
+  - [7] IF Organic_Carbon=medium; Nitrogen=low THEN Nitrogen: maintain
+  - [7] IF Organic_Carbon=medium; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Organic_Carbon=medium; Nitrogen=high THEN Nitrogen: maintain
+  - [7] IF Organic_Carbon=high; Nitrogen=low THEN Nitrogen: maintain
+  - [7] IF Organic_Carbon=high; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Organic_Carbon=high; Nitrogen=high THEN Nitrogen: reduce
+  - [8] IF Zinc=low; Soil_pH=acidic THEN Zinc: apply_soil
+  - [8] IF Zinc=low; Soil_pH=neutral THEN Zinc: apply_soil
+  - [8] IF Zinc=low; Soil_pH=alkaline THEN Zinc: apply_foliar_spray
+  - [8] IF Zinc=medium; Soil_pH=acidic THEN Zinc: maintain
+  - [8] IF Zinc=medium; Soil_pH=neutral THEN Zinc: maintain
+  - [8] IF Zinc=medium; Soil_pH=alkaline THEN Zinc: maintain
+  - [8] IF Zinc=high; Soil_pH=acidic THEN Zinc: monitor
+  - [8] IF Zinc=high; Soil_pH=neutral THEN Zinc: monitor
+  - [8] IF Zinc=high; Soil_pH=alkaline THEN Zinc: monitor
+  - [7] IF Growth_Stage=seedling; Nitrogen=low THEN Nitrogen: increase
+  - [7] IF Growth_Stage=seedling; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=seedling; Nitrogen=high THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=vegetative; Nitrogen=low THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=vegetative; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=vegetative; Nitrogen=high THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=flowering; Nitrogen=low THEN Nitrogen: increase, Phosphorus: increase
+  - [7] IF Growth_Stage=flowering; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=flowering; Nitrogen=high THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=maturity; Nitrogen=low THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=maturity; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Growth_Stage=maturity; Nitrogen=high THEN Nitrogen: reduce
+  - [7] IF Yield_Prediction=low; Nitrogen=low THEN Nitrogen: increase
+  - [7] IF Yield_Prediction=low; Nitrogen=medium THEN Nitrogen: maintain
   - [7] IF Yield_Prediction=low; Nitrogen=high THEN Nitrogen: review
-  - [8] IF Zinc=low; Rainfall=high THEN Zinc: apply_foliar_spray
-  - [4] IF Yield_Prediction=high; Nitrogen=medium; Phosphorus=medium; Potassium=medium; Soil_pH=neutral THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: maintain
-  - [4] IF Nitrogen=medium; Phosphorus=medium; Potassium=medium; Soil_pH=neutral; Rainfall=high THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: maintain
-  - [4] IF Nitrogen=medium; Phosphorus=medium; Potassium=medium; Soil_pH=neutral; Rainfall=low THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: maintain
+  - [7] IF Yield_Prediction=medium; Nitrogen=low THEN Nitrogen: maintain
+  - [7] IF Yield_Prediction=medium; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Yield_Prediction=medium; Nitrogen=high THEN Nitrogen: maintain
+  - [7] IF Yield_Prediction=high; Nitrogen=low THEN Nitrogen: maintain
+  - [7] IF Yield_Prediction=high; Nitrogen=medium THEN Nitrogen: maintain
+  - [7] IF Yield_Prediction=high; Nitrogen=high THEN Nitrogen: reduce
+  - [6] IF Nitrogen=low; Phosphorus=low; Potassium=low THEN Nitrogen: increase, Phosphorus: increase, Potassium: increase
+  - [6] IF Nitrogen=low; Phosphorus=low; Potassium=medium THEN Nitrogen: increase, Phosphorus: increase, Potassium: maintain
+  - [6] IF Nitrogen=low; Phosphorus=low; Potassium=high THEN Nitrogen: increase, Phosphorus: increase, Potassium: reduce
+  - [6] IF Nitrogen=low; Phosphorus=medium; Potassium=low THEN Nitrogen: increase, Phosphorus: maintain, Potassium: increase
+  - [6] IF Nitrogen=low; Phosphorus=medium; Potassium=medium THEN Nitrogen: increase, Phosphorus: maintain, Potassium: maintain
+  - [6] IF Nitrogen=low; Phosphorus=medium; Potassium=high THEN Nitrogen: increase, Phosphorus: maintain, Potassium: reduce
+  - [6] IF Nitrogen=low; Phosphorus=high; Potassium=low THEN Nitrogen: increase, Phosphorus: reduce, Potassium: increase
+  - [6] IF Nitrogen=low; Phosphorus=high; Potassium=medium THEN Nitrogen: increase, Phosphorus: reduce, Potassium: maintain
+  - [6] IF Nitrogen=low; Phosphorus=high; Potassium=high THEN Nitrogen: increase, Phosphorus: reduce, Potassium: reduce
+  - [6] IF Nitrogen=medium; Phosphorus=low; Potassium=low THEN Nitrogen: maintain, Phosphorus: increase, Potassium: increase
+  - [6] IF Nitrogen=medium; Phosphorus=low; Potassium=medium THEN Nitrogen: maintain, Phosphorus: increase, Potassium: maintain
+  - [6] IF Nitrogen=medium; Phosphorus=low; Potassium=high THEN Nitrogen: maintain, Phosphorus: increase, Potassium: reduce
+  - [6] IF Nitrogen=medium; Phosphorus=medium; Potassium=low THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: increase
+  - [6] IF Nitrogen=medium; Phosphorus=medium; Potassium=medium THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: maintain
+  - [6] IF Nitrogen=medium; Phosphorus=medium; Potassium=high THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: reduce
+  - [6] IF Nitrogen=medium; Phosphorus=high; Potassium=low THEN Nitrogen: maintain, Phosphorus: reduce, Potassium: increase
+  - [6] IF Nitrogen=medium; Phosphorus=high; Potassium=medium THEN Nitrogen: maintain, Phosphorus: reduce, Potassium: maintain
+  - [6] IF Nitrogen=medium; Phosphorus=high; Potassium=high THEN Nitrogen: maintain, Phosphorus: reduce, Potassium: reduce
+  - [6] IF Nitrogen=high; Phosphorus=low; Potassium=low THEN Nitrogen: reduce, Phosphorus: increase, Potassium: increase
+  - [6] IF Nitrogen=high; Phosphorus=low; Potassium=medium THEN Nitrogen: reduce, Phosphorus: increase, Potassium: maintain
+  - [6] IF Nitrogen=high; Phosphorus=low; Potassium=high THEN Nitrogen: reduce, Phosphorus: increase, Potassium: reduce
+  - [6] IF Nitrogen=high; Phosphorus=medium; Potassium=low THEN Nitrogen: reduce, Phosphorus: maintain, Potassium: increase
+  - [6] IF Nitrogen=high; Phosphorus=medium; Potassium=medium THEN Nitrogen: reduce, Phosphorus: maintain, Potassium: maintain
+  - [6] IF Nitrogen=high; Phosphorus=medium; Potassium=high THEN Nitrogen: reduce, Phosphorus: maintain, Potassium: reduce
+  - [6] IF Nitrogen=high; Phosphorus=high; Potassium=low THEN Nitrogen: reduce, Phosphorus: reduce, Potassium: increase
+  - [6] IF Nitrogen=high; Phosphorus=high; Potassium=medium THEN Nitrogen: reduce, Phosphorus: reduce, Potassium: maintain
+  - [6] IF Nitrogen=high; Phosphorus=high; Potassium=high THEN Nitrogen: reduce, Phosphorus: reduce, Potassium: reduce
+  - [6] IF Soil_pH=acidic; Rainfall=low; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=low; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=low; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=medium; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=medium; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=medium; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=high; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=high; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=acidic; Rainfall=high; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=low; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=low; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=low; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=medium; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=medium; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=medium; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=high; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=high; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=neutral; Rainfall=high; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=low; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=low; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=low; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=medium; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=medium; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=medium; Temperature_Max=hot THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=high; Temperature_Max=cool THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=high; Temperature_Max=moderate THEN Nitrogen: maintain
+  - [6] IF Soil_pH=alkaline; Rainfall=high; Temperature_Max=hot THEN Nitrogen: maintain
+  - [5] IF Nitrogen=low THEN Nitrogen: increase
+  - [5] IF Nitrogen=medium THEN Nitrogen: maintain
+  - [5] IF Nitrogen=high THEN Nitrogen: reduce
+  - [5] IF Phosphorus=low THEN Phosphorus: increase
+  - [5] IF Phosphorus=medium THEN Phosphorus: maintain
+  - [5] IF Phosphorus=high THEN Phosphorus: reduce
+  - [5] IF Potassium=low THEN Potassium: increase
+  - [5] IF Potassium=medium THEN Potassium: maintain
+  - [5] IF Potassium=high THEN Potassium: reduce
+  - [5] IF Soil_pH=acidic THEN Nitrogen: maintain
+  - [5] IF Soil_pH=neutral THEN Nitrogen: maintain
+  - [5] IF Soil_pH=alkaline THEN Nitrogen: maintain
+  - [5] IF Rainfall=low THEN Nitrogen: maintain
+  - [5] IF Rainfall=medium THEN Nitrogen: maintain
+  - [5] IF Rainfall=high THEN Nitrogen: maintain
+  - [5] IF Temperature_Max=cool THEN Nitrogen: maintain
+  - [5] IF Temperature_Max=moderate THEN Nitrogen: maintain
+  - [5] IF Temperature_Max=hot THEN Nitrogen: maintain
+  - [5] IF Zinc=low THEN Zinc: apply_foliar_spray
+  - [5] IF Zinc=medium THEN Zinc: maintain
+  - [5] IF Zinc=high THEN Zinc: monitor
+  - [5] IF Organic_Carbon=low THEN Nitrogen: increase
+  - [5] IF Organic_Carbon=medium THEN Nitrogen: maintain
+  - [5] IF Organic_Carbon=high THEN Nitrogen: reduce
+  - [5] IF Growth_Stage=seedling THEN Nitrogen: maintain
+  - [5] IF Growth_Stage=vegetative THEN Nitrogen: maintain
+  - [5] IF Growth_Stage=flowering THEN Nitrogen: maintain
+  - [5] IF Growth_Stage=maturity THEN Nitrogen: maintain
+  - [5] IF Yield_Prediction=low THEN Nitrogen: maintain
+  - [5] IF Yield_Prediction=medium THEN Nitrogen: maintain
+  - [5] IF Yield_Prediction=high THEN Nitrogen: maintain
+  - [6] IF Growth_Stage=seedling; Phosphorus=low THEN Phosphorus: increase
+  - [6] IF Growth_Stage=seedling; Phosphorus=high THEN Phosphorus: reduce
+  - [6] IF Growth_Stage=vegetative; Phosphorus=low THEN Phosphorus: increase
+  - [6] IF Growth_Stage=vegetative; Phosphorus=high THEN Phosphorus: reduce
+  - [6] IF Growth_Stage=flowering; Phosphorus=low THEN Phosphorus: increase
+  - [6] IF Growth_Stage=flowering; Phosphorus=high THEN Phosphorus: reduce
+  - [6] IF Growth_Stage=maturity; Phosphorus=low THEN Phosphorus: increase
+  - [6] IF Growth_Stage=maturity; Phosphorus=high THEN Phosphorus: reduce
+  - [6] IF Growth_Stage=seedling; Potassium=low THEN Potassium: increase
+  - [6] IF Growth_Stage=seedling; Potassium=high THEN Potassium: reduce
+  - [6] IF Growth_Stage=vegetative; Potassium=low THEN Potassium: increase
+  - [6] IF Growth_Stage=vegetative; Potassium=high THEN Potassium: reduce
+  - [6] IF Growth_Stage=flowering; Potassium=low THEN Potassium: increase
+  - [6] IF Growth_Stage=flowering; Potassium=high THEN Potassium: reduce
+  - [6] IF Growth_Stage=maturity; Potassium=low THEN Potassium: increase
+  - [6] IF Growth_Stage=maturity; Potassium=high THEN Potassium: reduce
+  - [6] IF Organic_Carbon=low; Soil_pH=acidic THEN Nitrogen: increase
+  - [6] IF Organic_Carbon=low; Soil_pH=alkaline THEN Nitrogen: increase
+  - [6] IF Organic_Carbon=high; Soil_pH=acidic THEN Nitrogen: maintain
+  - [6] IF Organic_Carbon=high; Soil_pH=alkaline THEN Nitrogen: maintain
+  - [6] IF Zinc=low; Rainfall=low THEN Zinc: apply_foliar_spray
+  - [6] IF Zinc=low; Rainfall=high THEN Zinc: apply_foliar_spray
+  - [3] IF Nitrogen=medium; Phosphorus=medium; Potassium=medium THEN Nitrogen: maintain, Phosphorus: maintain, Potassium: maintain
+  - [4] IF Nitrogen=high; Phosphorus=high; Potassium=high THEN Nitrogen: reduce, Phosphorus: reduce, Potassium: reduce
+  - [10] IF Nitrogen=low; Phosphorus=low; Potassium=low THEN Nitrogen: increase, Phosphorus: increase, Potassium: increase

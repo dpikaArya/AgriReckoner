@@ -1,6 +1,6 @@
 # Dataset Quality Score
-Generated: 2026-07-04 22:30:10
-Dataset: 3 rows × 131 columns
+Generated: 2026-07-20 17:17:17
+Dataset: 43 rows × 138 columns
 
 ## Quality Scorecard
 | Component | Score | Max | % |
@@ -8,16 +8,16 @@ Dataset: 3 rows × 131 columns
 | Schema Completeness | 20.0 | 20 | 100.0% |
 | Ontology Completeness | 0.0 | 10 | 0.0% |
 | Feature Completeness | 15.0 | 15 | 100.0% |
-| Missing Value Score | 2.6 | 15 | 17.6% |
+| Missing Value Score | 0.9 | 15 | 6.1% |
 | Documentation Score | 10.0 | 10 | 100.0% |
 | ML Readiness Score | 9.0 | 15 | 60.0% |
 | Scientific Reproducibility | 15.0 | 15 | 100.0% |
-| **Overall Quality Score** | **71.6** | **100** | **71.6%** |
+| **Overall Quality Score** | **69.9** | **100** | **69.9%** |
 
 ## Detailed Breakdown
 
 ### Schema Completeness (20.0/20)
-- UAMS columns in dataset: 128/128
+- UAMS columns in dataset: 138/138
 - Missing schema groups: TODO
 
 ### Ontology Completeness (0.0/10)
@@ -27,9 +27,9 @@ Dataset: 3 rows × 131 columns
 - Engineered features present: 9/9
 - Features missing: []
 
-### Missing Values (2.6/15)
-- Missing rate: 82.4%
-- Total missing: 324/393
+### Missing Values (0.9/15)
+- Missing rate: 93.9%
+- Total missing: 5572/5934
 
 ### Documentation (10.0/10)
 - Docs present: 5/5

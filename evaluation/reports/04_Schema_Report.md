@@ -1,15 +1,15 @@
 # Stage 04: Schema Mapping Report
-Generated: 2026-07-04 22:30:09
+Generated: 2026-07-20 17:17:05
 UAMS schema version: 1.0
-UAMS columns: 128
+UAMS columns: 138
 
 ## Summary
-- Variable mapping accuracy: 97.7%
+- Variable mapping accuracy: 66.7%
 - Schema coverage: 100.0%
-- Schema completeness: 97.7%
+- Schema completeness: 100.0%
 - Duplicate removal accuracy: 100.0%
-- Total columns in output: 131
-- UAMS columns present: 128
+- Total columns in output: 138
+- UAMS columns present: 138
 - Unmapped columns: 1
 - Duplicate columns: 0
 

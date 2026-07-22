@@ -1,67 +1,67 @@
 # Stage 09: Statistical Diagnostics Report
-Generated: 2026-07-04 22:30:10
+Generated: 2026-07-20 17:17:16
 
 ## Summary
-- Dataset shape: 3 rows × 131 columns
-- Numeric columns: 129
-- Missing values: 324/393 (82.4%)
-- High correlation pairs (|r| > 0.8): 109
-- High VIF features: 30
-- Highly skewed features: 0
-- High kurtosis features: 0
-- Non-normal features: 0
+- Dataset shape: 43 rows × 138 columns
+- Numeric columns: 132
+- Missing values: 5572/5934 (93.9%)
+- High correlation pairs (|r| > 0.8): 7
+- High VIF features: 7
+- Highly skewed features: 4
+- High kurtosis features: 4
+- Non-normal features: 5
 
 ## Missing Values (Top 20)
 | Column | Missing | % |
 |--------|---------|---|
-| Paper_ID | 3 | 100.0% |
-| DOI | 3 | 100.0% |
-| Journal | 3 | 100.0% |
-| Year | 3 | 100.0% |
-| Authors | 3 | 100.0% |
-| Country | 3 | 100.0% |
-| Scientific_Name | 3 | 100.0% |
-| Variety | 3 | 100.0% |
-| Growth_Duration_Days | 3 | 100.0% |
-| Design | 3 | 100.0% |
-| Replications | 3 | 100.0% |
-| Spacing_Row | 3 | 100.0% |
-| Spacing_Plant | 3 | 100.0% |
-| Sample_Size | 3 | 100.0% |
-| Location | 3 | 100.0% |
-| State | 3 | 100.0% |
-| Site | 3 | 100.0% |
-| Latitude | 3 | 100.0% |
-| Longitude | 3 | 100.0% |
-| Altitude | 3 | 100.0% |
+| Journal | 43 | 100.0% |
+| Year | 43 | 100.0% |
+| Authors | 43 | 100.0% |
+| Country | 43 | 100.0% |
+| Scientific_Name | 43 | 100.0% |
+| Variety | 43 | 100.0% |
+| Season | 43 | 100.0% |
+| Growth_Duration_Days | 43 | 100.0% |
+| Growth_Stage | 43 | 100.0% |
+| Plot_Size | 43 | 100.0% |
+| Spacing_Row | 43 | 100.0% |
+| Spacing_Plant | 43 | 100.0% |
+| Sample_Size | 43 | 100.0% |
+| Location | 43 | 100.0% |
+| State | 43 | 100.0% |
+| Site | 43 | 100.0% |
+| Latitude | 43 | 100.0% |
+| Longitude | 43 | 100.0% |
+| Altitude | 43 | 100.0% |
+| Temperature_Max | 43 | 100.0% |
 
-## High Correlation Pairs (109)
-- Plot_Size ↔ Temperature_Max: r=0.866
-- Plot_Size ↔ Temperature_Min: r=0.961
-- Plot_Size ↔ Rainfall: r=0.866
-- Plot_Size ↔ Soil_pH: r=0.866
-- Plot_Size ↔ EC: r=0.918
-- Plot_Size ↔ Nitrogen: r=0.945
-- Plot_Size ↔ Yield_per_Plot: r=0.866
-- Plot_Size ↔ Growing_Degree_Days: r=0.912
-- Plot_Size ↔ Heat_Units: r=0.866
-- Plot_Size ↔ Rainfall_Anomaly: r=0.866
-- Plot_Size ↔ Yield_per_Plot_Calc: r=0.866
-- Plot_Size ↔ Temp_ squared: r=0.891
-- Plot_Size ↔ Crop_Code: r=1.000
-- Plot_Size ↔ Season_Code: r=1.000
-- Plot_Size ↔ Temperature_Max_7d_MA: r=1.000
-- Plot_Size ↔ Temperature_Min_7d_MA: r=0.918
-- Temperature_Max ↔ Temperature_Min: r=0.971
-- Temperature_Max ↔ Soil_pH: r=1.000
-- Temperature_Max ↔ EC: r=0.993
-- Temperature_Max ↔ Nitrogen: r=0.982
+## High Correlation Pairs (7)
+- Rainfall ↔ Organic_Carbon: r=0.981
+- Rainfall ↔ Iron: r=0.927
+- Soil_pH ↔ Yield_per_Hectare: r=1.000
+- EC ↔ Organic_Carbon: r=1.000
+- EC ↔ Potassium: r=1.000
+- EC ↔ Iron: r=0.971
+- EC ↔ Yield_per_Hectare: r=1.000
 
-## Skewness (|skew| > 1: 0)
+## Skewness (|skew| > 1: 4)
+- Replications: 6.557
+- Soil_pH: 3.740
+- EC: 2.125
+- Organic_Carbon: 1.998
 
-## Kurtosis (|kurt| > 3: 0)
+## Kurtosis (|kurt| > 3: 4)
+- Replications: 43.000
+- Soil_pH: 13.993
+- EC: 3.228
+- Organic_Carbon: 3.992
 
-## Non-Normal Features (Shapiro-Wilk p<0.05: 0)
+## Non-Normal Features (Shapiro-Wilk p<0.05: 5)
+- Replications
+- Rainfall
+- Soil_pH
+- EC
+- Organic_Carbon
 
 ## Bottlenecks & Recommendations
 1. **Missing values**: Impute or drop columns with >10% missing before modeling

@@ -119,6 +119,23 @@ ollama/
 sentence_transformers/
 
 # ===========================
+# Old Package (superseded by agri_ai_agent/)
+# ===========================
+ades/
+ades.egg-info/
+
+# ===========================
+# Redundant Extraction Module
+# ===========================
+aaif/
+
+# ===========================
+# Databases (runtime data, not source)
+# ===========================
+*.sqlite
+agri_ai_agent/memory/*.db
+
+# ===========================
 # Secrets
 # ===========================
 .env

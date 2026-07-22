@@ -1,7 +1,6 @@
 ﻿metric,value
 completion_rate,1.0
-total_time,1.9905590000000002
-total_retries,0
-total_errors,0
-failed_count,0
-report,/Users/deepika/Desktop/UAS folder/evaluation/reports/Pipeline_Performance.md
+total_time,537.0000000000001
+total_retries,0.0
+total_errors,0.0
+failed_count,0.0
