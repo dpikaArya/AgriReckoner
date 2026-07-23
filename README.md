@@ -1,8 +1,42 @@
 # Agricultural Intelligence Framework 
 
-An end-to-end **Agentic Agricultural Intelligence Framework (AAIF)** that ingests research PDFs, extracts agronomic data into a Universal Agricultural Schema, trains ML models, applies fuzzy logic for fertilizer recommendations, and produces a **Ready Reckoner Table** — a per-crop yield decision support tool.
+Scientific Objectives & Main Implementation Features
+1. Scientific Objectives
+The Ready Reckoner Table AI Framework (also termed Agentic Agricultural Intelligence Framework, AAIF) addresses a fundamental challenge in precision agriculture: converting unstructured, heterogeneous research literature into actionable, crop-specific decision-support tools.
+The core scientific objectives are:
+1.	Automated Knowledge Extraction from Literature. Agronomic research is dispersed across thousands of PDF publications with inconsistent formatting, terminology, and tabular structures. The framework automates the ingestion, parsing, and structured extraction of key agronomic variables (soil properties, fertilizer treatments, growth parameters, and yield outcomes) from these documents, eliminating manual data curation.
+2.	Universal Schema Harmonisation. To enable cross-study and cross-crop comparisons, extracted data is mapped to the Universal Agricultural Machine Learning Schema (UAMS) v1.0 — a 138-column, 14-group ontology covering paper metadata, crop information, experimental design, environment, soil chemistry, fertilization, growth physiology, yield, and grain quality. This standardisation is a prerequisite for any downstream meta-analysis or machine learning.
+3.	Yield Prediction via Multi-Model Machine Learning. Once harmonised, the dataset supports supervised learning for predicting key agronomic targets — yield per hectare, plant height, SPAD (chlorophyll index), and shoot biomass — using an ensemble of 8 regression model families (Linear, Ridge, Lasso, ElasticNet, Random Forest, Gradient Boosting, XGBoost, SVR) with cross-validation and hyperparameter tuning. The goal is to identify the best predictive model per target under data-scarce conditions.
+4.	Fuzzy-Logic Fertilizer Recommendation. A Mamdani fuzzy inference system with 221 rules operates on 10 agronomic input variables (N, P, K, Zn, soil pH, rainfall, temperature, organic carbon, growth stage, yield prediction) to produce crop-specific, linguistically interpretable fertilizer recommendations (N/P/K dosages) with confidence scores. This bridges the gap between data-driven prediction and expert-system reasoning.
+5.	Ready Reckoner Table Generation. The terminal output is a per-crop Ready Reckoner Table — a compact decision-support artefact summarising optimal fertilizer regimes, expected yields, treatment alternatives, and confidence levels, exportable in Excel, CSV, and HTML formats for extension-agent and farmer use.
+2. Main Implementation Features
+The framework is implemented as a 10-phase agentic pipeline orchestrated by a central Orchestrator class that sequences 17 specialised agents, each governed by a typed AgentContract message protocol. Key implementation features include:
+Feature	Description
+Incremental PDF Ingestion	Scans a PDF directory; detects crop, DOI, title, and duplicates via fuzzy string matching (SequenceMatcher >0.90). Skips previously registered papers via a SQLite paper_registry (current skip rate: 84.6%).
+6-Reader Hybrid Extraction	Dispatches each PDF through Pdfminer, Camelot, Pdfplumber, Poppler (pdftotext), OCR, and Semantic readers with configurable timeouts. Regex patterns extract soil pH, N/P/K, yield, temperature, rainfall, and 15+ agronomic variables.
+Confidence-Weighted Evidence Fusion	The EvidenceFusionAgent deduplicates and merges multi-reader outputs using per-reader confidence weights, resolving conflicts at the cell level.
+Ontology Mapping & Table Intelligence	The OntologyAgent normalises heterogeneous column names to UAMS via a 120-entry master column map. The TableIntelligenceAgent classifies table types and computes summary statistics.
+Biological Range Validation	Enforces domain constraints (e.g., soil pH ∈ [3,10], yield ∈ [0, 50,000] kg/ha, Tmax ≥ Tmin). Flags IQR-based outliers (3× IQR), OCR artefacts, and unit inconsistencies.
+Feature Engineering (146 features)	Derives 16+ composite features: NPK Index, Soil Fertility Index, Climate Index, Growing Degree Days, Nitrogen/Water Use Efficiency, Growth-Yield Index, polynomial temperature terms, and factor-encoded categorical variables.
+Adaptive Model Selection	The ModelSelectionAgent selects the model pool based on sample size, applies SelectKBest feature selection when features exceed samples, and runs GridSearchCV with target-specific parameter grids.
+Mamdani Fuzzy Expert System	221 rules in YAML (v3.0) with 10 trapezoidal/triangular input MFs and 3 output MFs (Low/Medium/High for N, P, K). Centroid defuzzification produces continuous recommendation values, with crop-specific adjustment factors for all 9 crops.
+Explainability & Provenance	The ExplainabilityAgent generates per-prediction feature-attribution explanations. The ProvenanceAgent tracks per-cell data lineage from source PDF to final schema.
+Continuous Learning	Drift detection monitors model performance over time. New papers trigger incremental retraining; the paper registry and model versions are updated without full pipeline re-execution.
+11-Stage Evaluation Suite	Automated scoring across ingestion completeness, extraction accuracy, ontology coverage, schema compliance, unit consistency, data quality, feature utility, data-leakage checks, statistical soundness, model readiness, and documentation.
+Knowledge Graph	A NetworkX graph with 8 node types (Paper, Crop, Soil, Treatment, Yield, Feature, Model, Rule) encodes entity relationships for graph-based queries and downstream reasoning.
 
-> **Current state:** 68 research papers across 9 crops → 146 engineered features → 39 ML models → 221 fuzzy rules → Ready Reckoner Table
+3. Current Scale & Results
+Metric	Value
+Research papers processed	68 (from 91 PDFs)
+Crops covered	9 (Barley, Bell Pepper, Black Wheat, Cabbage, Carrot, Chickpea, Cotton, Maize, Spinach)
+UAMS schema columns	138
+Engineered features	146
+ML models trained	39 (5 targets × 8 model types)
+Best model R²	0.995 (Ridge, Plant Height; n=10)
+Fuzzy rules	221 (Mamdani v3.0)
+Pipeline phases	10
+Full pipeline runtime	~25 seconds (incremental mode)
+
 
 ---
 
@@ -446,4 +480,4 @@ See `requirements.txt` for exact versions.
 
 ## License
 
-This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
+This project is licensed under the Apache 2 License — see [LICENSE](LICENSE) for details.
