@@ -1,4 +1,4 @@
-# Ready Reckoner Table — AI Framework
+# Agricultural Intelligence Framework 
 
 An end-to-end **Agentic Agricultural Intelligence Framework (AAIF)** that ingests research PDFs, extracts agronomic data into a Universal Agricultural Schema, trains ML models, applies fuzzy logic for fertilizer recommendations, and produces a **Ready Reckoner Table** — a per-crop yield decision support tool.
 
