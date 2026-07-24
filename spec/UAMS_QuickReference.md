@@ -1,6 +1,6 @@
 # UAMS v1.0 — Quick Reference Card
 
-**128 columns · 13 groups · SI units · ML-ready**
+**138 columns · 14 groups · canonical agronomic units (UCUM/UO/QUDT) · ML-ready**
 
 ---
 
