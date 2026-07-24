@@ -436,7 +436,8 @@ Ready-Reckoner-AI-Framework/
 ├── database/
 │   └── paper_registry.sqlite       # Paper processing registry
 │
-├── run_aaf_pipeline.py             # Main pipeline entry point
+├── agri_ai_agent/cli.py            # Primary entry point: `agriai run --file data.csv`
+├── run_aaf_pipeline.py             # LEGACY frozen PDF runner (tag legacy-monolith-v1)
 ├── run_eval.py                     # Evaluation runner
 ├── requirements.txt                # Python dependencies
 ├── pyproject.toml                  # Project metadata
