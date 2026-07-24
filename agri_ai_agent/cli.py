@@ -36,7 +36,8 @@ def main():
     args = parser.parse_args()
 
     if args.command == "version":
-        print("AgriAI v1.0.0")
+        from agri_ai_agent import __version__
+        print(f"AgriAI v{__version__}")
         return
 
     if args.command is None:
