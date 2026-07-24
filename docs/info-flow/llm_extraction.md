@@ -22,11 +22,14 @@ The model returns values **unverified**. Trust is established by code, not by th
 
 1. **Structured output** — `response_format=json_schema, strict=True` forces the shape.
 2. **Grounding** (`extractors/grounding.py`): a value is accepted only if
-   - its number appears literally in the cited `source_quote` (numeric-echo check), and
-   - it falls within the registry's validated range for that column.
+   - its number appears literally in the cited `source_quote` (numeric-echo check),
+   - its reported unit is **convertible** to the column's canonical unit (`extractors/units.py`) —
+     compatible units are converted (4.2 t/ha → 4200 kg/ha; 13.4 g/kg OC → 1.34 %), and
+     dimensionally-incompatible ones are **rejected** (soil "g/kg" is not the column's "kg/ha" rate), and
+   - the converted value falls within the registry's validated range for that column.
 3. Rejected values are **flagged with a reason**, kept in `LLM_Extraction_Provenance.csv`
-   for human review — never silently dropped. Only `status == "reported"` values enter the
-   UAMS row.
+   (with both `value_reported`/`unit_as_reported` and `value_canonical`/`canonical_unit`) for human
+   review — never silently dropped. Only `status == "reported"` values, in canonical units, enter the row.
 
 ## Explicit non-responsibilities of the model
 
