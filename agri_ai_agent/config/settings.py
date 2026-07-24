@@ -39,6 +39,11 @@ class AgriAISettings:
     LOG_LEVEL: str = os.getenv("AGRI_LOG_LEVEL", "INFO")
     LOG_FORMAT: str = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 
+    # LLM extraction (optional; the framework runs offline without a key).
+    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    LLM_MODEL: str = os.getenv("AGRI_LLM_MODEL", "gpt-4o-mini")
+    LLM_TEMPERATURE: float = float(os.getenv("AGRI_LLM_TEMPERATURE", "0.0"))
+
     EXPORT_FORMATS: list[str] = ["csv", "parquet", "xlsx", "html"]
 
     BENCHMARK_DIR: Path = OUTPUT_DIR / "benchmark"

@@ -1,0 +1,49 @@
+"""Shared types for extraction strategies."""
+
+from dataclasses import dataclass, field
+from typing import Optional, Protocol, runtime_checkable
+
+
+@dataclass
+class ExtractedField:
+    """One value pulled from a paper, with its provenance and trust status.
+
+    ``status`` is one of: ``reported`` (verbatim from the source and grounded),
+    ``unverified`` (LLM-proposed but not yet grounded), ``rejected`` (failed grounding).
+    """
+
+    column: str
+    value: Optional[float] = None
+    unit_as_reported: Optional[str] = None
+    source_quote: Optional[str] = None
+    page: Optional[int] = None
+    model_confidence: Optional[float] = None
+    status: str = "unverified"
+    reject_reason: Optional[str] = None
+
+
+@dataclass
+class ExtractionResult:
+    """All fields extracted from a single paper, plus paper-level metadata."""
+
+    paper_id: str
+    crop: Optional[str] = None
+    doi: Optional[str] = None
+    year: Optional[int] = None
+    fields: list[ExtractedField] = field(default_factory=list)
+    method: str = "unknown"
+
+
+@runtime_checkable
+class Extractor(Protocol):
+    """A strategy that extracts UAMS fields from a paper's text."""
+
+    def extract(self, text: str, paper_id: str) -> ExtractionResult:
+        ...
+
+
+if __name__ == "__main__":
+    f = ExtractedField(column="Soil_pH", value=6.8, unit_as_reported=None, source_quote="Soil pH was 6.8")
+    r = ExtractionResult(paper_id="p1", crop="Wheat", fields=[f], method="test")
+    assert r.fields[0].column == "Soil_pH" and r.fields[0].status == "unverified"
+    print("base smoke OK ->", r.paper_id, r.fields[0].column)
