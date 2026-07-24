@@ -1,0 +1,344 @@
+{
+  "snapshot": "legacy-monolith-v1",
+  "produced_by": "run_aaf_pipeline.py (2004-line procedural monolith)",
+  "note": "Validated committed artifacts frozen before refactor. New engine must reproduce these (within tolerance) before the monolith may be deleted.",
+  "git_sha": "abbde49241be008b523587feb24abe776aeefdcb",
+  "files": {
+    "outputs/AAIF_Final_Report.html": {
+      "sha256": "68e7278b59ce8f1d8f022a48d1f1fac2b4c27fe75e05c26291d8f5af1835b74e",
+      "bytes": 10223
+    },
+    "outputs/Architecture.md": {
+      "sha256": "0e3b21dd3c6e1f3675b374aba113826fcc7e43f5e19f645d9894b9d7b35379e8",
+      "bytes": 1391
+    },
+    "outputs/Audit_Report_Improvements.docx": {
+      "sha256": "d6340214fd6bca4b9753d81907f34f53a3de80e465000a84440a01bc66e82bc2",
+      "bytes": 41261
+    },
+    "outputs/Correlation_Matrix.csv": {
+      "sha256": "d5782d9b7557e999edad05dd56b11db11a7d04556c2975466014e619e426618e",
+      "bytes": 165
+    },
+    "outputs/Data_Validation_Report.md": {
+      "sha256": "9fe5aaea09dc7070bf08c823907c9f20243b57b5a7a5758fc1131395814b7864",
+      "bytes": 9003
+    },
+    "outputs/Dataset_Card.md": {
+      "sha256": "4ca47246ab6a5c162a0da2fa7236daf68643f038da6358cd7346238b0f5c3598",
+      "bytes": 847
+    },
+    "outputs/Developer_Guide.md": {
+      "sha256": "2fff92b1ea11a952b0b0ad1539900ed1e6ab3d61f0f39d7506f74fac45742bd8",
+      "bytes": 682
+    },
+    "outputs/Document_Structures.json": {
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    "outputs/Encoding_Map.csv": {
+      "sha256": "b1933137a949708fafa8aba5e1aefc0dc17b1f50aba0ea5440dc219a59acb648",
+      "bytes": 108
+    },
+    "outputs/Evidence_Traceability.csv": {
+      "sha256": "70aac64db1156fcc3d1b707d137b9d3cd3acc53967a6d6c70c2076fcf6a0ffa9",
+      "bytes": 448
+    },
+    "outputs/Evidence_Validation_Report.md": {
+      "sha256": "42f01ea68f182d4f936d77f3f66d3069f510d9b966e6d4dca21863cd0006e0c4",
+      "bytes": 206
+    },
+    "outputs/Extraction_Report.md": {
+      "sha256": "0e92b9453fb303b711a05fe4bcfc691fb3d56f3c7be7f5e8d74d8043edfca7d9",
+      "bytes": 1459
+    },
+    "outputs/FAIR_Compliance_Report.md": {
+      "sha256": "8b24e3ee1cd3c07aaec8d2556c6f4bff9dc88c6e788f1205ab0e6ff2de117bb3",
+      "bytes": 633
+    },
+    "outputs/Feature_Availability_Check.csv": {
+      "sha256": "02354198b9913153c0d2aca37be4bf18dc8cd22b651d957a417c2c202edaecdc",
+      "bytes": 5307
+    },
+    "outputs/Feature_Dictionary.csv": {
+      "sha256": "0137a426f2ffa2e9e69a54edef8658ba67a82854db063bc78326447b2e9a332c",
+      "bytes": 12307
+    },
+    "outputs/Feature_Engineering_Report.md": {
+      "sha256": "219525a5d87303d87c1942fa21fb8af5ab5d05ad63178989a627ee463ead3105",
+      "bytes": 727
+    },
+    "outputs/Leakage_Report.csv": {
+      "sha256": "2ee061aa390e18c501142cc44913562ae6cde25f82cd61e6e03fb6d28d90c4bf",
+      "bytes": 583
+    },
+    "outputs/MachineLearning_Dataset.csv": {
+      "sha256": "a03e81f33f84a6864509a8a1e5586cdb5e51860ec0e77ea71acb2a5e32538ab3",
+      "bytes": 12531
+    },
+    "outputs/Missing_Data_Report.md": {
+      "sha256": "2617a738244448442cf805543258d63129cf62223adf14ec7a2e071c8fb99c72",
+      "bytes": 4740
+    },
+    "outputs/Missing_Value_Profile.csv": {
+      "sha256": "b64cafaacf49edbace64e453ff49d711f2000090395d670af7971a6256b97203",
+      "bytes": 4285
+    },
+    "outputs/Model_Readiness_Report.md": {
+      "sha256": "861ee1d8875e533f7fa83938886ff51377bf7ff2df1b45ff516e6826eb61d0da",
+      "bytes": 2362
+    },
+    "outputs/Ontology_Coverage_Report.md": {
+      "sha256": "70a25a0ae6c26b3b48fcc99e544d4ed937b99edfbaafab4a56c7b260af107d16",
+      "bytes": 591
+    },
+    "outputs/Ontology_Dictionary.md": {
+      "sha256": "9b40707735ece3f2256b42fe73f36f1fbfa0e2e9ba930cc713cf8c723baf892e",
+      "bytes": 599
+    },
+    "outputs/Ontology_Mapping.csv": {
+      "sha256": "9ad5197574e893f299d9b64f168e0b2f3036364995e8e0c0fa0278c3bdd3c040",
+      "bytes": 174
+    },
+    "outputs/Outlier_Profile.csv": {
+      "sha256": "b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46",
+      "bytes": 4
+    },
+    "outputs/Pipeline_Log.md": {
+      "sha256": "388081f6bc4778d4ebb3a4ed5a9e0278b2d78af4ae85507624ac7cafb531c490",
+      "bytes": 1051
+    },
+    "outputs/Pipeline_Provenance.json": {
+      "sha256": "9f6f8c64cfeb658d4c6bb2c3eea5c841308f3b32b90da695f7f07c9da3b8da1d",
+      "bytes": 2958
+    },
+    "outputs/Provenance_Registry.json": {
+      "sha256": "ff35f49591392252d2e458761016eb4b31ec90d29486c29be9c1df05f1d6b841",
+      "bytes": 1222
+    },
+    "outputs/Publication_Checklist.md": {
+      "sha256": "57f5a484c56556c1a2886441ccd3187bacac5db117edbae2c15e2c9059df15ba",
+      "bytes": 869
+    },
+    "outputs/Quality_Report.md": {
+      "sha256": "c743f74ad8d10d45e5545da5b29fcb51a614e3a8ed3c613aae44a540e8cae399",
+      "bytes": 448
+    },
+    "outputs/Ready_Reckoner.html": {
+      "sha256": "ecc0ff08ca095d3da761b982de679de38b1a3ed2c3cfd6a1525e29e087672a64",
+      "bytes": 28979
+    },
+    "outputs/Ready_Reckoner.xlsx": {
+      "sha256": "fad10f50553eb344fec7a44d2f09752f80bccb3b46197bfd1fb7400f09ec591e",
+      "bytes": 10073
+    },
+    "outputs/Reproducibility_Report.md": {
+      "sha256": "e351058f352fb2d8f2ea52340ed9d76d7527a799aa930fc00350133bfaa10c47",
+      "bytes": 958
+    },
+    "outputs/Schema_Mapping_Report.md": {
+      "sha256": "5ed34def7addcc6bc4f2a5423c4741ae1cc878a28b2b3cc174d67b69e598000d",
+      "bytes": 380
+    },
+    "outputs/Schema_Metadata.json": {
+      "sha256": "8464f13e43f8cb55283c624dc67f66202d5667cb80991ff551dae95956dcdec9",
+      "bytes": 10792
+    },
+    "outputs/Scientific_Extractions.json": {
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "bytes": 2
+    },
+    "outputs/Statistical_Profile.csv": {
+      "sha256": "fb964646bc629adb7a93a9b97f35552c0b60deb661ecdad678f586b27eba396a",
+      "bytes": 365
+    },
+    "outputs/Unit_Conversion_Report.md": {
+      "sha256": "86ccc82a071c65f34409cdb1e52f172cf8dc0fe62cd46940fe5a4be81b6e73e3",
+      "bytes": 365
+    },
+    "outputs/Universal_Agricultural_ML_Master.csv": {
+      "sha256": "a03e81f33f84a6864509a8a1e5586cdb5e51860ec0e77ea71acb2a5e32538ab3",
+      "bytes": 12531
+    },
+    "outputs/Universal_Agricultural_Schema.csv": {
+      "sha256": "03a413d82935b1142be06613ab706bdf6bc94c087b4c92334c051a7eaf710268",
+      "bytes": 18823
+    },
+    "outputs/Unmapped_Columns.csv": {
+      "sha256": "385f76869bc8ff505651e8b78b35bc7e4d5ac7990146a5ad4413ba5bc1585c6f",
+      "bytes": 30
+    },
+    "outputs/VIF_Report.csv": {
+      "sha256": "bf17c78ce788216969b423bb109e2f2b1c9c380f2c66ee105712589a5f3d9122",
+      "bytes": 157
+    },
+    "outputs/Validated_Extractions.json": {
+      "sha256": "09bb18cbe064c36adf406548016f93af5159c61481dff3267f43fb661b1e6a58",
+      "bytes": 414137
+    },
+    "outputs/Validation_Report.csv": {
+      "sha256": "31e30bdb713a28c7c2db3fe625f23b7c6740ad26ecc5014da6c29c4b42cb2630",
+      "bytes": 4703
+    },
+    "outputs/Validation_Report.xlsx": {
+      "sha256": "0298e9e0d67ff7e4c26d056dc4a628e00b5bb29260c81459453786342fa8be05",
+      "bytes": 9503
+    },
+    "outputs/Variable_Mapping.csv": {
+      "sha256": "e03f52157e312ea4230ed6000febcdaf373837eecf732408826ceaad439dee83",
+      "bytes": 83
+    },
+    "outputs/evaluation/Extraction_Method_Comparison.csv": {
+      "sha256": "2abc9b4b0a817f9ad6c42a6efaf8c882f1dcf83725026cf0f819efd5b89b1df5",
+      "bytes": 1012
+    },
+    "outputs/evaluation/Feature_Report.csv": {
+      "sha256": "640f2599d257fc023eb25511faf68caf08dadd88697dfa999f9a4ef4cd986c3d",
+      "bytes": 796
+    },
+    "outputs/evaluation/Schema_Validation_Report.csv": {
+      "sha256": "decc0e7ae30206c4589786576feea857484e6278b72b6f572374bafaef1bc9e3",
+      "bytes": 1180
+    },
+    "outputs/export/AAIF_All_Results.xlsx": {
+      "sha256": "ae9fef4b28a45640e7d7f0161804006e0dd28cc1e9102d0e9768c3d9c827d6f1",
+      "bytes": 65565
+    },
+    "outputs/export/AAIF_Model_Report.docx": {
+      "sha256": "6422e48fc1e8d4b7279e62c19cae467e968123d33fc627e9138ef79a48d392ec",
+      "bytes": 40849
+    },
+    "outputs/export/AAIF_Regression_Report.docx": {
+      "sha256": "ddc6dc83e7c30d05a6b656b4be031bd6789f49ff9ac41c3e5db0190e49b95036",
+      "bytes": 37438
+    },
+    "outputs/extraction_test.xlsx": {
+      "sha256": "3fb7db7a0e48eb22f7d79840280b0f4b236396e23f0898516f51162235c3160c",
+      "bytes": 5646
+    },
+    "outputs/feature_importance.csv": {
+      "sha256": "c4b46aebf17dad29f24bca8483ad2406eb5bfe363817427d90e5e87cbaa9d002",
+      "bytes": 312
+    },
+    "outputs/feature_importance_Plant_Height_cm.csv": {
+      "sha256": "ce9e24db54f7ff68ee65204a434df2870fb833f041817dcdb5494fc7d58db903",
+      "bytes": 141
+    },
+    "outputs/feature_importance_SPAD.csv": {
+      "sha256": "b0d21c6c2659d0f26fad62a9511f6f95daf5adbce85b8cc96df666ed2521007f",
+      "bytes": 99
+    },
+    "outputs/feature_importance_Shoot_Biomass_g.csv": {
+      "sha256": "e7b83a8f785c9a956e7eb293146badeeab746df4fd95d750f64d0c36e199d913",
+      "bytes": 234
+    },
+    "outputs/feature_importance_Yield_per_Hectare.csv": {
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "bytes": 1
+    },
+    "outputs/feature_importance_Yield_per_Plot.csv": {
+      "sha256": "242e7f57b4f3b10298eba4ba6929a6a2bbea24a14812c273ceb1a0e9fb5b9efa",
+      "bytes": 106
+    },
+    "outputs/features_dataset.csv": {
+      "sha256": "0e674e4714afcdb7bf347a9ed56bfe55e6e31368699ca45263febc385847ef09",
+      "bytes": 20876
+    },
+    "outputs/hybrid/extraction_report.csv": {
+      "sha256": "fa40c524143d047afe985f87d7f79f4e20c61ddab30ec3f27c99086b540ce48c",
+      "bytes": 1167
+    },
+    "outputs/hybrid/hybrid_extraction_results.xlsx": {
+      "sha256": "7a171e08c8719ae00cf410d01c7bf8afed5f559856aca5f2516cf44f0706c9b6",
+      "bytes": 7559
+    },
+    "outputs/ingestion_report.csv": {
+      "sha256": "7703d988ebbb4537f66d0e4dde8fad3837bc69b3188876b7b6b5398909d54282",
+      "bytes": 9805
+    },
+    "outputs/ingestion_report.xlsx": {
+      "sha256": "6789e6e161689d0ea407c8e3fc3239ee34f543d63b090a5737977f725b0ff9ba",
+      "bytes": 9951
+    },
+    "outputs/ingestion_test.xlsx": {
+      "sha256": "b814a8bd16ee3c32caec5c938e6a22c131580beafba7dd065f7195c28a3772ae",
+      "bytes": 6537
+    },
+    "outputs/master_datasets_combined.csv": {
+      "sha256": "82e210ac96fa0cb1e7667af732ca33d25a59512d41ba00a7e075342cfa5de70c",
+      "bytes": 13606
+    },
+    "outputs/model_metrics.xlsx": {
+      "sha256": "3e20909adc8f79f703d3a1a23786185c47bb40a9a2037d85ddae29f99dfb2234",
+      "bytes": 7637
+    },
+    "outputs/pdfplumber_extraction.xlsx": {
+      "sha256": "00f4a6ede7be33b26b536a51d4e9a34f72991a5066499d2092a425c52720a380",
+      "bytes": 10224
+    },
+    "outputs/recommendation_dashboard.html": {
+      "sha256": "09e4cf75e35a20894d77c0c216658a397f639eb9bfd04b4b34cdaa0876a52a2a",
+      "bytes": 6600
+    },
+    "outputs/recommendation_report.html": {
+      "sha256": "c5a030b7fc763abb5f4c93ae4be1ce5fea6bc8c3617195288da9ce6970f5f1f3",
+      "bytes": 1588
+    },
+    "outputs/recommendations/fertilizer_recommendations.csv": {
+      "sha256": "c7d338b9c364fecf3bd741ac7ccc181d46c3e54cc16eaecc54fc8730fc49dc8b",
+      "bytes": 17114
+    },
+    "outputs/recommendations/fertilizer_recommendations.xlsx": {
+      "sha256": "2a0e3ca23fe5c5a77650a4e1b00f20030e06437f9caf20f27fbe0a105e4833e5",
+      "bytes": 11413
+    },
+    "outputs/recommendations/recommendation_report.csv": {
+      "sha256": "b91532975655832b9463c483c0000706db731348af7fad9606507cf8f55e773c",
+      "bytes": 305
+    },
+    "outputs/tables/Model_Performance_Assessment.csv": {
+      "sha256": "3b5650d4050c595cb790610906b3f6976294783af02e1f5a914b0b827ea78a24",
+      "bytes": 1266
+    },
+    "outputs/tables/Model_Performance_Assessment.xlsx": {
+      "sha256": "43b2bd0e7f5194f6e7aa4ad6de0adc9c92c1f9e0ab2f7a353301673bdab9a944",
+      "bytes": 6172
+    },
+    "outputs/tables/Multi_Regression_Results.csv": {
+      "sha256": "0db173b26ea1eaebb7337f15a53e5a17769461a971ea64faaa652682f5fa4bc3",
+      "bytes": 321
+    },
+    "outputs/tables/Multi_Regression_Results.xlsx": {
+      "sha256": "13e55da708c8b34f0c452a59902834ebdb240e2e706556bb7bde82d527da348b",
+      "bytes": 5961
+    },
+    "outputs/treatment_level_extraction.csv": {
+      "sha256": "4b3521a3489cfc24f085f1b553a7f79ebd83ee161a37e25c4a8271f7491b8f2d",
+      "bytes": 28614
+    },
+    "outputs/treatment_level_extraction.xlsx": {
+      "sha256": "cca476fdce1e86a644859df6b4c94a70f5145eb84900f7229bd2bc32019ae20e",
+      "bytes": 11578
+    },
+    "models/best_model_Plant_Height_cm.pkl": {
+      "sha256": "7d006730eaa6ca3fd0cd3d5e648ad2f098def5c523ee5c2db5d5861b285f77e2",
+      "bytes": 117782
+    },
+    "models/best_model_SPAD.pkl": {
+      "sha256": "933e87560655debaf08e1a8c914bf1605380baf13c53b75435a150a120431d5c",
+      "bytes": 112273
+    },
+    "models/best_model_Shoot_Biomass_g.pkl": {
+      "sha256": "f036905d8177e5b6e1264c837486d7de620a32320fb11724d71adfb85b61f974",
+      "bytes": 95965
+    },
+    "models/best_model_Yield_per_Hectare.pkl": {
+      "sha256": "57abaed63ede1985d64b814666f84ea70e6b35f36bcfa8ec44fb3adc5c2eb9ef",
+      "bytes": 2403
+    },
+    "models/best_model_Yield_per_Plot.pkl": {
+      "sha256": "a63bd11aaea12671fa5810206daa862cda9094e4cd5451f8a82785ebc7843dd3",
+      "bytes": 889
+    }
+  }
+}
