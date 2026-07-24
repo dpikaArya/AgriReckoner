@@ -24,19 +24,20 @@ Agricultural research generates heterogeneous datasets with inconsistent column 
 | Group | Columns | Description |
 |-------|---------|-------------|
 | A. Paper Metadata | 6 | Bibliographic identifiers |
-| B. Crop Information | 5 | Crop identity and growth |
+| B. Crop Information | 6 | Crop identity and growth |
 | C. Experimental Design | 9 | Trial design parameters |
 | D. Environment | 8 | Geospatial and weather |
 | E. Soil Properties | 16 | Physical and chemical soil |
 | F. Fertilizer Information | 7 | Treatment and application |
-| G. Crop Growth Parameters | 20 | Biophysical measurements |
+| G. Crop Growth Parameters | 22 | Biophysical measurements |
 | H. Yield Parameters | 13 | Yield components |
 | I. Grain Quality | 14 | Nutritional composition |
 | J. ML Target Variables | 5 | Prediction targets |
 | K. Engineered Features | 16 | Derived domain features |
 | L. Leakage Labels | 1 | Prediction-time availability |
 | M. Encoded Variables | 6 | Numeric categorical codes |
-| **Total** | **128** | |
+| N. ML Predictions | 9 | Model outputs and recommendations |
+| **Total** | **138** | |
 
 ## Specification Documents
 
