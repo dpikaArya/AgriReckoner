@@ -145,3 +145,5 @@ agri_ai_agent/memory/*.db
 credentials.*
 token.*
 secrets.*
+REFACTOR_NOTES.md
+.venv/
