@@ -207,7 +207,7 @@ Maps every UAMS variable to its corresponding term in international agricultural
 
 ## Adding New Ontology Mappings
 
-Mappings are maintained in `ades/agents/agent03_ontology.py`. To add a new mapping:
+Mappings are maintained in `agri_ai_agent/agents/ontology_agent.py`. To add a new mapping:
 
 1. Add the entry to `ONTOLOGY_KNOWLEDGE_BASE` dictionary with ontology IDs
 2. Update this registry document

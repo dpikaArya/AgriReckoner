@@ -271,7 +271,7 @@ Every agent in the ADES pipeline communicates exclusively through `AgentContract
 
 ## Implementation
 
-Contracts are implemented as Python dataclasses in `ades/contracts/messages.py`:
+Contracts are implemented as Python dataclasses in `agri_ai_agent/contracts/messages.py`:
 
 ```python
 @dataclass

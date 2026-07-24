@@ -125,7 +125,7 @@ Universal_Agricultural_ML_Master.{csv|parquet|sqlite|duckdb}
 pip install -r requirements.txt
 
 # Run pipeline
-ades run input_dataset.xlsx
+agriai run --file input_dataset.xlsx
 
 # Or with legacy script
 python universal_schema_generator.py

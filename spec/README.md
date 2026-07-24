@@ -72,7 +72,7 @@ Datasets conforming to UAMS v1.0 are immediately compatible with:
 ### Validating a dataset against UAMS
 
 ```python
-from ades.config.schema import UAMS_COLUMNS, SCHEMA_GROUPS
+from agri_ai_agent.config.schema import UAMS_COLUMNS, SCHEMA_GROUPS
 
 def validate_uams_compliance(df):
     missing = [c for c in UAMS_COLUMNS if c not in df.columns]
@@ -89,7 +89,7 @@ def validate_uams_compliance(df):
 ### Programmatic access
 
 ```python
-from ades.config.schema import UAMS_COLUMNS, VARIANT_MAP, SCHEMA_GROUPS
+from agri_ai_agent.config.schema import UAMS_COLUMNS, VARIANT_MAP, SCHEMA_GROUPS
 ```
 
 ## License
