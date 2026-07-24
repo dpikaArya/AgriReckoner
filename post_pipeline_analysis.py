@@ -4,7 +4,6 @@ Post-Pipeline Comprehensive Analysis
 - Multi-Regression Results table
 - Updated Ready Reckoner for all 24 PDFs
 """
-import os
 import sys
 import warnings
 import numpy as np
@@ -49,8 +48,8 @@ def extract_all_table_data():
                 for r in plumber_rows:
                     r["Source_File"] = pdf_name
                 rows = plumber_rows
-        except Exception:
-            pass
+        except Exception as e:
+            log(f"  {pdf_name}: pdfplumber extraction failed: {e}")
 
         # Try enhanced extraction as fallback
         if not rows:
@@ -60,8 +59,8 @@ def extract_all_table_data():
                     for r in enh_rows:
                         r["Source_File"] = pdf_name
                     rows = enh_rows
-            except Exception:
-                pass
+            except Exception as e:
+                log(f"  {pdf_name}: enhanced extraction failed: {e}")
 
         if rows:
             all_rows.extend(rows)
@@ -104,7 +103,7 @@ def build_training_dataset(table_rows):
 # =========================================================================
 def train_all_models(df):
     """Train 10+ ML models with comprehensive evaluation metrics."""
-    from sklearn.model_selection import cross_val_score, LeaveOneOut, KFold
+    from sklearn.model_selection import cross_val_score, KFold
     from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
     from sklearn.ensemble import (RandomForestRegressor, ExtraTreesRegressor,
                                    GradientBoostingRegressor, AdaBoostRegressor)
@@ -246,8 +245,8 @@ def train_all_models(df):
                     cv_r2_std = cv_r2_scores.std()
                     cv_mae_mean = -cv_mae_scores.mean()
                     cv_mae_std = cv_mae_scores.std()
-                except Exception:
-                    pass
+                except Exception as e:
+                    log(f"  {name}: cross-validation failed: {e}")
 
             # AIC and BIC (for linear models only)
             aic = np.nan
@@ -262,8 +261,8 @@ def train_all_models(df):
                     k = p + 1
                     aic = n * np.log(rss / n) + 2 * k
                     bic = n * np.log(rss / n) + k * np.log(n)
-                except Exception:
-                    pass
+                except Exception as e:
+                    log(f"  {name}: AIC/BIC computation failed: {e}")
 
             # Feature importance
             fi = {}

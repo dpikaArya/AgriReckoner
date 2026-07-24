@@ -5,7 +5,6 @@ Generates:
   2. AAIF_Model_Report.docx      — Full narrative report
   3. AAIF_Regression_Report.docx — Multi-regression analysis report
 """
-import os
 import sys
 import warnings
 from pathlib import Path
@@ -155,10 +154,8 @@ def export_master_excel():
 def export_narrative_report():
     """Create a comprehensive Word document with all results."""
     from docx import Document
-    from docx.shared import Inches, Pt, Cm, RGBColor
+    from docx.shared import Pt, RGBColor
     from docx.enum.text import WD_ALIGN_PARAGRAPH
-    from docx.enum.table import WD_TABLE_ALIGNMENT
-    from docx.oxml.ns import qn
 
     log("Creating narrative report (DOCX)...")
 

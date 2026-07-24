@@ -9,7 +9,6 @@ Returns top-3 recommendations per row with risk/economic/environmental scores.
 
 import json
 from datetime import datetime
-from typing import Optional
 
 import numpy as np
 import pandas as pd
