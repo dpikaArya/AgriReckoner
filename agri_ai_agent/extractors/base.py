@@ -20,6 +20,8 @@ class ExtractedField:
     model_confidence: float | None = None
     status: str = "unverified"
     reject_reason: str | None = None
+    value_canonical: float | None = None
+    canonical_unit: str | None = None
 
 
 @dataclass

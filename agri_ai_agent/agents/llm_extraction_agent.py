@@ -39,12 +39,14 @@ class LLMExtractionAgent(BaseAgent):
             row = {"Paper_ID": paper_id, "Crop": result.crop, "DOI": result.doi, "Year": result.year}
             for item in grounded:
                 if item.status == "reported":
-                    row[item.column] = item.value
+                    row[item.column] = item.value_canonical
                 provenance.append({
                     "Paper_ID": paper_id,
                     "column": item.column,
-                    "value": item.value,
+                    "value_reported": item.value,
                     "unit_as_reported": item.unit_as_reported,
+                    "value_canonical": item.value_canonical,
+                    "canonical_unit": item.canonical_unit,
                     "source_quote": item.source_quote,
                     "model_confidence": item.model_confidence,
                     "status": item.status,

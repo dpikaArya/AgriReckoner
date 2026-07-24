@@ -10,6 +10,7 @@ import re
 
 from agri_ai_agent.extractors.base import ExtractedField
 from agri_ai_agent.extractors.fields import EXTRACTION_FIELDS
+from agri_ai_agent.extractors.units import convert
 
 _FIELD_BY_COLUMN = {f.column: f for f in EXTRACTION_FIELDS}
 _NUMBER = re.compile(r"-?\d+(?:\.\d+)?")
@@ -44,13 +45,21 @@ def ground_field(item: ExtractedField) -> ExtractedField:
         item.reject_reason = "value not found in cited source quote"
         return item
 
-    if spec.min_value is not None and item.value < spec.min_value:
+    canonical_value, ok, reason = convert(item.value, item.unit_as_reported, spec.canonical_unit)
+    if not ok:
         item.status = "rejected"
-        item.reject_reason = f"below range min {spec.min_value}"
+        item.reject_reason = reason
         return item
-    if spec.max_value is not None and item.value > spec.max_value:
+    item.value_canonical = canonical_value
+    item.canonical_unit = spec.canonical_unit
+
+    if spec.min_value is not None and canonical_value < spec.min_value:
         item.status = "rejected"
-        item.reject_reason = f"above range max {spec.max_value}"
+        item.reject_reason = f"below range min {spec.min_value} {spec.canonical_unit or ''}".strip()
+        return item
+    if spec.max_value is not None and canonical_value > spec.max_value:
+        item.status = "rejected"
+        item.reject_reason = f"above range max {spec.max_value} {spec.canonical_unit or ''}".strip()
         return item
 
     item.status = "reported"
@@ -67,6 +76,14 @@ if __name__ == "__main__":
     assert ok.status == "reported", ok
     bad_echo = ground_field(ExtractedField("Soil_pH", 9.9, None, "The soil pH was 6.8."))
     assert bad_echo.status == "rejected" and "not found" in bad_echo.reject_reason
-    out_of_range = ground_field(ExtractedField("Soil_pH", 42.0, None, "pH 42.0 (typo)."))
-    assert out_of_range.status == "rejected" and "range" in out_of_range.reject_reason
-    print("grounding smoke OK ->", ok.status, "|", bad_echo.reject_reason, "|", out_of_range.reject_reason)
+    # unit conversion: 4.2 t/ha grounds to 4200 kg/ha and passes the kg/ha range
+    yield_t = ground_field(ExtractedField("Yield_per_Hectare", 4.2, "t ha-1", "yield was 4.2 t ha-1"))
+    assert yield_t.status == "reported" and abs(yield_t.value_canonical - 4200) < 1e-6
+    # 13.4 g/kg organic carbon = 1.34%, now accepted (was wrongly rejected before)
+    oc = ground_field(ExtractedField("Organic_Carbon", 13.4, "g kg-1", "OC 13.4 g kg-1"))
+    assert oc.status == "reported" and abs(oc.value_canonical - 1.34) < 1e-6
+    # incompatible unit: soil N in g/kg is not the column's kg/ha rate
+    incompat = ground_field(ExtractedField("Nitrogen", 1.2, "g kg-1", "N 1.2 g kg-1"))
+    assert incompat.status == "rejected" and "incompatible" in incompat.reject_reason
+    print("grounding smoke OK -> yield", yield_t.value_canonical, "| OC", oc.value_canonical,
+          "| N", incompat.reject_reason)
