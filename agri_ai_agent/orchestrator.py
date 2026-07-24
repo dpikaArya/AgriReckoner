@@ -90,6 +90,7 @@ class Orchestrator:
             self.dataframe = df
 
         self.state.status = "running"
+        self._write_run_manifest(filepath=filepath, papers_dir=papers_dir)
 
         for step_key, agent_cls, step_name in PIPELINE_STEPS:
             if self.settings.INCREMENTAL_MODE and self._checkpoint_exists(step_key):
@@ -183,6 +184,43 @@ class Orchestrator:
     def _should_continue_on_failure(self, step_key: str) -> bool:
         critical = {"extraction", "training"}
         return step_key not in critical
+
+    def _write_run_manifest(self, filepath=None, papers_dir=None):
+        """Snapshot the run's identity for reproducibility: version, git SHA, config, input."""
+        from agri_ai_agent import __version__
+        run_dir = self.settings.OUTPUT_DIR / "runs" / self.state.pipeline_id
+        run_dir.mkdir(parents=True, exist_ok=True)
+        manifest = {
+            "pipeline_id": self.state.pipeline_id,
+            "package_version": __version__,
+            "git_sha": self._git_sha(),
+            "started_at": str(self.state.started_at),
+            "input": {
+                "filepath": filepath,
+                "papers_dir": papers_dir,
+                "df_rows": None if self.dataframe is None else len(self.dataframe),
+            },
+            "settings": {
+                "incremental_mode": self.settings.INCREMENTAL_MODE,
+                "checkpoint_enabled": self.settings.CHECKPOINT_ENABLED,
+                "output_dir": str(self.settings.OUTPUT_DIR),
+                "llm_model": getattr(self.settings, "LLM_MODEL", None),
+            },
+        }
+        with open(run_dir / "run_manifest.json", "w", encoding="utf-8") as f:
+            json.dump(manifest, f, indent=2, default=str)
+
+    @staticmethod
+    def _git_sha():
+        """Best-effort current git SHA; None if unavailable."""
+        import subprocess
+        try:
+            out = subprocess.run(
+                ["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5,
+            )
+            return out.stdout.strip() or None
+        except Exception:
+            return None
 
     def _write_provenance(self):
         provenance = {
