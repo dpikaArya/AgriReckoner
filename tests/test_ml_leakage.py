@@ -31,8 +31,17 @@ def test_target_family_collinearity_is_target_relative():
 
 
 def test_legitimate_predictors_are_not_excluded():
-    for col in ["Nitrogen", "Phosphorus", "Soil_pH", "Rainfall", "Spacing_Plant", "N_x_P"]:
+    for col in ["Nitrogen", "Phosphorus", "Soil_pH", "Rainfall", "Spacing_Plant",
+                "N_x_P", "NPK_ratio_N", "Rainfall_log", "Temp_x_Rainfall"]:
         assert not is_leaky_feature(col, "Yield_per_Hectare"), col
+
+
+def test_renamed_and_abbreviated_outcome_derivatives_are_leaky():
+    """Regression: the feature engineer abbreviates outcome columns (Fruit_Weight ->
+    FruitWeight_log, Harvest_Index -> HI_log); those must still be caught."""
+    for col in ["FruitWeight_log", "FruitWeight_squared", "SeedWeight_log",
+                "HI_log", "HI_squared"]:
+        assert is_leaky_feature(col, "Yield_per_Hectare"), col
 
 
 def test_strip_engineered():

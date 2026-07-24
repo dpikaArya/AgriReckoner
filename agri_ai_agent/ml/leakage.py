@@ -69,6 +69,49 @@ def _target_stem(target_col: str) -> str:
     return stem
 
 
+def _compact(name: str) -> str:
+    """Lowercase name with all separators removed (Fruit_Weight -> fruitweight)."""
+    return re.sub(r"[^a-z0-9]", "", name.lower())
+
+
+def _acronym(name: str) -> str:
+    """First letter of each token (Harvest_Index -> hi); empty for single-token names."""
+    tokens = [t for t in re.split(r"[^A-Za-z0-9]+", name) if t]
+    return "".join(t[0] for t in tokens).lower() if len(tokens) >= 2 else ""
+
+
+# Signatures of outcome columns, so engineered features that abbreviate them
+# (FruitWeight_log from Fruit_Weight, HI_log from Harvest_Index) are still caught.
+_OUTCOME_COMPACT = frozenset(_compact(c) for c in OUTCOME_COLUMNS)
+_OUTCOME_ACRONYMS = frozenset(a for a in (_acronym(c) for c in OUTCOME_COLUMNS) if a)
+_INTERACTION_MARKERS = ("_x_", "_interaction", "_ratio", "_div_", "_per_")
+
+
+def _is_engineered(name: str) -> bool:
+    """True if the name looks like an engineered feature (suffix, dup, or interaction)."""
+    low = name.lower()
+    return bool(
+        _DUP_SUFFIX.search(name)
+        or any(low.endswith(s) for s in _ENGINEERED_SUFFIXES)
+        or any(marker in low for marker in _INTERACTION_MARKERS)
+    )
+
+
+def _is_outcome_derived(col: str) -> bool:
+    """True if an engineered feature derives from an outcome, matched by compact/acronym."""
+    if not _is_engineered(col):
+        return False
+    compact_base = _compact(strip_engineered(col))
+    if compact_base in _OUTCOME_COMPACT or compact_base in _OUTCOME_ACRONYMS:
+        return True
+    for signature in _OUTCOME_COMPACT:
+        if len(signature) >= 5 and len(compact_base) >= 4 and (
+            compact_base in signature or signature in compact_base
+        ):
+            return True
+    return False
+
+
 def is_leaky_feature(col: str, target_col: str | None = None) -> bool:
     """Return True if ``col`` must be excluded from the feature matrix for ``target_col``."""
     base = strip_engineered(col)
@@ -77,6 +120,8 @@ def is_leaky_feature(col: str, target_col: str | None = None) -> bool:
     if col in PREDICTION_COLUMNS or base in PREDICTION_COLUMNS:
         return True
     if _tokens(col) & set(OUTCOME_INTERACTION_ROOTS):
+        return True
+    if _is_outcome_derived(col):
         return True
     if target_col:
         if col == target_col:
