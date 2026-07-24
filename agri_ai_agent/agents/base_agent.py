@@ -94,18 +94,9 @@ class BaseAgent(ABC):
         }
 
     def _resolve_duplicate_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Drop duplicate-named columns, keeping the first occurrence of each."""
         if df.columns.duplicated().any():
-            cols = df.columns.tolist()
-            seen: set = set()
-            new_cols: list[str] = []
-            for c in reversed(cols):
-                if c in seen:
-                    new_cols.append(c)
-                else:
-                    seen.add(c)
-                    new_cols.append(c)
-            new_cols.reverse()
-            df = df[new_cols]
+            df = df.loc[:, ~df.columns.duplicated(keep="first")]
         return df
 
     def _normalize(self, name: str) -> str:
