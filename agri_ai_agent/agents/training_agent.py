@@ -16,6 +16,8 @@ from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.config.schema import (
     NON_FEATURE_COLS, POST_HARVEST_VARIABLES, resolve_target_column,
 )
+from agri_ai_agent.ml.leakage import select_feature_columns
+from agri_ai_agent.ml.evaluation import evaluate_model, MIN_ROWS_FOR_METRIC
 
 TARGET_COLUMNS = [
     "Target_Yield", "Target_Fertilizer",
@@ -57,78 +59,88 @@ class TrainingAgent(BaseAgent):
         self._check_readiness(df)
 
         X, y = self._prepare_data(df, target_col)
-        if X is None or len(X) < 10:
-            self.log.warning("Insufficient data for training (%d samples)", len(X) if X is not None else 0)
+        if X is None or len(X) < MIN_ROWS_FOR_METRIC:
+            n = 0 if X is None else len(X)
+            self.log.warning("Insufficient data for honest training (%d samples)", n)
             return df
-
-        from sklearn.model_selection import train_test_split
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
         models_dir = self.settings.OUTPUT_DIR / "models"
         models_dir.mkdir(parents=True, exist_ok=True)
-
         feature_list = list(X.columns)
         with open(models_dir / "feature_list.json", "w") as f:
             json.dump(feature_list, f, indent=2)
 
-        results = []
-        artifacts = []
-        all_importances = []
-
-        models = self._get_models()
-        for name, model in models.items():
+        results, artifacts, all_importances = [], [], []
+        fitted = {}
+        for name, model in self._get_models().items():
             try:
-                self.log.info("Training %s on target '%s'...", name, target_col)
-                model.fit(X_train, y_train)
-                y_pred = model.predict(X_test)
-                metrics = self._compute_metrics(y_test, y_pred)
-
+                metrics = evaluate_model(model, X, y)
+                pipeline = self._fit_pipeline(model, X, y)
+                fitted[name] = pipeline
                 model_path = models_dir / f"{name.lower().replace(' ', '_')}_{target_col.lower()}.joblib"
                 import joblib
-                joblib.dump(model, model_path)
+                joblib.dump(pipeline, model_path)
                 artifacts.append(str(model_path))
-
-                importances = self._extract_feature_importance(model, name, feature_list)
-                all_importances.extend(importances)
-
-                results.append({
-                    "model": name,
-                    "target": target_col,
-                    **metrics,
-                    "model_path": str(model_path),
-                })
-                self.log.info("%s -> R2=%.4f RMSE=%.2f MAE=%.2f", name, metrics["r2"], metrics["rmse"], metrics["mae"])
+                all_importances.extend(
+                    self._extract_feature_importance(pipeline.named_steps["model"], name, feature_list)
+                )
+                results.append({"model": name, "target": target_col, **metrics, "model_path": str(model_path)})
+                self.log.info("%s -> %s", name, self._format_metrics(metrics))
             except Exception as e:
                 self.log.warning("Failed to train %s: %s", name, e)
                 results.append({"model": name, "target": target_col, "error": str(e)})
 
         if all_importances:
-            fi_df = pd.DataFrame(all_importances)
-            fi_df = fi_df.sort_values(["model", "importance"], ascending=[True, False])
+            fi_df = pd.DataFrame(all_importances).sort_values(
+                ["model", "importance"], ascending=[True, False]
+            )
             self.save_artifact(fi_df, "feature_importance.csv")
-            self.log.info("Saved feature_importance.csv (%d entries)", len(all_importances))
 
         self._save_results(results, target_col)
         self._generate_documentation(df, results)
 
-        leaderboard = sorted([r for r in results if "r2" in r], key=lambda x: x["r2"], reverse=True)
-        if leaderboard:
-            best = leaderboard[0]
-            best_model = models[best["model"]]
-            best_model.fit(X_train, y_train)
-            yield_model_path = models_dir / "yield_model.pkl"
+        best = self._best_result(results)
+        if best is not None:
             import joblib
-            joblib.dump(best_model, yield_model_path)
+            yield_model_path = models_dir / "yield_model.pkl"
+            joblib.dump(fitted[best["model"]], yield_model_path)
             artifacts.append(str(yield_model_path))
-            self.log.info("Saved yield_model.pkl (%s, R2=%.4f)", best["model"], best["r2"])
+            self.log.info("Saved yield_model.pkl (%s, %s)", best["model"], self._format_metrics(best))
 
         if artifacts:
             self.contract.artifacts.extend(artifacts)
 
         self.dataframe = df
-        self.log.info("Training complete: %d/%d models succeeded",
+        self.log.info("Training complete: %d/%d models scored",
                       sum(1 for r in results if "r2" in r), len(results))
         return df
+
+    @staticmethod
+    def _fit_pipeline(model, X, y):
+        """Fit a median-impute + model pipeline on all rows (for persistence/importances)."""
+        from sklearn.impute import SimpleImputer
+        from sklearn.pipeline import Pipeline
+        pipeline = Pipeline([
+            ("impute", SimpleImputer(strategy="median")),
+            ("model", model.__class__(**model.get_params())),
+        ])
+        return pipeline.fit(X, y)
+
+    @staticmethod
+    def _best_result(results: list[dict]):
+        """Pick the best cross-validated model, preferring robust (non-small-n) scores."""
+        scored = [r for r in results if r.get("r2") is not None and "r2" in r]
+        if not scored:
+            return None
+        return sorted(scored, key=lambda r: (r.get("robust", False), r["r2"]), reverse=True)[0]
+
+    @staticmethod
+    def _format_metrics(metrics: dict) -> str:
+        if "r2" not in metrics:
+            return metrics.get("note", "no score")
+        std = f"±{metrics['r2_std']}" if metrics.get("r2_std") is not None else ""
+        flag = "" if metrics.get("robust") else " [small-n]"
+        return f"R2={metrics['r2']}{std} RMSE={metrics.get('rmse')} (n={metrics.get('n')}, {metrics.get('cv_scheme')}){flag}"
 
     def _get_models(self):
         from sklearn.ensemble import RandomForestRegressor
@@ -226,45 +238,22 @@ class TrainingAgent(BaseAgent):
         self.log.info("Readiness check complete: %d compatible, %d incompatible", len(compatible), len(incompatible))
 
     def _prepare_data(self, df: pd.DataFrame, target_col: str):
-        exclude = EXCLUDE_COLS | {c for c in TARGET_COLUMNS if c != target_col}
-        numeric_df = df.select_dtypes(include=[np.number])
-        feature_cols = [c for c in numeric_df.columns if c not in exclude]
-
-        if not feature_cols:
+        """Build a leakage-safe feature matrix; keep rows with gaps (imputed inside CV)."""
+        feature_cols = select_feature_columns(df, target_col, base_exclude=EXCLUDE_COLS)
+        if len(feature_cols) < 2:
             return None, None
 
-        X = numeric_df[feature_cols].copy()
-        y = df[target_col].copy()
-
+        y = pd.to_numeric(df[target_col], errors="coerce")
+        X = df[feature_cols].apply(pd.to_numeric, errors="coerce")
         X = X.replace([np.inf, -np.inf], np.nan)
-        mask = X.notna().all(axis=1) & y.notna()
-        X = X[mask]
-        y = y[mask]
 
-        if len(X) < 10 or len(X.columns) < 2:
+        keep = y.notna()
+        X, y = X[keep], y[keep]
+        X = X.dropna(axis=1, how="all")
+
+        if len(X) < MIN_ROWS_FOR_METRIC or X.shape[1] < 2:
             return None, None
-
-        for col in X.columns:
-            if X[col].isna().any():
-                X[col] = X[col].fillna(X[col].median())
-
         return X, y
-
-    def _compute_metrics(self, y_true, y_pred):
-        residuals = y_true - y_pred
-        mse = np.mean(residuals ** 2)
-        rmse = float(np.sqrt(mse))
-        mae = float(np.mean(np.abs(residuals)))
-        mape = float(np.mean(np.abs(residuals / (y_true + 1e-10))) * 100)
-        ss_res = np.sum(residuals ** 2)
-        ss_tot = np.sum((y_true - np.mean(y_true)) ** 2)
-        r2 = float(1 - (ss_res / (ss_tot + 1e-10)))
-        return {
-            "rmse": round(rmse, 4),
-            "mae": round(mae, 4),
-            "mape": round(mape, 2),
-            "r2": round(r2, 4),
-        }
 
     def _save_results(self, results: list[dict], target_col: str):
         results_df = pd.DataFrame(results)
@@ -273,12 +262,14 @@ class TrainingAgent(BaseAgent):
         leaderboard = sorted([r for r in results if "r2" in r], key=lambda x: x["r2"], reverse=True)
         rows = ""
         for i, r in enumerate(leaderboard):
+            std = f" ± {r['r2_std']}" if r.get("r2_std") is not None else ""
+            robust = "yes" if r.get("robust") else "no (small-n)"
             rows += (
                 f"<tr>"
                 f"<td>{i+1}</td><td>{r['model']}</td>"
-                f"<td>{r['r2']}</td><td>{r['rmse']}</td>"
-                f"<td>{r['mae']}</td><td>{r['mape']}</td>"
-                f"<td>{r.get('model_path', 'N/A')}</td>"
+                f"<td>{r['r2']}{std}</td><td>{r.get('rmse', 'N/A')}</td>"
+                f"<td>{r.get('n', 'N/A')}</td><td>{r.get('cv_scheme', 'N/A')}</td>"
+                f"<td>{robust}</td>"
                 f"</tr>\n"
             )
 
@@ -307,10 +298,13 @@ tr:nth-child(even) {{ background-color: #f2f2f2; }}
 <h1>Training Report</h1>
 <p>Generated: {now}</p>
 <p>Target variable: <strong>{target_col}</strong></p>
+<p style="background:#fff3cd;border:1px solid #ffe69c;padding:8px">
+Scores are <strong>cross-validated</strong> (imputation fitted inside each fold; leakage-derived
+features excluded). Rows flagged <em>not robust</em> are small-n (n&lt;30) and are advisory only.</p>
 <h2>Leaderboard</h2>
 <table>
 <thead>
-<tr><th>Rank</th><th>Model</th><th>R<sup>2</sup></th><th>RMSE</th><th>MAE</th><th>MAPE (%)</th><th>Path</th></tr>
+<tr><th>Rank</th><th>Model</th><th>Cross-validated R<sup>2</sup></th><th>RMSE</th><th>n</th><th>CV scheme</th><th>Robust</th></tr>
 </thead>
 <tbody>
 {rows}
@@ -384,10 +378,10 @@ tr:nth-child(even) {{ background-color: #f2f2f2; }}
             "## Models Trained",
         ]
         for r in trained:
-            doc_lines.append(f"- {r['model']}: R2={r['r2']}, RMSE={r['rmse']}, MAE={r['mae']}, MAPE={r['mape']}%")
-        if trained:
-            best = trained[0]
-            doc_lines.append(f"\nBest model: {best['model']} (R2={best['r2']})")
+            doc_lines.append(f"- {r['model']}: {self._format_metrics(r)}")
+        best = self._best_result(results)
+        if best is not None:
+            doc_lines.append(f"\nBest model: {best['model']} ({self._format_metrics(best)})")
         self.save_text_artifact("\n".join(doc_lines), "Training_Documentation.md")
         self.log.info("Generated Feature_Dictionary.csv and Training_Documentation.md")
 

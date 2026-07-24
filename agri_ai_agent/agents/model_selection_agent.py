@@ -18,6 +18,7 @@ from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.config.schema import (
     NON_FEATURE_COLS, POST_HARVEST_VARIABLES, resolve_target_column,
 )
+from agri_ai_agent.ml.leakage import select_feature_columns
 
 
 EXCLUDE_COLS = frozenset({
@@ -224,28 +225,22 @@ class ModelSelectionAgent(BaseAgent):
         return df
 
     def _prepare_data(self, df: pd.DataFrame, target_col: str):
-        exclude = EXCLUDE_COLS | {c for c in TARGET_COLUMNS if c != target_col}
-        numeric_df = df.select_dtypes(include=[np.number])
-        feature_cols = [c for c in numeric_df.columns if c not in exclude]
-
-        if not feature_cols:
+        """Build a leakage-safe feature matrix, keeping rows with gaps (no complete-case bias)."""
+        feature_cols = select_feature_columns(df, target_col, base_exclude=EXCLUDE_COLS)
+        if len(feature_cols) < 2:
             return None, None, []
 
-        X = numeric_df[feature_cols].copy()
-        y = df[target_col].copy()
+        y = pd.to_numeric(df[target_col], errors="coerce")
+        X = df[feature_cols].apply(pd.to_numeric, errors="coerce").replace([np.inf, -np.inf], np.nan)
 
-        X = X.replace([np.inf, -np.inf], np.nan)
-        mask = X.notna().all(axis=1) & y.notna()
-        X = X[mask]
-        y = y[mask]
+        keep = y.notna()
+        X, y = X[keep], y[keep]
+        X = X.dropna(axis=1, how="all")
 
-        if len(X) < 10 or len(X.columns) < 2:
+        if len(X) < 10 or X.shape[1] < 2:
             return None, None, []
 
-        for col in X.columns:
-            if X[col].isna().any():
-                X[col] = X[col].fillna(X[col].median())
-
+        X = X.fillna(X.median(numeric_only=True))
         return X.values, y.values, list(X.columns)
 
     def _evaluate_model(self, name, model, param_grid, X, y, feature_names,
