@@ -6,7 +6,6 @@ units, and validation in lockstep with the single source of ontology truth.
 """
 
 from dataclasses import dataclass
-from typing import Optional
 
 from agri_ai_agent.ontology.registry import load_registry
 
@@ -14,9 +13,9 @@ from agri_ai_agent.ontology.registry import load_registry
 @dataclass(frozen=True)
 class ExtractionField:
     column: str
-    canonical_unit: Optional[str]
-    min_value: Optional[float]
-    max_value: Optional[float]
+    canonical_unit: str | None
+    min_value: float | None
+    max_value: float | None
     synonyms: tuple
 
 

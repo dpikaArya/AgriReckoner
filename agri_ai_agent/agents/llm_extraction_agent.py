@@ -6,7 +6,6 @@ and in CI. Only grounded values reach the schema row; rejected values are kept, 
 provenance artifact for human review — never silently dropped.
 """
 
-from typing import Optional
 
 import pandas as pd
 
@@ -16,7 +15,7 @@ from agri_ai_agent.extractors.grounding import ground_all
 
 
 class LLMExtractionAgent(BaseAgent):
-    def __init__(self, settings=None, extractor: Optional[Extractor] = None, **kwargs):
+    def __init__(self, settings=None, extractor: Extractor | None = None, **kwargs):
         super().__init__(settings=settings, **kwargs)
         self._extractor = extractor
 
@@ -63,7 +62,7 @@ class LLMExtractionAgent(BaseAgent):
         self.dataframe = out
         return out
 
-    def _resolve_extractor(self) -> Optional[Extractor]:
+    def _resolve_extractor(self) -> Extractor | None:
         if self._extractor is not None:
             return self._extractor
         key = getattr(self.settings, "OPENAI_API_KEY", "")

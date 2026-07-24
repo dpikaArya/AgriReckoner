@@ -7,8 +7,8 @@ injects :func:`make_openai_completer`. Values come back UNVERIFIED — grounding
 """
 
 import json
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable
 
 from agri_ai_agent.extractors.base import ExtractedField, ExtractionResult
 from agri_ai_agent.extractors.fields import EXTRACTION_COLUMNS

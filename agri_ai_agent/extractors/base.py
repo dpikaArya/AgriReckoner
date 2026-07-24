@@ -1,7 +1,7 @@
 """Shared types for extraction strategies."""
 
 from dataclasses import dataclass, field
-from typing import Optional, Protocol, runtime_checkable
+from typing import Protocol, runtime_checkable
 
 
 @dataclass
@@ -13,13 +13,13 @@ class ExtractedField:
     """
 
     column: str
-    value: Optional[float] = None
-    unit_as_reported: Optional[str] = None
-    source_quote: Optional[str] = None
-    page: Optional[int] = None
-    model_confidence: Optional[float] = None
+    value: float | None = None
+    unit_as_reported: str | None = None
+    source_quote: str | None = None
+    page: int | None = None
+    model_confidence: float | None = None
     status: str = "unverified"
-    reject_reason: Optional[str] = None
+    reject_reason: str | None = None
 
 
 @dataclass
@@ -27,9 +27,9 @@ class ExtractionResult:
     """All fields extracted from a single paper, plus paper-level metadata."""
 
     paper_id: str
-    crop: Optional[str] = None
-    doi: Optional[str] = None
-    year: Optional[int] = None
+    crop: str | None = None
+    doi: str | None = None
+    year: int | None = None
     fields: list[ExtractedField] = field(default_factory=list)
     method: str = "unknown"
 
