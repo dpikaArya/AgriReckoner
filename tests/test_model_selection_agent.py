@@ -95,10 +95,16 @@ class TestModelSelectionAgent:
         score = result["_model_selection_score"].iloc[0]
         assert isinstance(score, (int, float))
 
-    def test_no_target_returns_input(self, agent, small_df):
-        result = agent.process(small_df.drop(columns=["Target_Yield"]))
+    def test_no_usable_target_returns_input(self, agent, small_df):
+        from agri_ai_agent.config.schema import MEASURED_TARGETS
+        stripped = small_df.drop(columns=["Target_Yield", *MEASURED_TARGETS], errors="ignore")
+        result = agent.process(stripped)
         assert isinstance(result, pd.DataFrame)
         assert "_model_selection_score" not in result.columns
+
+    def test_falls_back_to_measured_target(self, agent, small_df):
+        result = agent.process(small_df.drop(columns=["Target_Yield"]))
+        assert "_model_selection_score" in result.columns
 
     def test_optimized_vs_default(self, agent, small_df):
         r_opt = agent.process(small_df.copy(), target="Target_Yield",

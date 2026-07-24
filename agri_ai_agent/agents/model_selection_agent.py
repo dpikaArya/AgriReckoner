@@ -15,7 +15,9 @@ import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.settings import AgriAISettings
-from agri_ai_agent.config.schema import NON_FEATURE_COLS, POST_HARVEST_VARIABLES
+from agri_ai_agent.config.schema import (
+    NON_FEATURE_COLS, POST_HARVEST_VARIABLES, resolve_target_column,
+)
 
 
 EXCLUDE_COLS = frozenset({
@@ -128,13 +130,12 @@ class ModelSelectionAgent(BaseAgent):
         return "ModelSelectionAgent"
 
     def process(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
-        target_col = kwargs.get("target", "Target_Yield")
-        if target_col not in df.columns:
-            available = [c for c in TARGET_COLUMNS if c in df.columns]
-            if not available:
-                self.log.error("No target column found")
-                return df
-            target_col = available[0]
+        target_col = resolve_target_column(
+            df, requested=kwargs.get("target"), extra_targets=TARGET_COLUMNS
+        )
+        if target_col is None:
+            self.log.error("No usable target column found")
+            return df
 
         is_classification = kwargs.get("is_classification", False)
         cv_folds = kwargs.get("cv_folds", 5)

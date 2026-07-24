@@ -40,21 +40,24 @@ from agri_ai_agent.agents import (
     KnowledgeIntegrationAgent,
 )
 
+# Ordered so that extraction + schema normalization run BEFORE the knowledge agents
+# (which look up canonical UAMS columns), and fuzzy runs AFTER prediction (it consumes
+# the model's Yield_Prediction). See the refactor notes for the wiring rationale.
 PIPELINE_STEPS = [
-    ("knowledge", KnowledgeAgent, "Domain Knowledge"),
-    ("knowledge_integration", KnowledgeIntegrationAgent, "Knowledge Integration & Missing Value Fill"),
     ("extraction", ExtractionAgent, "Extract & Schema"),
     ("evidence_fusion", EvidenceFusionAgent, "Evidence Fusion & Provenance"),
     ("ontology", OntologyAgent, "Ontology Mapping & Normalization"),
     ("table_intelligence", TableIntelligenceAgent, "Table Intelligence & Statistics"),
     ("schema_population", SchemaPopulationAgent, "Schema Population & Inference"),
+    ("knowledge_integration", KnowledgeIntegrationAgent, "Knowledge Integration & Missing Value Fill"),
+    ("knowledge", KnowledgeAgent, "Domain Knowledge"),
     ("validation", ValidationAgent, "Validate & Harmonize"),
     ("feature", FeatureAgent, "Feature Engineering"),
     ("model_selection", ModelSelectionAgent, "Adaptive Model Selection & CV"),
     ("training", TrainingAgent, "Model Training"),
-    ("fuzzy", FuzzyAgent, "Fuzzy Expert System"),
     ("prediction", PredictionAgent, "ML Prediction"),
     ("recommendation", RecommendationAgent, "Generate Recommendations"),
+    ("fuzzy", FuzzyAgent, "Fuzzy Expert System"),
     ("benchmark", BenchmarkAgent, "Pipeline Benchmarking"),
     ("explainability", ExplainabilityAgent, "Prediction Explainability"),
     ("ready_reckoner", ReadyReckonerAgent, "Ready Reckoner & Exports"),
@@ -84,6 +87,7 @@ class Orchestrator:
             self.log.info("Input file: %s", filepath)
         elif df is not None:
             self.log.info("Input DataFrame (%d rows)", len(df))
+            self.dataframe = df
 
         self.state.status = "running"
 

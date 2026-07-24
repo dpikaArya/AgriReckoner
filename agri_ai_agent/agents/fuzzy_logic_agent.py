@@ -123,13 +123,19 @@ class FuzzyAgent(BaseAgent):
     # ── Fuzzify ──────────────────────────────────────────────────────
 
     def _fuzzify_row(self, row: pd.Series) -> dict[str, dict[str, float]]:
+        """Fuzzify each numeric input variable; skip non-numeric values (e.g. textual Growth_Stage)."""
         result = {}
         for var in INPUT_VARS:
             val = row.get(var)
-            if pd.notna(val):
-                mfs = fuzzify(var, float(val))
-                if mfs:
-                    result[var] = mfs
+            if not pd.notna(val):
+                continue
+            try:
+                numeric_val = float(val)
+            except (ValueError, TypeError):
+                continue
+            mfs = fuzzify(var, numeric_val)
+            if mfs:
+                result[var] = mfs
         return result
 
     # ── Numerical engine (Mamdani → centroid) ────────────────────────
