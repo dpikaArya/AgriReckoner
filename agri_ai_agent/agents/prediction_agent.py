@@ -222,9 +222,9 @@ class PredictionAgent(BaseAgent):
 
         options = []
 
-        baseline = self._get_fertilizer_baseline(df)
-        if baseline is None:
-            return options
+        baseline = self._get_fertilizer_baseline(df) or {}
+        if not baseline:
+            self.log.warning("No fertilizer data found; emitting a single baseline option only")
 
         dose_col = "Dose" if "Dose" in df.columns else None
         interval_col = "Application_Interval" if "Application_Interval" in df.columns else None
@@ -315,7 +315,7 @@ class PredictionAgent(BaseAgent):
             row_comparisons.sort(key=lambda r: r["Predicted_Yield"], reverse=True)
             all_comparisons.append(row_comparisons)
 
-        best_overall = all_comparisons[0][0] if all_comparisons else {}
+        best_overall = all_comparisons[0][0] if all_comparisons and all_comparisons[0] else {}
         self.log.info("Top option: %s → yield=%.2f (Δ%+.2f)",
                       best_overall.get("label", "?"),
                       best_overall.get("Predicted_Yield", 0),
