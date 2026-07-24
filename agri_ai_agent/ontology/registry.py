@@ -12,7 +12,6 @@ no external CURIE is shared across two different columns.
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -88,7 +87,7 @@ class Registry:
             raise KeyError(f"Unknown UAMS column: {column}")
         return self._columns[column]
 
-    def term_iri(self, column: str) -> Optional[str]:
+    def term_iri(self, column: str) -> str | None:
         """Return the expanded IRI of the column's first (preferred) term.
 
         Returns None when the column has no external ontology term.
@@ -98,7 +97,7 @@ class Registry:
             return None
         return self.expand_curie(terms[0]["curie"])
 
-    def canonical_unit(self, column: str) -> Optional[str]:
+    def canonical_unit(self, column: str) -> str | None:
         """Return the column's honest UCUM unit, or None if dimensionless."""
         return self._column(column).get("unit_ucum")
 
@@ -106,7 +105,7 @@ class Registry:
         """Return the column's synonym list (possibly empty)."""
         return list(self._column(column).get("synonyms") or [])
 
-    def validation_range(self, column: str) -> tuple[Optional[float], Optional[float]]:
+    def validation_range(self, column: str) -> tuple[float | None, float | None]:
         """Return the (min, max) validation range; either bound may be None."""
         validation = self._column(column).get("validation") or {}
         return validation.get("min"), validation.get("max")
