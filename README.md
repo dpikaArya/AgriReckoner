@@ -351,9 +351,18 @@ default pipeline and requires the `llm` extra plus an API key:
 
 ```bash
 pip install -e ".[llm]"
-export OPENAI_API_KEY=...            # your OpenAI key
-python scripts/smoke_llm_extract.py  # live smoke test (makes a real API call)
+export OPENAI_API_KEY=...             # your OpenAI key
+python scripts/smoke_llm_extract.py   # live smoke test (makes a real API call)
+
+# extract UAMS rows from a directory of PDFs:
+agriai extract --papers ./pdfs --out extracted_schema.csv
 ```
+
+The extractor reports values **as written**, then a grounding pass keeps a value only if its
+number appears in the cited source span, its unit converts to the column's canonical unit
+(incompatible units — e.g. a soil `g/kg` concentration for a `kg/ha` rate column — are rejected),
+and it passes the registry range. Accepted, rejected, and flagged values are all recorded in
+`LLM_Extraction_Provenance.csv` for review. Validated live on open-access agronomy PDFs.
 
 ---
 
