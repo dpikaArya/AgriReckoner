@@ -349,6 +349,7 @@ class ModelSelectionAgent(BaseAgent):
 
     def _build_report(self, cv_results, leaderboard, n_samples, n_features,
                       target_col, is_classification, n_splits, scoring):
+        advisory = n_samples < 30
         lines = [
             "# Model Selection Report",
             f"Generated: {datetime.now().isoformat()}",
@@ -356,6 +357,13 @@ class ModelSelectionAgent(BaseAgent):
             f"Samples: {n_samples}  |  Features: {n_features}",
             f"Task: {'Classification' if is_classification else 'Regression'}",
             f"CV: {n_splits}-fold  |  Scoring: `{scoring}`",
+            "",
+            "> **Honesty note.** The scores below are hyperparameter-*tuning* scores: the",
+            "> winner is chosen on the same folds it is scored on (not nested CV), so they are",
+            "> optimistically biased, and features are median-imputed before CV. Treat them as a",
+            "> model-shortlisting aid, not a generalization estimate. The authoritative honest",
+            "> evaluation (leakage-controlled, imputation inside folds) is in `training_report.html`."
+            + ("  At this sample size (n<30) every score is **advisory only**." if advisory else ""),
             "",
             "## Leaderboard",
             "",
