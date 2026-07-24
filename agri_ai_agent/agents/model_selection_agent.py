@@ -17,7 +17,7 @@ from agri_ai_agent.config.schema import (
     POST_HARVEST_VARIABLES,
     resolve_target_column,
 )
-from agri_ai_agent.ml.leakage import select_feature_columns
+from agri_ai_agent.ml.leakage import drop_suspected_leaks, select_feature_columns
 
 EXCLUDE_COLS = frozenset({
     "Paper_ID", "DOI", "Journal", "Year", "Authors", "Country",
@@ -236,6 +236,10 @@ class ModelSelectionAgent(BaseAgent):
         keep = y.notna()
         X, y = X[keep], y[keep]
         X = X.dropna(axis=1, how="all")
+
+        X, dropped = drop_suspected_leaks(X, y)
+        if dropped:
+            self.log.warning("Dropped %d suspected-leakage features: %s", len(dropped), dropped)
 
         if len(X) < 10 or X.shape[1] < 2:
             return None, None, []

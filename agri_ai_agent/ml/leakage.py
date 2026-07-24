@@ -148,6 +148,27 @@ def select_feature_columns(df, target_col, base_exclude=frozenset()):
     ]
 
 
+CORRELATION_LEAK_THRESHOLD = 0.999
+
+
+def drop_suspected_leaks(X, y, threshold=CORRELATION_LEAK_THRESHOLD):
+    """Drop features whose correlation with the target is near-perfect (suspected leakage).
+
+    A data-driven safety net for outcome-derived features the name-based guard might miss.
+    Only near-identical-to-target columns (|corr| >= threshold) are removed, so genuine
+    strong predictors survive. Returns (X_without_leaks, dropped_column_names).
+    """
+    dropped = []
+    for col in X.columns:
+        series = X[col]
+        if series.nunique(dropna=True) < 2:
+            continue
+        corr = series.corr(y)
+        if corr is not None and abs(corr) >= threshold:
+            dropped.append(col)
+    return (X.drop(columns=dropped) if dropped else X), dropped
+
+
 if __name__ == "__main__":
     import pandas as pd
 

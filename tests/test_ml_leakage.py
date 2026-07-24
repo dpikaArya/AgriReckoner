@@ -59,6 +59,21 @@ def test_select_feature_columns_drops_leaks():
     assert set(feats) == {"Nitrogen", "Soil_pH", "Rainfall"}
 
 
+def test_drop_suspected_leaks_removes_near_perfect_corr():
+    from agri_ai_agent.ml.leakage import drop_suspected_leaks
+    rng = np.random.default_rng(0)
+    n = 30
+    y = pd.Series(rng.normal(size=n))
+    X = pd.DataFrame({
+        "leak": y + rng.normal(scale=1e-7, size=n),        # ~identical to target
+        "unrelated": rng.normal(size=n),
+        "signal": y * 0.5 + rng.normal(scale=1.0, size=n),  # correlated but not perfect
+    })
+    cleaned, dropped = drop_suspected_leaks(X, y)
+    assert dropped == ["leak"]
+    assert "unrelated" in cleaned.columns and "signal" in cleaned.columns
+
+
 def test_permuted_target_kills_perfect_fit():
     """A model using only safe features cannot achieve R2=1 by memorizing the target."""
     from sklearn.linear_model import LinearRegression

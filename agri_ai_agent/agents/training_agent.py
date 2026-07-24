@@ -5,19 +5,18 @@ Flow: Model Readiness → Train (XGBoost, RF, LR) → Evaluate → Export Metric
 
 import json
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.config.schema import (
-    NON_FEATURE_COLS, POST_HARVEST_VARIABLES, resolve_target_column,
+    NON_FEATURE_COLS,
+    POST_HARVEST_VARIABLES,
+    resolve_target_column,
 )
-from agri_ai_agent.ml.leakage import select_feature_columns
-from agri_ai_agent.ml.evaluation import evaluate_model, MIN_ROWS_FOR_METRIC
+from agri_ai_agent.ml.evaluation import MIN_ROWS_FOR_METRIC, evaluate_model
+from agri_ai_agent.ml.leakage import drop_suspected_leaks, select_feature_columns
 
 TARGET_COLUMNS = [
     "Target_Yield", "Target_Fertilizer",
@@ -250,6 +249,13 @@ class TrainingAgent(BaseAgent):
         keep = y.notna()
         X, y = X[keep], y[keep]
         X = X.dropna(axis=1, how="all")
+
+        X, dropped = drop_suspected_leaks(X, y)
+        if dropped:
+            self.log.warning(
+                "Dropped %d near-perfect-correlation features (suspected leakage): %s",
+                len(dropped), dropped,
+            )
 
         if len(X) < MIN_ROWS_FOR_METRIC or X.shape[1] < 2:
             return None, None
