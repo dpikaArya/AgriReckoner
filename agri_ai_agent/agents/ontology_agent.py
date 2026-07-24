@@ -306,6 +306,29 @@ class OntologyAgent(BaseAgent):
         self.unit_synonyms = dict(UNIT_SYNONYMS)
         self.new_synonyms: list[dict[str, str]] = []
         self.ontology_path = self.settings.OUTPUT_DIR / "ontology_map.json"
+        self.registry = self._load_registry()
+
+    @staticmethod
+    def _load_registry():
+        """Load the UAMS ontology registry; None if unavailable (agent still runs)."""
+        try:
+            from agri_ai_agent.ontology.registry import Registry
+            return Registry.load()
+        except Exception:
+            return None
+
+    def _term_annotation(self, canonical: str) -> dict:
+        """Return the registry term IRI + canonical unit for a mapped column, if any."""
+        if self.registry is None or canonical not in self.registry.columns:
+            return {}
+        annotation = {}
+        iri = self.registry.term_iri(canonical)
+        unit = self.registry.canonical_unit(canonical)
+        if iri:
+            annotation["term_iri"] = iri
+        if unit:
+            annotation["canonical_unit"] = unit
+        return annotation
 
     @property
     def agent_name(self) -> str:
@@ -321,6 +344,7 @@ class OntologyAgent(BaseAgent):
             "columns_unmapped": 0,
             "synonyms_added": 0,
             "mapping": {},
+            "ontology_terms": {},
         }
 
         rename_map: dict[str, str] = {}
@@ -328,13 +352,14 @@ class OntologyAgent(BaseAgent):
 
         for col in df.columns:
             canonical = self._resolve_column(col)
-            if canonical and canonical != col:
-                rename_map[col] = canonical
+            if canonical:
                 mapping_report["mapping"][col] = canonical
                 mapping_report["columns_mapped"] += 1
-            elif canonical:
-                mapping_report["mapping"][col] = col
-                mapping_report["columns_mapped"] += 1
+                annotation = self._term_annotation(canonical)
+                if annotation:
+                    mapping_report["ontology_terms"][canonical] = annotation
+                if canonical != col:
+                    rename_map[col] = canonical
             else:
                 unmapped.append(col)
                 mapping_report["columns_unmapped"] += 1
