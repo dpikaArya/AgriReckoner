@@ -10,7 +10,7 @@ The core scientific objectives are:
 4.	Fuzzy-Logic Fertilizer Recommendation. A Mamdani fuzzy inference system with 221 rules operates on 10 agronomic input variables (N, P, K, Zn, soil pH, rainfall, temperature, organic carbon, growth stage, yield prediction) to produce crop-specific, linguistically interpretable fertilizer recommendations (N/P/K dosages) with confidence scores. This bridges the gap between data-driven prediction and expert-system reasoning.
 5.	Ready Reckoner Table Generation. The terminal output is a per-crop Ready Reckoner Table — a compact decision-support artefact summarising optimal fertilizer regimes, expected yields, treatment alternatives, and confidence levels, exportable in Excel, CSV, and HTML formats for extension-agent and farmer use.
 2. Main Implementation Features
-The framework is implemented as a 10-phase agentic pipeline orchestrated by a central Orchestrator class that sequences 17 specialised agents, each governed by a typed AgentContract message protocol. Key implementation features include:
+The framework is implemented as a 10-phase agentic pipeline orchestrated by a central Orchestrator class. It sequences **17 agents wired into the default pipeline** (`orchestrator.PIPELINE_STEPS`), each governed by a typed AgentContract message protocol. One further agent — the **ProvenanceAgent** — is available in the codebase but is **not** part of the default pipeline. An **optional LLM extraction agent** (OpenAI-backed, see [Optional LLM extraction](#optional-llm-extraction)) can be enabled separately. Key implementation features include:
 Feature	Description
 Incremental PDF Ingestion	Scans a PDF directory; detects crop, DOI, title, and duplicates via fuzzy string matching (SequenceMatcher >0.90). Skips previously registered papers via a SQLite paper_registry (current skip rate: 84.6%).
 6-Reader Hybrid Extraction	Dispatches each PDF through Pdfminer, Camelot, Pdfplumber, Poppler (pdftotext), OCR, and Semantic readers with configurable timeouts. Regex patterns extract soil pH, N/P/K, yield, temperature, rainfall, and 15+ agronomic variables.
@@ -20,22 +20,21 @@ Biological Range Validation	Enforces domain constraints (e.g., soil pH ∈ [3,10
 Feature Engineering (146 features)	Derives 16+ composite features: NPK Index, Soil Fertility Index, Climate Index, Growing Degree Days, Nitrogen/Water Use Efficiency, Growth-Yield Index, polynomial temperature terms, and factor-encoded categorical variables.
 Adaptive Model Selection	The ModelSelectionAgent selects the model pool based on sample size, applies SelectKBest feature selection when features exceed samples, and runs GridSearchCV with target-specific parameter grids.
 Mamdani Fuzzy Expert System	221 rules in YAML (v3.0) with 10 trapezoidal/triangular input MFs and 3 output MFs (Low/Medium/High for N, P, K). Centroid defuzzification produces continuous recommendation values, with crop-specific adjustment factors for all 9 crops.
-Explainability & Provenance	The ExplainabilityAgent generates per-prediction feature-attribution explanations. The ProvenanceAgent tracks per-cell data lineage from source PDF to final schema.
+Explainability & Provenance	The ExplainabilityAgent generates per-prediction feature-attribution explanations. A ProvenanceAgent that tracks per-cell data lineage from source PDF to final schema exists in the codebase but is **not wired into the default pipeline** — it is available for callers that instantiate it directly.
 Continuous Learning	Drift detection monitors model performance over time. New papers trigger incremental retraining; the paper registry and model versions are updated without full pipeline re-execution.
 11-Stage Evaluation Suite	Automated scoring across ingestion completeness, extraction accuracy, ontology coverage, schema compliance, unit consistency, data quality, feature utility, data-leakage checks, statistical soundness, model readiness, and documentation.
 Knowledge Graph	A NetworkX graph with 8 node types (Paper, Crop, Soil, Treatment, Yield, Feature, Model, Rule) encodes entity relationships for graph-based queries and downstream reasoning.
 
 3. Current Scale & Results
 Metric	Value
-Research papers processed	68 (from 91 PDFs)
+Package version	2.0.0
+License	Apache-2.0
+UAMS schema columns	138 (14 groups, A–N)
 Crops covered	9 (Barley, Bell Pepper, Black Wheat, Cabbage, Carrot, Chickpea, Cotton, Maize, Spinach)
-UAMS schema columns	138
-Engineered features	146
-ML models trained	39 (5 targets × 8 model types)
-Best model R²	0.995 (Ridge, Plant Height; n=10)
 Fuzzy rules	221 (Mamdani v3.0)
+Agents wired into default pipeline	17 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent)
 Pipeline phases	10
-Full pipeline runtime	~25 seconds (incremental mode)
+Model R²	Previously reported values (e.g. 0.995) were target-leakage artefacts, not validated skill — see [ML Models](#ml-models)
 
 
 ---
@@ -181,10 +180,15 @@ This framework automates the conversion of unstructured agricultural research PD
 | D. Environment | 8 | Lat, Lon, Alt, Temp, Rainfall, Humidity |
 | E. Soil Properties | 16 | pH, EC, N, P, K, micronutrients |
 | F. Fertilizer Information | 7 | Treatment, Fertilizer, Dose |
-| G. Crop Growth | 22 | Height, Biomass, SPAD, Leaf Area |
+| G. Crop Growth Parameters | 22 | Height, Biomass, SPAD, Leaf Area |
 | H. Yield Parameters | 13 | Yield per Plot/Hectare, Fruit, Seeds |
 | I. Grain Quality | 14 | Protein, Ash, Gluten |
-| J–N. ML / Derived / Encoded | 56 | Targets, features, predictions |
+| J. ML Target Variables | 5 | Prediction targets |
+| K. Engineered Features | 16 | Derived domain features |
+| L. Leakage Labels | 1 | Prediction-time availability |
+| M. Encoded Variables | 6 | Numeric categorical codes |
+| N. ML Predictions | 9 | Model outputs and recommendations |
+| **Total** | **138** | 14 groups (A–N) |
 
 ### Data Coverage
 
@@ -209,17 +213,28 @@ This framework automates the conversion of unstructured agricultural research PD
 - **8 model types**: LinearRegression, Ridge, Lasso, ElasticNet, RandomForest, GradientBoosting, XGBoost, SVR
 - **Cross-validation**: 5-fold where sample size permits
 
-### Best Model Per Target
+### On the previously reported R² scores (important)
 
-| Target | Best Model | R² | RMSE | Samples |
-|--------|-----------|-----|------|---------|
-| **Plant_Height_cm** | Ridge | **0.995** | 0.14 | 10 |
-| **Yield_per_Hectare** | XGBoost | **0.823** | 46.30 | 14 |
-| **SPAD** | LinearRegression | 0.333 | 2.62 | 11 |
-| **Shoot_Biomass_g** | LinearRegression | 0.150 | 1.35 | 18 |
-| **Yield_per_Plot** | RandomForest | -0.129 | 467.23 | 8 |
+Earlier versions of this README published a "Best Model Per Target" table with headline
+scores such as **R² = 0.995** (Ridge, Plant Height) and **R² = 1.0** (Linear Regression).
+**Those numbers were target-leakage artefacts, not evidence of predictive skill.** Post-harvest
+outcomes, target columns, and model-prediction columns were reachable by the feature matrix,
+so models were effectively reading the answer. They were also computed from a single hold-out on
+only a handful of test points. They must **not** be cited as validated performance.
 
-> Note: R² values reflect current data availability. Plant_Height and Yield_per_Hectare show strong signal. Other targets require more training data for reliable predictions.
+The refactor addresses this at two levels:
+
+- **Leakage control** — `agri_ai_agent/ml/leakage.py` removes columns unavailable at prediction
+  time (UAMS post-harvest, target group J, and prediction group N), including engineered features
+  derived from those outcome families, before any model sees the data.
+- **Honest small-n evaluation** — `agri_ai_agent/ml/evaluation.py` cross-validates each model
+  (leave-one-out below n=30, repeated 5-fold above), fitting imputation inside each fold so no test
+  information leaks into training. It **refuses to report any skill metric below n=8** ("insufficient
+  data") and **flags every metric below n=30 as advisory** (cross-validated but non-robust).
+
+Given the current data volume (single- and low-double-digit sample counts per target), any metric
+this pipeline emits today is **advisory**. Reliable per-target performance requires substantially
+more extracted training data. No validated R² table is published here until that data exists.
 
 ---
 
@@ -255,12 +270,12 @@ This framework automates the conversion of unstructured agricultural research PD
 | Research papers processed | 68 (from 91 PDFs) |
 | Master dataset rows | 45 (5 crops) |
 | Total training rows | 113 (merged) |
-| Schema columns | 138 |
+| Schema columns | 138 (14 groups, A–N) |
 | Engineered features | 146 |
-| ML models trained | 39 |
-| Best model R² | 0.995 (Ridge, Plant_Height) |
+| Model R² | Not published as validated — earlier scores (e.g. 0.995) were target-leakage artefacts; metrics are advisory at current n (see [ML Models](#ml-models)) |
 | Fuzzy rules | 221 (v3.0) |
 | Crops covered | 9 |
+| Agents wired into default pipeline | 17 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent) |
 | Pipeline phases | 10 |
 | Evaluation stages | 11 |
 | Pipeline run time | ~25 seconds (incremental) |
@@ -273,14 +288,17 @@ This framework automates the conversion of unstructured agricultural research PD
 ### Prerequisites
 
 - Python 3.10+
-- Poppler (for pdftotext) — [install guide](#poppler-installation)
+- Poppler (for `pdftotext`) — [install guide](#poppler-installation)
+- **macOS only:** `brew install libomp` (required by `xgboost`; import fails without it)
+- Source research PDFs live in a **gitignored `Data ADES/`** directory at the repo root.
+  This directory is not shipped with the repository; create it and add your own PDFs.
 
 ### Installation
 
 ```bash
 git clone https://github.com/matrixflora/Ready-Reckoner-AI-Framework.git
 cd Ready-Reckoner-AI-Framework
-pip install -r requirements.txt
+pip install -e .          # installs the agri-ai-agent package (v2.0.0)
 ```
 
 ### Poppler Installation (Windows)
@@ -289,13 +307,35 @@ Download Poppler from: https://github.com/osber/poppler-windows/releases
 
 Extract to `C:\poppler\poppler-24.08.0\Library\bin\` and add to PATH.
 
-### Run Full Pipeline
+### Run the pipeline (primary entry point)
+
+The primary engine is the `agriai` CLI (installed by `pip install -e .`):
 
 ```bash
-python run_aaf_pipeline.py
+agriai run --file data.csv        # run on a prepared feature/data table
+agriai run --papers "Data ADES/"  # ingest PDFs, then run the full pipeline
 ```
 
-This runs all 10 phases: ingestion → extraction → validation → feature engineering → ML training → fuzzy logic → recommendations → ready reckoner → continuous learning.
+Equivalently, without the console script:
+
+```bash
+python -m agri_ai_agent run --file data.csv
+```
+
+This runs the 10-phase pipeline: ingestion → extraction → validation → feature
+engineering → ML training → fuzzy logic → recommendations → ready reckoner →
+continuous learning.
+
+### Legacy runner (frozen)
+
+`run_aaf_pipeline.py` is the **legacy, validated monolithic PDF runner**, frozen at git tag
+**`legacy-monolith-v1`**. It remains the reference for PDF-based runs while the agent path is
+being validated on real PDFs, and will be **retired once that validation is complete**. Prefer
+the `agriai` entry point above for new work.
+
+```bash
+python run_aaf_pipeline.py   # legacy path (git tag legacy-monolith-v1)
+```
 
 ### Run Evaluation
 
@@ -303,18 +343,26 @@ This runs all 10 phases: ingestion → extraction → validation → feature eng
 python run_eval.py
 ```
 
-### Run Individual Components
+### Optional LLM extraction
+
+An optional OpenAI-backed extraction agent (`LLMExtractionAgent`) can extract UAMS values
+from free text with source-grounding and per-cell provenance. It is **not** part of the
+default pipeline and requires the `llm` extra plus an API key:
 
 ```bash
-# Post-pipeline analysis
-python post_pipeline_analysis.py
+pip install -e ".[llm]"
+export OPENAI_API_KEY=...             # your OpenAI key
+python scripts/smoke_llm_extract.py   # live smoke test (makes a real API call)
 
-# Export all results
-python export_all_results.py
-
-# Pdfplumber extraction
-python pdfplumber_extraction.py
+# extract UAMS rows from a directory of PDFs:
+agriai extract --papers ./pdfs --out extracted_schema.csv
 ```
+
+The extractor reports values **as written**, then a grounding pass keeps a value only if its
+number appears in the cited source span, its unit converts to the column's canonical unit
+(incompatible units — e.g. a soil `g/kg` concentration for a `kg/ha` rate column — are rejected),
+and it passes the registry range. Accepted, rejected, and flagged values are all recorded in
+`LLM_Extraction_Provenance.csv` for review. Validated live on open-access agronomy PDFs.
 
 ---
 
@@ -397,11 +445,12 @@ Ready-Reckoner-AI-Framework/
 ├── database/
 │   └── paper_registry.sqlite       # Paper processing registry
 │
-├── run_aaf_pipeline.py             # Main pipeline entry point
+├── agri_ai_agent/cli.py            # Primary entry point: `agriai run --file data.csv`
+├── run_aaf_pipeline.py             # LEGACY frozen PDF runner (tag legacy-monolith-v1)
 ├── run_eval.py                     # Evaluation runner
 ├── requirements.txt                # Python dependencies
 ├── pyproject.toml                  # Project metadata
-├── LICENSE                         # MIT License
+├── LICENSE                         # Apache-2.0 License
 └── README.md                       # This file
 ```
 

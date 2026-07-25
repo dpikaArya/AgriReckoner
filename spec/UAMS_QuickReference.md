@@ -1,6 +1,6 @@
 # UAMS v1.0 — Quick Reference Card
 
-**128 columns · 13 groups · SI units · ML-ready**
+**138 columns · 14 groups · canonical agronomic units (UCUM/UO/QUDT) · ML-ready**
 
 ---
 
@@ -125,7 +125,7 @@ Universal_Agricultural_ML_Master.{csv|parquet|sqlite|duckdb}
 pip install -r requirements.txt
 
 # Run pipeline
-ades run input_dataset.xlsx
+agriai run --file input_dataset.xlsx
 
 # Or with legacy script
 python universal_schema_generator.py

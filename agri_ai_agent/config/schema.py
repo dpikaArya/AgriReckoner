@@ -258,3 +258,34 @@ PRE_HARVEST_MEASUREMENTS = frozenset({
     "Stem_Diameter_mm", "Root_Diameter_mm",
     "Plant_Height_cm",
 })
+
+# Measured agronomic outcomes to model when no synthetic Target_* column is populated,
+# in order of preference. Mirrors the columns the validated monolith actually trained on.
+MEASURED_TARGETS = [
+    "Yield_per_Hectare", "Yield_per_Plot", "Plant_Height_cm", "SPAD", "Shoot_Biomass_g",
+]
+
+MIN_TARGET_ROWS = 5
+
+
+def resolve_target_column(df, requested=None, extra_targets=None, min_non_null=MIN_TARGET_ROWS):
+    """Return a usable target column name, or None.
+
+    Prefers the requested column, then any synthetic Target_* passed as extra_targets,
+    then the measured agronomic outcomes; a candidate is accepted only if it exists and
+    has at least ``min_non_null`` non-null values.
+    """
+    candidates = []
+    if requested:
+        candidates.append(requested)
+    if extra_targets:
+        candidates.extend(extra_targets)
+    candidates.extend(MEASURED_TARGETS)
+    seen = set()
+    for col in candidates:
+        if col in seen:
+            continue
+        seen.add(col)
+        if col in df.columns and df[col].notna().sum() >= min_non_null:
+            return col
+    return None

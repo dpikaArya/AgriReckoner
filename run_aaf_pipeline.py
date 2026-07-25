@@ -1,7 +1,22 @@
 """
-AAIF Complete Pipeline Runner
-Executes Phases 1-10 across all PDFs in data/Data ADES/
+AAIF Complete Pipeline Runner — LEGACY (frozen).
+
+This 2000-line procedural monolith produced the validated committed outputs/ and models/
+(git tag ``legacy-monolith-v1``). It is kept ONLY as the reference PDF-extraction path until
+the agent pipeline is validated on real source PDFs. Do not extend it.
+
+Prefer the maintained engine:  ``agriai run --file data.csv``  (agri_ai_agent.orchestrator).
+
+Retirement criterion: delete this file once the agent pipeline reproduces the golden outputs.
 """
+import warnings
+
+warnings.warn(
+    "run_aaf_pipeline.py is the frozen legacy runner; use `agriai run` (agri_ai_agent) instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
 import io
 import json
 import os

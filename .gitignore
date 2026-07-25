@@ -145,3 +145,12 @@ agri_ai_agent/memory/*.db
 credentials.*
 token.*
 secrets.*
+REFACTOR_NOTES.md
+.venv/
+
+# runtime artifacts (committed outputs/ is the frozen baseline)
+agri_ai_agent/outputs/
+agri_ai_agent/models/
+agri_ai_agent/memory/
+agri_ai_agent/logs/
+.checkpoints/

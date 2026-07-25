@@ -5,19 +5,16 @@ Flow: Read file/paper → Extract structured data → Map to ontology → Conver
 
 import json
 import re
-import csv
 import subprocess
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.config.schema import UAMS_COLUMNS, VARIANT_MAP
-from agri_ai_agent.contracts.messages import AgentContract
 
 # ---------------------------------------------------------------------------
 # CONSTANTS
@@ -416,8 +413,9 @@ class ExtractionAgent(BaseAgent):
             )
             if result.returncode == 0:
                 return result.stdout
-        except Exception:
-            pass
+        except Exception as e:
+            self.log.warning("[%s] pdftotext extraction failed for %s: %s",
+                             self.agent_name, pdf_path.name, e)
         return ""
 
     def _ner_from_text(self, text: str, source: str = "text") -> list[dict]:

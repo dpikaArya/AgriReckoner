@@ -753,24 +753,21 @@ class FeatureAgent(BaseAgent):
         self.log.info("Engineered %d features: %s", len(features_added), features_added)
 
     def _detect_leakage(self, df: pd.DataFrame) -> None:
+        from agri_ai_agent.ml.leakage import is_leaky_feature, strip_engineered
+
         leaked = []
         safe = []
         non_feature = []
         feature_labels = []
 
         for col in df.columns:
-            base_col = col
-            for suffix in ["_Calc", "_7d_MA", "_squared"]:
-                if col.endswith(suffix):
-                    base_col = col[: -len(suffix)]
-                    break
-            if base_col in POST_HARVEST_VARIABLES:
-                leaked.append(col)
-                feature_labels.append((col, "POST_HARVEST"))
-            elif col in NON_FEATURE_COLS:
+            if col in NON_FEATURE_COLS:
                 non_feature.append(col)
                 feature_labels.append((col, "NON_FEATURE"))
-            elif base_col in PRE_HARVEST_MEASUREMENTS:
+            elif is_leaky_feature(col):
+                leaked.append(col)
+                feature_labels.append((col, "POST_HARVEST_OR_DERIVED"))
+            elif strip_engineered(col) in PRE_HARVEST_MEASUREMENTS:
                 safe.append(col)
                 feature_labels.append((col, "PRE_HARVEST_MEASUREMENT"))
             else:

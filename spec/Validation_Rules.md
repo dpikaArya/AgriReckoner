@@ -1,7 +1,7 @@
 # UAMS Validation Rules
 
 **Version:** 1.0  
-**Scope:** Data quality constraints for all 128 UAMS columns
+**Scope:** Data quality constraints for all 138 UAMS columns
 
 ---
 

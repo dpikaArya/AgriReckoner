@@ -79,7 +79,7 @@ Every agent in the ADES pipeline communicates exclusively through `AgentContract
   "mapping": {"tmax_c": "Temperature_Max"},
   "unmapped_columns": ["custom_var"],
   "schema_version": "1.0",
-  "output_data": {"rows": 1000, "columns": ["Temperature_Max", ...], "column_count": 128}
+  "output_data": {"rows": 1000, "columns": ["Temperature_Max", ...], "column_count": 138}
 }
 ```
 
@@ -271,7 +271,7 @@ Every agent in the ADES pipeline communicates exclusively through `AgentContract
 
 ## Implementation
 
-Contracts are implemented as Python dataclasses in `ades/contracts/messages.py`:
+Contracts are implemented as Python dataclasses in `agri_ai_agent/contracts/messages.py`:
 
 ```python
 @dataclass

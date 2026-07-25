@@ -20,7 +20,6 @@ import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.contracts.messages import AgentContract
 
 BEST_MODEL_LABEL = "best_model"
 RETRAIN_R2_THRESHOLD = 0.01
@@ -263,8 +262,8 @@ class ContinuousLearningAgent(BaseAgent):
         if csv_path.exists():
             try:
                 return pd.read_csv(csv_path).to_dict(orient="records")
-            except Exception:
-                pass
+            except Exception as e:
+                self.log.warning("Could not read training metrics %s: %s", csv_path, e)
         return []
 
     def _deploy_if_improved(self, model_paths: list[Path], metrics: dict) -> bool:
@@ -293,8 +292,8 @@ class ContinuousLearningAgent(BaseAgent):
             try:
                 with open(path) as f:
                     return json.load(f)
-            except Exception:
-                pass
+            except Exception as e:
+                self.log.warning("Could not read best-model metrics %s: %s", path, e)
         return {}
 
     def _deploy_best(self, model_paths: list[Path], metrics: dict):
@@ -473,8 +472,8 @@ class ContinuousLearningAgent(BaseAgent):
                         if line:
                             entries.append(json.loads(line))
                 return entries
-            except Exception:
-                pass
+            except Exception as e:
+                self.log.warning("Could not read performance history %s: %s", history_path, e)
         return []
 
     def _build_output(self, df: pd.DataFrame, **kwargs) -> dict:
