@@ -1,87 +1,87 @@
 # Agent Benchmark Results
-Generated: 2026-07-04 22:30:10
+Generated: 2026-07-28 15:48:26
 
 ## Summary
 | Metric | Value |
 |--------|-------|
 | Total agents | 12 |
-| Average execution time | 0.17s |
-| Total execution time | 1.99s |
+| Average execution time | 42.68s |
+| Total execution time | 8.54m |
 | Average retries | 0.00 |
-| Success rate | 100.0% |
-| Fastest agent | unit_harmonization (0.00s) |
-| Slowest agent | export (0.66s) |
+| Success rate | 41.7% |
+| Fastest agent | ontology_mapping (0.00s) |
+| Slowest agent | ingestion (8.52m) |
 
 ## Per-Agent Breakdown
 ### ingestion
-- Time: 0.00s
+- Time: 8.52m
 - Retries: 0
 - Success: Yes
 - Exceptions: 0
-- Avg latency: 0.0042s
+- Avg latency: 511.0000s
 ### schema_mapping
-- Time: 0.05s
+- Time: 0.10s
 - Retries: 0
 - Success: Yes
 - Exceptions: 0
-- Avg latency: 0.0536s
+- Avg latency: 0.1000s
 ### ontology_mapping
 - Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.0047s
+- Avg latency: 0.0000s
 ### unit_harmonization
 - Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.0033s
+- Avg latency: 0.0000s
 ### quality_assurance
-- Time: 0.13s
+- Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.1293s
+- Avg latency: 0.0000s
 ### feature_engineering
-- Time: 0.03s
+- Time: 0.10s
 - Retries: 0
 - Success: Yes
 - Exceptions: 0
-- Avg latency: 0.0331s
+- Avg latency: 0.1000s
 ### leakage_detection
-- Time: 0.04s
+- Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.0358s
+- Avg latency: 0.0000s
 ### encoding
-- Time: 0.04s
+- Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.0369s
+- Avg latency: 0.0000s
 ### statistical_diagnostics
-- Time: 0.62s
+- Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.6239s
+- Avg latency: 0.0000s
 ### model_readiness
-- Time: 0.01s
+- Time: 0.00s
 - Retries: 0
-- Success: Yes
+- Success: No
 - Exceptions: 0
-- Avg latency: 0.0068s
+- Avg latency: 0.0000s
 ### documentation
-- Time: 0.40s
+- Time: 0.50s
 - Retries: 0
 - Success: Yes
 - Exceptions: 0
-- Avg latency: 0.3966s
+- Avg latency: 0.5000s
 ### export
-- Time: 0.66s
+- Time: 0.50s
 - Retries: 0
 - Success: Yes
 - Exceptions: 0
-- Avg latency: 0.6622s
+- Avg latency: 0.5000s

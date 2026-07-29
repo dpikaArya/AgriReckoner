@@ -1,7 +1,1 @@
-Feature,Importance,Target
-Leaf_Number,0.4149,Shoot_Biomass_g
-Root_Diameter_mm,0.2322,Shoot_Biomass_g
-Shoot_Length_cm,0.1611,Shoot_Biomass_g
-Tillers,0.1229,Shoot_Biomass_g
-Root_Biomass_g,0.0688,Shoot_Biomass_g
-SPAD,0.0,Shoot_Biomass_g
+

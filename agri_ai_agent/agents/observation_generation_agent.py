@@ -54,11 +54,12 @@ class ObservationGenerationAgent(BaseAgent):
     def _normalize_observation_hierarchy(self, df: pd.DataFrame) -> pd.DataFrame:
         if "Paper_ID" not in df.columns:
             df["Paper_ID"] = "PAPER/DEFAULT"
-
-        paper_with_no_ds = df["Paper_ID"] == "" 
-        if paper_with_no_ds.any():
-            df.loc[paper_with_no_ds, "Paper_ID"] = df.loc[paper_with_no_ds].apply(
-                lambda _: f"PAPER/{uuid.uuid4().hex[:8]}", axis=1,
+        else:
+            import numpy as np
+            df["Paper_ID"] = df["Paper_ID"].apply(
+                lambda x: f"PAPER/{uuid.uuid4().hex[:8]}"
+                if pd.isna(x) or str(x).strip() == ""
+                else str(x)
             )
 
         if "Experiment_ID" not in df.columns or df["Experiment_ID"].isna().all() or (df["Experiment_ID"] == "").all():
@@ -90,7 +91,7 @@ class ObservationGenerationAgent(BaseAgent):
                 )
 
         if "Dataset_ID" not in df.columns or df["Dataset_ID"].isna().all() or (df["Dataset_ID"] == "").all():
-            df["Dataset_ID"] = df["Paper_ID"].apply(lambda p: p.replace("/paper", ""))
+            df["Dataset_ID"] = df["Paper_ID"].str.replace("/paper", "", regex=False)
 
         if "Document_ID" not in df.columns or df["Document_ID"].isna().all() or (df["Document_ID"] == "").all():
             df["Document_ID"] = df["Dataset_ID"].apply(lambda d: f"{d}/doc/0")

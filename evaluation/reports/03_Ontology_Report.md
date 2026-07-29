@@ -1,17 +1,17 @@
 # Stage 03: Ontology Mapping Report
-Generated: 2026-07-04 22:30:09
-Total mapped entries: 42
+Generated: 2026-07-28 15:48:24
+Total mapped entries: 2
 
 ## Summary
 - Average ontology coverage: 0.0%
 - Missing ontology terms: 0
 
 ## Coverage by Ontology Source
-- AGROVOC: 0.0% (0/42 mapped)
-- Crop Ontology: 0.0% (0/42 mapped)
-- Plant Ontology: 0.0% (0/42 mapped)
-- Environment Ontology: 0.0% (0/42 mapped)
-- Unit Ontology: 0.0% (0/42 mapped)
+- AGROVOC: 0.0% (0/2 mapped)
+- Crop Ontology: 0.0% (0/2 mapped)
+- Plant Ontology: 0.0% (0/2 mapped)
+- Environment Ontology: 0.0% (0/2 mapped)
+- Unit Ontology: 0.0% (0/2 mapped)
 
 ## Missing Ontology Terms: 0
 

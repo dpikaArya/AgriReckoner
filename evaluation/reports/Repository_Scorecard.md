@@ -1,43 +1,39 @@
 # Repository Scorecard
-Generated: 2026-07-20 17:17:18
+Generated: 2026-07-28 15:48:26
 
 ## Scores
 | Category | Score | Grade |
 |----------|-------|-------|
-| Paper Ingestion | 0.0 | D |
-| Scientific Extraction | 0.0 | D |
-| Schema Mapping | 66.7 | B |
+| Paper Ingestion | 100.0 | A+ |
+| Scientific Extraction | 34.0 | D |
+| Schema Mapping | 71.0 | B+ |
 | Ontology Mapping | 0.0 | D |
-| Quality Assurance | 0.0 | D |
-| Feature Engineering | 100.0 | A+ |
+| Quality Assurance | 100.0 | A+ |
+| Feature Engineering | 93.8 | A+ |
 | Documentation | 100.0 | A+ |
 | ML Readiness | 0.0 | D |
-| **Overall** | **69.9** | **B** |
+| **Overall** | **64.1** | **B** |
 
 ## Strengths
-- Feature Engineering (100.0)
+- Paper Ingestion (100.0)
 - Documentation (100.0)
-- Schema Mapping (66.7)
+- Quality Assurance (100.0)
 
 ## Weaknesses
-- Paper Ingestion (0.0)
-- Scientific Extraction (0.0)
 - Ontology Mapping (0.0)
+- ML Readiness (0.0)
+- Scientific Extraction (34.0)
 
 ## Bottlenecks
-- Paper Ingestion: 0/100
-- Scientific Extraction: 0/100
 - Ontology Mapping: 0/100
-- Quality Assurance: 0/100
+- ML Readiness: 0/100
+- Scientific Extraction: 34/100
 
 ## Recommendations
-1. Install PDF parser (pdfplumber) and integrate paper ingestion agent
-2. Implement NLP-based scientific information extraction from PDFs
-3. Expand VARIANT_MAP in schema.py to cover more column name variants
-4. Complete ontology mappings for all unmapped variables
-5. Strengthen data validation rules and outlier detection thresholds
-6. Address model readiness issues: encoding, missing values, scaling
+1. Implement NLP-based scientific information extraction from PDFs
+2. Complete ontology mappings for all unmapped variables
+3. Address model readiness issues: encoding, missing values, scaling
 
 ## Verdict
 **CONDITIONALLY READY**
-Overall Score: 69.9/100
+Overall Score: 64.1/100

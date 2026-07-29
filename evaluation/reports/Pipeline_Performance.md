@@ -1,5 +1,5 @@
 # End-to-End Pipeline Performance Report
-Generated: 2026-07-20 17:17:17
+Generated: 2026-07-28 15:48:25
 
 ## Summary
 | Metric | Value |
@@ -11,7 +11,7 @@ Generated: 2026-07-20 17:17:17
 | Total retries | 0 |
 | Total errors | 0 |
 | Total execution time | 8.95m |
-| Peak memory (RSS) | 148.1 MB |
+| Peak memory (RSS) | 410.4 MB |
 | Current CPU usage | 0.0% |
 
 ## Per-Agent Execution Times
@@ -33,9 +33,9 @@ Generated: 2026-07-20 17:17:17
 ## Failed Agents (0)
 
 ## Resource Usage
-- Memory (RSS): 148.1 MB
-- Memory (VMS): 348.3 MB
-- Memory percent: 0.9%
+- Memory (RSS): 410.4 MB
+- Memory (VMS): 610.9 MB
+- Memory percent: 2.4%
 - CPU: 0.0%
 
 > Note: GPU usage not available on this system.

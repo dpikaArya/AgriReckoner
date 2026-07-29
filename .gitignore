@@ -154,3 +154,8 @@ agri_ai_agent/models/
 agri_ai_agent/memory/
 agri_ai_agent/logs/
 .checkpoints/
+
+# Production pipeline artifacts
+reports/
+external_data/
+deliverables_*.zip

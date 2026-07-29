@@ -31,26 +31,26 @@ tr:hover { background: #f0faf4; }
 <body>
 <div class="header">
 <h1>Agentic Agricultural Intelligence Framework</h1>
-<p>Final Execution Report — Incremental Mode — Generated: 2026-07-22 14:48:54</p>
+<p>Final Execution Report — Incremental Mode — Generated: 2026-07-28 15:16:37</p>
 </div>
 <div class="container">
 
 <div class="stats">
-<div class="stat"><div class="value">91</div><div class="label">Total PDFs</div></div>
-<div class="stat"><div class="value">0</div><div class="label">New Papers Extracted</div></div>
-<div class="stat"><div class="value">91</div><div class="label">Previously Processed (Skipped)</div></div>
-<div class="stat"><div class="value">68</div><div class="label">Total Schema Rows</div></div>
-<div class="stat"><div class="value">8</div><div class="label">Features Created</div></div>
-<div class="stat"><div class="value">39</div><div class="label">Models Trained</div></div>
+<div class="stat"><div class="value">10</div><div class="label">Total PDFs</div></div>
+<div class="stat"><div class="value">10</div><div class="label">New Papers Extracted</div></div>
+<div class="stat"><div class="value">0</div><div class="label">Previously Processed (Skipped)</div></div>
+<div class="stat"><div class="value">10</div><div class="label">Total Schema Rows</div></div>
+<div class="stat"><div class="value">7</div><div class="label">Features Created</div></div>
+<div class="stat"><div class="value">8</div><div class="label">Models Trained</div></div>
 </div>
 
 <div class="card">
 <h2>Phase 1 — Ingestion (Incremental)</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Total PDFs found</td><td>91</td></tr>
-<tr><td>New papers (to extract)</td><td>0</td></tr>
-<tr><td>Previously processed (skipped)</td><td>91</td></tr>
+<tr><td>Total PDFs found</td><td>10</td></tr>
+<tr><td>New papers (to extract)</td><td>10</td></tr>
+<tr><td>Previously processed (skipped)</td><td>0</td></tr>
 <tr><td>Duplicates (intra-run)</td><td>0</td></tr>
 <tr><td>Ingestion report</td><td>outputs/ingestion_report.xlsx</td></tr>
 </table>
@@ -60,9 +60,9 @@ tr:hover { background: #f0faf4; }
 <h2>Phase 2-3 — AI Extraction &amp; Universal Schema (Incremental)</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>New rows extracted</td><td>0</td></tr>
-<tr><td>Total schema rows (merged)</td><td>68</td></tr>
-<tr><td>Schema columns</td><td>138</td></tr>
+<tr><td>New rows extracted</td><td>10</td></tr>
+<tr><td>Total schema rows (merged)</td><td>10</td></tr>
+<tr><td>Schema columns</td><td>296</td></tr>
 <tr><td>Universal Schema XLSX</td><td>outputs/Universal_Agricultural_Schema.xlsx</td></tr>
 <tr><td>Universal Schema CSV</td><td>outputs/Universal_Agricultural_Schema.csv</td></tr>
 </table>
@@ -72,9 +72,9 @@ tr:hover { background: #f0faf4; }
 <h2>Phase 4 — Validation</h2>
 <table>
 <tr><th>Issue</th><th>Count</th></tr>
-<tr><td>Missing Values</td><td>134</td></tr>
+<tr><td>Missing Values</td><td>289</td></tr>
 <tr><td>Duplicate Records</td><td>0</td></tr>
-<tr><td>Impossible Values</td><td>0</td></tr>
+<tr><td>Impossible Values</td><td>4</td></tr>
 <tr><td>Outliers</td><td>2</td></tr>
 <tr><td>Ocr Mistakes</td><td>0</td></tr>
 <tr><td>Unit Inconsistencies</td><td>0</td></tr>
@@ -86,7 +86,7 @@ tr:hover { background: #f0faf4; }
 <h2>Phase 5 — Feature Engineering</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Features created</td><td>8</td></tr>
+<tr><td>Features created</td><td>7</td></tr>
 <tr><td>Feature dataset</td><td>outputs/features_dataset.csv</td></tr>
 </table>
 </div>
@@ -95,50 +95,19 @@ tr:hover { background: #f0faf4; }
 <h2>Phase 6 — Model Training</h2>
 <table>
 <tr><th>Model</th><th>R²</th><th>RMSE</th><th>MAE</th><th>MAPE</th></tr>
-<tr><td>LinearRegression</td><td>-0.1973</td><td>481.2096</td><td>389.7884</td><td>37.92%</td></tr>
-<tr><td>Ridge</td><td>-0.1822</td><td>478.1578</td><td>392.5491</td><td>37.91%</td></tr>
-<tr><td>Lasso</td><td>-0.1972</td><td>481.1881</td><td>389.802</td><td>37.92%</td></tr>
-<tr><td>ElasticNet</td><td>-0.1926</td><td>480.2533</td><td>390.6859</td><td>37.92%</td></tr>
-<tr><td>RandomForest</td><td>-0.1288</td><td>467.2311</td><td>404.5621</td><td>37.88%</td></tr>
-<tr><td>GradientBoosting</td><td>-0.6475</td><td>564.4687</td><td>422.1858</td><td>42.79%</td></tr>
-<tr><td>XGBoost</td><td>-0.5397</td><td>545.693</td><td>439.7701</td><td>42.9%</td></tr>
-<tr><td>LinearRegression</td><td>-0.0206</td><td>111.1959</td><td>91.8109</td><td>4356.19%</td></tr>
-<tr><td>Ridge</td><td>-0.0127</td><td>110.7651</td><td>90.881</td><td>4241.52%</td></tr>
-<tr><td>Lasso</td><td>-0.02</td><td>111.1634</td><td>91.7188</td><td>4343.21%</td></tr>
-<tr><td>ElasticNet</td><td>-0.0157</td><td>110.929</td><td>91.2212</td><td>4282.34%</td></tr>
-<tr><td>RandomForest</td><td>0.6656</td><td>63.6501</td><td>40.8028</td><td>467.01%</td></tr>
-<tr><td>GradientBoosting</td><td>0.8185</td><td>46.894</td><td>31.0065</td><td>162.89%</td></tr>
-<tr><td>XGBoost</td><td>0.823</td><td>46.3029</td><td>30.6482</td><td>139.52%</td></tr>
-<tr><td>SVR</td><td>-0.4575</td><td>132.8822</td><td>80.9987</td><td>601.73%</td></tr>
-<tr><td>LinearRegression</td><td>0.9752</td><td>0.3211</td><td>0.3209</td><td>0.77%</td></tr>
-<tr><td>Ridge</td><td>0.9953</td><td>0.1403</td><td>0.1275</td><td>0.31%</td></tr>
-<tr><td>Lasso</td><td>0.9918</td><td>0.1844</td><td>0.1664</td><td>0.41%</td></tr>
-<tr><td>ElasticNet</td><td>0.9927</td><td>0.1744</td><td>0.1621</td><td>0.4%</td></tr>
-<tr><td>RandomForest</td><td>0.464</td><td>1.4915</td><td>1.4151</td><td>3.44%</td></tr>
-<tr><td>GradientBoosting</td><td>-0.9855</td><td>2.8707</td><td>2.7611</td><td>6.7%</td></tr>
-<tr><td>XGBoost</td><td>0.4527</td><td>1.5072</td><td>1.4626</td><td>3.46%</td></tr>
-<tr><td>SVR</td><td>-1.2881</td><td>3.0818</td><td>2.4346</td><td>5.61%</td></tr>
-<tr><td>LinearRegression</td><td>0.3325</td><td>2.6241</td><td>2.4275</td><td>4.87%</td></tr>
-<tr><td>Ridge</td><td>0.312</td><td>2.664</td><td>2.4758</td><td>4.98%</td></tr>
-<tr><td>Lasso</td><td>0.2181</td><td>2.8401</td><td>2.665</td><td>5.4%</td></tr>
-<tr><td>ElasticNet</td><td>0.2651</td><td>2.7535</td><td>2.5762</td><td>5.2%</td></tr>
-<tr><td>RandomForest</td><td>-0.01</td><td>3.2279</td><td>3.0215</td><td>6.06%</td></tr>
-<tr><td>GradientBoosting</td><td>-1.121</td><td>4.6777</td><td>3.8166</td><td>7.75%</td></tr>
-<tr><td>XGBoost</td><td>-0.1067</td><td>3.3789</td><td>2.5517</td><td>5.0%</td></tr>
-<tr><td>SVR</td><td>-0.3119</td><td>3.6788</td><td>3.4966</td><td>7.26%</td></tr>
-<tr><td>LinearRegression</td><td>0.1504</td><td>1.35</td><td>0.8545</td><td>12.58%</td></tr>
-<tr><td>Ridge</td><td>-0.0439</td><td>1.4964</td><td>0.969</td><td>14.15%</td></tr>
-<tr><td>Lasso</td><td>-0.4074</td><td>1.7375</td><td>1.1913</td><td>17.07%</td></tr>
-<tr><td>ElasticNet</td><td>-0.2403</td><td>1.6311</td><td>1.0873</td><td>15.73%</td></tr>
-<tr><td>RandomForest</td><td>-0.4185</td><td>1.7443</td><td>1.1457</td><td>16.66%</td></tr>
-<tr><td>GradientBoosting</td><td>-0.3175</td><td>1.6811</td><td>1.0731</td><td>15.75%</td></tr>
-<tr><td>XGBoost</td><td>-0.2719</td><td>1.6517</td><td>0.9411</td><td>14.35%</td></tr>
-<tr><td>SVR</td><td>-0.5575</td><td>1.8278</td><td>1.155</td><td>17.02%</td></tr>
+<tr><td>LinearRegression</td><td>-0.4714</td><td>1.7766</td><td>1.0782</td><td>16.1%</td></tr>
+<tr><td>Ridge</td><td>-0.4714</td><td>1.7766</td><td>1.0782</td><td>16.1%</td></tr>
+<tr><td>Lasso</td><td>-0.4714</td><td>1.7766</td><td>1.0782</td><td>16.1%</td></tr>
+<tr><td>ElasticNet</td><td>-0.4714</td><td>1.7766</td><td>1.0782</td><td>16.1%</td></tr>
+<tr><td>RandomForest</td><td>-0.4822</td><td>1.7831</td><td>1.0839</td><td>16.18%</td></tr>
+<tr><td>GradientBoosting</td><td>-0.4714</td><td>1.7766</td><td>1.0782</td><td>16.1%</td></tr>
+<tr><td>XGBoost</td><td>-0.4714</td><td>1.7766</td><td>1.0782</td><td>16.1%</td></tr>
+<tr><td>SVR</td><td>-0.4303</td><td>1.7516</td><td>1.0558</td><td>15.8%</td></tr>
 </table>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Best model</td><td>0.9953 (Ridge)</td></tr>
-<tr><td>Samples trained</td><td>113</td></tr>
+<tr><td>Best model</td><td>-0.4303 (SVR)</td></tr>
+<tr><td>Samples trained</td><td>55</td></tr>
 <tr><td>Features used</td><td>0</td></tr>
 <tr><td>XGBoost model</td><td>models/xgboost_model.pkl</td></tr>
 <tr><td>Regression model</td><td>models/regression_model.pkl</td></tr>
@@ -160,7 +129,7 @@ tr:hover { background: #f0faf4; }
 <h2>Phase 8 — Recommendations</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Recommendations generated</td><td>113</td></tr>
+<tr><td>Recommendations generated</td><td>55</td></tr>
 <tr><td>Recommendations file</td><td>outputs/recommendations/fertilizer_recommendations.xlsx</td></tr>
 </table>
 </div>
@@ -169,7 +138,7 @@ tr:hover { background: #f0faf4; }
 <h2>Phase 9 — Ready Reckoner</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Entries</td><td>113</td></tr>
+<tr><td>Entries</td><td>55</td></tr>
 <tr><td>Ready Reckoner XLSX</td><td>outputs/Ready_Reckoner.xlsx</td></tr>
 <tr><td>Ready Reckoner PDF</td><td>outputs/Ready_Reckoner.pdf</td></tr>
 </table>
@@ -180,7 +149,7 @@ tr:hover { background: #f0faf4; }
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
 <tr><td>Database</td><td>database/paper_registry.sqlite</td></tr>
-<tr><td>Papers registered</td><td>91</td></tr>
+<tr><td>Papers registered</td><td>10</td></tr>
 </table>
 </div>
 
@@ -188,13 +157,13 @@ tr:hover { background: #f0faf4; }
 <h2>Efficiency Improvement Summary</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Total PDFs in folder</td><td>91</td></tr>
-<tr><td>Previously processed (skipped)</td><td>91</td></tr>
-<tr><td>New papers extracted this run</td><td>0</td></tr>
-<tr><td>Skipped ratio</td><td>100.0%</td></tr>
-<tr><td>PDF extraction avoided</td><td>91 PDFs x ~30s avg = ~45.5 min saved</td></tr>
-<tr><td>Time efficiency gain</td><td>Only 0 of 91 PDFs required extraction (0.0% of total)</td></tr>
-<tr><td>Schema growth</td><td>68 total rows (incremental merge)</td></tr>
+<tr><td>Total PDFs in folder</td><td>10</td></tr>
+<tr><td>Previously processed (skipped)</td><td>0</td></tr>
+<tr><td>New papers extracted this run</td><td>10</td></tr>
+<tr><td>Skipped ratio</td><td>0.0%</td></tr>
+<tr><td>PDF extraction avoided</td><td>0 PDFs x ~30s avg = ~0.0 min saved</td></tr>
+<tr><td>Time efficiency gain</td><td>Only 10 of 10 PDFs required extraction (100.0% of total)</td></tr>
+<tr><td>Schema growth</td><td>10 total rows (incremental merge)</td></tr>
 </table>
 </div>
 

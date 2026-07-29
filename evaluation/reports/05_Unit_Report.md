@@ -1,5 +1,5 @@
 # Stage 05: Unit Harmonization Report
-Generated: 2026-07-20 17:17:06
+Generated: 2026-07-28 15:48:24
 
 ## Summary
 - Unit conversions applied: 0
