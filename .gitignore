@@ -159,3 +159,16 @@ agri_ai_agent/logs/
 reports/
 external_data/
 deliverables_*.zip
+
+# Generated runtime data (not source)
+database/
+.checkpoints/
+
+# Generated output artifacts
+outputs/AAIF_Layer_Efficiency_Report.txt
+outputs/Data_ADES_File_Inventory.csv
+outputs/Model_Results_All.csv
+outputs/Pipeline_Manifest.json
+outputs/Ready_Reckoner_Table*.csv
+outputs/Ready_Reckoner_Updated.xlsx
+outputs/benchmark_history.json
