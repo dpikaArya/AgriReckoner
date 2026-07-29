@@ -70,7 +70,13 @@ class LLMExtractor:
 
     def extract(self, text: str, paper_id: str) -> ExtractionResult:
         raw = self.complete(self._system, _build_user_prompt(text), self._schema)
-        data = json.loads(raw)
+        try:
+            data = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ValueError(
+                f"LLM returned malformed JSON for paper {paper_id}: {exc}. "
+                f"Raw response (first 200 chars): {raw[:200]!r}"
+            ) from exc
         fields = [
             ExtractedField(
                 column=f["column"],

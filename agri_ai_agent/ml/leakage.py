@@ -166,7 +166,7 @@ def drop_suspected_leaks(X, y, threshold=CORRELATION_LEAK_THRESHOLD):
         corr = series.corr(y)
         if corr is not None and abs(corr) >= threshold:
             dropped.append(col)
-    return (X.drop(columns=dropped) if dropped else X), dropped
+    return (X.drop(columns=dropped, errors="ignore") if dropped else X), dropped
 
 
 if __name__ == "__main__":

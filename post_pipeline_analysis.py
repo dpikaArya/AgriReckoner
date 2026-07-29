@@ -154,7 +154,7 @@ def train_all_models(df):
     # Also drop columns with zero or near-zero variance
     for col in list(X_full.columns):
         if X_full[col].std() < 1e-10:
-            X_full.drop(columns=[col], inplace=True)
+            X_full.drop(columns=[col], inplace=True, errors="ignore")
     feature_cols = list(X_full.columns)
 
     log(f"  Training samples: {len(X_full)}")
@@ -227,7 +227,8 @@ def train_all_models(df):
 
             try:
                 mape = mean_absolute_percentage_error(y_full, y_pred_full) * 100
-            except Exception:
+            except Exception as e:
+                log(f"  MAPE calculation failed: {e}")
                 mape = np.nan
 
             # Cross-validation metrics

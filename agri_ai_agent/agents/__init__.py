@@ -18,6 +18,11 @@ from .ready_reckoner_agent import ReadyReckonerAgent
 from .continuous_learning_agent import ContinuousLearningAgent
 from .knowledge_integration_agent import KnowledgeIntegrationAgent
 from .external_data_source_agent import ExternalDataSourceAgent
+from .dataset_normalization_agent import DatasetNormalizationAgent
+from .dataset_ingestion_bridge_agent import DatasetIngestionBridgeAgent
+from .observation_generation_agent import ObservationGenerationAgent
+from .feature_store_agent import FeatureStoreAgent
+from .repository_sync_agent import RepositorySyncAgent
 
 __all__ = [
     "BaseAgent",
@@ -40,4 +45,9 @@ __all__ = [
     "ContinuousLearningAgent",
     "KnowledgeIntegrationAgent",
     "ExternalDataSourceAgent",
+    "DatasetNormalizationAgent",
+    "DatasetIngestionBridgeAgent",
+    "ObservationGenerationAgent",
+    "FeatureStoreAgent",
+    "RepositorySyncAgent",
 ]

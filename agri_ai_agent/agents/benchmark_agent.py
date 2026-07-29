@@ -287,8 +287,8 @@ class BenchmarkAgent(BaseAgent):
             try:
                 with open(path, encoding="utf-8") as f:
                     return json.load(f)
-            except Exception:
-                pass
+            except (json.JSONDecodeError, OSError) as e:
+                self.log.debug("Could not load benchmark history: %s", e)
         return []
 
     def _find_best_run(self, history: list[dict]) -> Optional[dict]:

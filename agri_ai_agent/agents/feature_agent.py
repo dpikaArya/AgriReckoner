@@ -1,6 +1,9 @@
 """
 Consolidated Feature Agent: Feature Engineering + Leakage Detection
 + Categorical Encoding + Statistical Diagnostics.
+
+All engineered features are built in a dict and joined in a single
+pd.concat to avoid DataFrame fragmentation (PerformanceWarning).
 """
 
 import pandas as pd
@@ -36,723 +39,309 @@ class FeatureAgent(BaseAgent):
 
     def process(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
         df = df.copy()
-        self._engineer_features(df)
-        self._detect_leakage(df)
+        new_cols = self._engineer_features(df)
+        if new_cols:
+            df = pd.concat([df, pd.DataFrame(new_cols, index=df.index)], axis=1)
+        self._detect_leakage(df, target_col=kwargs.get("target_col"))
         self._encode_categoricals(df)
         self._run_diagnostics(df)
         return df
 
-    def _engineer_features(self, df: pd.DataFrame) -> None:
-        features_added = []
+    def _engineer_features(self, df: pd.DataFrame) -> dict[str, pd.Series]:
+        new: dict[str, pd.Series] = {}
         tbase = 10.0
 
+        def _num(col):
+            return pd.to_numeric(df[col], errors="coerce")
+
+        def _add(name, series):
+            if name not in df.columns and name not in new:
+                new[name] = series
+
         if "Temperature_Max" in df.columns and "Temperature_Min" in df.columns:
-            tmax = pd.to_numeric(df["Temperature_Max"], errors="coerce")
-            tmin = pd.to_numeric(df["Temperature_Min"], errors="coerce")
+            tmax = _num("Temperature_Max")
+            tmin = _num("Temperature_Min")
             tmean = (tmax + tmin) / 2.0
 
-            if "Growing_Degree_Days" not in df.columns:
-                df["Growing_Degree_Days"] = np.maximum(0, tmean - tbase)
-                features_added.append("Growing_Degree_Days")
-
-            if "Heat_Units" not in df.columns:
-                df["Heat_Units"] = np.maximum(0, tmax - tbase)
-                features_added.append("Heat_Units")
-
-            if "Temp_squared" not in df.columns:
-                df["Temp_squared"] = tmean ** 2
-                features_added.append("Temp_squared")
-
-            optimal_temp = 25.0
-            if "Stress_Index" not in df.columns:
-                df["Stress_Index"] = np.abs(tmean - optimal_temp) / optimal_temp
-                features_added.append("Stress_Index")
-
-            if "Temp_Range" not in df.columns:
-                df["Temp_Range"] = tmax - tmin
-                features_added.append("Temp_Range")
-
-            if "Temp_CV" not in df.columns:
-                df["Temp_CV"] = np.where(tmean > 0, (tmax - tmin) / tmean, 0)
-                features_added.append("Temp_CV")
+            _add("Growing_Degree_Days", np.maximum(0, tmean - tbase))
+            _add("Heat_Units", np.maximum(0, tmax - tbase))
+            _add("Temp_squared", tmean ** 2)
+            _add("Stress_Index", np.abs(tmean - 25.0) / 25.0)
+            _add("Temp_Range", tmax - tmin)
+            _add("Temp_CV", np.where(tmean > 0, (tmax - tmin) / tmean, 0))
 
             for t in [10, 15, 20, 25, 30, 35]:
-                name = f"Temp_Above_{t}"
-                if name not in df.columns:
-                    df[name] = np.maximum(0, tmean - t)
-                    features_added.append(name)
+                _add(f"Temp_Above_{t}", np.maximum(0, tmean - t))
 
         if "Rainfall" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Rainfall_Anomaly" not in df.columns:
-                df["Rainfall_Anomaly"] = rainfall - rainfall.mean()
-                features_added.append("Rainfall_Anomaly")
-
-            if "Rainfall_log" not in df.columns:
-                df["Rainfall_log"] = np.log1p(rainfall.clip(lower=0))
-                features_added.append("Rainfall_log")
-
-            if "Rainfall_sqrt" not in df.columns:
-                df["Rainfall_sqrt"] = np.sqrt(rainfall.clip(lower=0))
-                features_added.append("Rainfall_sqrt")
-
-            if "Rainfall_squared" not in df.columns:
-                df["Rainfall_squared"] = rainfall ** 2
-                features_added.append("Rainfall_squared")
-
-            if "Rainfall_Bin" not in df.columns:
-                df["Rainfall_Bin"] = pd.cut(rainfall, bins=[0, 200, 500, 1000, 5000, 10000],
-                                            labels=[0, 1, 2, 3, 4]).astype(float)
-                features_added.append("Rainfall_Bin")
+            rainfall = _num("Rainfall")
+            _add("Rainfall_Anomaly", rainfall - rainfall.mean())
+            _add("Rainfall_log", np.log1p(rainfall.clip(lower=0)))
+            _add("Rainfall_sqrt", np.sqrt(rainfall.clip(lower=0)))
+            _add("Rainfall_squared", rainfall ** 2)
+            _add("Rainfall_Bin", pd.cut(rainfall, bins=[0, 200, 500, 1000, 5000, 10000],
+                                        labels=[0, 1, 2, 3, 4]).astype(float))
+            _add("Rainfall_100_bin", (rainfall / 100).round() * 100)
 
         if "Rainfall" in df.columns and "Temperature_Max" in df.columns:
-            tmean_series = (pd.to_numeric(df.get("Temperature_Max", 0), errors="coerce") +
-                           pd.to_numeric(df.get("Temperature_Min", 0), errors="coerce")) / 2.0
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Temp_x_Rainfall" not in df.columns:
-                df["Temp_x_Rainfall"] = tmean_series * rainfall
-                features_added.append("Temp_x_Rainfall")
+            tmean_s = (_num("Temperature_Max") + _num("Temperature_Min")) / 2.0
+            _add("Temp_x_Rainfall", tmean_s * _num("Rainfall"))
 
         if "Nitrogen" in df.columns and "Phosphorus" in df.columns:
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            if "N_x_P" not in df.columns:
-                df["N_x_P"] = n * p
-                features_added.append("N_x_P")
+            _add("N_x_P", _num("Nitrogen") * _num("Phosphorus"))
 
         if "Nitrogen" in df.columns:
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "N_log" not in df.columns:
-                df["N_log"] = np.log1p(n.clip(lower=0))
-                features_added.append("N_log")
-            if "N_sqrt" not in df.columns:
-                df["N_sqrt"] = np.sqrt(n.clip(lower=0))
-                features_added.append("N_sqrt")
+            n = _num("Nitrogen")
+            _add("N_log", np.log1p(n.clip(lower=0)))
+            _add("N_sqrt", np.sqrt(n.clip(lower=0)))
+            _add("N_squared", n ** 2)
+            _add("N_category", pd.cut(n, bins=5, labels=[0, 1, 2, 3, 4]).astype(float))
 
         if "Phosphorus" in df.columns:
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            if "P_log" not in df.columns:
-                df["P_log"] = np.log1p(p.clip(lower=0))
-                features_added.append("P_log")
+            p = _num("Phosphorus")
+            _add("P_log", np.log1p(p.clip(lower=0)))
+            _add("P_squared", p ** 2)
+            _add("P_category", pd.cut(p, bins=5, labels=[0, 1, 2, 3, 4]).astype(float))
 
         if "Potassium" in df.columns:
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            if "K_log" not in df.columns:
-                df["K_log"] = np.log1p(k.clip(lower=0))
-                features_added.append("K_log")
+            k = _num("Potassium")
+            _add("K_log", np.log1p(k.clip(lower=0)))
+            _add("K_squared", k ** 2)
+            _add("K_category", pd.cut(k, bins=5, labels=[0, 1, 2, 3, 4]).astype(float))
 
         if all(c in df.columns for c in ["Nitrogen", "Phosphorus", "Potassium"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            if "NPK_sum" not in df.columns:
-                df["NPK_sum"] = n + p + k
-                features_added.append("NPK_sum")
-            if "NPK_ratio_N" not in df.columns:
-                total = (n + p + k).replace(0, np.nan)
-                df["NPK_ratio_N"] = n / total
-                features_added.append("NPK_ratio_N")
-            if "NPK_ratio_P" not in df.columns:
-                df["NPK_ratio_P"] = p / total
-                features_added.append("NPK_ratio_P")
-            if "NPK_ratio_K" not in df.columns:
-                df["NPK_ratio_K"] = k / total
-                features_added.append("NPK_ratio_K")
-            if "N_x_K" not in df.columns:
-                df["N_x_K"] = n * k
-                features_added.append("N_x_K")
-            if "P_x_K" not in df.columns:
-                df["P_x_K"] = p * k
-                features_added.append("P_x_K")
-            if "N_plus_P" not in df.columns:
-                df["N_plus_P"] = n + p
-                features_added.append("N_plus_P")
-            if "N_plus_K" not in df.columns:
-                df["N_plus_K"] = n + k
-                features_added.append("N_plus_K")
-            if "P_plus_K" not in df.columns:
-                df["P_plus_K"] = p + k
-                features_added.append("P_plus_K")
+            n, p, k = _num("Nitrogen"), _num("Phosphorus"), _num("Potassium")
+            total = (n + p + k).replace(0, np.nan)
+            _add("NPK_sum", n + p + k)
+            _add("NPK_ratio_N", n / total)
+            _add("NPK_ratio_P", p / total)
+            _add("NPK_ratio_K", k / total)
+            _add("N_x_K", n * k)
+            _add("P_x_K", p * k)
+            _add("N_plus_P", n + p)
+            _add("N_plus_K", n + k)
+            _add("P_plus_K", p + k)
 
         if "Soil_pH" in df.columns:
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "Soil_pH_squared" not in df.columns:
-                df["Soil_pH_squared"] = ph ** 2
-                features_added.append("Soil_pH_squared")
-            if "Soil_pH_neutral" not in df.columns:
-                df["Soil_pH_neutral"] = np.abs(ph - 7.0)
-                features_added.append("Soil_pH_neutral")
-            if "Soil_pH_acidic" not in df.columns:
-                df["Soil_pH_acidic"] = np.where(ph < 6.5, 1, 0)
-                features_added.append("Soil_pH_acidic")
-            if "Soil_pH_alkaline" not in df.columns:
-                df["Soil_pH_alkaline"] = np.where(ph > 7.5, 1, 0)
-                features_added.append("Soil_pH_alkaline")
+            ph = _num("Soil_pH")
+            _add("Soil_pH_squared", ph ** 2)
+            _add("Soil_pH_neutral", np.abs(ph - 7.0))
+            _add("Soil_pH_acidic", np.where(ph < 6.5, 1, 0))
+            _add("Soil_pH_alkaline", np.where(ph > 7.5, 1, 0))
 
         if "Organic_Carbon" in df.columns:
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "OC_log" not in df.columns:
-                df["OC_log"] = np.log1p(oc.clip(lower=0))
-                features_added.append("OC_log")
+            _add("OC_log", np.log1p(_num("Organic_Carbon").clip(lower=0)))
+            _add("OC_squared", _num("Organic_Carbon") ** 2)
 
         if all(c in df.columns for c in ["Organic_Carbon", "Nitrogen"]):
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "C_N_ratio" not in df.columns:
-                df["C_N_ratio"] = oc / n.replace(0, np.nan)
-                features_added.append("C_N_ratio")
+            _add("C_N_ratio", _num("Organic_Carbon") / _num("Nitrogen").replace(0, np.nan))
 
         if all(c in df.columns for c in ["Nitrogen", "Phosphorus"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            if "N_P_ratio" not in df.columns:
-                df["N_P_ratio"] = n / p.replace(0, np.nan)
-                features_added.append("N_P_ratio")
+            _add("N_P_ratio", _num("Nitrogen") / _num("Phosphorus").replace(0, np.nan))
 
         if all(c in df.columns for c in ["Phosphorus", "Potassium"]):
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            if "P_K_ratio" not in df.columns:
-                df["P_K_ratio"] = p / k.replace(0, np.nan)
-                features_added.append("P_K_ratio")
+            _add("P_K_ratio", _num("Phosphorus") / _num("Potassium").replace(0, np.nan))
 
-        if "Biomass_Yield" in df.columns and "Yield_per_Hectare" in df.columns:
-            biomass = pd.to_numeric(df["Biomass_Yield"], errors="coerce")
-            yield_ha = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            with np.errstate(divide="ignore", invalid="ignore"):
-                if "Harvest_Index_Calc" not in df.columns:
-                    df["Harvest_Index_Calc"] = np.where(biomass > 0, yield_ha / biomass, np.nan)
-                    features_added.append("Harvest_Index_Calc")
-                if "Biomass_log" not in df.columns:
-                    df["Biomass_log"] = np.log1p(biomass.clip(lower=0))
-                    features_added.append("Biomass_log")
-
-        if "Nitrogen" in df.columns and "Yield_per_Hectare" in df.columns:
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            yield_ha = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            with np.errstate(divide="ignore", invalid="ignore"):
-                if "Nitrogen_Use_Efficiency" not in df.columns:
-                    df["Nitrogen_Use_Efficiency"] = np.where(n > 0, yield_ha / n, np.nan)
-                    features_added.append("Nitrogen_Use_Efficiency")
-
-        if "Rainfall" in df.columns and "Yield_per_Hectare" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            yield_ha = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            with np.errstate(divide="ignore", invalid="ignore"):
-                if "Water_Use_Efficiency" not in df.columns:
-                    df["Water_Use_Efficiency"] = np.where(rainfall > 0, yield_ha / rainfall, np.nan)
-                    features_added.append("Water_Use_Efficiency")
+        if "Biomass_Yield" in df.columns:
+            _add("Biomass_log", np.log1p(_num("Biomass_Yield").clip(lower=0)))
 
         if "Humidity" in df.columns and "Temperature_Max" in df.columns:
-            hum = pd.to_numeric(df["Humidity"], errors="coerce")
-            tmax = pd.to_numeric(df["Temperature_Max"], errors="coerce")
-            if "Disease_Risk_Index" not in df.columns:
-                df["Disease_Risk_Index"] = np.where(
-                    (hum > 80) & (tmax > 25), 1.0,
-                    np.where((hum > 60) & (tmax > 20), 0.5, 0.0),
-                )
-                features_added.append("Disease_Risk_Index")
+            hum, tmax = _num("Humidity"), _num("Temperature_Max")
+            _add("Disease_Risk_Index", np.where(
+                (hum > 80) & (tmax > 25), 1.0,
+                np.where((hum > 60) & (tmax > 20), 0.5, 0.0)))
+            _add("Humidity_squared", hum ** 2)
+            _add("Humidity_log", np.log1p(hum.clip(lower=0)))
 
-        if "Yield_per_Plot" in df.columns:
-            if "Yield_per_Plot_Calc" not in df.columns:
-                df["Yield_per_Plot_Calc"] = pd.to_numeric(df["Yield_per_Plot"], errors="coerce")
-                features_added.append("Yield_per_Plot_Calc")
-
-            if "Yield_per_Hectare" not in df.columns and "Plot_Size" in df.columns:
-                plot_size = pd.to_numeric(df["Plot_Size"], errors="coerce")
-                yield_plot = pd.to_numeric(df["Yield_per_Plot"], errors="coerce")
-                with np.errstate(divide="ignore", invalid="ignore"):
-                    if "Yield_per_Hectare_Calc" not in df.columns:
-                        df["Yield_per_Hectare_Calc"] = np.where(
-                            plot_size > 0, yield_plot / plot_size * 10000, np.nan,
-                        )
-                        features_added.append("Yield_per_Hectare_Calc")
+        if "Yield_per_Plot" in df.columns and "Yield_per_Hectare" not in df.columns and "Plot_Size" in df.columns:
+            ps, yp = _num("Plot_Size"), _num("Yield_per_Plot")
+            with np.errstate(divide="ignore", invalid="ignore"):
+                _add("Yield_per_Hectare_Calc", np.where(ps > 0, yp / ps * 10000, np.nan))
 
         if "Fruit_Number" in df.columns and "Fruit_Weight" in df.columns:
-            fn = pd.to_numeric(df["Fruit_Number"], errors="coerce")
-            fw = pd.to_numeric(df["Fruit_Weight"], errors="coerce")
+            fn, fw = _num("Fruit_Number"), _num("Fruit_Weight")
             with np.errstate(divide="ignore", invalid="ignore"):
-                if "Yield_per_Plant" not in df.columns:
-                    df["Yield_per_Plant"] = np.where(fn > 0, fn * fw, np.nan)
-                    features_added.append("Yield_per_Plant")
+                _add("Yield_per_Plant", np.where(fn > 0, fn * fw, np.nan))
 
         if "Plant_Height_cm" in df.columns:
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            if "Height_log" not in df.columns:
-                df["Height_log"] = np.log1p(ph.clip(lower=0))
-                features_added.append("Height_log")
-            if "Height_sqrt" not in df.columns:
-                df["Height_sqrt"] = np.sqrt(ph.clip(lower=0))
-                features_added.append("Height_sqrt")
+            ph = _num("Plant_Height_cm")
+            _add("Height_log", np.log1p(ph.clip(lower=0)))
+            _add("Height_sqrt", np.sqrt(ph.clip(lower=0)))
+            _add("Height_squared", ph ** 2)
 
         if "SPAD" in df.columns:
-            spad = pd.to_numeric(df["SPAD"], errors="coerce")
-            if "SPAD_log" not in df.columns:
-                df["SPAD_log"] = np.log1p(spad.clip(lower=0))
-                features_added.append("SPAD_log")
-            if "SPAD_category" not in df.columns:
-                df["SPAD_category"] = pd.cut(spad, bins=[0, 20, 35, 50, 100],
-                                             labels=[0, 1, 2, 3]).astype(float)
-                features_added.append("SPAD_category")
+            spad = _num("SPAD")
+            _add("SPAD_log", np.log1p(spad.clip(lower=0)))
+            _add("SPAD_squared", spad ** 2)
+            _add("SPAD_category", pd.cut(spad, bins=[0, 20, 35, 50, 100],
+                                         labels=[0, 1, 2, 3]).astype(float))
 
         if all(c in df.columns for c in ["Plant_Height_cm", "Leaf_Area_cm2"]):
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            la = pd.to_numeric(df["Leaf_Area_cm2"], errors="coerce")
-            if "Height_x_LeafArea" not in df.columns:
-                df["Height_x_LeafArea"] = ph * la
-                features_added.append("Height_x_LeafArea")
+            _add("Height_x_LeafArea", _num("Plant_Height_cm") * _num("Leaf_Area_cm2"))
 
         if all(c in df.columns for c in ["Plant_Height_cm", "Shoot_Biomass_g"]):
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            sb = pd.to_numeric(df["Shoot_Biomass_g"], errors="coerce")
-            if "Height_x_ShootBiomass" not in df.columns:
-                df["Height_x_ShootBiomass"] = ph * sb
-                features_added.append("Height_x_ShootBiomass")
+            _add("Height_x_ShootBiomass", _num("Plant_Height_cm") * _num("Shoot_Biomass_g"))
 
         for col in ["Rainfall", "Temperature_Max", "Temperature_Min", "Average_Temperature"]:
             if col in df.columns:
-                vals = pd.to_numeric(df[col], errors="coerce")
-                col_name = f"{col}_7d_MA"
-                if col_name not in df.columns:
-                    df[col_name] = vals.rolling(window=7, min_periods=1).mean()
-                    features_added.append(col_name)
+                _add(f"{col}_7d_MA", _num(col).rolling(window=7, min_periods=1).mean())
 
-        if "Average_Temperature" in df.columns:
-            tavg = pd.to_numeric(df["Average_Temperature"], errors="coerce")
-            if "Temp_x_N" in df.columns:
-                pass
-            elif "Nitrogen" in df.columns:
-                n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-                if "Temp_x_N" not in df.columns:
-                    df["Temp_x_N"] = tavg * n
-                    features_added.append("Temp_x_N")
+        if "Average_Temperature" in df.columns and "Nitrogen" in df.columns:
+            _add("Temp_x_N", _num("Average_Temperature") * _num("Nitrogen"))
 
         if "Rainfall" in df.columns and "Nitrogen" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Rainfall_x_N" not in df.columns:
-                df["Rainfall_x_N"] = rainfall * n
-                features_added.append("Rainfall_x_N")
+            _add("Rainfall_x_N", _num("Rainfall") * _num("Nitrogen"))
 
         if "Rainfall" in df.columns and "Phosphorus" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            if "Rainfall_x_P" not in df.columns:
-                df["Rainfall_x_P"] = rainfall * p
-                features_added.append("Rainfall_x_P")
+            _add("Rainfall_x_P", _num("Rainfall") * _num("Phosphorus"))
 
         if "Rainfall" in df.columns and "Potassium" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            if "Rainfall_x_K" not in df.columns:
-                df["Rainfall_x_K"] = rainfall * k
-                features_added.append("Rainfall_x_K")
+            _add("Rainfall_x_K", _num("Rainfall") * _num("Potassium"))
 
         if "Organic_Carbon" in df.columns and "Soil_pH" in df.columns:
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "OC_x_pH" not in df.columns:
-                df["OC_x_pH"] = oc * ph
-                features_added.append("OC_x_pH")
+            _add("OC_x_pH", _num("Organic_Carbon") * _num("Soil_pH"))
 
         if "EC" in df.columns and "Soil_pH" in df.columns:
-            ec = pd.to_numeric(df["EC"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "EC_x_pH" not in df.columns:
-                df["EC_x_pH"] = ec * ph
-                features_added.append("EC_x_pH")
+            _add("EC_x_pH", _num("EC") * _num("Soil_pH"))
 
-        for col in ["Yield_per_Hectare", "Plant_Height_cm", "Biomass_Yield", "SPAD",
-                     "Shoot_Biomass_g", "Root_Biomass_g", "Leaf_Area_cm2",
-                     "Fruit_Weight", "100_Seed_Weight", "Harvest_Index"]:
+        for col in ["Plant_Height_cm", "SPAD", "Shoot_Biomass_g", "Root_Biomass_g",
+                     "Leaf_Area_cm2", "Fruit_Weight", "100_Seed_Weight", "Harvest_Index"]:
             if col in df.columns:
-                vals = pd.to_numeric(df[col], errors="coerce")
-                log_name = f"{col}_log"
-                if log_name not in df.columns and vals.min() >= 0:
-                    df[log_name] = np.log1p(vals.clip(lower=0))
-                    features_added.append(log_name)
-
-        if "Yield_per_Hectare" in df.columns:
-            yh = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            if "Yield_category" not in df.columns:
-                df["Yield_category"] = pd.cut(yh, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
-                features_added.append("Yield_category")
+                vals = _num(col)
+                if vals.min() >= 0:
+                    _add(f"{col}_log", np.log1p(vals.clip(lower=0)))
 
         if "EC" in df.columns:
-            ec = pd.to_numeric(df["EC"], errors="coerce")
-            if "EC_log" not in df.columns:
-                df["EC_log"] = np.log1p(ec.clip(lower=0))
-                features_added.append("EC_log")
-            if "EC_squared" not in df.columns:
-                df["EC_squared"] = ec ** 2
-                features_added.append("EC_squared")
-            if "EC_category" not in df.columns:
-                df["EC_category"] = pd.cut(ec, bins=[0, 0.5, 1.5, 4, 100],
-                                           labels=[0, 1, 2, 3]).astype(float)
-                features_added.append("EC_category")
+            ec = _num("EC")
+            _add("EC_log", np.log1p(ec.clip(lower=0)))
+            _add("EC_squared", ec ** 2)
+            _add("EC_category", pd.cut(ec, bins=[0, 0.5, 1.5, 4, 100],
+                                       labels=[0, 1, 2, 3]).astype(float))
 
         if "Rainfall" in df.columns and "Soil_pH" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "Rainfall_x_pH" not in df.columns:
-                df["Rainfall_x_pH"] = rainfall * ph
-                features_added.append("Rainfall_x_pH")
+            _add("Rainfall_x_pH", _num("Rainfall") * _num("Soil_pH"))
 
         if "Rainfall" in df.columns and "Organic_Carbon" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "Rainfall_x_OC" not in df.columns:
-                df["Rainfall_x_OC"] = rainfall * oc
-                features_added.append("Rainfall_x_OC")
+            _add("Rainfall_x_OC", _num("Rainfall") * _num("Organic_Carbon"))
 
         if all(c in df.columns for c in ["Nitrogen", "Soil_pH"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "N_x_pH" not in df.columns:
-                df["N_x_pH"] = n * ph
-                features_added.append("N_x_pH")
+            _add("N_x_pH", _num("Nitrogen") * _num("Soil_pH"))
 
         if all(c in df.columns for c in ["Phosphorus", "Soil_pH"]):
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "P_x_pH" not in df.columns:
-                df["P_x_pH"] = p * ph
-                features_added.append("P_x_pH")
+            _add("P_x_pH", _num("Phosphorus") * _num("Soil_pH"))
 
         if all(c in df.columns for c in ["Potassium", "Soil_pH"]):
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "K_x_pH" not in df.columns:
-                df["K_x_pH"] = k * ph
-                features_added.append("K_x_pH")
-
-        if "Yield_per_Hectare" in df.columns and "Nitrogen" in df.columns:
-            yh = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Yield_x_N" not in df.columns:
-                df["Yield_x_N"] = yh * n
-                features_added.append("Yield_x_N")
-
-        if "Yield_per_Hectare" in df.columns and "Soil_pH" in df.columns:
-            yh = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "Yield_x_pH" not in df.columns:
-                df["Yield_x_pH"] = yh * ph
-                features_added.append("Yield_x_pH")
+            _add("K_x_pH", _num("Potassium") * _num("Soil_pH"))
 
         if "Plant_Height_cm" in df.columns and "Nitrogen" in df.columns:
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Height_x_N" not in df.columns:
-                df["Height_x_N"] = ph * n
-                features_added.append("Height_x_N")
+            _add("Height_x_N", _num("Plant_Height_cm") * _num("Nitrogen"))
 
         if "Plant_Height_cm" in df.columns and "Rainfall" in df.columns:
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Height_x_Rainfall" not in df.columns:
-                df["Height_x_Rainfall"] = ph * rainfall
-                features_added.append("Height_x_Rainfall")
+            _add("Height_x_Rainfall", _num("Plant_Height_cm") * _num("Rainfall"))
 
         if "Plant_Height_cm" in df.columns and "Soil_pH" in df.columns:
-            ph_col = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            soil_ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "Height_x_pH" not in df.columns:
-                df["Height_x_pH"] = ph_col * soil_ph
-                features_added.append("Height_x_pH")
+            _add("Height_x_pH", _num("Plant_Height_cm") * _num("Soil_pH"))
 
         if all(c in df.columns for c in ["Temperature_Max", "Nitrogen"]):
-            tmax = pd.to_numeric(df["Temperature_Max"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Tmax_x_N" not in df.columns:
-                df["Tmax_x_N"] = tmax * n
-                features_added.append("Tmax_x_N")
+            _add("Tmax_x_N", _num("Temperature_Max") * _num("Nitrogen"))
 
         if all(c in df.columns for c in ["Temperature_Max", "Rainfall"]):
-            tmax = pd.to_numeric(df["Temperature_Max"], errors="coerce")
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Tmax_x_Rainfall" not in df.columns:
-                df["Tmax_x_Rainfall"] = tmax * rainfall
-                features_added.append("Tmax_x_Rainfall")
+            _add("Tmax_x_Rainfall", _num("Temperature_Max") * _num("Rainfall"))
 
         if all(c in df.columns for c in ["Temperature_Min", "Rainfall"]):
-            tmin = pd.to_numeric(df["Temperature_Min"], errors="coerce")
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Tmin_x_Rainfall" not in df.columns:
-                df["Tmin_x_Rainfall"] = tmin * rainfall
-                features_added.append("Tmin_x_Rainfall")
+            _add("Tmin_x_Rainfall", _num("Temperature_Min") * _num("Rainfall"))
 
         if all(c in df.columns for c in ["Humidity", "Rainfall"]):
-            hum = pd.to_numeric(df["Humidity"], errors="coerce")
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Humidity_x_Rainfall" not in df.columns:
-                df["Humidity_x_Rainfall"] = hum * rainfall
-                features_added.append("Humidity_x_Rainfall")
+            _add("Humidity_x_Rainfall", _num("Humidity") * _num("Rainfall"))
 
         if all(c in df.columns for c in ["Humidity", "Nitrogen"]):
-            hum = pd.to_numeric(df["Humidity"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Humidity_x_N" not in df.columns:
-                df["Humidity_x_N"] = hum * n
-                features_added.append("Humidity_x_N")
+            _add("Humidity_x_N", _num("Humidity") * _num("Nitrogen"))
 
-        if all(c in df.columns for c in ["Yield_per_Hectare", "Biomass_Yield"]):
-            yh = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            bm = pd.to_numeric(df["Biomass_Yield"], errors="coerce")
-            if "Yield_x_Biomass" not in df.columns:
-                df["Yield_x_Biomass"] = yh * bm
-                features_added.append("Yield_x_Biomass")
-
-        if "Humidity" in df.columns:
-            hum = pd.to_numeric(df["Humidity"], errors="coerce")
-            if "Humidity_squared" not in df.columns:
-                df["Humidity_squared"] = hum ** 2
-                features_added.append("Humidity_squared")
-            if "Humidity_log" not in df.columns:
-                df["Humidity_log"] = np.log1p(hum.clip(lower=0))
-                features_added.append("Humidity_log")
-
-        if "Organic_Carbon" in df.columns:
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "OC_squared" not in df.columns:
-                df["OC_squared"] = oc ** 2
-                features_added.append("OC_squared")
-
-        if "EC" in df.columns and "Organic_Carbon" in df.columns:
-            ec = pd.to_numeric(df["EC"], errors="coerce")
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "EC_x_OC" not in df.columns:
-                df["EC_x_OC"] = ec * oc
-                features_added.append("EC_x_OC")
+        if all(c in df.columns for c in ["EC", "Organic_Carbon"]):
+            _add("EC_x_OC", _num("EC") * _num("Organic_Carbon"))
 
         if all(c in df.columns for c in ["Nitrogen", "Organic_Carbon"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "N_x_OC" not in df.columns:
-                df["N_x_OC"] = n * oc
-                features_added.append("N_x_OC")
+            _add("N_x_OC", _num("Nitrogen") * _num("Organic_Carbon"))
 
         if all(c in df.columns for c in ["Phosphorus", "Organic_Carbon"]):
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "P_x_OC" not in df.columns:
-                df["P_x_OC"] = p * oc
-                features_added.append("P_x_OC")
+            _add("P_x_OC", _num("Phosphorus") * _num("Organic_Carbon"))
 
         if all(c in df.columns for c in ["Potassium", "Organic_Carbon"]):
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            oc = pd.to_numeric(df["Organic_Carbon"], errors="coerce")
-            if "K_x_OC" not in df.columns:
-                df["K_x_OC"] = k * oc
-                features_added.append("K_x_OC")
+            _add("K_x_OC", _num("Potassium") * _num("Organic_Carbon"))
 
         if "Leaf_Area_cm2" in df.columns:
-            la = pd.to_numeric(df["Leaf_Area_cm2"], errors="coerce")
-            if "LA_log" not in df.columns:
-                df["LA_log"] = np.log1p(la.clip(lower=0))
-                features_added.append("LA_log")
-            if "LA_squared" not in df.columns:
-                df["LA_squared"] = la ** 2
-                features_added.append("LA_squared")
+            la = _num("Leaf_Area_cm2")
+            _add("LA_log", np.log1p(la.clip(lower=0)))
+            _add("LA_squared", la ** 2)
 
         if "Shoot_Biomass_g" in df.columns:
-            sb = pd.to_numeric(df["Shoot_Biomass_g"], errors="coerce")
-            if "ShootBiomass_log" not in df.columns:
-                df["ShootBiomass_log"] = np.log1p(sb.clip(lower=0))
-                features_added.append("ShootBiomass_log")
+            _add("ShootBiomass_log", np.log1p(_num("Shoot_Biomass_g").clip(lower=0)))
 
         if "Root_Biomass_g" in df.columns:
-            rb = pd.to_numeric(df["Root_Biomass_g"], errors="coerce")
-            if "RootBiomass_log" not in df.columns:
-                df["RootBiomass_log"] = np.log1p(rb.clip(lower=0))
-                features_added.append("RootBiomass_log")
+            _add("RootBiomass_log", np.log1p(_num("Root_Biomass_g").clip(lower=0)))
 
         if all(c in df.columns for c in ["Shoot_Biomass_g", "Root_Biomass_g"]):
-            sb = pd.to_numeric(df["Shoot_Biomass_g"], errors="coerce")
-            rb = pd.to_numeric(df["Root_Biomass_g"], errors="coerce")
+            sb, rb = _num("Shoot_Biomass_g"), _num("Root_Biomass_g")
             total = sb + rb
-            if "Shoot_Root_Ratio" not in df.columns:
-                df["Shoot_Root_Ratio"] = sb / rb.replace(0, np.nan)
-                features_added.append("Shoot_Root_Ratio")
-            if "Root_Shoot_Ratio" not in df.columns:
-                df["Root_Shoot_Ratio"] = rb / sb.replace(0, np.nan)
-                features_added.append("Root_Shoot_Ratio")
-            if "Root_pct" not in df.columns:
-                df["Root_pct"] = rb / total.replace(0, np.nan)
-                features_added.append("Root_pct")
+            _add("Shoot_Root_Ratio", sb / rb.replace(0, np.nan))
+            _add("Root_Shoot_Ratio", rb / sb.replace(0, np.nan))
+            _add("Root_pct", rb / total.replace(0, np.nan))
 
         if all(c in df.columns for c in ["Nitrogen", "Phosphorus", "Soil_pH"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "N_x_P_x_pH" not in df.columns:
-                df["N_x_P_x_pH"] = n * p * ph
-                features_added.append("N_x_P_x_pH")
+            _add("N_x_P_x_pH", _num("Nitrogen") * _num("Phosphorus") * _num("Soil_pH"))
 
         if "Fruit_Weight" in df.columns:
-            fw = pd.to_numeric(df["Fruit_Weight"], errors="coerce")
-            if "FruitWeight_log" not in df.columns:
-                df["FruitWeight_log"] = np.log1p(fw.clip(lower=0))
-                features_added.append("FruitWeight_log")
-            if "FruitWeight_squared" not in df.columns:
-                df["FruitWeight_squared"] = fw ** 2
-                features_added.append("FruitWeight_squared")
+            fw = _num("Fruit_Weight")
+            _add("FruitWeight_log", np.log1p(fw.clip(lower=0)))
+            _add("FruitWeight_squared", fw ** 2)
 
         if "100_Seed_Weight" in df.columns:
-            sw = pd.to_numeric(df["100_Seed_Weight"], errors="coerce")
-            if "SeedWeight_log" not in df.columns:
-                df["SeedWeight_log"] = np.log1p(sw.clip(lower=0))
-                features_added.append("SeedWeight_log")
+            _add("SeedWeight_log", np.log1p(_num("100_Seed_Weight").clip(lower=0)))
 
         if "Harvest_Index" in df.columns:
-            hi = pd.to_numeric(df["Harvest_Index"], errors="coerce")
-            if "HI_squared" not in df.columns:
-                df["HI_squared"] = hi ** 2
-                features_added.append("HI_squared")
-            if "HI_log" not in df.columns:
-                df["HI_log"] = np.log1p(hi.clip(lower=0))
-                features_added.append("HI_log")
-
-        if "Rainfall" in df.columns:
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "Rainfall_100_bin" not in df.columns:
-                df["Rainfall_100_bin"] = (rainfall / 100).round() * 100
-                features_added.append("Rainfall_100_bin")
+            hi = _num("Harvest_Index")
+            _add("HI_squared", hi ** 2)
+            _add("HI_log", np.log1p(hi.clip(lower=0)))
 
         if "Average_Temperature" in df.columns:
-            tavg = pd.to_numeric(df["Average_Temperature"], errors="coerce")
-            if "Tavg_squared" not in df.columns:
-                df["Tavg_squared"] = tavg ** 2
-                features_added.append("Tavg_squared")
-            if "Tavg_log" not in df.columns:
-                df["Tavg_log"] = np.log1p(tavg.clip(lower=0))
-                features_added.append("Tavg_log")
-
-        if "Nitrogen" in df.columns:
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "N_squared" not in df.columns:
-                df["N_squared"] = n ** 2
-                features_added.append("N_squared")
-            if "N_category" not in df.columns:
-                df["N_category"] = pd.cut(n, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
-                features_added.append("N_category")
-
-        if "Phosphorus" in df.columns:
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            if "P_squared" not in df.columns:
-                df["P_squared"] = p ** 2
-                features_added.append("P_squared")
-            if "P_category" not in df.columns:
-                df["P_category"] = pd.cut(p, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
-                features_added.append("P_category")
-
-        if "Potassium" in df.columns:
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            if "K_squared" not in df.columns:
-                df["K_squared"] = k ** 2
-                features_added.append("K_squared")
-            if "K_category" not in df.columns:
-                df["K_category"] = pd.cut(k, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
-                features_added.append("K_category")
-
-        if "Plant_Height_cm" in df.columns:
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            if "Height_squared" not in df.columns:
-                df["Height_squared"] = ph ** 2
-                features_added.append("Height_squared")
-
-        if "SPAD" in df.columns:
-            spad = pd.to_numeric(df["SPAD"], errors="coerce")
-            if "SPAD_squared" not in df.columns:
-                df["SPAD_squared"] = spad ** 2
-                features_added.append("SPAD_squared")
+            tavg = _num("Average_Temperature")
+            _add("Tavg_squared", tavg ** 2)
+            _add("Tavg_log", np.log1p(tavg.clip(lower=0)))
 
         if all(c in df.columns for c in ["Nitrogen", "Phosphorus", "Potassium", "Soil_pH"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "NPK_x_pH" not in df.columns:
-                df["NPK_x_pH"] = (n + p + k) * ph
-                features_added.append("NPK_x_pH")
+            n, p, k, ph = _num("Nitrogen"), _num("Phosphorus"), _num("Potassium"), _num("Soil_pH")
+            _add("NPK_x_pH", (n + p + k) * ph)
 
         if all(c in df.columns for c in ["Nitrogen", "Rainfall"]):
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            rainfall = pd.to_numeric(df["Rainfall"], errors="coerce")
-            if "N_Rainfall_ratio" not in df.columns:
-                df["N_Rainfall_ratio"] = n / rainfall.replace(0, np.nan)
-                features_added.append("N_Rainfall_ratio")
-
-        if all(c in df.columns for c in ["Yield_per_Hectare", "Plant_Height_cm"]):
-            yh = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            if "Yield_per_Height" not in df.columns:
-                df["Yield_per_Height"] = yh / ph.replace(0, np.nan)
-                features_added.append("Yield_per_Height")
+            _add("N_Rainfall_ratio", _num("Nitrogen") / _num("Rainfall").replace(0, np.nan))
 
         if all(c in df.columns for c in ["Biomass_Yield", "Nitrogen"]):
-            bm = pd.to_numeric(df["Biomass_Yield"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Biomass_x_N" not in df.columns:
-                df["Biomass_x_N"] = bm * n
-                features_added.append("Biomass_x_N")
-            if "Biomass_N_ratio" not in df.columns:
-                df["Biomass_N_ratio"] = bm / n.replace(0, np.nan)
-                features_added.append("Biomass_N_ratio")
+            bm, n = _num("Biomass_Yield"), _num("Nitrogen")
+            _add("Biomass_x_N", bm * n)
+            _add("Biomass_N_ratio", bm / n.replace(0, np.nan))
 
         if all(c in df.columns for c in ["Biomass_Yield", "Soil_pH"]):
-            bm = pd.to_numeric(df["Biomass_Yield"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            if "Biomass_x_pH" not in df.columns:
-                df["Biomass_x_pH"] = bm * ph
-                features_added.append("Biomass_x_pH")
+            _add("Biomass_x_pH", _num("Biomass_Yield") * _num("Soil_pH"))
 
         if all(c in df.columns for c in ["SPAD", "Nitrogen"]):
-            spad = pd.to_numeric(df["SPAD"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "SPAD_x_N" not in df.columns:
-                df["SPAD_x_N"] = spad * n
-                features_added.append("SPAD_x_N")
+            _add("SPAD_x_N", _num("SPAD") * _num("Nitrogen"))
 
         if all(c in df.columns for c in ["Leaf_Area_cm2", "Nitrogen"]):
-            la = pd.to_numeric(df["Leaf_Area_cm2"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "LA_x_N" not in df.columns:
-                df["LA_x_N"] = la * n
-                features_added.append("LA_x_N")
+            _add("LA_x_N", _num("Leaf_Area_cm2") * _num("Nitrogen"))
 
         if all(c in df.columns for c in ["Plant_Height_cm", "Phosphorus"]):
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            p = pd.to_numeric(df["Phosphorus"], errors="coerce")
-            if "Height_x_P" not in df.columns:
-                df["Height_x_P"] = ph * p
-                features_added.append("Height_x_P")
+            _add("Height_x_P", _num("Plant_Height_cm") * _num("Phosphorus"))
 
         if all(c in df.columns for c in ["Plant_Height_cm", "Potassium"]):
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            k = pd.to_numeric(df["Potassium"], errors="coerce")
-            if "Height_x_K" not in df.columns:
-                df["Height_x_K"] = ph * k
-                features_added.append("Height_x_K")
-
-        if all(c in df.columns for c in ["Yield_per_Hectare", "Soil_pH", "Nitrogen"]):
-            yh = pd.to_numeric(df["Yield_per_Hectare"], errors="coerce")
-            ph = pd.to_numeric(df["Soil_pH"], errors="coerce")
-            n = pd.to_numeric(df["Nitrogen"], errors="coerce")
-            if "Yield_pH_N_interaction" not in df.columns:
-                df["Yield_pH_N_interaction"] = yh * ph * n
-                features_added.append("Yield_pH_N_interaction")
+            _add("Height_x_K", _num("Plant_Height_cm") * _num("Potassium"))
 
         if all(c in df.columns for c in ["Plant_Height_cm", "SPAD"]):
-            ph = pd.to_numeric(df["Plant_Height_cm"], errors="coerce")
-            spad = pd.to_numeric(df["SPAD"], errors="coerce")
-            if "Height_x_SPAD" not in df.columns:
-                df["Height_x_SPAD"] = ph * spad
-                features_added.append("Height_x_SPAD")
+            _add("Height_x_SPAD", _num("Plant_Height_cm") * _num("SPAD"))
 
-        self.log.info("Engineered %d features: %s", len(features_added), features_added)
+        self.log.info("Engineered %d features", len(new))
+        return new
 
-    def _detect_leakage(self, df: pd.DataFrame) -> None:
+    def _detect_leakage(self, df: pd.DataFrame, target_col: str | None = None) -> None:
         from agri_ai_agent.ml.leakage import is_leaky_feature, strip_engineered
 
         leaked = []
@@ -764,7 +353,7 @@ class FeatureAgent(BaseAgent):
             if col in NON_FEATURE_COLS:
                 non_feature.append(col)
                 feature_labels.append((col, "NON_FEATURE"))
-            elif is_leaky_feature(col):
+            elif is_leaky_feature(col, target_col):
                 leaked.append(col)
                 feature_labels.append((col, "POST_HARVEST_OR_DERIVED"))
             elif strip_engineered(col) in PRE_HARVEST_MEASUREMENTS:
@@ -839,8 +428,8 @@ class FeatureAgent(BaseAgent):
                 try:
                     sample = vals.sample(min(5000, n), random_state=42)
                     norm_stat, norm_p = stats.shapiro(sample)
-                except Exception:
-                    pass
+                except Exception as e:
+                    self.log.debug("Shapiro test failed for %s: %s", col, e)
 
             stats_rows.append({
                 "Variable": col,
@@ -900,7 +489,8 @@ class FeatureAgent(BaseAgent):
                 lr.fit(X, y)
                 r2 = lr.score(X, y)
                 vif = 1.0 / (1.0 - r2) if r2 < 1.0 else float("inf")
-            except Exception:
+            except Exception as e:
+                self.log.debug("VIF computation failed for %s: %s", col, e)
                 vif = float("inf")
             vif_data.append({"Variable": col, "VIF": round(vif, 4)})
         return pd.DataFrame(vif_data)

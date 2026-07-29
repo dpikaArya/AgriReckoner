@@ -42,7 +42,7 @@ OUTPUT_DIR = BASE_DIR / "outputs"
 EVAL_DIR = BASE_DIR / "evaluation"
 REPORTS_DIR = EVAL_DIR / "reports"
 
-PAPERS_DIR = BASE_DIR / "Data ADES"
+PAPERS_DIR = BASE_DIR / "DataADES"
 
 PIPELINE_AGENTS = [
     "ingestion", "schema_mapping", "ontology_mapping",
@@ -54,11 +54,16 @@ PIPELINE_AGENTS = [
 PAPER_FILES = sorted([p.name for p in PAPERS_DIR.glob("*.pdf")]) if PAPERS_DIR.exists() else []
 
 CROP_FROM_PAPER = {
-    "Bell pepper.pdf": "Bell Pepper",
-    "Black wheat.pdf": "Black Wheat",
-    "Carrot.pdf": "Carrot",
-    "Cowpea paper publish.pdf": "Cowpea",
-    "Spinach.pdf": "Spinach",
+    "28july.pdf": "Wheat",
+    "28july1.pdf": "Maize",
+    "4449-7.pdf": "Micronutrients",
+    "bouis-et-al-2000-the-consultative-group-on-international-agricultural-research-(cgiar)-micronutrients-project.pdf": "Multi-crop",
+    "erh064.pdf": "Micronutrients",
+    "Review_Paper_on_Effect_of_Micronutrients.pdf": "Micronutrients",
+    "s10705-018-09968-7.pdf": "Micronutrients",
+    "s13593-017-0431-0.pdf": "Cowpea",
+    "shukla-ijfapril2018.pdf": "Micronutrients",
+    "The Effect of Micronutrients in Ensuring Efficient Use of Macronu.pdf": "Micronutrients",
 }
 
 MODEL_LIST = [

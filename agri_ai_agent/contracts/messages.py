@@ -29,6 +29,13 @@ class AgentContract:
     completed_at: Optional[datetime] = None
     execution_time_sec: float = 0.0
     retry_count: int = 0
+    dataset_id: str = ""
+    provider: str = ""
+    repository_version: str = ""
+    connector_name: str = ""
+    checksum: str = ""
+    processing_stage: str = ""
+    processing_mode: str = ""
 
     def to_dict(self) -> dict:
         return json.loads(json.dumps(asdict(self), default=_serialize))

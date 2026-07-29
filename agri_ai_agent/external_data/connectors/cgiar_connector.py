@@ -1,13 +1,15 @@
 import hashlib
-from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-import pandas as pd
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
+from agri_ai_agent.external_data.download_strategy import (
+    download_huggingface_parquet,
+    try_priority_downloads,
+)
 
 
 class CGIARConnector(ExternalDataConnector):
@@ -48,23 +50,24 @@ class CGIARConnector(ExternalDataConnector):
 
     def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
         target_dir.mkdir(parents=True, exist_ok=True)
-        csv_url = f"https://huggingface.co/datasets/{resource_id}/resolve/main/data.csv"
-        local_path = target_dir / f"cgiar_{resource_id.replace('/', '_')}.csv"
-        try:
-            resp = requests.get(csv_url, timeout=120)
-            resp.raise_for_status()
-            local_path.write_bytes(resp.content)
-            return local_path
-        except requests.RequestException:
-            parquet_url = f"https://huggingface.co/datasets/{resource_id}/resolve/main/data/train-00000-of-00001.parquet"
-            try:
-                resp = requests.get(parquet_url, timeout=120)
-                resp.raise_for_status()
-                local_path = local_path.with_suffix(".parquet")
-                local_path.write_bytes(resp.content)
-                return local_path
-            except requests.RequestException:
-                return None
+
+        path = download_huggingface_parquet(resource_id, target_dir)
+        if path is not None:
+            return path
+
+        safe_name = resource_id.replace("/", "_")
+        return try_priority_downloads([
+            (
+                f"https://huggingface.co/datasets/{resource_id}/resolve/main/data/train-00000-of-00001.parquet",
+                "parquet",
+                target_dir / f"cgiar_{safe_name}.parquet",
+            ),
+            (
+                f"https://huggingface.co/datasets/{resource_id}/resolve/main/data.csv",
+                "csv",
+                target_dir / f"cgiar_{safe_name}.csv",
+            ),
+        ])
 
     def validate(self, package: DatasetPackage) -> bool:
         package.validation_errors.clear()

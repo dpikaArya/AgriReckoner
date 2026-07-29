@@ -6,6 +6,7 @@ import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
+from agri_ai_agent.external_data.download_strategy import try_priority_downloads
 
 
 class ICARConnector(ExternalDataConnector):
@@ -50,27 +51,20 @@ class ICARConnector(ExternalDataConnector):
 
     def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
         target_dir.mkdir(parents=True, exist_ok=True)
-        local_path = target_dir / f"icar_{resource_id}.pdf"
-        try:
-            resp = requests.get(
+
+        result = try_priority_downloads([
+            (
+                f"{self.base_url}/records/{resource_id}/metadata/csv",
+                "csv",
+                target_dir / f"icar_{resource_id}.csv",
+            ),
+            (
                 f"https://krishikosh.egranth.ac.in/bitstream/{resource_id}/1/fulltext.pdf",
-                timeout=120,
-            )
-            resp.raise_for_status()
-            local_path.write_bytes(resp.content)
-            return local_path
-        except requests.RequestException:
-            csv_path = target_dir / f"icar_{resource_id}.csv"
-            try:
-                resp = requests.get(
-                    f"{self.base_url}/records/{resource_id}/metadata/csv",
-                    timeout=60,
-                )
-                resp.raise_for_status()
-                csv_path.write_bytes(resp.content)
-                return csv_path
-            except requests.RequestException:
-                return None
+                "pdf",
+                target_dir / f"icar_{resource_id}.pdf",
+            ),
+        ])
+        return result
 
     def validate(self, package: DatasetPackage) -> bool:
         package.validation_errors.clear()

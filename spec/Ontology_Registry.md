@@ -127,7 +127,7 @@ Generated from `spec/uams_ontology.yaml` by `scripts/gen_ontology_docs.py`. Do n
 | Yield_per_Hectare_Calc | K. Engineered Features | — | kg/ha | — | — |
 | Temp_x_Rainfall | K. Engineered Features | — | — | — | — |
 | N_x_P | K. Engineered Features | — | — | — | — |
-| Temp_ squared | K. Engineered Features | — | — | — | — |
+| Temp_squared | K. Engineered Features | — | — | — | — |
 | Rainfall_7d_MA | K. Engineered Features | — | mm | — | — |
 | Temp_7d_MA | K. Engineered Features | — | Cel | — | — |
 | Feature_Available_Before_Prediction | L. Leakage Labels | — | — | — | — |

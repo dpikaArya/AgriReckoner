@@ -66,8 +66,9 @@ def evaluate_model_readiness():
                         skew_val = float(col.skew())
                         if abs(skew_val) > 2:
                             target_imbalance = True
-                except Exception:
-                    pass
+                except Exception as e:
+                    import logging
+                    logging.getLogger("Stage10").debug("Imbalance check failed for %s: %s", t, e)
 
     model_readiness = {}
     for model in EVALUATED_MODELS:

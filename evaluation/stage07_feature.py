@@ -16,7 +16,7 @@ ENGINEERED_FEATURES = [
     "Nitrogen_Use_Efficiency", "Water_Use_Efficiency",
     "Rainfall_Anomaly", "Stress_Index", "Disease_Risk_Index",
     "Yield_per_Plant", "Yield_per_Plot_Calc", "Yield_per_Hectare_Calc",
-    "Temp_x_Rainfall", "N_x_P", "Temp_ squared",
+    "Temp_x_Rainfall", "N_x_P", "Temp_squared",
     "Rainfall_7d_MA", "Temp_7d_MA",
 ]
 

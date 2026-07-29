@@ -1,6 +1,9 @@
 """
 Base agent class with common functionality.
 Every agent extends BaseAgent and implements run().
+
+Downstream agents consume DatasetPackage as the standard exchange format.
+Agents access tabular data via package.to_dataframe() internally.
 """
 
 import time
@@ -14,6 +17,7 @@ import pandas as pd
 
 from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import AgentContract
+from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.utils.logging_utils import get_logger
 
 
@@ -30,6 +34,7 @@ class BaseAgent(ABC):
         self.log = get_logger(self.__class__.__name__)
         self.contract: Optional[AgentContract] = None
         self.dataframe: Optional[pd.DataFrame] = None
+        self.dataset_package: Optional[DatasetPackage] = None
 
     @property
     @abstractmethod

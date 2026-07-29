@@ -74,19 +74,11 @@ DERIVATION_RULES: list[dict[str, Any]] = [
         "description": "Biomass_Yield = Shoot_Biomass + Root_Biomass",
     },
     {
-        "name": "harvest_index_calc",
-        "target": "Harvest_Index",
-        "sources": ["Yield_per_Hectare", "Biomass_Yield"],
-        "confidence": 0.96,
-        "method": lambda df: df["Yield_per_Hectare"] / df["Biomass_Yield"].replace(0, np.nan),
-        "description": "Harvest_Index = Grain_Yield / Total_Biomass",
-    },
-    {
         "name": "leaf_area_index",
         "target": "Leaf_Area_cm2",
         "sources": ["Leaf_Area_30_cm2", "Leaf_Area_60_cm2"],
         "confidence": 0.95,
-        "method": lambda df: df[["Leaf_Area_30_cm2", "Leaf_Area_60_cm2"]].max(axis=1),
+        "method": lambda df: df[[c for c in ["Leaf_Area_30_cm2", "Leaf_Area_60_cm2"] if c in df.columns]].max(axis=1),
         "description": "Leaf_Area_cm2 = max of available leaf area measurements",
     },
     {
@@ -104,22 +96,6 @@ DERIVATION_RULES: list[dict[str, Any]] = [
         "confidence": 0.97,
         "method": lambda df: df["Yield_per_Plot"] * df["Plot_Size"],
         "description": "Yield_per_Plant = Yield_per_Plot * Plot_Size (m2)",
-    },
-    {
-        "name": "nitrogen_use_efficiency",
-        "target": "Nitrogen_Use_Efficiency",
-        "sources": ["Yield_per_Hectare", "Nitrogen"],
-        "confidence": 0.98,
-        "method": lambda df: df["Yield_per_Hectare"] / df["Nitrogen"].replace(0, np.nan),
-        "description": "NUE = Yield / N_applied",
-    },
-    {
-        "name": "water_use_efficiency",
-        "target": "Water_Use_Efficiency",
-        "sources": ["Yield_per_Hectare", "Rainfall"],
-        "confidence": 0.95,
-        "method": lambda df: df["Yield_per_Hectare"] / df["Rainfall"].replace(0, np.nan),
-        "description": "WUE = Yield / Rainfall (kg/ha/mm)",
     },
     {
         "name": "temp_x_rainfall_interaction",

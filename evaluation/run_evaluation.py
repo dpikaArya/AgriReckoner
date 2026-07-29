@@ -30,7 +30,7 @@ def run_all():
             "papers_count": len(results),
             "report": path,
         }
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -45,7 +45,7 @@ def run_all():
             "avg_recall": sum(r.get("recall", 0) for r in results) / len(results) if results else 0,
             "report": path,
         }
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -59,7 +59,7 @@ def run_all():
             "avg_coverage": sum(coverage_vals) / len(coverage_vals) if coverage_vals else 0,
             "report": path,
         }
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -70,7 +70,7 @@ def run_all():
         results, path = evaluate_schema()
         all_results["schema"] = results
         all_results["schema"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -81,7 +81,7 @@ def run_all():
         results, path = evaluate_unit()
         all_results["unit"] = results
         all_results["unit"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -92,7 +92,7 @@ def run_all():
         results, path = evaluate_quality()
         all_results["qa"] = results
         all_results["qa"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -103,7 +103,7 @@ def run_all():
         results, path = evaluate_features()
         all_results["features"] = results
         all_results["features"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -114,7 +114,7 @@ def run_all():
         results, path = evaluate_leakage()
         all_results["leakage"] = results
         all_results["leakage"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -125,7 +125,7 @@ def run_all():
         results, path = evaluate_statistics()
         all_results["statistics"] = results
         all_results["statistics"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -142,7 +142,7 @@ def run_all():
             "total_models": total,
             "report": path,
         }
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -153,7 +153,7 @@ def run_all():
         results, path = evaluate_documentation()
         all_results["documentation"] = results
         all_results["documentation"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -164,7 +164,7 @@ def run_all():
         results, path = evaluate_e2e()
         all_results["e2e"] = results
         all_results["e2e"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -175,7 +175,7 @@ def run_all():
         results, path = compute_quality_score()
         all_results["quality_score"] = results
         all_results["quality_score"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -192,7 +192,7 @@ def run_all():
             "success_rate": trained / (trained + failed) if (trained + failed) > 0 else 0,
             "report": path,
         }
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -202,7 +202,7 @@ def run_all():
         from evaluation.agent_benchmark import benchmark_agents
         results, path = benchmark_agents()
         all_results["agent_benchmark"] = {"csv_path": path}
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -213,7 +213,7 @@ def run_all():
         results, path = validate_output()
         all_results["output_validation"] = results
         all_results["output_validation"]["report"] = path
-        print(f"OK → {path}")
+        print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
 
@@ -223,7 +223,7 @@ def run_all():
         from evaluation.dashboard import generate_dashboard
         dash_results = generate_dashboard(all_results)
         all_results["dashboard"] = dash_results
-        print(f"OK → {dash_results.get('dashboard_html', '')}")
+        print(f"OK -> {dash_results.get('dashboard_html', '')}")
     except Exception as e:
         print(f"FAILED: {e}")
 

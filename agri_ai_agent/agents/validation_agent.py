@@ -433,8 +433,8 @@ class ValidationAgent(BaseAgent):
                         violations.append(
                             f"Row {row.name}: {rule['message']} [{rule['severity']}]"
                         )
-                except Exception:
-                    continue
+                except Exception as e:
+                    self.log.debug("Agronomic rule %s failed: %s", rule.get("name", rule.get("message", "?")), e)
         if len(violations) > 50:
             violations = violations[:50] + [f"... and {len(violations) - 50} more"]
         return violations

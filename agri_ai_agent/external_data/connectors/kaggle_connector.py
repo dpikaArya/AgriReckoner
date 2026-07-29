@@ -5,6 +5,7 @@ from typing import Optional
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
+from agri_ai_agent.external_data.download_strategy import FormatFilter
 
 
 class KaggleConnector(ExternalDataConnector):
@@ -46,7 +47,8 @@ class KaggleConnector(ExternalDataConnector):
                         "size": parts[3].strip('"') if len(parts) > 3 else "",
                     })
             return datasets
-        except Exception:
+        except Exception as e:
+            self.log.debug("Kaggle list_datasets failed: %s", e)
             return []
 
     def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
@@ -57,14 +59,22 @@ class KaggleConnector(ExternalDataConnector):
                 ["kaggle", "datasets", "download", resource_id, "-p", str(target_dir), "--unzip"],
                 capture_output=True, text=True, timeout=300,
             )
-            csv_files = list(target_dir.glob("*.csv"))
-            if csv_files:
-                return csv_files[0]
-            parquet_files = list(target_dir.glob("*.parquet"))
-            if parquet_files:
-                return parquet_files[0]
-            return target_dir / f"{resource_id.replace('/', '_')}.zip"
-        except Exception:
+            all_files = []
+            for ext in ["parquet", "arrow", "csv", "json", "xml", "html", "pdf"]:
+                all_files.extend(target_dir.glob(f"*.{ext}"))
+            all_files.extend(target_dir.glob("*.zip"))
+
+            file_infos = []
+            for fp in all_files:
+                fmt = fp.suffix.lower().lstrip(".")
+                file_infos.append({"path": fp, "format": fmt})
+            if not file_infos:
+                return None
+
+            ordered = FormatFilter.sorted_files(file_infos)
+            return ordered[0]["path"] if ordered else None
+        except Exception as e:
+            self.log.debug("Kaggle download failed for %s: %s", resource_id, e)
             return None
 
     def validate(self, package: DatasetPackage) -> bool:

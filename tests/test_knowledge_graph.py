@@ -263,10 +263,10 @@ class TestKnowledgeGraph:
         assert edges == 0
 
     def test_valid_node_types_count(self):
-        assert len(VALID_NODE_TYPES) == 8
+        assert len(VALID_NODE_TYPES) == 12
 
     def test_valid_edge_types_count(self):
-        assert len(VALID_EDGE_TYPES) == 8
+        assert len(VALID_EDGE_TYPES) == 12
 
     def test_edge_node_pairs_count(self):
-        assert len(EDGE_NODE_PAIRS) == 8
+        assert len(EDGE_NODE_PAIRS) == 12

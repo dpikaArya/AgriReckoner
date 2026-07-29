@@ -1,8 +1,10 @@
 """
 KnowledgeGraph — structured graph for agricultural research entities.
 
-Node types: Paper, Treatment, Crop, Observation, Yield, Soil, Climate, Management
-Edge types: DESCRIBES, TREATS, GROWS, OBSERVES, YIELDS, HAS_SOIL, HAS_CLIMATE, MANAGES
+Node types: Paper, Treatment, Crop, Observation, Yield, Soil, Climate, Management,
+           Repository, Dataset, Evidence, Document
+Edge types: DESCRIBES, TREATS, GROWS, OBSERVES, YIELDS, HAS_SOIL, HAS_CLIMATE, MANAGES,
+           PROVIDES, CONTAINS, SUPPORTED_BY, FROM_SOURCE
 """
 
 import json
@@ -18,11 +20,13 @@ import pandas as pd
 VALID_NODE_TYPES = frozenset([
     "Paper", "Treatment", "Crop", "Observation",
     "Yield", "Soil", "Climate", "Management",
+    "Repository", "Dataset", "Evidence", "Document",
 ])
 
 VALID_EDGE_TYPES = frozenset([
     "DESCRIBES", "TREATS", "GROWS", "OBSERVES",
     "YIELDS", "HAS_SOIL", "HAS_CLIMATE", "MANAGES",
+    "PROVIDES", "CONTAINS", "SUPPORTED_BY", "FROM_SOURCE",
 ])
 
 EDGE_NODE_PAIRS = {
@@ -34,6 +38,10 @@ EDGE_NODE_PAIRS = {
     "HAS_SOIL": ("Paper", "Soil"),
     "HAS_CLIMATE": ("Paper", "Climate"),
     "MANAGES": ("Treatment", "Management"),
+    "PROVIDES": ("Repository", "Dataset"),
+    "CONTAINS": ("Dataset", "Document"),
+    "SUPPORTED_BY": ("Document", "Evidence"),
+    "FROM_SOURCE": ("Document", "Repository"),
 }
 
 

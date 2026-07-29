@@ -242,7 +242,7 @@ Domain-specific derived features computed from raw measurements.
 | 117 | `Yield_per_Hectare_Calc` | float | kg/ha | No | Extrapolated hectare yield |
 | 118 | `Temp_x_Rainfall` | float | °C·mm | No | Temperature–rainfall interaction |
 | 119 | `N_x_P` | float | (kg/ha)² | No | Nitrogen–phosphorus interaction |
-| 120 | `Temp_ squared` | float | °C² | No | Quadratic temperature term |
+| 120 | `Temp_squared` | float | °C² | No | Quadratic temperature term |
 | 121 | `Rainfall_7d_MA` | float | mm | No | 7-day rainfall moving average |
 | 122 | `Temp_7d_MA` | float | °C | No | 7-day temperature moving average |
 

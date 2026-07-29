@@ -2,6 +2,7 @@
 Stage 02: Scientific Information Extraction Evaluation
 Evaluates study metadata, crop extraction, location, soil, weather,
 management, growth, yield, lab measurements extraction.
+Uses VARIANT_MAP synonyms for domain-aware text matching.
 """
 
 import re
@@ -17,11 +18,47 @@ from evaluation.utils import (
 import numpy as np
 
 
+def _build_synonym_index():
+    """Build reverse lookup: UAMS column -> list of synonym strings to search for."""
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from agri_ai_agent.config.schema import VARIANT_MAP
+    except ImportError:
+        return {}
+
+    reverse = {}
+    for variant, uams_col in VARIANT_MAP.items():
+        reverse.setdefault(uams_col, set())
+        # Add the variant itself (already lowercase-normalized in VARIANT_MAP keys)
+        reverse[uams_col].add(variant)
+        # Also add the column name variants
+        reverse[uams_col].add(uams_col.lower())
+        reverse[uams_col].add(uams_col.lower().replace("_", " "))
+        reverse[uams_col].add(uams_col.lower().replace("_", ""))
+    return reverse
+
+
+def _field_found_in_text(uams_col, text_lower, synonym_index):
+    """Check if a UAMS column or any of its synonyms appears in the text."""
+    synonyms = synonym_index.get(uams_col, set())
+    if not synonyms:
+        # Fallback: try the column name itself
+        synonyms = {uams_col.lower(), uams_col.lower().replace("_", " "), uams_col.lower().replace("_", "")}
+
+    for syn in synonyms:
+        if len(syn) >= 3 and syn in text_lower:
+            return True
+    return False
+
+
 def evaluate_extraction():
     uams_cols = get_uams_cols()
     master_df = get_master_df()
     n_rows = len(master_df) if master_df is not None else 0
     n_cols = len(master_df.columns) if master_df is not None else 0
+
+    synonym_index = _build_synonym_index()
 
     categories = {
         "Study Metadata": ["Paper_ID", "DOI", "Journal", "Year", "Authors", "Country"],
@@ -62,8 +99,7 @@ def evaluate_extraction():
         total_found = 0
 
         for cat, cols in categories.items():
-            found = sum(1 for c in cols if c.lower().replace("_", " ") in text_lower or
-                       c.lower().replace("_", "") in text_lower)
+            found = sum(1 for c in cols if _field_found_in_text(c, text_lower, synonym_index))
             category_hits[cat] = {"expected": len(cols), "found": found}
             total_expected += len(cols)
             total_found += found
@@ -106,6 +142,7 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 - Average F1 Score: {avg_f1:.1%}
 - Average Hallucination Rate: {avg_hallucination:.1%}
 - Average Extraction Completeness: {avg_completeness:.1%}
+- Synonym index entries: {len(synonym_index)}
 
 ## Per-Paper Results
 """
@@ -129,11 +166,11 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 
     report += """
 ## Bottlenecks & Recommendations
-1. **Low recall** suggests many paper fields not captured in the UAMS schema
-2. **Precision** can be improved with domain-specific NLP extraction
-3. **Hallucination** indicates need for stricter field validation
-4. Consider using LLM-based extraction for structured paper parsing
-5. Add crop-specific extraction templates for each of the 5 crops
+1. **Weather Variables**: Review papers rarely contain raw weather data; consider extracting from cited sources
+2. **Growth Parameters**: Extract from table data rather than text body
+3. **Yield Variables**: These are review papers - yield data is discussed qualitatively
+4. Consider using LLM-based extraction for structured table parsing
+5. Add crop-specific extraction templates for each crop type
 """
     path = write_report("02_Extraction_Report.md", report)
     return paper_results, str(path)

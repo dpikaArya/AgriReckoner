@@ -33,6 +33,9 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "ruff>=0.6",
+    "black>=24.0",
+    "mypy>=1.10",
+    "pip-audit>=2.7",
 ]
 
 [project.scripts]
@@ -41,14 +44,25 @@ agriai = "agri_ai_agent.cli:main"
 [tool.setuptools.packages.find]
 include = ["agri_ai_agent*"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-filterwarnings = ["ignore::DeprecationWarning"]
-
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = ["E", "F", "I", "UP", "B", "W"]
 ignore = ["E501"]
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = "3.10"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+
+[tool.coverage.run]
+source = ["agri_ai_agent", "src"]

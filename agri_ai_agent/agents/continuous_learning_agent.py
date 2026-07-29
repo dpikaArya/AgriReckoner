@@ -20,6 +20,16 @@ import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
+from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
+from agri_ai_agent.continuous_learning.version_history import VersionHistory
+from agri_ai_agent.continuous_learning.change_detector import ChangeDetector
+from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph
+from agri_ai_agent.continuous_learning.incremental_engine import IncrementalEngine
+from agri_ai_agent.continuous_learning.reports import (
+    generate_sync_report,
+    generate_provenance_report,
+    generate_retraining_report,
+)
 
 BEST_MODEL_LABEL = "best_model"
 RETRAIN_R2_THRESHOLD = 0.01
@@ -36,6 +46,7 @@ class ContinuousLearningAgent(BaseAgent):
         papers_dir = kwargs.get("papers_dir")
         force_retrain = kwargs.get("force_retrain", False)
         update_fuzzy = kwargs.get("update_fuzzy_rules", False)
+        use_incremental = kwargs.get("use_incremental_engine", False)
 
         cycle_stats = {
             "started_at": datetime.now().isoformat(),
@@ -57,6 +68,9 @@ class ContinuousLearningAgent(BaseAgent):
         self.log.info("=" * 60)
         self.log.info("Continuous Learning Cycle v2 Started")
         self.log.info("=" * 60)
+
+        if use_incremental:
+            return self._run_incremental_cycle(df, cycle_stats, **kwargs)
 
         if papers_dir:
             new_data = self._extract_new_data(papers_dir)
@@ -111,6 +125,36 @@ class ContinuousLearningAgent(BaseAgent):
         self.log.info("=" * 60)
 
         self.dataframe = df
+        return df
+
+    def _run_incremental_cycle(self, df: pd.DataFrame, stats: dict, **kwargs) -> pd.DataFrame:
+        db_path = kwargs.get("continuous_learning_db", self.settings.CONTINUOUS_LEARNING_DB)
+        registry = RepositoryRegistry(db_path)
+        history = VersionHistory(db_path)
+        detector = ChangeDetector(registry, history)
+        graph = DependencyGraph()
+        engine = IncrementalEngine(self.settings, registry, history, detector, graph)
+
+        run_results = kwargs.get("pipeline_results", {})
+        cycle_result = engine.execute_cycle(df, run_results)
+
+        registry.close()
+        history.close()
+
+        self.log.info(
+            "Incremental cycle: %d repo(s) checked, %d changed, %d stage(s) executed",
+            cycle_result.get("repos_checked", 0),
+            cycle_result.get("repos_changed", 0),
+            len(cycle_result.get("stages_executed", [])),
+        )
+
+        if cycle_result.get("sync_id"):
+            self.contract.output_data["sync_id"] = cycle_result["sync_id"]
+        self.contract.dataset_id = kwargs.get("dataset_id", "")
+        self.contract.provider = kwargs.get("provider", "")
+        self.contract.processing_stage = "continuous_learning"
+        self.contract.processing_mode = "incremental"
+
         return df
 
     def _should_retrain(self, df: pd.DataFrame) -> bool:
@@ -311,16 +355,28 @@ class ContinuousLearningAgent(BaseAgent):
             deployed = models_dir / f"{BEST_MODEL_LABEL}.pkl"
             shutil.copy2(str(best_path), str(deployed))
 
+        metrics_payload = {
+            "r2": metrics.get("r2", 0),
+            "rmse": metrics.get("rmse", 0),
+            "mae": metrics.get("mae", 0),
+            "deployed_at": datetime.now().isoformat(),
+        }
         metrics_path = models_dir / f"{BEST_MODEL_LABEL}_metrics.json"
         with open(metrics_path, "w") as f:
-            json.dump({
-                "r2": metrics.get("r2", 0),
-                "rmse": metrics.get("rmse", 0),
-                "mae": metrics.get("mae", 0),
-                "deployed_at": datetime.now().isoformat(),
-            }, f, indent=2)
+            json.dump(metrics_payload, f, indent=2)
 
         self._log_model_version(metrics)
+
+        try:
+            from agri_ai_agent.continuous_learning.version_history import VersionHistory
+            vh = VersionHistory(self.settings.CONTINUOUS_LEARNING_DB)
+            checksum = VersionHistory.compute_hash(json.dumps(metrics_payload, sort_keys=True))
+            vh.register_version("model", BEST_MODEL_LABEL,
+                                checksum=checksum,
+                                metadata=metrics_payload)
+            vh.close()
+        except Exception as exc:
+            self.log.warning("Model version registration skipped: %s", exc)
 
     def _log_model_version(self, metrics: dict):
         history_path = self.settings.OUTPUT_DIR / "models" / "model_history.jsonl"
@@ -402,6 +458,7 @@ class ContinuousLearningAgent(BaseAgent):
         try:
             from agri_ai_agent.agents.recommendation_agent import RecommendationAgent
             from agri_ai_agent.agents.ready_reckoner_agent import ReadyReckonerAgent
+            from agri_ai_agent.continuous_learning.version_history import VersionHistory
 
             rec_agent = RecommendationAgent(settings=self.settings)
             df_rec = rec_agent.process(df)
@@ -410,6 +467,13 @@ class ContinuousLearningAgent(BaseAgent):
             df_rec = reck_agent.process(df_rec)
             if self.contract is not None and reck_agent.contract and reck_agent.contract.artifacts:
                 self.contract.artifacts.extend(reck_agent.contract.artifacts)
+
+            vh = VersionHistory(self.settings.CONTINUOUS_LEARNING_DB)
+            vh.register_version("reckoner", "ready_reckoner",
+                                checksum=VersionHistory.compute_hash(
+                                    datetime.now().isoformat()),
+                                metadata={"deployed_at": datetime.now().isoformat()})
+            vh.close()
         except Exception as e:
             self.log.warning("Reckoner regeneration failed: %s", e)
 

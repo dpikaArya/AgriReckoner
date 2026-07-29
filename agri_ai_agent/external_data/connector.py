@@ -3,9 +3,26 @@ from pathlib import Path
 from typing import Optional
 
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
+from agri_ai_agent.external_data.download_strategy import FormatFilter
+from agri_ai_agent.external_data.registry_db import DatasetRegistry
 
 
 class ExternalDataConnector(ABC):
+    def __init__(self):
+        self._registry: Optional[DatasetRegistry] = None
+        self._format_filter = FormatFilter()
+
+    def set_registry(self, registry: DatasetRegistry):
+        self._registry = registry
+
+    @property
+    def registry(self) -> Optional[DatasetRegistry]:
+        return self._registry
+
+    @property
+    def format_filter(self) -> FormatFilter:
+        return self._format_filter
+
     @property
     @abstractmethod
     def source_name(self) -> str:
@@ -32,9 +49,16 @@ class ExternalDataConnector(ABC):
     def validate(self, package: DatasetPackage) -> bool:
         ...
 
-    @abstractmethod
     def register(self, package: DatasetPackage) -> str:
-        ...
+        if self._registry is None:
+            return ""
+        dataset_id, _ = self._registry.register(
+            package,
+            version=package.version,
+            license=package.license,
+            source_url=package.source_url or self.base_url,
+        )
+        return dataset_id
 
     @abstractmethod
     def update(self) -> int:
@@ -45,6 +69,15 @@ class ExternalDataConnector(ABC):
         ...
 
     def fetch(self, resource_id: str, target_dir: Path) -> Optional[DatasetPackage]:
+        if self._registry:
+            existing = self._registry.find(self.source_name, resource_id)
+            if existing:
+                version_check = self._registry.check_update(
+                    self.source_name, resource_id, existing["version"]
+                )
+                if version_check is None:
+                    return None
+
         self.connect()
         try:
             path = self.download(resource_id, target_dir)

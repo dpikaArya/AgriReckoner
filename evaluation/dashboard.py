@@ -44,7 +44,7 @@ def generate_dashboard(all_results: dict):
     quality = all_results.get("quality_score", {}).get("overall", 0)
     ingestion_score = all_results.get("ingestion", {}).get("completeness", 0) * 100
     extraction_score = all_results.get("extraction", {}).get("avg_f1", 0) * 100
-    schema_score = all_results.get("schema", {}).get("mapping_accuracy", 0) * 100
+    schema_score = all_results.get("schema", {}).get("core_coverage", all_results.get("schema", {}).get("mapping_accuracy", 0)) * 100
     ontology_score = all_results.get("ontology", {}).get("avg_coverage", 0) * 100
     quality_score = all_results.get("qa", {}).get("validation_accuracy", 0) * 100
     feature_score = all_results.get("features", {}).get("feature_count", 0) / 16 * 100

@@ -314,7 +314,9 @@ class OntologyAgent(BaseAgent):
         try:
             from agri_ai_agent.ontology.registry import Registry
             return Registry.load()
-        except Exception:
+        except Exception as e:
+            logger = get_logger("OntologyAgent")
+            logger.debug("Registry load failed (non-fatal): %s", e)
             return None
 
     def _term_annotation(self, canonical: str) -> dict:
@@ -365,7 +367,7 @@ class OntologyAgent(BaseAgent):
                 mapping_report["columns_unmapped"] += 1
 
         if rename_map:
-            df = df.rename(columns=rename_map)
+            df = df.rename(columns=rename_map, errors="ignore")
 
         df = self._normalize_column_names(df)
         df = self._standardize_units(df)

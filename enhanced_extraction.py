@@ -124,10 +124,10 @@ def parse_value(v):
     m = re.match(r'([\d.]+)\s*[±±]\s*[\d.]+', c)
     if m:
         try: return float(m.group(1))
-        except: return None
+        except Exception: return None
     if re.match(r'^-?\d+\.?\d*$', c):
         try: return float(c)
-        except: return None
+        except Exception: return None
     return None
 
 
@@ -169,7 +169,7 @@ def yield_regex_extraction(full_text):
         m = re.search(pat, full_text, re.IGNORECASE)
         if m:
             try: results[var] = float(m.group(1)); break
-            except: pass
+            except Exception: pass
     return results
 
 

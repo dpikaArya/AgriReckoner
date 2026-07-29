@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
@@ -7,8 +8,16 @@ import pandas as pd
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import AgentContract
-from agri_ai_agent.external_data.registry import ConnectorRegistry
-from agri_ai_agent.external_data.dataset_package import DatasetPackage
+from agri_ai_agent.external_data.connector_manager import (
+    ConnectorManager,
+)
+from agri_ai_agent.external_data.registry_db import DatasetRegistry
+from agri_ai_agent.knowledge_graph.graph import KnowledgeGraph
+from agri_ai_agent.knowledge_graph.provenance import (
+    register_dataset_lineage,
+    write_provenance_artifact,
+    update_knowledge_graph,
+)
 
 
 class ExternalDataSourceAgent(BaseAgent):
@@ -22,93 +31,113 @@ class ExternalDataSourceAgent(BaseAgent):
         download_dir = Path(download_dir)
         download_dir.mkdir(parents=True, exist_ok=True)
 
-        ConnectorRegistry.discover()
-        available = ConnectorRegistry.list_sources()
+        registry_path = kwargs.get("registry_path", self.settings.DATASET_REGISTRY_PATH)
+        registry = DatasetRegistry(registry_path)
+
+        use_integration = kwargs.get("use_integration",
+                                     os.getenv("AGRI_USE_DATA_SOURCE_INTEGRATION", "false").lower() == "true")
+
+        if use_integration:
+            from src.data_sources.integration import DataSourceIntegration
+            integration = DataSourceIntegration(
+                registry=registry,
+                download_dir=download_dir,
+                storage_dir=kwargs.get("storage_dir"),
+                max_workers=kwargs.get("max_workers"),
+                retry_max_attempts=kwargs.get("retry_max_attempts"),
+                retry_base_delay=kwargs.get("retry_base_delay"),
+            )
+            integration_impl = integration
+            available = integration_impl.list_sources()
+        else:
+            manager = ConnectorManager(
+                registry=registry,
+                download_dir=download_dir,
+                max_workers=kwargs.get("max_workers", 4),
+                retry_max_attempts=kwargs.get("retry_max_attempts", 3),
+                retry_base_delay=kwargs.get("retry_base_delay", 2.0),
+            )
+            integration_impl = manager
+            available = manager.list_sources()
+
         self.log.info("Discovered %d external data sources: %s", len(available), available)
 
-        selected = sources if sources else available
-        all_packages: list[DatasetPackage] = []
-        results = []
+        selected = sources if sources is not None else available
+        if not selected:
+            self.log.warning("No sources selected, skipping external data layer")
+            return df if df is not None else pd.DataFrame()
 
-        for source_name in selected:
-            connector = ConnectorRegistry.instantiate(source_name)
-            if connector is None:
-                self.log.warning("Connector not found for source: %s", source_name)
-                continue
+        self.log.info("Running health checks on %d source(s)...", len(selected))
+        health_results = integration_impl.health_checks(selected)
+        healthy = [s for s, h in health_results.items() if h.is_healthy]
+        unhealthy = [s for s, h in health_results.items() if not h.is_healthy]
+        if unhealthy:
+            self.log.warning("Unhealthy sources (skipped): %s", unhealthy)
+        if not healthy:
+            self.log.warning("No healthy sources available")
+            return df if df is not None else pd.DataFrame()
 
-            self.log.info("Connecting to %s...", source_name)
-            connected = connector.connect()
-            if not connected:
-                self.log.warning("Cannot connect to %s, skipping", source_name)
-                continue
+        self.log.info(
+            "Running %d healthy connector(s) concurrently...",
+            len(healthy),
+        )
+        packages_by_source, run_logs = integration_impl.run_all(sources=healthy)
 
-            self.log.info("Discovering datasets from %s...", source_name)
-            datasets = connector.discover()
-            self.log.info("Found %d datasets from %s", len(datasets), source_name)
+        summary = integration_impl.summarize_runs(run_logs)
+        self.log.info(
+            "Connector run complete: %d succeeded, %d failed, "
+            "%d datasets downloaded, %d valid, %.1fs total",
+            summary["succeeded"], summary["failed"],
+            summary["total_datasets_downloaded"],
+            summary["total_datasets_valid"],
+            summary["total_duration_sec"],
+        )
 
-            for ds in datasets:
-                resource_id = ds.get("id", "")
-                if not resource_id:
-                    continue
-                self.log.info("Downloading %s from %s...", resource_id, source_name)
+        all_packages = []
+        results_rows = []
+
+        provenance_dir = Path(kwargs.get("provenance_dir", download_dir / "provenance"))
+        kg: Optional[KnowledgeGraph] = kwargs.get("knowledge_graph")
+
+        for src, pkgs in packages_by_source.items():
+            for pkg in pkgs:
+                all_packages.append(pkg)
                 try:
-                    package = connector.fetch(resource_id, download_dir / source_name)
-                    if package is not None:
-                        all_packages.append(package)
-                        results.append({
-                            "source": source_name,
-                            "resource_id": resource_id,
-                            "name": package.name,
-                            "rows": package.row_count,
-                            "columns": package.column_count,
-                            "is_valid": package.is_valid,
-                            "download_path": str(package.download_path) if package.download_path else "",
-                        })
-                        self.log.info(
-                            "Successfully fetched %s from %s (%d rows, %d cols)",
-                            resource_id, source_name, package.row_count, package.column_count,
-                        )
-                except Exception as e:
-                    self.log.error("Error fetching %s from %s: %s", resource_id, source_name, e)
+                    write_provenance_artifact(provenance_dir, pkg, connector_name=src)
+                    if kg is not None:
+                        update_knowledge_graph(kg, pkg, connector_name=src)
+                    self.contract.dataset_id = pkg.dataset_id
+                    self.contract.provider = pkg.provider or pkg.source
+                    self.contract.connector_name = src
+                    self.contract.checksum = pkg.checksum
+                    self.contract.processing_stage = "external_data"
+                    self.contract.processing_mode = "download"
+                except Exception as exc:
+                    self.log.warning("[%s] provenance tracking failed for %s/%s: %s",
+                                     self.agent_name, src, pkg.resource_id, exc)
+                results_rows.append({
+                    "source": src,
+                    "resource_id": pkg.resource_id,
+                    "name": pkg.name,
+                    "rows": pkg.row_count,
+                    "columns": pkg.column_count,
+                    "is_valid": pkg.is_valid,
+                    "version": pkg.version,
+                    "download_path": str(pkg.download_path) if pkg.download_path else "",
+                })
 
-            connector.close()
-
-        result_df = pd.DataFrame(results) if results else pd.DataFrame()
+        result_df = pd.DataFrame(results_rows) if results_rows else pd.DataFrame()
         summary_path = self.save_artifact(
             result_df, "external_data_sources.csv", subdir="external_data"
         )
         self.log.info("External data source summary written to %s", summary_path)
 
-        merged = self._merge_packages(all_packages, df)
+        merged = integration_impl.merge_packages(packages_by_source, df)
         self.log.info(
             "External data layer complete: %d packages from %d sources merged into %d rows",
-            len(all_packages), len(selected), len(merged),
+            len(all_packages), len(healthy), len(merged),
         )
         return merged
-
-    def _merge_packages(
-        self, packages: list[DatasetPackage], existing_df: pd.DataFrame
-    ) -> pd.DataFrame:
-        if not packages:
-            return existing_df if existing_df is not None else pd.DataFrame()
-
-        frames = [existing_df] if existing_df is not None else []
-        for pkg in packages:
-            df = pkg.to_dataframe()
-            if df is not None and not df.empty:
-                for col in ["source", "resource_id", "download_timestamp"]:
-                    if col not in df.columns:
-                        df[col] = ""
-                df["source"] = pkg.source
-                df["resource_id"] = pkg.resource_id
-                df["download_timestamp"] = datetime.now().isoformat()
-                frames.append(df)
-
-        if not frames:
-            return pd.DataFrame()
-        result = pd.concat(frames, ignore_index=True, sort=False)
-        result = result.loc[:, ~result.columns.duplicated(keep="first")]
-        return result
 
     def run(self, df: pd.DataFrame, contract: Optional[AgentContract] = None, **kwargs) -> AgentContract:
         self.dataframe = df

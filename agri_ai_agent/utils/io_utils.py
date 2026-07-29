@@ -22,6 +22,8 @@ def detect_encoding(filepath: Path, n_bytes: int = 10000) -> str:
 
 
 def detect_delimiter(filepath: Path, n_lines: int = 5) -> str:
+    if not filepath.exists():
+        return ","
     try:
         with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
             sample = "".join(f.readline() for _ in range(n_lines))
@@ -33,6 +35,8 @@ def detect_delimiter(filepath: Path, n_lines: int = 5) -> str:
 
 def detect_worksheet(filepath: Path) -> Optional[str]:
     if filepath.suffix.lower() in (".xlsx", ".xls"):
+        if not filepath.exists():
+            return None
         xls = pd.ExcelFile(filepath, engine="openpyxl")
         sheets = xls.sheet_names
         if len(sheets) == 1:
@@ -52,6 +56,9 @@ def read_dataset(
     delimiter: Optional[str] = None,
 ) -> pd.DataFrame:
     filepath = Path(filepath)
+    if not filepath.exists():
+        raise FileNotFoundError(f"Dataset not found: {filepath}")
+
     suffix = filepath.suffix.lower()
 
     if suffix == ".csv":
@@ -75,21 +82,25 @@ def read_dataset(
     elif suffix == ".db":
         import sqlite3
         conn = sqlite3.connect(str(filepath))
-        tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
-        if len(tables):
-            return pd.read_sql(f"SELECT * FROM [{tables.iloc[0, 0]}]", conn)
-        conn.close()
-        return pd.DataFrame()
+        try:
+            tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
+            if len(tables):
+                return pd.read_sql(f"SELECT * FROM [{tables.iloc[0, 0]}]", conn)
+            return pd.DataFrame()
+        finally:
+            conn.close()
 
     elif suffix == ".duckdb":
         try:
             import duckdb
             con = duckdb.connect(str(filepath))
-            tables = con.execute("SELECT table_name FROM information_schema.tables").fetchdf()
-            if len(tables):
-                return con.execute(f"SELECT * FROM \"{tables.iloc[0, 0]}\"").fetchdf()
-            con.close()
-            return pd.DataFrame()
+            try:
+                tables = con.execute("SELECT table_name FROM information_schema.tables").fetchdf()
+                if len(tables):
+                    return con.execute(f"SELECT * FROM \"{tables.iloc[0, 0]}\"").fetchdf()
+                return pd.DataFrame()
+            finally:
+                con.close()
         except ImportError:
             raise RuntimeError("duckdb package required to read .duckdb files")
 
@@ -124,14 +135,18 @@ def write_dataframe(
     elif format == "sqlite":
         import sqlite3
         conn = sqlite3.connect(str(path))
-        df.to_sql("data", conn, if_exists="replace", index=False)
-        conn.close()
+        try:
+            df.to_sql("data", conn, if_exists="replace", index=False)
+        finally:
+            conn.close()
     elif format == "duckdb":
         try:
             import duckdb
             con = duckdb.connect(str(path))
-            con.execute("CREATE TABLE data AS SELECT * FROM df")
-            con.close()
+            try:
+                con.execute("CREATE TABLE data AS SELECT * FROM df")
+            finally:
+                con.close()
         except ImportError:
             raise RuntimeError("duckdb package required to write .duckdb files")
     else:

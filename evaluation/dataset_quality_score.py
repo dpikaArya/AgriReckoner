@@ -27,9 +27,23 @@ def compute_quality_score():
 
     n_rows, n_cols = master_df.shape
 
-    # 1. Schema completeness (0-20)
-    cols_in_schema = [c for c in master_df.columns if c in uams_set]
-    schema_completeness = len(cols_in_schema) / total_uams if total_uams > 0 else 0
+    # 1. Schema completeness (0-20) - use core UAMS columns (A-N)
+    cols_in_schema = []
+    try:
+        import sys
+        sys.path.insert(0, str(Path(__file__).parent.parent))
+        from agri_ai_agent.config.schema import SCHEMA_GROUPS
+        core_cols_list = []
+        for g_name, g_cols in SCHEMA_GROUPS.items():
+            if any(g_name.startswith(p) for p in ["A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N."]):
+                core_cols_list.extend(g_cols)
+        core_set = set(core_cols_list)
+        cols_in_core = [c for c in master_df.columns if c in core_set]
+        cols_in_schema = cols_in_core
+        schema_completeness = len(cols_in_core) / len(core_cols_list) if core_cols_list else 0
+    except (ImportError, Exception):
+        cols_in_schema = [c for c in master_df.columns if c in uams_set]
+        schema_completeness = len(cols_in_schema) / total_uams if total_uams > 0 else 0
     schema_score = schema_completeness * 20
 
     # 2. Ontology completeness (0-10)

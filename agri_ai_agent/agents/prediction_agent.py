@@ -185,11 +185,11 @@ class PredictionAgent(BaseAgent):
         if not target_models:
             target_models = model_registry
         all_preds = []
-        for _, m in target_models:
+        for model_name, m in target_models:
             try:
                 all_preds.append(m.predict(X))
-            except Exception:
-                continue
+            except Exception as e:
+                self.log.debug("Model %s predict failed: %s", model_name, e)
         if not all_preds:
             return None
         return np.mean(all_preds, axis=0)
@@ -201,15 +201,15 @@ class PredictionAgent(BaseAgent):
             if name == primary_name:
                 try:
                     all_preds.append(model.predict(X))
-                except Exception:
-                    continue
+                except Exception as e:
+                    self.log.debug("Primary model %s predict failed: %s", name, e)
         if all_preds:
             return np.mean(all_preds, axis=0)
-        for _, model in model_registry:
+        for name, model in model_registry:
             try:
                 all_preds.append(model.predict(X))
-            except Exception:
-                continue
+            except Exception as e:
+                self.log.debug("Fallback model %s predict failed: %s", name, e)
         return np.mean(all_preds, axis=0) if all_preds else np.zeros(len(X))
 
     # ── Step 2: Build Fertilizer Options ─────────────────────────────
@@ -343,11 +343,11 @@ class PredictionAgent(BaseAgent):
             df["Confidence_Score"] = 0.5
             return df
         all_preds = []
-        for _, m in model_registry:
+        for name, m in model_registry:
             try:
                 all_preds.append(m.predict(X))
-            except Exception:
-                continue
+            except Exception as e:
+                self.log.debug("Confidence model %s predict failed: %s", name, e)
         if len(all_preds) < 2:
             df["Confidence_Score"] = 0.5
             return df

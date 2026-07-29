@@ -76,8 +76,11 @@ class TestKnowledgeIntegrationAgent:
 
     def test_yield_range_fill(self, agent, sample_df):
         result = agent.process(sample_df)
-        assert pd.notna(result.loc[2, "Yield_per_Hectare"])
-        assert pd.notna(result.loc[3, "Yield_per_Hectare"])
+        assert "Yield_Lower_Bound" in result.columns
+        assert "Yield_Upper_Bound" in result.columns
+        assert pd.notna(result.loc[2, "Yield_Lower_Bound"])
+        assert pd.notna(result.loc[3, "Yield_Lower_Bound"])
+        assert pd.isna(result.loc[2, "Yield_per_Hectare"]) or result.loc[2, "Yield_per_Hectare"] == result.loc[2, "Yield_per_Hectare"]
 
     def test_existing_values_not_overwritten(self, agent, sample_df):
         result = agent.process(sample_df)

@@ -240,7 +240,7 @@ class ExtractionAgent(BaseAgent):
         ontology_mappings = []
 
         # --- Step 1: Read / Ingest ---
-        if df is not None:
+        if df is not None and not df.empty:
             self.dataframe = df
             self.log.info("[%s] Using provided DataFrame with %d columns", self.agent_name, len(df.columns))
         elif filepath:
@@ -533,9 +533,12 @@ class ExtractionAgent(BaseAgent):
         result_df = df.rename(columns=rename_map, errors="ignore")
         result_df = self._resolve_duplicate_columns(result_df)
 
-        for col in UAMS_COLUMNS:
-            if col not in result_df.columns:
-                result_df[col] = pd.NA
+        missing_uams = [col for col in UAMS_COLUMNS if col not in result_df.columns]
+        if missing_uams:
+            result_df = pd.concat(
+                [result_df, pd.DataFrame({col: pd.NA for col in missing_uams}, index=result_df.index)],
+                axis=1,
+            )
 
         ordered = [c for c in UAMS_COLUMNS if c in result_df.columns]
         extra = [c for c in result_df.columns if c not in UAMS_COLUMNS]

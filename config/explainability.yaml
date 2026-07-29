@@ -7,7 +7,7 @@ enabled: true
 top_n_features: 10
 
 # Output settings
-output_dir: reports/explainability
+output_dir: agri_ai_agent/outputs/reports/explainability
 save_individual_reports: true
 save_summary: true
 save_feature_importance_csv: true

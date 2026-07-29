@@ -244,7 +244,8 @@ class ModelSelectionAgent(BaseAgent):
         if len(X) < 10 or X.shape[1] < 2:
             return None, None, []
 
-        X = X.fillna(X.median(numeric_only=True))
+        # NOTE: Do NOT impute here.  The Pipeline inside each CV fold handles
+        # imputation so that no information leaks across folds.
         return X.values, y.values, list(X.columns)
 
     def _evaluate_model(self, name, model, param_grid, X, y, feature_names,
@@ -380,22 +381,8 @@ class ModelSelectionAgent(BaseAgent):
                             "direction": 1 if coef > 0 else -1,
                             "method": "coefficient",
                         })
-            except Exception:
-                pass
-
-        if fitted_models and feature_names:
-            try:
-                from sklearn.inspection import permutation_importance
-                best_result = None
-                for r in sorted(cv_results, key=lambda x: x.get("cv_score", -999), reverse=True):
-                    if r["model"] in fitted_models:
-                        best_result = r
-                        break
-                if best_result:
-                    best_model = fitted_models[best_result["model"]]
-                    perm = permutation_importance(best_model, np.array([feature_names[i] for i in range(len(feature_names))]) if False else np.zeros((1, len(feature_names))), np.array([0]), n_repeats=1, random_state=42)
-            except Exception:
-                pass
+            except Exception as e:
+                self.log.debug("Could not compute regression coefficients: %s", e)
 
         return all_imp
 

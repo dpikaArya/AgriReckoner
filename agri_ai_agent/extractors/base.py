@@ -16,7 +16,6 @@ class ExtractedField:
     value: float | None = None
     unit_as_reported: str | None = None
     source_quote: str | None = None
-    page: int | None = None
     model_confidence: float | None = None
     status: str = "unverified"
     reject_reason: str | None = None

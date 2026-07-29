@@ -1,0 +1,94 @@
+# API Configuration for External Data Sources
+# Loaded at runtime by src/data_sources/config_loader.py
+# Override values via environment variables: AGRI_{SOURCE}_{KEY}
+
+sources:
+  CGIAR:
+    enabled: true
+    base_url: "https://huggingface.co/api/datasets/CGIAR"
+    strategy: huggingface
+    priority: 1
+    timeout_sec: 300
+    retry_max: 3
+    params:
+      search: "CGIAR"
+
+  FAOSTAT:
+    enabled: true
+    base_url: "https://fenixservices.fao.org/faostat/static/bulkdownloads"
+    strategy: http
+    priority: 2
+    timeout_sec: 300
+
+  NASA_POWER:
+    enabled: true
+    base_url: "https://power.larc.nasa.gov/api"
+    strategy: http
+    priority: 3
+    timeout_sec: 120
+    params:
+      user_community: "AG"
+
+  SoilGrids:
+    enabled: true
+    base_url: "https://rest.isric.org"
+    strategy: http
+    priority: 4
+    timeout_sec: 120
+
+  ISRIC:
+    enabled: true
+    base_url: "https://files.isric.org/soilgrids/latest/data"
+    strategy: http
+    priority: 5
+    timeout_sec: 300
+
+  Zenodo:
+    enabled: true
+    base_url: "https://zenodo.org/api"
+    strategy: http
+    priority: 6
+    timeout_sec: 300
+
+  Mendeley_Data:
+    enabled: true
+    base_url: "https://data.mendeley.com/api"
+    strategy: http
+    priority: 7
+    timeout_sec: 300
+
+  Kaggle:
+    enabled: true
+    base_url: "https://www.kaggle.com/api/v1"
+    strategy: kaggle
+    priority: 8
+    timeout_sec: 300
+    auth:
+      username_env: "KAGGLE_USERNAME"
+      key_env: "KAGGLE_KEY"
+
+  ICAR:
+    enabled: true
+    base_url: "https://krishikosh.egranth.ac.in/api"
+    strategy: http
+    priority: 9
+    timeout_sec: 120
+
+  State_Agricultural_Universities:
+    enabled: true
+    base_url: "https://api.example.edu/sau"
+    strategy: http
+    priority: 10
+    timeout_sec: 60
+
+storage:
+  base_dir: "external_data/raw"
+  immutable: true
+  versioned: true
+  dedup_by_checksum: true
+
+pipeline:
+  max_workers: 4
+  retry_max_attempts: 3
+  retry_base_delay_sec: 2.0
+  log_dir: "external_data/.logs"

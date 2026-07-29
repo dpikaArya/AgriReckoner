@@ -199,19 +199,19 @@ class KnowledgeIntegrationAgent(BaseAgent):
                 defaults = SOIL_PROPERTY_DEFAULTS["Loamy"]
 
             if "Soil_pH" in df.columns and pd.isna(row.get("Soil_pH")):
-                df.at[idx, "Soil_pH"] = np.random.uniform(*defaults["ph"])
+                df.at[idx, "Soil_pH"] = (defaults["ph"][0] + defaults["ph"][1]) / 2
                 count += 1
             if "Organic_Carbon" in df.columns and pd.isna(row.get("Organic_Carbon")):
-                df.at[idx, "Organic_Carbon"] = np.random.uniform(*defaults["oc"])
+                df.at[idx, "Organic_Carbon"] = (defaults["oc"][0] + defaults["oc"][1]) / 2
                 count += 1
             if "Nitrogen" in df.columns and pd.isna(row.get("Nitrogen")):
-                df.at[idx, "Nitrogen"] = np.random.uniform(*defaults["n"])
+                df.at[idx, "Nitrogen"] = (defaults["n"][0] + defaults["n"][1]) / 2
                 count += 1
             if "Phosphorus" in df.columns and pd.isna(row.get("Phosphorus")):
-                df.at[idx, "Phosphorus"] = np.random.uniform(*defaults["p"])
+                df.at[idx, "Phosphorus"] = (defaults["p"][0] + defaults["p"][1]) / 2
                 count += 1
             if "Potassium" in df.columns and pd.isna(row.get("Potassium")):
-                df.at[idx, "Potassium"] = np.random.uniform(*defaults["k"])
+                df.at[idx, "Potassium"] = (defaults["k"][0] + defaults["k"][1]) / 2
                 count += 1
         return df, count
 
@@ -233,38 +233,42 @@ class KnowledgeIntegrationAgent(BaseAgent):
                 defaults = {"temp_range": (18, 35), "rainfall_range": (500, 1500), "humidity_range": (40, 80)}
 
             if "Average_Temperature" in df.columns and pd.isna(row.get("Average_Temperature")):
-                df.at[idx, "Average_Temperature"] = np.random.uniform(*defaults["temp_range"])
+                df.at[idx, "Average_Temperature"] = (defaults["temp_range"][0] + defaults["temp_range"][1]) / 2
                 count += 1
             if "Temperature_Max" in df.columns and pd.isna(row.get("Temperature_Max")):
                 avg = df.at[idx, "Average_Temperature"] if pd.notna(row.get("Average_Temperature")) else np.mean(defaults["temp_range"])
-                df.at[idx, "Temperature_Max"] = avg + np.random.uniform(3, 8)
+                df.at[idx, "Temperature_Max"] = avg + 5.5
                 count += 1
             if "Temperature_Min" in df.columns and pd.isna(row.get("Temperature_Min")):
                 avg = df.at[idx, "Average_Temperature"] if pd.notna(row.get("Average_Temperature")) else np.mean(defaults["temp_range"])
-                df.at[idx, "Temperature_Min"] = avg - np.random.uniform(3, 8)
+                df.at[idx, "Temperature_Min"] = avg - 5.5
                 count += 1
             if "Rainfall" in df.columns and pd.isna(row.get("Rainfall")):
-                df.at[idx, "Rainfall"] = np.random.uniform(*defaults["rainfall_range"])
+                df.at[idx, "Rainfall"] = (defaults["rainfall_range"][0] + defaults["rainfall_range"][1]) / 2
                 count += 1
             if "Humidity" in df.columns and pd.isna(row.get("Humidity")):
-                df.at[idx, "Humidity"] = np.random.uniform(*defaults["humidity_range"])
+                df.at[idx, "Humidity"] = (defaults["humidity_range"][0] + defaults["humidity_range"][1]) / 2
                 count += 1
         return df, count
 
     def _fill_yield_ranges(self, df: pd.DataFrame) -> tuple[pd.DataFrame, int]:
         count = 0
-        if "Yield_per_Hectare" not in df.columns or "Crop" not in df.columns:
+        if "Crop" not in df.columns:
             return df, 0
 
+        if "Yield_Lower_Bound" not in df.columns:
+            df["Yield_Lower_Bound"] = pd.Series(dtype="float64", index=df.index)
+        if "Yield_Upper_Bound" not in df.columns:
+            df["Yield_Upper_Bound"] = pd.Series(dtype="float64", index=df.index)
+
         for idx, row in df.iterrows():
-            if pd.notna(row.get("Yield_per_Hectare")):
-                continue
             crop = str(row.get("Crop", "")).strip()
             info = CROP_YIELD_RANGES.get(crop)
-            if info:
-                midpoint = (info["min"] + info["max"]) / 2
-                df.at[idx, "Yield_per_Hectare"] = midpoint
-                count += 1
+            if not info:
+                continue
+            df.at[idx, "Yield_Lower_Bound"] = info["min"]
+            df.at[idx, "Yield_Upper_Bound"] = info["max"]
+            count += 1
         return df, count
 
     @staticmethod

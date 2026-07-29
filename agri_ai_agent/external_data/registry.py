@@ -1,15 +1,23 @@
 import importlib
 import inspect
 import pkgutil
-from pathlib import Path
 from typing import Optional
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
+from agri_ai_agent.external_data.registry_db import DatasetRegistry
+from agri_ai_agent.utils.logging_utils import get_logger
+
+_logger = get_logger("ConnectorRegistry")
 
 
 class ConnectorRegistry:
     _connectors: dict[str, type[ExternalDataConnector]] = {}
     _initialized = False
+    _registry: Optional[DatasetRegistry] = None
+
+    @classmethod
+    def set_registry(cls, registry: DatasetRegistry):
+        cls._registry = registry
 
     @classmethod
     def discover(cls, package_path: Optional[str] = None) -> dict[str, type[ExternalDataConnector]]:
@@ -30,8 +38,8 @@ class ConnectorRegistry:
                     ):
                         instance = obj()
                         cls._connectors[instance.source_name] = obj
-            except Exception:
-                continue
+            except Exception as e:
+                _logger.debug("Could not register connector from module %s: %s", name, e)
         cls._initialized = True
         return cls._connectors
 
@@ -52,4 +60,7 @@ class ConnectorRegistry:
         connector_cls = cls.get(source_name)
         if connector_cls is None:
             return None
-        return connector_cls()
+        instance = connector_cls()
+        if cls._registry is not None:
+            instance.set_registry(cls._registry)
+        return instance

@@ -23,7 +23,7 @@
 | 11 | Yield_per_Hectare_Calc | Yield | Yield_per_Plot, Plot_Size | kg/ha |
 | 12 | Temp_x_Rainfall | Interaction | Tmean, Rainfall | °C·mm |
 | 13 | N_x_P | Interaction | Nitrogen, Phosphorus | (kg/ha)² |
-| 14 | Temp_ squared | Polynomial | Tmean | °C² |
+| 14 | Temp_squared | Polynomial | Tmean | °C² |
 | 15 | Rainfall_7d_MA | Rolling | Rainfall | mm |
 | 16 | Temp_7d_MA | Rolling | Tmean | °C |
 
@@ -245,7 +245,7 @@ Quadratic polynomial term for non-linear modeling.
 
 **Formula:**
 ```
-Temp_ squared = Tmean²
+Temp_squared = Tmean²
 ```
 
 **Units:** °C²  

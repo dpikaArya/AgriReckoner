@@ -1,0 +1,74 @@
+# API source configurations
+sources:
+  openai:
+    base_url: "https://api.openai.com/v1"
+    timeout_sec: 60
+    max_retries: 3
+    rate_limit: 10
+    rate_period_sec: 60
+    models:
+      default: "gpt-4o-mini"
+      fallback: "gpt-3.5-turbo"
+    temperature: 0.0
+  
+  nasa_power:
+    base_url: "https://power.larc.nasa.gov/api"
+    timeout_sec: 30
+    max_retries: 3
+    rate_limit: 20
+    rate_period_sec: 60
+    endpoints:
+      daily: "/temporal/daily/point"
+      monthly: "/temporal/monthly/point"
+      yearly: "/temporal/climatology/point"
+  
+  faostat:
+    base_url: "https://fenixservices.fao.org/faostat/api/v1"
+    timeout_sec: 30
+    max_retries: 3
+    rate_limit: 10
+    rate_period_sec: 60
+  
+  soilgrids:
+    base_url: "https://rest.isric.org/soilgrids/v2.0"
+    timeout_sec: 30
+    max_retries: 3
+    rate_limit: 5
+    rate_period_sec: 60
+
+  zenodo:
+    base_url: "https://zenodo.org/api"
+    timeout_sec: 30
+    max_retries: 3
+    rate_limit: 10
+    rate_period_sec: 60
+
+  mendeley:
+    base_url: "https://api.mendeley.com"
+    timeout_sec: 30
+    max_retries: 3
+    rate_limit: 5
+    rate_period_sec: 60
+
+  huggingface:
+    base_url: "https://huggingface.co/api"
+    timeout_sec: 60
+    max_retries: 3
+    rate_limit: 10
+    rate_period_sec: 60
+
+  kaggle:
+    timeout_sec: 300
+    max_retries: 2
+
+  cgiar:
+    base_url: "https://ccafs.cgiar.org/api"
+    timeout_sec: 30
+    max_retries: 2
+    rate_limit: 5
+    rate_period_sec: 60
+
+  icar:
+    base_url: "https://www.icar.org/api"
+    timeout_sec: 30
+    max_retries: 2

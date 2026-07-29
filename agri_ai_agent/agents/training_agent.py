@@ -340,8 +340,8 @@ features excluded). Rows flagged <em>not robust</em> are small-n (n&lt;30) and a
 </tbody>
 </table>
 """
-            except Exception:
-                pass
+            except Exception as e:
+                self.log.debug("Failed to render feature importance HTML: %s", e)
 
         if failed_rows:
             html += f"""<h2>Failed Models</h2>

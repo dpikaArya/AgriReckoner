@@ -40,14 +40,23 @@ from agri_ai_agent.agents import (
     ContinuousLearningAgent,
     KnowledgeIntegrationAgent,
     ExternalDataSourceAgent,
+    DatasetNormalizationAgent,
+    DatasetIngestionBridgeAgent,
+    ObservationGenerationAgent,
+    FeatureStoreAgent,
+    RepositorySyncAgent,
 )
 
 # Ordered so that external data ingestion runs first (PHASE -1), then
+# dataset normalization converts everything into DatasetPackage format, then
 # extraction + schema normalization run BEFORE the knowledge agents
 # (which look up canonical UAMS columns), and fuzzy runs AFTER prediction (it consumes
 # the model's Yield_Prediction). See the refactor notes for the wiring rationale.
 PIPELINE_STEPS = [
+    ("repository_sync", RepositorySyncAgent, "Repository Sync & Change Detection"),
     ("external_data", ExternalDataSourceAgent, "External Data Source Layer"),
+    ("dataset_normalization", DatasetNormalizationAgent, "Dataset Normalization"),
+    ("dataset_ingestion_bridge", DatasetIngestionBridgeAgent, "Dataset Ingestion Bridge & ID Assignment"),
     ("extraction", ExtractionAgent, "Extract & Schema"),
     ("evidence_fusion", EvidenceFusionAgent, "Evidence Fusion & Provenance"),
     ("ontology", OntologyAgent, "Ontology Mapping & Normalization"),
@@ -55,7 +64,9 @@ PIPELINE_STEPS = [
     ("schema_population", SchemaPopulationAgent, "Schema Population & Inference"),
     ("knowledge_integration", KnowledgeIntegrationAgent, "Knowledge Integration & Missing Value Fill"),
     ("knowledge", KnowledgeAgent, "Domain Knowledge"),
+    ("observation_generation", ObservationGenerationAgent, "Observation Generation & Hierarchy"),
     ("validation", ValidationAgent, "Validate & Harmonize"),
+    ("feature_store", FeatureStoreAgent, "Feature Store & Validation Gate"),
     ("feature", FeatureAgent, "Feature Engineering"),
     ("model_selection", ModelSelectionAgent, "Adaptive Model Selection & CV"),
     ("training", TrainingAgent, "Model Training"),
@@ -96,19 +107,25 @@ class Orchestrator:
         self.state.status = "running"
         self._write_run_manifest(filepath=filepath, papers_dir=papers_dir)
 
+        packages: list = []
+
         for step_key, agent_cls, step_name in PIPELINE_STEPS:
             if self.settings.INCREMENTAL_MODE and self._checkpoint_exists(step_key):
                 self.log.info("[%s] Skipping (checkpoint exists)", step_name)
                 self.dataframe = self._load_checkpoint(step_key)
                 continue
 
-            self.state.current_agent = step_key
-            self.log.info("\n[STEP] %s (%s)", step_name, step_key)
+                self.state.current_agent = step_key
+            self.log.info("[STEP] %s (%s)", step_name, step_key)
 
             try:
                 agent = agent_cls(settings=self.settings)
 
-                if step_key == "extraction":
+                if step_key == "dataset_normalization":
+                    contract = agent.run(df=self.dataframe, packages=packages)
+                elif step_key == "dataset_ingestion_bridge":
+                    contract = agent.run(df=self.dataframe, packages=packages)
+                elif step_key == "extraction":
                     contract = agent.run(df=self.dataframe, filepath=filepath, papers_dir=papers_dir)
                 elif step_key == "benchmark":
                     contract = agent.run(df=self.dataframe, pipeline_results=self.results)
@@ -122,6 +139,8 @@ class Orchestrator:
                 if contract.status == "success":
                     if hasattr(agent, 'dataframe') and agent.dataframe is not None:
                         self.dataframe = agent.dataframe
+                    if hasattr(agent, 'dataset_package') and agent.dataset_package is not None:
+                        packages = [agent.dataset_package]
                     self.state.completed_agents.append(step_key)
                     if self.settings.CHECKPOINT_ENABLED:
                         self._save_checkpoint(step_key)
@@ -161,20 +180,82 @@ class Orchestrator:
 
         return self.dataframe if self.dataframe is not None else pd.DataFrame()
 
-    def run_continuous(self, papers_dir: str, **kwargs) -> pd.DataFrame:
-        self.log.info("Starting continuous learning cycle...")
+    def run_continuous(self, papers_dir: str = "", **kwargs) -> pd.DataFrame:
+        use_incremental = kwargs.get("use_incremental_engine", False)
+        self.log.info("Starting continuous learning cycle (incremental=%s)...", use_incremental)
+
+        if use_incremental:
+            contract = self._run_incremental_continuous(**kwargs)
+            self.results["continuous_learning"] = contract
+            return self.dataframe if self.dataframe is not None else pd.DataFrame()
+
         agent = ContinuousLearningAgent(settings=self.settings)
         contract = agent.run(df=self.dataframe, papers_dir=papers_dir, **kwargs)
         self.dataframe = agent.dataframe
         self.results["continuous_learning"] = contract
         return self.dataframe
 
+    def _run_incremental_continuous(self, **kwargs) -> AgentContract:
+        from agri_ai_agent.continuous_learning.incremental_engine import IncrementalEngine
+        from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
+        from agri_ai_agent.continuous_learning.version_history import VersionHistory
+        from agri_ai_agent.continuous_learning.change_detector import ChangeDetector
+        from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph
+
+        db_path = kwargs.get("continuous_learning_db", self.settings.CONTINUOUS_LEARNING_DB)
+        registry = RepositoryRegistry(db_path)
+        history = VersionHistory(db_path)
+        detector = ChangeDetector(registry, history)
+        graph = DependencyGraph()
+        engine = IncrementalEngine(self.settings, registry, history, detector, graph)
+
+        def run_step(step_key: str, df) -> Optional[pd.DataFrame]:
+            for step in PIPELINE_STEPS:
+                if step[0] == step_key:
+                    agent_cls = step[1]
+                    try:
+                        agent = agent_cls(settings=self.settings)
+                        contract = agent.run(df=df)
+                        if contract.status == "success" and hasattr(agent, "dataframe"):
+                            return agent.dataframe
+                    except Exception as e:
+                        self.log.error("Incremental step %s failed: %s", step_key, e)
+                    return None
+            return None
+
+        cycle_result = engine.execute_cycle(
+            self.dataframe,
+            run_pipeline_fn=run_step,
+        )
+
+        registry.close()
+        history.close()
+
+        contract = AgentContract(
+            agent_name="ContinuousLearningAgent",
+            status="success",
+            dataset_id=kwargs.get("dataset_id", ""),
+            provider=kwargs.get("provider", ""),
+            processing_stage="continuous_learning",
+            processing_mode="incremental",
+        )
+        contract.output_data = {
+            "cycle_result": {k: v for k, v in cycle_result.items()
+                           if isinstance(v, (str, int, float, bool, list))},
+            "stages_executed": cycle_result.get("stages_executed", []),
+        }
+        return contract
+
     def _save_checkpoint(self, step_key: str):
         if self.dataframe is None:
             return
         self.checkpoint_dir.mkdir(parents=True, exist_ok=True)
         path = self.checkpoint_dir / f"{step_key}.parquet"
-        self.dataframe.to_parquet(path, index=False)
+        df = self.dataframe.copy()
+        for col in df.columns:
+            if df[col].dtype == "object" or str(df[col].dtype) == "string":
+                df[col] = df[col].astype(str)
+        df.to_parquet(path, index=False)
 
     def _load_checkpoint(self, step_key: str) -> pd.DataFrame:
         path = self.checkpoint_dir / f"{step_key}.parquet"
@@ -222,7 +303,9 @@ class Orchestrator:
                 ["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5,
             )
             return out.stdout.strip() or None
-        except Exception:
+        except Exception as e:
+            logger = get_logger("Orchestrator")
+            logger.debug("Could not get git SHA: %s", e)
             return None
 
     def _write_provenance(self):

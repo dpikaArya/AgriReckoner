@@ -33,7 +33,8 @@ def safe_read(path, **kwargs):
     """Safely read a file, return None if not found."""
     try:
         return pd.read_excel(path, **kwargs)
-    except Exception:
+    except Exception as e:
+        log(f"Could not read {path}: {e}")
         return None
 
 

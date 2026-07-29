@@ -145,9 +145,11 @@ def load_registered_papers() -> set:
         try:
             import sqlite3
             conn = sqlite3.connect(str(db_path))
-            for row in conn.execute("SELECT paper_name FROM paper_registry").fetchall():
-                registered.add(row[0])
-            conn.close()
+            try:
+                for row in conn.execute("SELECT paper_name FROM paper_registry").fetchall():
+                    registered.add(row[0])
+            finally:
+                conn.close()
         except Exception:
             pass
     return registered
@@ -371,7 +373,7 @@ def phase0_load_master_datasets() -> pd.DataFrame:
     combined = pd.concat(all_dfs, ignore_index=True)
     log(f"Combined master datasets: {len(combined)} rows, {len(combined.columns)} cols")
 
-    mapped = combined.rename(columns=MASTER_COLUMN_MAP)
+    mapped = combined.rename(columns=MASTER_COLUMN_MAP, errors="ignore")
     mapped = mapped.loc[:, ~mapped.columns.duplicated()]
 
     for col in UAMS_COLUMNS:
@@ -512,7 +514,8 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
             existing_df = pd.read_csv(cached_csv)
             if len(existing_df) > 0:
                 log(f"Loaded existing schema: {len(existing_df)} rows from cache")
-        except Exception:
+        except Exception as e:
+            log(f"Could not load cached schema: {e}")
             existing_df = None
 
     new_papers_mask = ingestion_df["Status"] == "New"
@@ -1027,7 +1030,7 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
             from sklearn.feature_selection import SelectKBest, f_regression
             zero_var = [c for c in X.columns if X[c].std() == 0]
             if zero_var:
-                X = X.drop(columns=zero_var)
+                X = X.drop(columns=zero_var, errors="ignore")
                 log(f"  Dropped {len(zero_var)} zero-variance features")
             if X.shape[1] > 0:
                 k = max(2, X.shape[0] // 3)
@@ -1070,8 +1073,8 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
             try:
                 models_dict["SVR"] = SVR(kernel="rbf", C=1.0)
                 param_grids["SVR"] = {"C": [0.1, 1.0, 10.0], "epsilon": [0.01, 0.1]}
-            except Exception:
-                pass
+            except Exception as e:
+                log(f"  SVR not available: {e}")
 
         target_results = []
         target_cv = {}
@@ -1106,7 +1109,8 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
                         gs.fit(X_train, y_train)
                         best_params = gs.best_params_
                         best_score = round(float(gs.best_score_), 4)
-                    except Exception:
+                    except Exception as gs_e:
+                        log(f"  GridSearchCV failed for {name}: {gs_e}")
                         best_params = {}
                         best_score = cv_mean
                 else:
@@ -1315,8 +1319,8 @@ def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> p
                         if any(v != 0 for v in feat_vals):
                             predicted_yield = round(float(model.predict([feat_vals])[0]), 2)
                             break
-                except Exception:
-                    pass
+                except Exception as e:
+                    log(f"  Model predict failed: {e}")
 
         if n is not None and n < 50:
             best_fert = "Urea (Nitrogen-rich)"
