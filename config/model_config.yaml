@@ -57,6 +57,25 @@ metrics:
     - f1
     - roc_auc
 
+feature_selection:
+  importance_threshold: 0.01
+  correlation_threshold: 0.90
+  variance_threshold: 0.001
+  max_features: 150
+  min_features: 80
+
+optimization:
+  n_trials: 50
+  timeout_seconds: 300
+
+ensemble:
+  enabled: true
+  auto_weight: true
+
+data_quality:
+  high_threshold: 0.8
+  medium_threshold: 0.5
+
 thresholds:
   min_r2: 0.0
   max_rmse: 100.0

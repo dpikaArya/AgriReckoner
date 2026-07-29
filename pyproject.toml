@@ -29,6 +29,18 @@ dependencies = [
 
 [project.optional-dependencies]
 llm = ["openai>=1.40"]
+ml = [
+    "optuna>=4.0",
+    "lightgbm>=4.0",
+    "shap>=0.45",
+]
+ml-full = [
+    "optuna>=4.0",
+    "lightgbm>=4.0",
+    "shap>=0.45",
+    "catboost>=1.2",
+    "python-docx>=1.1",
+]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
@@ -42,7 +54,7 @@ dev = [
 agriai = "agri_ai_agent.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["agri_ai_agent*"]
+include = ["agri_ai_agent*", "src*"]
 
 [tool.ruff]
 line-length = 100
