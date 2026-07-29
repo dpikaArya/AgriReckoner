@@ -105,6 +105,7 @@ df = orch.run(filepath="data.csv")
 | Document | Description |
 |----------|-------------|
 | [ARCHITECTURE.md](ARCHITECTURE.md) | System architecture, core components, agent communication, extension points |
+| [docs/flowchart.md](docs/flowchart.md) | Visual Mermaid flowchart of the full 23-agent pipeline |
 | [DATA_PIPELINE.md](DATA_PIPELINE.md) | End-to-end data flow, DatasetPackage format, ID hierarchy, validation, versioning |
 | [MODEL_TRAINING.md](MODEL_TRAINING.md) | Training workflow, model types, hyperparameter tuning, evaluation, experiment tracking |
 | [docs/architecture.md](docs/architecture.md) | Detailed architecture reference |
