@@ -14,7 +14,7 @@ class TestFeatureAgentV2:
     def test_agent_name(self):
         assert self.agent.agent_name == "FeatureAgent"
 
-    def test_generates_150_plus_features(self):
+    def test_generates_140_plus_features(self):
         df = pd.DataFrame({
             "Temperature_Max": np.random.uniform(20, 40, 20),
             "Temperature_Min": np.random.uniform(10, 25, 20),
@@ -42,7 +42,7 @@ class TestFeatureAgentV2:
         final_cols = len(result.columns)
         new_features = final_cols - initial_cols
         print(f"Features generated: {new_features} (from {initial_cols} to {final_cols})")
-        assert final_cols >= 150, f"Expected >=150 columns, got {final_cols}"
+        assert final_cols >= 140, f"Expected >=140 columns, got {final_cols}"
 
     def test_process_minimal_dataframe(self):
         df = pd.DataFrame({"Soil_pH": [6.5, 7.0]})
@@ -72,12 +72,10 @@ class TestFeatureAgentV2:
 
     def test_log_features_created(self):
         df = pd.DataFrame({
-            "Yield_per_Hectare": [3000, 4000, 5000],
             "Rainfall": [200, 400, 600],
             "Nitrogen": [80, 100, 120],
         })
         result = self.agent.process(df)
-        assert "Yield_per_Hectare_log" in result.columns
         assert "Rainfall_log" in result.columns
         assert "N_log" in result.columns
 

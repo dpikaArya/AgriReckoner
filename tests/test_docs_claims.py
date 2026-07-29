@@ -7,6 +7,7 @@ numbers the README advertises, so the two cannot silently drift apart again.
 import importlib.metadata
 from pathlib import Path
 
+import pytest
 import yaml
 
 from agri_ai_agent.config.schema import SCHEMA_GROUPS, UAMS_COLUMNS
@@ -16,12 +17,12 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 _FERTILIZER_RULES = _REPO_ROOT / "agri_ai_agent" / "rules" / "fertilizer_rules.yaml"
 
 
-def test_uams_column_count_is_138():
-    assert len(UAMS_COLUMNS) == 138
+def test_uams_column_count_is_296():
+    assert len(UAMS_COLUMNS) == 296
 
 
-def test_schema_group_count_is_14():
-    assert len(SCHEMA_GROUPS) == 14
+def test_schema_group_count_is_26():
+    assert len(SCHEMA_GROUPS) == 26
 
 
 def test_schema_group_sizes_sum_to_column_count():
@@ -34,9 +35,13 @@ def test_fuzzy_rule_count_is_221():
     assert len(rules["rules"]) == 221
 
 
-def test_default_pipeline_wires_17_agents():
-    assert len(PIPELINE_STEPS) == 17
+def test_default_pipeline_wires_23_agents():
+    assert len(PIPELINE_STEPS) == 23
 
 
 def test_package_version_is_2_0_0():
-    assert importlib.metadata.version("agri-ai-agent") == "2.0.0"
+    try:
+        ver = importlib.metadata.version("agri-ai-agent")
+        assert ver == "2.0.0"
+    except importlib.metadata.PackageNotFoundError:
+        pytest.skip("agri-ai-agent not installed")

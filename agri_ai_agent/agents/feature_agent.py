@@ -143,7 +143,10 @@ class FeatureAgent(BaseAgent):
             _add("P_K_ratio", _num("Phosphorus") / _num("Potassium").replace(0, np.nan))
 
         if "Biomass_Yield" in df.columns:
-            _add("Biomass_log", np.log1p(_num("Biomass_Yield").clip(lower=0)))
+            bm = _num("Biomass_Yield")
+            _add("Biomass_log", np.log1p(bm.clip(lower=0)))
+            _add("Biomass_sqrt", np.sqrt(bm.clip(lower=0)))
+            _add("Biomass_squared", bm ** 2)
 
         if "Humidity" in df.columns and "Temperature_Max" in df.columns:
             hum, tmax = _num("Humidity"), _num("Temperature_Max")
@@ -293,10 +296,13 @@ class FeatureAgent(BaseAgent):
         if "Fruit_Weight" in df.columns:
             fw = _num("Fruit_Weight")
             _add("FruitWeight_log", np.log1p(fw.clip(lower=0)))
+            _add("FruitWeight_sqrt", np.sqrt(fw.clip(lower=0)))
             _add("FruitWeight_squared", fw ** 2)
 
         if "100_Seed_Weight" in df.columns:
-            _add("SeedWeight_log", np.log1p(_num("100_Seed_Weight").clip(lower=0)))
+            sw = _num("100_Seed_Weight")
+            _add("SeedWeight_log", np.log1p(sw.clip(lower=0)))
+            _add("SeedWeight_squared", sw ** 2)
 
         if "Harvest_Index" in df.columns:
             hi = _num("Harvest_Index")
