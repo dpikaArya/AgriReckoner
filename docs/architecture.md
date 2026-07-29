@@ -2,40 +2,53 @@
 
 ## Overview
 
-The AAIF is an **18-agent sequential pipeline** that converts unstructured agricultural research PDFs into structured, ML-ready datasets and actionable fertilizer recommendations. PHASE -1 (External Data Source Layer) provides a plugin-based external data ingestion system that runs before the main pipeline. Each agent extends `BaseAgent`, communicates via typed `AgentContract` messages, and is orchestrated by a central `Orchestrator` with checkpoint/recovery, retry logic, and provenance logging.
+The AAIF is a **23-agent sequential pipeline** that converts unstructured agricultural research PDFs into structured, ML-ready datasets and actionable fertilizer recommendations. PHASE -1 (External Data Source Layer) provides a plugin-based external data ingestion system that runs before the main pipeline. Each agent extends `BaseAgent`, communicates via typed `AgentContract` messages, and is orchestrated by a central `Orchestrator` with checkpoint/recovery, retry logic, and provenance logging.
 
 ## Agent Pipeline
 
 ```
-External Data Sources ─► 0. External Data Source Layer ─►
-Master Datasets ─► 1. Extraction ─► 2. Evidence Fusion ─► 3. Ontology ─►
-4. Table Intelligence ─► 5. Schema Population ─► 6. Knowledge Integration ─►
-7. Knowledge ─► 8. Validation ─► 9. Feature Engineering ─►
-10. Model Selection ─► 11. Training ─► 12. Prediction ─►
-13. Recommendation ─► 14. Fuzzy Logic ─► 15. Benchmark ─►
-16. Explainability ─► 17. Ready Reckoner
+PHASE 0: INGESTION & NORMALIZATION
+Repository Sync ─► External Data ─► Dataset Normalization ─► Dataset Ingestion Bridge ─►
+
+PHASE 1: EXTRACTION & KNOWLEDGE
+Extraction ─► Evidence Fusion ─► Ontology ─► Table Intelligence ─►
+Schema Population ─► Knowledge Integration ─► Knowledge ─► Observation Generation ─►
+
+PHASE 2: VALIDATION & FEATURES
+Validation ─► Feature Store (gate) ─► Feature Engineering ─►
+
+PHASE 3: ML TRAINING & PREDICTION
+Model Selection ─► Training ─► Prediction ─►
+
+PHASE 4: RECOMMENDATION & EXPORT
+Recommendation ─► Fuzzy Logic ─► Benchmark ─► Explainability ─► Ready Reckoner
 ```
 
 | # | Agent | Class | Purpose |
 |---|-------|-------|---------|
-| 0 | **ExternalDataSourceAgent** | `external_data_source_agent.py` | Plugin-based external data ingestion via `ExternalDataConnector` interface; discovers, downloads, validates and registers datasets from 10+ external agricultural repositories |
-| 1 | **ExtractionAgent** | `extraction_agent.py` | 6-reader hybrid PDF extraction (Pdfminer, Camelot, Pdfplumber, Poppler, OCR, Semantic) with regex pattern matching for agronomic variables |
-| 2 | **EvidenceFusionAgent** | `evidence_fusion_agent.py` | Confidence-weighted multi-reader deduplication and cell-level conflict resolution |
-| 3 | **OntologyAgent** | `ontology_agent.py` | Normalises heterogeneous column names to UAMS via a 120+ entry master column variant map |
-| 4 | **TableIntelligenceAgent** | `table_intelligence_agent.py` | Table type classification, summary statistics computation |
-| 5 | **SchemaPopulationAgent** | `schema_population_agent.py` | Derived column computation and missing value inference |
-| 6 | **KnowledgeIntegrationAgent** | `knowledge_integration_agent.py` | Domain-knowledge-based missing value imputation |
-| 7 | **KnowledgeAgent** | `knowledge_agent.py` | Agronomic domain constraint application |
-| 8 | **ValidationAgent** | `validation_agent.py` | Biological range enforcement (pH∈[3,10], yield∈[0,50000]), IQR outlier detection (3×IQR), OCR artefact flagging |
-| 9 | **FeatureAgent** | `feature_agent.py` | 16+ composite features: NPK Index, Soil Fertility Index, Climate Index, Growing Degree Days, NUE, WUE, polynomial terms (→146 total cols) |
-| 10 | **ModelSelectionAgent** | `model_selection_agent.py` | Adaptive model pool selection by sample size, SelectKBest feature selection, GridSearchCV |
-| 11 | **TrainingAgent** | `training_agent.py` | 8 regression families (Linear, Ridge, Lasso, ElasticNet, RF, GBM, XGBoost, SVR) with 5-fold CV / LOO |
-| 12 | **PredictionAgent** | `prediction_agent.py` | Loads best models, generates predictions for 5 targets |
-| 13 | **RecommendationAgent** | `recommendation_agent.py` | Per-crop top-3 treatment alternatives with confidence scoring |
-| 14 | **FuzzyAgent** | `fuzzy_logic_agent.py` | 221 Mamdani rules (v3.0), 10 trapezoidal/triangular input MFs, 3 output MFs, centroid defuzzification |
-| 15 | **BenchmarkAgent** | `benchmark_agent.py` | Phase-by-phase timing, data quality and coverage metrics |
-| 16 | **ExplainabilityAgent** | `explainability_agent.py` | Feature-attribution analysis per prediction |
-| 17 | **ReadyReckonerAgent** | `ready_reckoner_agent.py` | Excel/CSV/HTML/JSON per-crop decision-support table export |
+| 0 | **RepositorySyncAgent** | `repository_sync_agent.py` | Change detection and repository sync for data sources |
+| 1 | **ExternalDataSourceAgent** | `external_data_source_agent.py` | Plugin-based external data ingestion via `ExternalDataConnector` interface; discovers, downloads, validates and registers datasets from 10+ external agricultural repositories |
+| 2 | **DatasetNormalizationAgent** | `dataset_normalization_agent.py` | Normalises raw datasets to standard `DatasetPackage` format |
+| 3 | **DatasetIngestionBridgeAgent** | `dataset_ingestion_bridge_agent.py` | Assigns ID hierarchy: Dataset_ID / Document_ID / Paper_ID / Experiment_ID / Treatment_ID / Observation_ID |
+| 4 | **ExtractionAgent** | `extraction_agent.py` | 6-reader hybrid PDF extraction (Pdfminer, Camelot, Pdfplumber, Poppler, OCR, Semantic) with regex pattern matching for agronomic variables |
+| 5 | **EvidenceFusionAgent** | `evidence_fusion_agent.py` | Confidence-weighted multi-reader deduplication and cell-level conflict resolution |
+| 6 | **OntologyAgent** | `ontology_agent.py` | Normalises heterogeneous column names to UAMS via a 553-entry master column variant map |
+| 7 | **TableIntelligenceAgent** | `table_intelligence_agent.py` | Table type classification, summary statistics computation |
+| 8 | **SchemaPopulationAgent** | `schema_population_agent.py` | Derived column computation and missing value inference |
+| 9 | **KnowledgeIntegrationAgent** | `knowledge_integration_agent.py` | Domain-knowledge-based missing value imputation |
+| 10 | **KnowledgeAgent** | `knowledge_agent.py` | Agronomic domain constraint application |
+| 11 | **ObservationGenerationAgent** | `observation_generation_agent.py` | Builds observation hierarchy, generates Paper_ID / Dataset_ID from metadata |
+| 12 | **ValidationAgent** | `validation_agent.py` | Biological range enforcement (pH∈[3,10], yield∈[0,50000]), IQR outlier detection (3×IQR), OCR artefact flagging |
+| 13 | **FeatureStoreAgent** | `feature_store_agent.py` | Validation gate + Parquet persistence layer |
+| 14 | **FeatureAgent** | `feature_agent.py` | 140+ composite features: NPK Index, Soil Fertility Index, Climate Index, Growing Degree Days, NUE, WUE, polynomial terms (→449 total cols on production data) |
+| 15 | **ModelSelectionAgent** | `model_selection_agent.py` | Adaptive model pool selection by sample size, SelectKBest feature selection, GridSearchCV |
+| 16 | **TrainingAgent** | `training_agent.py` | 8 regression families (Linear, Ridge, Lasso, ElasticNet, RF, GBM, XGBoost, SVR) with 5-fold CV / LOO |
+| 17 | **PredictionAgent** | `prediction_agent.py` | Loads best models, generates predictions for 5 targets |
+| 18 | **RecommendationAgent** | `recommendation_agent.py` | Per-crop top-3 treatment alternatives with confidence scoring |
+| 19 | **FuzzyAgent** | `fuzzy_logic_agent.py` | 221 Mamdani rules (v3.0), 10 trapezoidal/triangular input MFs, 3 output MFs, centroid defuzzification |
+| 20 | **BenchmarkAgent** | `benchmark_agent.py` | Phase-by-phase timing, data quality and coverage metrics |
+| 21 | **ExplainabilityAgent** | `explainability_agent.py` | Feature-attribution analysis per prediction |
+| 22 | **ReadyReckonerAgent** | `ready_reckoner_agent.py` | Excel/CSV/HTML/JSON per-crop decision-support table export |
 
 ### Additional Agents (not in default pipeline)
 
@@ -115,8 +128,8 @@ Supports: centrality analysis (degree, betweenness), shortest path, PageRank, su
 
 **File:** `agri_ai_agent/config/schema.py`
 
-- **26 groups** (A–Z), covering Paper Metadata, Crop Information, Experimental Design, Environment, Soil Properties, Fertilizer Information, Crop Growth Parameters, Yield Parameters, Grain Quality, ML Targets, Engineered Features, Leakage Labels, Encoded Variables, ML Predictions, Soil Biological Properties, Soil Enzyme Activity, Soil Microbial Community, Remote Sensing Indices, Soil Exchangeable Cations, Water Extractable Organic, Soil Physical Properties, Nematode Ecology, Economic Parameters, Nutrient Uptake, Irrigation & Management, Soil pH Variants.
-- Full column variant map (`VARIANT_MAP`) with ~700+ entries for normalising heterogeneous source column names
+- **296 columns** in **26 groups** (A–Z), covering Paper Metadata, Crop Information, Experimental Design, Environment, Soil Properties, Fertilizer Information, Crop Growth Parameters, Yield Parameters, Grain Quality, ML Targets, Engineered Features, Leakage Labels, Encoded Variables, ML Predictions, Soil Biological Properties, Soil Enzyme Activity, Soil Microbial Community, Remote Sensing Indices, Soil Exchangeable Cations, Water Extractable Organic, Soil Physical Properties, Nematode Ecology, Economic Parameters, Nutrient Uptake, Irrigation & Management, Soil pH Variants.
+- Full column variant map (`VARIANT_MAP`) with **553 unique entries** for normalising heterogeneous source column names
 - `NON_FEATURE_COLS`, `POST_HARVEST_VARIABLES`, `PRE_HARVEST_MEASUREMENTS`, `NUMERIC_UAMS_COLUMNS` sets for downstream processing
 
 ## External Data Source Layer (PHASE -1)
@@ -188,14 +201,12 @@ Standardized return type from every connector:
 ## Data Flow
 
 ```
-External Repositories ──► ExternalDataSourceAgent (PHASE -1)
-    │
-    ▼
-PDFs / Excel ──► Extraction ──► EvidenceFusion ──► Ontology ──►
-TableIntelligence ──► SchemaPopulation ──► KnowledgeIntegration ──►
-Knowledge ──► Validation ──► Feature ──► ModelSelection ──►
-Training ──► Prediction ──► Recommendation ──► Fuzzy ──►
-Benchmark ──► Explainability ──► ReadyReckoner
+PHASE 0: Repository Sync ─► External Data ─► Dataset Normalization ─► Dataset Ingestion Bridge ─►
+PHASE 1: Extraction ─► Evidence Fusion ─► Ontology ─► Table Intelligence ─►
+         Schema Population ─► Knowledge Integration ─► Knowledge ─► Observation Generation ─►
+PHASE 2: Validation ─► Feature Store (gate) ─► Feature Engineering ─►
+PHASE 3: Model Selection ─► Training ─► Prediction ─►
+PHASE 4: Recommendation ─► Fuzzy Logic ─► Benchmark ─► Explainability ─► Ready Reckoner
 ```
 
 Each agent receives the cumulative `pd.DataFrame` from its predecessor, processes/appends columns, and passes it forward. The `AgentContract` carries metadata alongside the data.

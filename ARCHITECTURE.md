@@ -56,7 +56,7 @@
 
 ```
 agri_ai_agent/                  # Core agent framework
-├── agents/                     # 29 agent implementations
+├── agents/                     # 26 agent implementations
 │   ├── base_agent.py           # Abstract base with retry + artifact saving
 │   ├── extraction_agent.py     # 6-reader hybrid PDF extraction
 │   ├── evidence_fusion_agent.py # Confidence-weighted multi-reader merge
@@ -66,7 +66,7 @@ agri_ai_agent/                  # Core agent framework
 │   ├── knowledge_integration_agent.py  # Domain-knowledge imputation
 │   ├── knowledge_agent.py      # PDF ingestion + paper registry
 │   ├── validation_agent.py     # Range checks, unit harmonisation, quality
-│   ├── feature_agent.py        # 16+ composite feature engineering
+│   ├── feature_agent.py        # 140+ composite feature engineering
 │   ├── feature_store_agent.py  # Validation gate + parquet persistence
 │   ├── model_selection_agent.py # Adaptive pool + GridSearchCV + nested CV
 │   ├── training_agent.py       # Model training + evaluation + export
@@ -85,8 +85,8 @@ agri_ai_agent/                  # Core agent framework
 │   ├── provenance_agent.py     # Per-cell lineage (optional)
 │   └── llm_extraction_agent.py # OpenAI-backed extraction (optional)
 ├── config/
-│   ├── schema.py               # UAMS v2.0: 154+ columns, 26 groups (A-Z)
-│   │                           # VARIANT_MAP: 700+ name variants
+│   ├── schema.py               # UAMS v2.0: 296 columns, 26 groups (A-Z)
+│   │                           # VARIANT_MAP: 553 unique name variants
 │   └── settings.py             # AgriAISettings: all paths + params
 ├── contracts/
 │   └── messages.py             # AgentContract dataclass + 20+ subclasses
@@ -140,7 +140,7 @@ config/                         # Runtime configuration
 ├── benchmark.yaml              # Benchmark thresholds
 └── explainability.yaml         # Explainability settings
 
-tests/                          # 40+ test files covering all agents
+tests/                          # 37 test files covering all agents
 evaluation/                     # 11-stage automated evaluation suite
 benchmarks/                     # Gold standard benchmarking data
 ```
@@ -251,7 +251,7 @@ Orchestrator.run()
 ├─12. observation_generation — Build observation hierarchy
 ├─13. validation            — Biological range, unit harmonisation, quality
 ├─14. feature_store         — Validation gate + Parquet persistence
-├─15. feature               — 146 engineered features
+├─15. feature               — 140+ engineered features
 ├─16. model_selection       — Adaptive pool + GridSearchCV
 ├─17. training              — Model training + evaluation
 ├─18. prediction            — Load best models, generate predictions
@@ -270,7 +270,7 @@ Orchestrator.run()
 - **`config/apis.yaml`**: External data source definitions — URLs, strategies, auth, priorities, timeouts. Overridable via `AGRI_{SOURCE}_{KEY}` env vars.
 - **`config/benchmark.yaml`**: Benchmark thresholds and performance targets.
 - **`config/explainability.yaml`**: SHAP/permutation importance configuration.
-- **`agri_ai_agent/config/schema.py`**: UAMS v2.0 — 154+ canonical columns, 26 groups (A-Z), 700+ entry `VARIANT_MAP` for column name normalisation, plus helper sets (`NON_FEATURE_COLS`, `POST_HARVEST_VARIABLES`, `PRE_HARVEST_MEASUREMENTS`, `NUMERIC_UAMS_COLUMNS`).
+- **`agri_ai_agent/config/schema.py`**: UAMS v2.0 — 296 canonical columns, 26 groups (A-Z), 553 unique entry `VARIANT_MAP` for column name normalisation, plus helper sets (`NON_FEATURE_COLS`, `POST_HARVEST_VARIABLES`, `PRE_HARVEST_MEASUREMENTS`, `NUMERIC_UAMS_COLUMNS`).
 
 ## Extension Points
 
