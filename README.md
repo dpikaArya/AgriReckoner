@@ -10,7 +10,7 @@ The core scientific objectives are:
 4.	Fuzzy-Logic Fertilizer Recommendation. A Mamdani fuzzy inference system with 221 rules operates on 10 agronomic input variables (N, P, K, Zn, soil pH, rainfall, temperature, organic carbon, growth stage, yield prediction) to produce crop-specific, linguistically interpretable fertilizer recommendations (N/P/K dosages) with confidence scores. This bridges the gap between data-driven prediction and expert-system reasoning.
 5.	Ready Reckoner Table Generation. The terminal output is a per-crop Ready Reckoner Table — a compact decision-support artefact summarising optimal fertilizer regimes, expected yields, treatment alternatives, and confidence levels, exportable in Excel, CSV, and HTML formats for extension-agent and farmer use.
 2. Main Implementation Features
-The framework is implemented as a 10-phase agentic pipeline orchestrated by a central Orchestrator class. It sequences **17 agents wired into the default pipeline** (`orchestrator.PIPELINE_STEPS`), each governed by a typed AgentContract message protocol. One further agent — the **ProvenanceAgent** — is available in the codebase but is **not** part of the default pipeline. An **optional LLM extraction agent** (OpenAI-backed, see [Optional LLM extraction](#optional-llm-extraction)) can be enabled separately. Key implementation features include:
+The framework is implemented as a **17-agent pipeline** orchestrated by a central Orchestrator class. It sequences the agents in `orchestrator.PIPELINE_STEPS`, each governed by a typed AgentContract message protocol. One further agent — the **ProvenanceAgent** — is available in the codebase but is **not** part of the default pipeline. An **optional LLM extraction agent** (OpenAI-backed, see [Optional LLM extraction](#optional-llm-extraction)) can be enabled separately. Key implementation features include:
 Feature	Description
 Incremental PDF Ingestion	Scans a PDF directory; detects crop, DOI, title, and duplicates via fuzzy string matching (SequenceMatcher >0.90). Skips previously registered papers via a SQLite paper_registry (current skip rate: 84.6%).
 6-Reader Hybrid Extraction	Dispatches each PDF through Pdfminer, Camelot, Pdfplumber, Poppler (pdftotext), OCR, and Semantic readers with configurable timeouts. Regex patterns extract soil pH, N/P/K, yield, temperature, rainfall, and 15+ agronomic variables.
@@ -33,7 +33,7 @@ UAMS schema columns	138 (14 groups, A–N)
 Crops covered	9 (Barley, Bell Pepper, Black Wheat, Cabbage, Carrot, Chickpea, Cotton, Maize, Spinach)
 Fuzzy rules	221 (Mamdani v3.0)
 Agents wired into default pipeline	17 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent)
-Pipeline phases	10
+Pipeline agents	17
 Model R²	Previously reported values (e.g. 0.995) were target-leakage artefacts, not validated skill — see [ML Models](#ml-models)
 
 
@@ -80,87 +80,192 @@ This framework automates the conversion of unstructured agricultural research PD
 
 ## Architecture
 
+The framework is orchestrated as a **17-agent sequential pipeline** (`orchestrator.PIPELINE_STEPS`), each agent extending `BaseAgent` and communicating via typed `AgentContract` messages. An `Orchestrator` class manages execution order, checkpoint/recovery, retry logic, and provenance logging. An additional `ProvenanceAgent` and optional `LLMExtractionAgent` are available but not wired into the default pipeline.
+
+### Agent Pipeline
+
 ```
-  ┌─────────────────────────────────────────────────────────────────┐
-  │                    PHASE 0: LOAD MASTER DATASETS                │
-  │              5 crop-specific Excel workbooks (45 rows)          │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │                 PHASE 1: INCREMENTAL INGESTION                  │
-  │           91 PDFs scanned → 105 papers registered               │
-  │           SQLite registry tracks processed papers               │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │           PHASE 2-3: AI EXTRACTION + SCHEMA MAPPING            │
-  │     6 hybrid readers → Evidence fusion → UAMS (138 columns)     │
-  │     68 papers mapped to Universal Agricultural Schema           │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │                   PHASE 4: DATA VALIDATION                     │
-  │        Biological range checks, outlier detection,              │
-  │        crop verification, DOI validation, temperature           │
-  │        consistency checks                                       │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │                 PHASE 5: FEATURE ENGINEERING                    │
-  │     16 derived features → 146 total columns                     │
-  │     NPK index, Soil fertility, Climate index,                   │
-  │     Growth-Yield interactions                                   │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │                   PHASE 6: ML TRAINING                         │
-  │     5 targets × 8 models = 39 trained models                   │
-  │     Ridge, Lasso, ElasticNet, RF, GBM, XGBoost, SVR, KNN       │
-  │     Cross-validation, feature selection, hyperparameter tuning  │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │                  PHASE 7: FUZZY LOGIC                          │
-  │     221 Mamdani rules (v3.0)                                    │
-  │     10 input variables, centroid defuzzification                │
-  │     Crop-specific N/P/K recommendations                        │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │               PHASE 8: RECOMMENDATION AGENT                    │
-  │     Per-crop fertilizer recommendations                        │
-  │     Confidence scoring, treatment alternatives                  │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │                PHASE 9: READY RECKONER                         │
-  │     Excel, HTML export generation                               │
-  │     Per-crop yield summaries                                    │
-  └───────────────────────────────┬─────────────────────────────────┘
-                                  │
-  ┌───────────────────────────────▼─────────────────────────────────┐
-  │              PHASE 10: CONTINUOUS LEARNING                      │
-  │     Paper registry update, drift detection                      │
-  │     Model versioning, incremental retraining                    │
-  └─────────────────────────────────────────────────────────────────┘
+                                    ┌─────────────────────────────┐
+                                    │   INPUT: Master Datasets    │
+                                    │  5 crop-specific Excel      │
+                                    │  workbooks (45 rows)        │
+                                    └──────────┬──────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │              1. EXTRACTION AGENT      6-reader hybrid extraction       │
+         │  Pdfminer · Camelot · Pdfplumber · Poppler · OCR · Semantic readers    │
+         │  Regex extraction of soil pH, N/P/K, yield, temperature, rainfall      │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │           2. EVIDENCE FUSION AGENT   Confidence-weighted merge          │
+         │  Deduplicates multi-reader outputs, resolves conflicts at cell level    │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │             3. ONTOLOGY AGENT   Column name resolution                  │
+         │  Normalises heterogeneous column names → UAMS via 120-entry master map  │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │         4. TABLE INTELLIGENCE AGENT   Table classification              │
+         │  Classifies table types, computes summary statistics                    │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │        5. SCHEMA POPULATION AGENT   Derived column computation          │
+         │  Fills computed columns, infers missing values                          │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │     6. KNOWLEDGE INTEGRATION AGENT   Missing value fill                 │
+         │  Domain-knowledge-based missing value imputation                        │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │             7. KNOWLEDGE AGENT   Domain knowledge                       │
+         │  Applies agronomic domain constraints                                   │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │            8. VALIDATION AGENT   Biological range validation            │
+         │  pH∈[3,10], yield∈[0,50000] kg/ha, Tmax≥Tmin                           │
+         │  IQR outlier detection (3× IQR), OCR artefact flagging                  │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │            9. FEATURE AGENT   Feature engineering (146 cols)            │
+         │  NPK Index, Soil Fertility Index, Climate Index, Growing Degree Days    │
+         │  NUE, WUE, Growth-Yield Index, polynomial temperature terms             │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │      10. MODEL SELECTION AGENT   Adaptive model selection               │
+         │  Selects model pool based on sample size, SelectKBest feature selection │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │           11. TRAINING AGENT   Model training (8 families)              │
+         │  Linear · Ridge · Lasso · ElasticNet · Random Forest · GBM · XGBoost   │
+         │  · SVR · GridSearchCV · 5-fold CV / LOO                                 │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │           12. PREDICTION AGENT   Yield prediction                       │
+         │  Loads best models, generates predictions for 5 targets                 │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │        13. RECOMMENDATION AGENT   Fertilizer recommendations            │
+         │  Per-crop top-3 treatment alternatives with confidence scoring          │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │          14. FUZZY AGENT   Mamdani fuzzy inference (221 rules)         │
+         │  10 trapezoidal/triangular input MFs, 3 output MFs (Low/Med/High)      │
+         │  Centroid defuzzification, crop-specific adjustment factors             │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │          15. BENCHMARK AGENT   Pipeline metrics                         │
+         │  Measures phase-by-phase timing, data quality, coverage metrics         │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │       16. EXPLAINABILITY AGENT   Per-prediction explanations            │
+         │  Feature-attribution analysis, SHAP-based explanations                  │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+         ┌─────────────────────────────────────▼───────────────────────────────────┐
+         │        17. READY RECKONER AGENT   Final export generation               │
+         │  Excel · CSV · HTML · JSON per-crop decision-support tables             │
+         └─────────────────────────────────────────────────────────────────────────┘
+
+                               ┌─────────────────────────────┐
+                               │   CONTINUOUS LEARNING        │
+                               │  (run_continuous)            │
+                               │  Drift detection, registry   │
+                               │  update, model versioning    │
+                               └─────────────────────────────┘
 ```
+
+### Supporting Infrastructure
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     KNOWLEDGE GRAPH (NetworkX DiGraph)                   │
+│  8 node types: Paper · Treatment · Crop · Observation · Yield · Soil    │
+│  · Climate · Management                                                  │
+│  8 edge types: DESCRIBES · TREATS · GROWS · OBSERVES · YIELDS ·         │
+│  HAS_SOIL · HAS_CLIMATE · MANAGES                                        │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│                     CONTRACT PROTOCOL (AgentContract)                    │
+│  Typed dataclass: agent_name, status, input/output_data, artifacts,      │
+│  errors, warnings, timing, retry_count                                   │
+│  Subclasses: TrainingResult, PredictionResult, ExportResult, etc.        │
+└──────────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────────┐
+│                       CHECKPOINT & RECOVERY                              │
+│  Per-agent Parquet checkpoints in .checkpoints/                          │
+│  Incremental mode: skips completed agents                                │
+│  Critical steps (extraction, training): pipeline halts on failure        │
+│  Non-critical steps: warnings logged, pipeline continues                 │
+└──────────────────────────────────────────────────────────────────────────┘
+```
+
+### Agent Contract Protocol
+
+Every agent accepts an `AgentContract` message and returns one with the same shape:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `agent_name` | `str` | Agent identifier |
+| `status` | `str` | `pending` → `running` → `success`/`failed` |
+| `input_data` | `dict` | Input configuration |
+| `output_data` | `dict` | Output summary (rows, columns) |
+| `artifacts` | `list[str]` | Generated file paths |
+| `errors` | `list[str]` | Per-attempt error traces |
+| `warnings` | `list[str]` | Non-fatal warnings |
+| `execution_time_sec` | `float` | Wall-clock execution time |
+| `retry_count` | `int` | Number of retry attempts |
+
+### Data Flow
+
+```
+PDFs / Excel ──► ExtractionAgent ──► EvidenceFusionAgent ──► OntologyAgent ──►
+TableIntelligenceAgent ──► SchemaPopulationAgent ──► KnowledgeIntegrationAgent ──►
+KnowledgeAgent ──► ValidationAgent ──► FeatureAgent ──► ModelSelectionAgent ──►
+TrainingAgent ──► PredictionAgent ──► RecommendationAgent ──► FuzzyAgent ──►
+BenchmarkAgent ──► ExplainabilityAgent ──► ReadyReckonerAgent
+```
+Each agent receives the cumulative `pd.DataFrame` from its predecessor, processes/appends columns, and passes it forward. The `AgentContract` carries metadata (status, timing, artifacts) alongside the data.
 
 ---
 
 ## Pipeline Phases
 
-| Phase | Name | Description | Key Output |
-|-------|------|-------------|------------|
-| 0 | **Master Datasets** | Load crop-specific Excel workbooks | 45 rows × 81 cols |
-| 1 | **Incremental Ingestion** | Scan PDFs, skip registered papers | 91 PDFs → 0 new (incremental) |
-| 2-3 | **AI Extraction** | 6 hybrid readers + schema mapping | 68 rows × 138 cols |
-| 4 | **Validation** | Biological ranges, outlier detection | Cleaned schema |
-| 5 | **Feature Engineering** | 16 derived features, interaction terms | 68 rows × 146 cols |
-| 6 | **ML Training** | 5 targets, 8 model types, CV | 39 trained models |
-| 7 | **Fuzzy Logic** | 221 Mamdani rules, 10 input vars | Fertilizer rules |
-| 8 | **Recommendations** | Per-crop N/P/K recommendations | 9 crop recs |
-| 9 | **Ready Reckoner** | Excel + HTML generation | Decision support tables |
-| 10 | **Continuous Learning** | Registry update, drift detection | Updated paper DB |
+| Step | Agent | Description | Key Output |
+|------|-------|-------------|------------|
+| 1 | **ExtractionAgent** | 6-reader hybrid PDF extraction (Pdfminer, Camelot, Pdfplumber, Poppler, OCR, Semantic) | Extracted raw variables |
+| 2 | **EvidenceFusionAgent** | Confidence-weighted multi-reader deduplication & cell-level conflict resolution | Fused extractions |
+| 3 | **OntologyAgent** | Column name normalisation to UAMS via 120-entry map | Ontology-mapped schema |
+| 4 | **TableIntelligenceAgent** | Table type classification, summary statistics | Table classification |
+| 5 | **SchemaPopulationAgent** | Derived column computation, inference | Populated UAMS columns |
+| 6 | **KnowledgeIntegrationAgent** | Domain-knowledge-based missing value imputation | Imputed schema |
+| 7 | **KnowledgeAgent** | Domain knowledge constraints & enrichment | Knowledge-enriched data |
+| 8 | **ValidationAgent** | Biological range checks (pH∈[3,10], yield∈[0,50000]), IQR outlier detection (3×IQR), OCR artefact flagging | Validated schema |
+| 9 | **FeatureAgent** | 16+ composite features: NPK Index, Soil Fertility, Climate Index, GDD, NUE, WUE | 146 engineered features |
+| 10 | **ModelSelectionAgent** | Adaptive model pool selection, SelectKBest feature selection | Model pool config |
+| 11 | **TrainingAgent** | 8 regression families (Linear, Ridge, Lasso, ElasticNet, RF, GBM, XGBoost, SVR) with GridSearchCV | 39 trained models |
+| 12 | **PredictionAgent** | Load best models, generate predictions for 5 targets | Predictions |
+| 13 | **RecommendationAgent** | Per-crop top-3 treatment alternatives with confidence scoring | Recommendations |
+| 14 | **FuzzyAgent** | 221 Mamdani rules (v3.0), 10 input MFs, 3 output MFs, centroid defuzzification | Fuzzy recommendations |
+| 15 | **BenchmarkAgent** | Phase-by-phase timing, data quality & coverage metrics | Benchmark report |
+| 16 | **ExplainabilityAgent** | Feature-attribution per prediction | Explanations |
+| 17 | **ReadyReckonerAgent** | Excel/CSV/HTML/JSON per-crop decision-support table export | Ready Reckoner tables |
 
 ---
 
@@ -276,7 +381,7 @@ more extracted training data. No validated R² table is published here until tha
 | Fuzzy rules | 221 (v3.0) |
 | Crops covered | 9 |
 | Agents wired into default pipeline | 17 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent) |
-| Pipeline phases | 10 |
+| Pipeline agents | 17 |
 | Evaluation stages | 11 |
 | Pipeline run time | ~25 seconds (incremental) |
 | PDF skip rate | 84.6% (incremental mode) |
@@ -322,9 +427,10 @@ Equivalently, without the console script:
 python -m agri_ai_agent run --file data.csv
 ```
 
-This runs the 10-phase pipeline: ingestion → extraction → validation → feature
-engineering → ML training → fuzzy logic → recommendations → ready reckoner →
-continuous learning.
+This runs the 17-agent pipeline: extraction → evidence fusion → ontology → table
+intelligence → schema population → knowledge integration → knowledge → validation →
+feature engineering → model selection → training → prediction → recommendations →
+fuzzy logic → benchmark → explainability → ready reckoner.
 
 ### Legacy runner (frozen)
 
