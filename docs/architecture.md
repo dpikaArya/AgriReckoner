@@ -2,11 +2,12 @@
 
 ## Overview
 
-The AAIF is a **17-agent sequential pipeline** that converts unstructured agricultural research PDFs into structured, ML-ready datasets and actionable fertilizer recommendations. Each agent extends `BaseAgent`, communicates via typed `AgentContract` messages, and is orchestrated by a central `Orchestrator` with checkpoint/recovery, retry logic, and provenance logging.
+The AAIF is an **18-agent sequential pipeline** that converts unstructured agricultural research PDFs into structured, ML-ready datasets and actionable fertilizer recommendations. PHASE -1 (External Data Source Layer) provides a plugin-based external data ingestion system that runs before the main pipeline. Each agent extends `BaseAgent`, communicates via typed `AgentContract` messages, and is orchestrated by a central `Orchestrator` with checkpoint/recovery, retry logic, and provenance logging.
 
 ## Agent Pipeline
 
 ```
+External Data Sources ─► 0. External Data Source Layer ─►
 Master Datasets ─► 1. Extraction ─► 2. Evidence Fusion ─► 3. Ontology ─►
 4. Table Intelligence ─► 5. Schema Population ─► 6. Knowledge Integration ─►
 7. Knowledge ─► 8. Validation ─► 9. Feature Engineering ─►
@@ -17,6 +18,7 @@ Master Datasets ─► 1. Extraction ─► 2. Evidence Fusion ─► 3. Ontolog
 
 | # | Agent | Class | Purpose |
 |---|-------|-------|---------|
+| 0 | **ExternalDataSourceAgent** | `external_data_source_agent.py` | Plugin-based external data ingestion via `ExternalDataConnector` interface; discovers, downloads, validates and registers datasets from 10+ external agricultural repositories |
 | 1 | **ExtractionAgent** | `extraction_agent.py` | 6-reader hybrid PDF extraction (Pdfminer, Camelot, Pdfplumber, Poppler, OCR, Semantic) with regex pattern matching for agronomic variables |
 | 2 | **EvidenceFusionAgent** | `evidence_fusion_agent.py` | Confidence-weighted multi-reader deduplication and cell-level conflict resolution |
 | 3 | **OntologyAgent** | `ontology_agent.py` | Normalises heterogeneous column names to UAMS via a 120+ entry master column variant map |
@@ -117,9 +119,78 @@ Supports: centrality analysis (degree, betweenness), shortest path, PageRank, su
 - Full column variant map (`VARIANT_MAP`) with ~700+ entries for normalising heterogeneous source column names
 - `NON_FEATURE_COLS`, `POST_HARVEST_VARIABLES`, `PRE_HARVEST_MEASUREMENTS`, `NUMERIC_UAMS_COLUMNS` sets for downstream processing
 
+## External Data Source Layer (PHASE -1)
+
+**Package:** `agri_ai_agent/external_data/`
+
+A plugin-based ingestion framework for external agricultural data repositories. Runs before the main pipeline and merges external datasets into the pipeline DataFrame.
+
+### Architecture
+
+```
+ConnectorRegistry (discovers connectors via pkgutil)
+    │
+    ├── CGIARConnector          (huggingface.co/datasets/CGIAR)
+    ├── FAOSTATConnector        (fao.org/faostat/)
+    ├── NASAPowerConnector      (power.larc.nasa.gov)
+    ├── SoilGridsConnector      (soilgrids.org)
+    ├── ISRICConnector          (isric.org)
+    ├── ZenodoConnector         (zenodo.org)
+    ├── MendeleyConnector       (data.mendeley.com)
+    ├── KaggleConnector         (kaggle.com/datasets)
+    ├── ICARConnector           (krishikosh.egranth.ac.in)
+    └── SAUConnector            (State Agricultural University portals)
+```
+
+### ExternalDataConnector Interface
+
+Every connector implements exactly the same abstract interface:
+
+| Method | Return | Purpose |
+|--------|--------|---------|
+| `connect()` | `bool` | Establish connection to the data source |
+| `discover(query)` | `list[dict]` | List available datasets/resources |
+| `download(resource_id, target_dir)` | `Optional[Path]` | Download dataset to local filesystem |
+| `validate(package)` | `bool` | Validate downloaded data integrity |
+| `register(package)` | `str` | Register dataset in local registry, return checksum |
+| `update()` | `int` | Check for new/updated datasets, return count |
+| `close()` | `None` | Clean up connection resources |
+
+### DatasetPackage
+
+Standardized return type from every connector:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `source` | `str` | Connector source name |
+| `resource_id` | `str` | Unique identifier within the source |
+| `name` | `str` | Human-readable dataset name |
+| `download_path` | `Optional[Path]` | Local filesystem path to downloaded data |
+| `data` | `Optional[pd.DataFrame]` | In-memory DataFrame |
+| `metadata` | `dict` | Source-specific metadata |
+| `checksum` | `Optional[str]` | Content hash for deduplication |
+| `is_valid` | `bool` | Validation result |
+| `row_count` / `column_count` | `int` | Shape of the dataset |
+
+### Design Principles
+
+1. **Plugin-based discovery** — `ConnectorRegistry` auto-discovers all `ExternalDataConnector` subclasses in the `connectors` package via `pkgutil`, no registration needed
+2. **Single interface** — every source implements exactly the same 7 methods; the pipeline never knows which repository produced the data
+3. **SOLID compliance**
+   - *Single Responsibility* — each connector handles one source
+   - *Open/Closed* — add new sources by creating a new connector class, no pipeline changes
+   - *Liskov Substitution* — all connectors are interchangeable via the abstract base
+   - *Interface Segregation* — focused 7-method interface
+   - *Dependency Inversion* — pipeline depends on the abstract `ExternalDataConnector`, not concrete implementations
+4. **Standardized output** — every connector returns `DatasetPackage`; the agent merges all packages into a single DataFrame
+5. **No hardcoded repository logic** — source URLs, API endpoints, and behavior are encapsulated per connector class
+
 ## Data Flow
 
 ```
+External Repositories ──► ExternalDataSourceAgent (PHASE -1)
+    │
+    ▼
 PDFs / Excel ──► Extraction ──► EvidenceFusion ──► Ontology ──►
 TableIntelligence ──► SchemaPopulation ──► KnowledgeIntegration ──►
 Knowledge ──► Validation ──► Feature ──► ModelSelection ──►

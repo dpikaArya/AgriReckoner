@@ -49,6 +49,8 @@ class AgriAISettings:
     BENCHMARK_DIR: Path = OUTPUT_DIR / "benchmark"
     EXPLAINABILITY_DIR: Path = REPORTS_DIR / "explainability"
 
+    EXTERNAL_DATA_DIR: Path = BASE_DIR / "external_data"
+
     CHECKPOINT_ENABLED: bool = True
     INCREMENTAL_MODE: bool = False
 
@@ -58,5 +60,6 @@ class AgriAISettings:
                   self.CHECKPOINT_DIR, self.MODELS_DIR, self.XGBOOST_DIR,
                   self.REGRESSION_DIR, self.FUZZY_MODELS_DIR,
                   self.MEMORY_DIR, self.MODEL_VERSIONS_DIR,
-                  self.BENCHMARK_DIR, self.EXPLAINABILITY_DIR]:
+                  self.BENCHMARK_DIR, self.EXPLAINABILITY_DIR,
+                  self.EXTERNAL_DATA_DIR]:
             d.mkdir(parents=True, exist_ok=True)

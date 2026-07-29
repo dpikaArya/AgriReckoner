@@ -17,6 +17,7 @@ from .explainability_agent import ExplainabilityAgent
 from .ready_reckoner_agent import ReadyReckonerAgent
 from .continuous_learning_agent import ContinuousLearningAgent
 from .knowledge_integration_agent import KnowledgeIntegrationAgent
+from .external_data_source_agent import ExternalDataSourceAgent
 
 __all__ = [
     "BaseAgent",
@@ -38,4 +39,5 @@ __all__ = [
     "ReadyReckonerAgent",
     "ContinuousLearningAgent",
     "KnowledgeIntegrationAgent",
+    "ExternalDataSourceAgent",
 ]

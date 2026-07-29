@@ -18,6 +18,7 @@ from agri_ai_agent.contracts.messages import (
     OrchestratorState,
 )
 from agri_ai_agent.utils.logging_utils import get_logger
+from agri_ai_agent import __version__
 
 from agri_ai_agent.agents import (
     KnowledgeAgent,
@@ -38,12 +39,15 @@ from agri_ai_agent.agents import (
     ReadyReckonerAgent,
     ContinuousLearningAgent,
     KnowledgeIntegrationAgent,
+    ExternalDataSourceAgent,
 )
 
-# Ordered so that extraction + schema normalization run BEFORE the knowledge agents
+# Ordered so that external data ingestion runs first (PHASE -1), then
+# extraction + schema normalization run BEFORE the knowledge agents
 # (which look up canonical UAMS columns), and fuzzy runs AFTER prediction (it consumes
 # the model's Yield_Prediction). See the refactor notes for the wiring rationale.
 PIPELINE_STEPS = [
+    ("external_data", ExternalDataSourceAgent, "External Data Source Layer"),
     ("extraction", ExtractionAgent, "Extract & Schema"),
     ("evidence_fusion", EvidenceFusionAgent, "Evidence Fusion & Provenance"),
     ("ontology", OntologyAgent, "Ontology Mapping & Normalization"),
@@ -187,7 +191,6 @@ class Orchestrator:
 
     def _write_run_manifest(self, filepath=None, papers_dir=None):
         """Snapshot the run's identity for reproducibility: version, git SHA, config, input."""
-        from agri_ai_agent import __version__
         run_dir = self.settings.OUTPUT_DIR / "runs" / self.state.pipeline_id
         run_dir.mkdir(parents=True, exist_ok=True)
         manifest = {
@@ -225,7 +228,7 @@ class Orchestrator:
     def _write_provenance(self):
         provenance = {
             "pipeline_id": self.state.pipeline_id,
-            "pipeline_version": "1.0.0",
+            "pipeline_version": __version__,
             "status": self.state.status,
             "started_at": str(self.state.started_at),
             "completed_at": str(self.state.completed_at),

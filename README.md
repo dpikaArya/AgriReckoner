@@ -10,7 +10,7 @@ The core scientific objectives are:
 4.	Fuzzy-Logic Fertilizer Recommendation. A Mamdani fuzzy inference system with 221 rules operates on 10 agronomic input variables (N, P, K, Zn, soil pH, rainfall, temperature, organic carbon, growth stage, yield prediction) to produce crop-specific, linguistically interpretable fertilizer recommendations (N/P/K dosages) with confidence scores. This bridges the gap between data-driven prediction and expert-system reasoning.
 5.	Ready Reckoner Table Generation. The terminal output is a per-crop Ready Reckoner Table — a compact decision-support artefact summarising optimal fertilizer regimes, expected yields, treatment alternatives, and confidence levels, exportable in Excel, CSV, and HTML formats for extension-agent and farmer use.
 2. Main Implementation Features
-The framework is implemented as a **17-agent pipeline** orchestrated by a central Orchestrator class. It sequences the agents in `orchestrator.PIPELINE_STEPS`, each governed by a typed AgentContract message protocol. One further agent — the **ProvenanceAgent** — is available in the codebase but is **not** part of the default pipeline. An **optional LLM extraction agent** (OpenAI-backed, see [Optional LLM extraction](#optional-llm-extraction)) can be enabled separately. Key implementation features include:
+The framework is implemented as an **18-agent pipeline** orchestrated by a central Orchestrator class. It sequences the agents in `orchestrator.PIPELINE_STEPS`, each governed by a typed AgentContract message protocol. One further agent — the **ProvenanceAgent** — is available in the codebase but is **not** part of the default pipeline. An **optional LLM extraction agent** (OpenAI-backed, see [Optional LLM extraction](#optional-llm-extraction)) can be enabled separately. Key implementation features include:
 Feature	Description
 Incremental PDF Ingestion	Scans a PDF directory; detects crop, DOI, title, and duplicates via fuzzy string matching (SequenceMatcher >0.90). Skips previously registered papers via a SQLite paper_registry (current skip rate: 84.6%).
 6-Reader Hybrid Extraction	Dispatches each PDF through Pdfminer, Camelot, Pdfplumber, Poppler (pdftotext), OCR, and Semantic readers with configurable timeouts. Regex patterns extract soil pH, N/P/K, yield, temperature, rainfall, and 15+ agronomic variables.
@@ -32,7 +32,7 @@ License	Apache-2.0
 UAMS schema columns	138 (14 groups, A–N)
 Crops covered	9 (Barley, Bell Pepper, Black Wheat, Cabbage, Carrot, Chickpea, Cotton, Maize, Spinach)
 Fuzzy rules	221 (Mamdani v3.0)
-Agents wired into default pipeline	17 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent)
+Agents wired into default pipeline	18 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent)
 Pipeline agents	17
 Model R²	Previously reported values (e.g. 0.995) were target-leakage artefacts, not validated skill — see [ML Models](#ml-models)
 
@@ -80,12 +80,20 @@ This framework automates the conversion of unstructured agricultural research PD
 
 ## Architecture
 
-The framework is orchestrated as a **17-agent sequential pipeline** (`orchestrator.PIPELINE_STEPS`), each agent extending `BaseAgent` and communicating via typed `AgentContract` messages. An `Orchestrator` class manages execution order, checkpoint/recovery, retry logic, and provenance logging. An additional `ProvenanceAgent` and optional `LLMExtractionAgent` are available but not wired into the default pipeline.
+The framework is orchestrated as an **18-agent sequential pipeline** (`orchestrator.PIPELINE_STEPS`), each agent extending `BaseAgent` and communicating via typed `AgentContract` messages. An `Orchestrator` class manages execution order, checkpoint/recovery, retry logic, and provenance logging. An additional `ProvenanceAgent` and optional `LLMExtractionAgent` are available but not wired into the default pipeline.
 
 ### Agent Pipeline
 
 ```
-                                    ┌─────────────────────────────┐
+         ┌─────────────────────────────────────────────────────────────────────────┐
+         │   PHASE -1: EXTERNAL DATA SOURCE LAYER                                 │
+         │   Plugin-based ingestion from external agricultural repositories        │
+         │   Every connector implements: ExternalDataConnector interface          │
+         │   connect() → discover() → download() → validate() → register()        │
+         │   Returns standardized DatasetPackage objects                          │
+         └─────────────────────────────────────┬───────────────────────────────────┘
+                                               │
+                                    ┌──────────▼──────────────────┐
                                     │   INPUT: Master Datasets    │
                                     │  5 crop-specific Excel      │
                                     │  workbooks (45 rows)        │
@@ -249,6 +257,7 @@ Each agent receives the cumulative `pd.DataFrame` from its predecessor, processe
 
 | Step | Agent | Description | Key Output |
 |------|-------|-------------|------------|
+| -1 | **ExternalDataSourceAgent** | Plugin-based external data ingestion via `ExternalDataConnector` interface; supports CGIAR, FAOSTAT, NASA POWER, SoilGrids, ISRIC, Zenodo, Mendeley, Kaggle, ICAR, SAUs and future sources | Standardized `DatasetPackage` objects merged into pipeline DataFrame |
 | 1 | **ExtractionAgent** | 6-reader hybrid PDF extraction (Pdfminer, Camelot, Pdfplumber, Poppler, OCR, Semantic) | Extracted raw variables |
 | 2 | **EvidenceFusionAgent** | Confidence-weighted multi-reader deduplication & cell-level conflict resolution | Fused extractions |
 | 3 | **OntologyAgent** | Column name normalisation to UAMS via 120-entry map | Ontology-mapped schema |
@@ -380,8 +389,8 @@ more extracted training data. No validated R² table is published here until tha
 | Model R² | Not published as validated — earlier scores (e.g. 0.995) were target-leakage artefacts; metrics are advisory at current n (see [ML Models](#ml-models)) |
 | Fuzzy rules | 221 (v3.0) |
 | Crops covered | 9 |
-| Agents wired into default pipeline | 17 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent) |
-| Pipeline agents | 17 |
+| Agents wired into default pipeline | 18 (+ ProvenanceAgent available but not wired, + optional LLM extraction agent) |
+| Pipeline agents | 18 |
 | Evaluation stages | 11 |
 | Pipeline run time | ~25 seconds (incremental) |
 | PDF skip rate | 84.6% (incremental mode) |
@@ -427,7 +436,7 @@ Equivalently, without the console script:
 python -m agri_ai_agent run --file data.csv
 ```
 
-This runs the 17-agent pipeline: extraction → evidence fusion → ontology → table
+This runs the 18-agent pipeline: external data → extraction → evidence fusion → ontology → table
 intelligence → schema population → knowledge integration → knowledge → validation →
 feature engineering → model selection → training → prediction → recommendations →
 fuzzy logic → benchmark → explainability → ready reckoner.
