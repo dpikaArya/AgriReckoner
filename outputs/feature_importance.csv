@@ -1,19 +1,292 @@
-Feature,Coefficient
-Replications,0.0
-Average_Temperature,0.0
-Rainfall,-0.0
-Soil_pH,0.0
-EC,0.0
-Organic_Carbon,0.0
-Phosphorus,0.0
-Potassium,0.0
-Iron,0.0
-Zinc,-0.0
-SPAD,0.0
-Growing_Degree_Days,0.0
-Nitrogen_Use_Efficiency,0.0
-Water_Use_Efficiency,0.0
-Rainfall_Anomaly,0.0
-N_x_P,0.0
-Crop_Code,0.0
-Fertilizer_Code,0.0
+﻿feature,importance,model,direction
+Leaf_Area_60_cm2,111624.21664775137,Linear Regression,1
+Leaf_Area_90_cm2,28390.63456402605,Linear Regression,1
+Plant_Height_60_cm,16408.475932489775,Linear Regression,1
+Flowers,15388.150789479309,Linear Regression,1
+Plant_Height_90_cm,14131.879704406572,Linear Regression,-1
+Dose,12678.430505950864,Linear Regression,-1
+Plant_Height_120_cm,12502.032212536405,Linear Regression,1
+Plant_Height_30_cm,8627.278536244477,Linear Regression,1
+Leaf_Area_30_cm2,7780.11794555548,Linear Regression,-1
+Leaf_Area_120_cm2,5644.516184562661,Linear Regression,-1
+Branches,3987.115475103316,Linear Regression,-1
+Replications,3.637978807091713e-11,Linear Regression,1
+Plot_Size,2.9103830456733704e-11,Linear Regression,1
+Longitude,2.9103830456733704e-11,Linear Regression,-1
+Temperature_Min,3.637978807091713e-12,Linear Regression,1
+Average_Temperature,3.637978807091713e-12,Linear Regression,-1
+Temperature_Max,1.8189894035458565e-12,Linear Regression,-1
+Latitude,0.0,Linear Regression,-1
+Rainfall,0.0,Linear Regression,-1
+Humidity,0.0,Linear Regression,-1
+Soil_pH,0.0,Linear Regression,-1
+Organic_Carbon,0.0,Linear Regression,-1
+Nitrogen,0.0,Linear Regression,-1
+Phosphorus,0.0,Linear Regression,-1
+Potassium,0.0,Linear Regression,-1
+Optimal_pH_Min,0.0,Linear Regression,-1
+Optimal_pH_Max,0.0,Linear Regression,-1
+_replicates,0.0,Linear Regression,-1
+Temp_Range,0.0,Linear Regression,-1
+Temp_CV,0.0,Linear Regression,-1
+Temp_Above_10,0.0,Linear Regression,-1
+Temp_Above_15,0.0,Linear Regression,-1
+Temp_Above_20,0.0,Linear Regression,-1
+Temp_Above_25,0.0,Linear Regression,-1
+Temp_Above_30,0.0,Linear Regression,-1
+Temp_Above_35,0.0,Linear Regression,-1
+Rainfall_log,0.0,Linear Regression,-1
+Rainfall_sqrt,0.0,Linear Regression,-1
+Rainfall_squared,0.0,Linear Regression,-1
+Rainfall_Bin,0.0,Linear Regression,-1
+Rainfall_100_bin,0.0,Linear Regression,-1
+N_log,0.0,Linear Regression,-1
+N_sqrt,0.0,Linear Regression,-1
+N_squared,0.0,Linear Regression,-1
+N_category,0.0,Linear Regression,-1
+P_log,0.0,Linear Regression,-1
+P_squared,0.0,Linear Regression,-1
+P_category,0.0,Linear Regression,-1
+K_log,0.0,Linear Regression,-1
+K_squared,0.0,Linear Regression,-1
+K_category,0.0,Linear Regression,-1
+NPK_sum,0.0,Linear Regression,-1
+NPK_ratio_N,0.0,Linear Regression,-1
+NPK_ratio_P,0.0,Linear Regression,-1
+NPK_ratio_K,0.0,Linear Regression,-1
+N_x_K,0.0,Linear Regression,-1
+P_x_K,0.0,Linear Regression,-1
+N_plus_P,0.0,Linear Regression,-1
+N_plus_K,0.0,Linear Regression,-1
+P_plus_K,0.0,Linear Regression,-1
+Soil_pH_squared,0.0,Linear Regression,-1
+Soil_pH_neutral,0.0,Linear Regression,-1
+Soil_pH_acidic,0.0,Linear Regression,-1
+Soil_pH_alkaline,0.0,Linear Regression,-1
+OC_log,0.0,Linear Regression,-1
+OC_squared,0.0,Linear Regression,-1
+C_N_ratio,0.0,Linear Regression,-1
+N_P_ratio,0.0,Linear Regression,-1
+P_K_ratio,0.0,Linear Regression,-1
+Humidity_squared,0.0,Linear Regression,-1
+Humidity_log,0.0,Linear Regression,-1
+Temperature_Max_7d_MA,0.0,Linear Regression,-1
+Temperature_Min_7d_MA,0.0,Linear Regression,-1
+Average_Temperature_7d_MA,0.0,Linear Regression,-1
+Temp_x_N,0.0,Linear Regression,-1
+Rainfall_x_N,0.0,Linear Regression,-1
+Rainfall_x_P,0.0,Linear Regression,-1
+Rainfall_x_K,0.0,Linear Regression,-1
+OC_x_pH,0.0,Linear Regression,-1
+Rainfall_x_pH,0.0,Linear Regression,-1
+Rainfall_x_OC,0.0,Linear Regression,-1
+N_x_pH,0.0,Linear Regression,-1
+P_x_pH,0.0,Linear Regression,-1
+K_x_pH,0.0,Linear Regression,-1
+Tmax_x_N,0.0,Linear Regression,-1
+Tmax_x_Rainfall,0.0,Linear Regression,-1
+Tmin_x_Rainfall,0.0,Linear Regression,-1
+Humidity_x_Rainfall,0.0,Linear Regression,-1
+Humidity_x_N,0.0,Linear Regression,-1
+N_x_OC,0.0,Linear Regression,-1
+P_x_OC,0.0,Linear Regression,-1
+K_x_OC,0.0,Linear Regression,-1
+N_x_P_x_pH,0.0,Linear Regression,-1
+Tavg_squared,0.0,Linear Regression,-1
+Tavg_log,0.0,Linear Regression,-1
+NPK_x_pH,0.0,Linear Regression,-1
+N_Rainfall_ratio,0.0,Linear Regression,-1
+Leaf_Area_30_cm2,0.18679681949910468,Random Forest,0
+Flowers,0.12070700711213453,Random Forest,0
+Branches,0.11803569884896717,Random Forest,0
+Plant_Height_120_cm,0.08653898347437666,Random Forest,0
+Leaf_Area_90_cm2,0.08017016785288364,Random Forest,0
+Plant_Height_90_cm,0.07778325731799497,Random Forest,0
+Dose,0.07668894796554737,Random Forest,0
+Leaf_Area_60_cm2,0.07078998051817978,Random Forest,0
+Plant_Height_60_cm,0.07059740840827164,Random Forest,0
+Plant_Height_30_cm,0.05787816889317284,Random Forest,0
+Leaf_Area_120_cm2,0.054013560109366685,Random Forest,0
+Replications,0.0,Random Forest,0
+Plot_Size,0.0,Random Forest,0
+Latitude,0.0,Random Forest,0
+Longitude,0.0,Random Forest,0
+Temperature_Max,0.0,Random Forest,0
+Temperature_Min,0.0,Random Forest,0
+Average_Temperature,0.0,Random Forest,0
+Rainfall,0.0,Random Forest,0
+Humidity,0.0,Random Forest,0
+Soil_pH,0.0,Random Forest,0
+Organic_Carbon,0.0,Random Forest,0
+Nitrogen,0.0,Random Forest,0
+Phosphorus,0.0,Random Forest,0
+Potassium,0.0,Random Forest,0
+Optimal_pH_Min,0.0,Random Forest,0
+Optimal_pH_Max,0.0,Random Forest,0
+_replicates,0.0,Random Forest,0
+Temp_Range,0.0,Random Forest,0
+Temp_CV,0.0,Random Forest,0
+Temp_Above_10,0.0,Random Forest,0
+Temp_Above_15,0.0,Random Forest,0
+Temp_Above_20,0.0,Random Forest,0
+Temp_Above_25,0.0,Random Forest,0
+Temp_Above_30,0.0,Random Forest,0
+Temp_Above_35,0.0,Random Forest,0
+Rainfall_log,0.0,Random Forest,0
+Rainfall_sqrt,0.0,Random Forest,0
+Rainfall_squared,0.0,Random Forest,0
+Rainfall_Bin,0.0,Random Forest,0
+Rainfall_100_bin,0.0,Random Forest,0
+N_log,0.0,Random Forest,0
+N_sqrt,0.0,Random Forest,0
+N_squared,0.0,Random Forest,0
+N_category,0.0,Random Forest,0
+P_log,0.0,Random Forest,0
+P_squared,0.0,Random Forest,0
+P_category,0.0,Random Forest,0
+K_log,0.0,Random Forest,0
+K_squared,0.0,Random Forest,0
+K_category,0.0,Random Forest,0
+NPK_sum,0.0,Random Forest,0
+NPK_ratio_N,0.0,Random Forest,0
+NPK_ratio_P,0.0,Random Forest,0
+NPK_ratio_K,0.0,Random Forest,0
+N_x_K,0.0,Random Forest,0
+P_x_K,0.0,Random Forest,0
+N_plus_P,0.0,Random Forest,0
+N_plus_K,0.0,Random Forest,0
+P_plus_K,0.0,Random Forest,0
+Soil_pH_squared,0.0,Random Forest,0
+Soil_pH_neutral,0.0,Random Forest,0
+Soil_pH_acidic,0.0,Random Forest,0
+Soil_pH_alkaline,0.0,Random Forest,0
+OC_log,0.0,Random Forest,0
+OC_squared,0.0,Random Forest,0
+C_N_ratio,0.0,Random Forest,0
+N_P_ratio,0.0,Random Forest,0
+P_K_ratio,0.0,Random Forest,0
+Humidity_squared,0.0,Random Forest,0
+Humidity_log,0.0,Random Forest,0
+Temperature_Max_7d_MA,0.0,Random Forest,0
+Temperature_Min_7d_MA,0.0,Random Forest,0
+Average_Temperature_7d_MA,0.0,Random Forest,0
+Temp_x_N,0.0,Random Forest,0
+Rainfall_x_N,0.0,Random Forest,0
+Rainfall_x_P,0.0,Random Forest,0
+Rainfall_x_K,0.0,Random Forest,0
+OC_x_pH,0.0,Random Forest,0
+Rainfall_x_pH,0.0,Random Forest,0
+Rainfall_x_OC,0.0,Random Forest,0
+N_x_pH,0.0,Random Forest,0
+P_x_pH,0.0,Random Forest,0
+K_x_pH,0.0,Random Forest,0
+Tmax_x_N,0.0,Random Forest,0
+Tmax_x_Rainfall,0.0,Random Forest,0
+Tmin_x_Rainfall,0.0,Random Forest,0
+Humidity_x_Rainfall,0.0,Random Forest,0
+Humidity_x_N,0.0,Random Forest,0
+N_x_OC,0.0,Random Forest,0
+P_x_OC,0.0,Random Forest,0
+K_x_OC,0.0,Random Forest,0
+N_x_P_x_pH,0.0,Random Forest,0
+Tavg_squared,0.0,Random Forest,0
+Tavg_log,0.0,Random Forest,0
+NPK_x_pH,0.0,Random Forest,0
+N_Rainfall_ratio,0.0,Random Forest,0
+Leaf_Area_120_cm2,0.8691983222961426,XGBoost,0
+Leaf_Area_30_cm2,0.04205922782421112,XGBoost,0
+Branches,0.03748391941189766,XGBoost,0
+Flowers,0.02529802918434143,XGBoost,0
+Plant_Height_30_cm,0.012303965166211128,XGBoost,0
+Plant_Height_60_cm,0.009232602082192898,XGBoost,0
+Dose,0.004423846490681171,XGBoost,0
+Leaf_Area_60_cm2,1.0748124612547372e-11,XGBoost,0
+Replications,0.0,XGBoost,0
+Plot_Size,0.0,XGBoost,0
+Latitude,0.0,XGBoost,0
+Longitude,0.0,XGBoost,0
+Temperature_Max,0.0,XGBoost,0
+Temperature_Min,0.0,XGBoost,0
+Average_Temperature,0.0,XGBoost,0
+Rainfall,0.0,XGBoost,0
+Humidity,0.0,XGBoost,0
+Soil_pH,0.0,XGBoost,0
+Organic_Carbon,0.0,XGBoost,0
+Nitrogen,0.0,XGBoost,0
+Phosphorus,0.0,XGBoost,0
+Potassium,0.0,XGBoost,0
+Plant_Height_90_cm,0.0,XGBoost,0
+Plant_Height_120_cm,0.0,XGBoost,0
+Leaf_Area_90_cm2,0.0,XGBoost,0
+Optimal_pH_Min,0.0,XGBoost,0
+Optimal_pH_Max,0.0,XGBoost,0
+_replicates,0.0,XGBoost,0
+Temp_Range,0.0,XGBoost,0
+Temp_CV,0.0,XGBoost,0
+Temp_Above_10,0.0,XGBoost,0
+Temp_Above_15,0.0,XGBoost,0
+Temp_Above_20,0.0,XGBoost,0
+Temp_Above_25,0.0,XGBoost,0
+Temp_Above_30,0.0,XGBoost,0
+Temp_Above_35,0.0,XGBoost,0
+Rainfall_log,0.0,XGBoost,0
+Rainfall_sqrt,0.0,XGBoost,0
+Rainfall_squared,0.0,XGBoost,0
+Rainfall_Bin,0.0,XGBoost,0
+Rainfall_100_bin,0.0,XGBoost,0
+N_log,0.0,XGBoost,0
+N_sqrt,0.0,XGBoost,0
+N_squared,0.0,XGBoost,0
+N_category,0.0,XGBoost,0
+P_log,0.0,XGBoost,0
+P_squared,0.0,XGBoost,0
+P_category,0.0,XGBoost,0
+K_log,0.0,XGBoost,0
+K_squared,0.0,XGBoost,0
+K_category,0.0,XGBoost,0
+NPK_sum,0.0,XGBoost,0
+NPK_ratio_N,0.0,XGBoost,0
+NPK_ratio_P,0.0,XGBoost,0
+NPK_ratio_K,0.0,XGBoost,0
+N_x_K,0.0,XGBoost,0
+P_x_K,0.0,XGBoost,0
+N_plus_P,0.0,XGBoost,0
+N_plus_K,0.0,XGBoost,0
+P_plus_K,0.0,XGBoost,0
+Soil_pH_squared,0.0,XGBoost,0
+Soil_pH_neutral,0.0,XGBoost,0
+Soil_pH_acidic,0.0,XGBoost,0
+Soil_pH_alkaline,0.0,XGBoost,0
+OC_log,0.0,XGBoost,0
+OC_squared,0.0,XGBoost,0
+C_N_ratio,0.0,XGBoost,0
+N_P_ratio,0.0,XGBoost,0
+P_K_ratio,0.0,XGBoost,0
+Humidity_squared,0.0,XGBoost,0
+Humidity_log,0.0,XGBoost,0
+Temperature_Max_7d_MA,0.0,XGBoost,0
+Temperature_Min_7d_MA,0.0,XGBoost,0
+Average_Temperature_7d_MA,0.0,XGBoost,0
+Temp_x_N,0.0,XGBoost,0
+Rainfall_x_N,0.0,XGBoost,0
+Rainfall_x_P,0.0,XGBoost,0
+Rainfall_x_K,0.0,XGBoost,0
+OC_x_pH,0.0,XGBoost,0
+Rainfall_x_pH,0.0,XGBoost,0
+Rainfall_x_OC,0.0,XGBoost,0
+N_x_pH,0.0,XGBoost,0
+P_x_pH,0.0,XGBoost,0
+K_x_pH,0.0,XGBoost,0
+Tmax_x_N,0.0,XGBoost,0
+Tmax_x_Rainfall,0.0,XGBoost,0
+Tmin_x_Rainfall,0.0,XGBoost,0
+Humidity_x_Rainfall,0.0,XGBoost,0
+Humidity_x_N,0.0,XGBoost,0
+N_x_OC,0.0,XGBoost,0
+P_x_OC,0.0,XGBoost,0
+K_x_OC,0.0,XGBoost,0
+N_x_P_x_pH,0.0,XGBoost,0
+Tavg_squared,0.0,XGBoost,0
+Tavg_log,0.0,XGBoost,0
+NPK_x_pH,0.0,XGBoost,0
+N_Rainfall_ratio,0.0,XGBoost,0
