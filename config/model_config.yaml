@@ -63,6 +63,20 @@ feature_selection:
   variance_threshold: 0.001
   max_features: 150
   min_features: 80
+  n_top_features: 100
+
+importance_methods:
+  random_forest: true
+  xgboost: true
+  lightgbm: true
+  catboost: false
+  shap: true
+
+feature_engineering:
+  enabled: true
+  validate_with_cv: true
+  min_cv_improvement: 0.001
+  remove_if_no_improvement: true
 
 optimization:
   n_trials: 50
@@ -70,11 +84,23 @@ optimization:
 
 ensemble:
   enabled: true
+  methods:
+    - weighted_average
+    - stacking
   auto_weight: true
 
 data_quality:
-  high_threshold: 0.8
-  medium_threshold: 0.5
+  scoring_enabled: true
+  high_quality_threshold: 0.8
+  medium_quality_threshold: 0.5
+  prioritize_high_quality: true
+
+validation:
+  cv_folds: 5
+  spatial_folds: 3
+  temporal_folds: 3
+  leakage_check: true
+  stop_on_leakage: true
 
 thresholds:
   min_r2: 0.0

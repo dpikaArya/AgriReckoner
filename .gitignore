@@ -172,3 +172,13 @@ outputs/Pipeline_Manifest.json
 outputs/Ready_Reckoner_Table*.csv
 outputs/Ready_Reckoner_Updated.xlsx
 outputs/benchmark_history.json
+
+# Generated feature sets (test output)
+features/
+
+# Auto-generated ensemble files (test artifacts)
+models/ensemble_weights.json
+models/stacking_ensemble_info.json
+models/*_optimization_history.json
+models/*_best_params.json
+models/optimization/
