@@ -165,14 +165,15 @@ def step1_sync_external_data_sources() -> dict:
             results["note"] = "No healthy sources; all datasets skipped"
             packages_by_source, run_logs = {}, []
         else:
-            # Filter out connectors with very large discovery counts (they time out)
+            max_discovery = int(os.environ.get("AGRI_MAX_DISCOVERY_PER_SOURCE", "50"))
             quick_sources = []
             for s in healthy:
                 h = health_results.get(s)
-                if h and h.discovered_count <= 5:
+                if h and h.discovered_count <= max_discovery:
                     quick_sources.append(s)
                 else:
-                    logger.info("Skipping %s (%d datasets discovered — too many for quick sync)", s, h.discovered_count if h else -1)
+                    logger.info("Skipping %s (%d datasets — exceeds AGRI_MAX_DISCOVERY_PER_SOURCE=%d)",
+                                s, h.discovered_count if h else -1, max_discovery)
             if not quick_sources:
                 logger.warning("No quick-sync sources available after filtering")
                 results["note"] = "No quick-sync sources; all filtered out"
@@ -207,7 +208,6 @@ def step1_sync_external_data_sources() -> dict:
             summary = manager.summarize_runs(run_logs)
             logger.info("Sync summary: %s", json.dumps(summary, indent=2))
 
-            # Merge external data with existing
             merged_df = manager.merge_packages(packages_by_source)
             if not merged_df.empty:
                 merged_path = REPORTS_DIR / "external_data_merged.csv"
@@ -395,6 +395,7 @@ def step10_benchmark(pipeline_results: dict, step1_results: dict) -> dict:
             try:
                 history = json.loads(history_path.read_text(encoding="utf-8"))
             except Exception:
+                logger.warning("Failed to read benchmark history, starting fresh", exc_info=True)
                 history = []
         history.append({
             "run_id": RUN_ID,
@@ -1121,8 +1122,8 @@ def main():
         "datasets_downloaded": step1_results.get("datasets_downloaded", 0),
     }
 
-    # If Step 1 downloaded data, merge it with master datasets and save as
-    # the external_data checkpoint so the pipeline doesn't re-download.
+    # If Step 1 downloaded data, enrich master datasets with external data
+    # via spatial/crop key-based joins and save as checkpoint.
     if step1_results.get("datasets_downloaded", 0) > 0:
         try:
             packages_by_source = step1_results.get("packages_by_source", {})
@@ -1133,19 +1134,19 @@ def main():
                     download_dir=settings.EXTERNAL_DATA_DIR,
                 )
                 combined_df = _load_master_datasets()
-                merged = mgr.merge_packages(packages_by_source, combined_df if not combined_df.empty else None)
-                if merged is not None and not merged.empty:
+                enriched = mgr.enrich_packages(packages_by_source, combined_df)
+                if enriched is not None and not enriched.empty:
                     ckpt_dir = settings.CHECKPOINT_DIR
                     ckpt_dir.mkdir(parents=True, exist_ok=True)
-                    safe_merged = merged.copy()
-                    for col in safe_merged.columns:
-                        if safe_merged[col].dtype == "object" or str(safe_merged[col].dtype) == "string":
-                            safe_merged[col] = safe_merged[col].astype(str)
-                    safe_merged.to_parquet(ckpt_dir / "external_data.parquet", index=False)
-                    logger.info("Saved external_data checkpoint with %d rows (master + %d external datasets)",
-                                len(merged), step1_results.get("datasets_downloaded", 0))
+                    safe_enriched = enriched.copy()
+                    for col in safe_enriched.columns:
+                        if safe_enriched[col].dtype == "object" or str(safe_enriched[col].dtype) == "string":
+                            safe_enriched[col] = safe_enriched[col].astype(str)
+                    safe_enriched.to_parquet(ckpt_dir / "external_data.parquet", index=False)
+                    logger.info("Saved enriched master checkpoint with %d columns (%d original + external enrichments)",
+                                len(enriched.columns), len(combined_df.columns) if not combined_df.empty else 0)
         except Exception as e:
-            logger.warning("Could not create external_data checkpoint from Step 1 results: %s", e)
+            logger.warning("Could not create enriched checkpoint from Step 1 results: %s", e)
 
     # ── STEPS 2-9 ──────────────────────────────────────────────────────
     try:

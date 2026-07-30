@@ -18,6 +18,7 @@ class FeatureSelector:
         variance_threshold: float = 0.001,
         max_features: int = 150,
         min_features: int = 80,
+        max_missing_pct: float = 1.0,
     ):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -26,6 +27,7 @@ class FeatureSelector:
         self.variance_threshold = variance_threshold
         self.max_features = max_features
         self.min_features = min_features
+        self.max_missing_pct = max_missing_pct
         self.selected_features_: list[str] = []
         self.removed_features_: dict[str, list[str]] = {}
 
@@ -56,6 +58,11 @@ class FeatureSelector:
 
         initial_count = len(candidates)
         logger.info("Starting feature selection with %d candidates", initial_count)
+
+        high_missing = self._remove_high_missingness(X_num, candidates)
+        removed["high_missingness"] = high_missing
+        candidates = [c for c in candidates if c not in high_missing]
+        logger.info("After high-missingness removal: %d features", len(candidates))
 
         low_var = self._remove_low_variance(X_num, candidates)
         removed["low_variance"] = low_var
@@ -95,6 +102,21 @@ class FeatureSelector:
         self._generate_report(initial_count)
         return candidates
 
+    def _remove_high_missingness(
+        self, X: pd.DataFrame, candidates: list[str]
+    ) -> list[str]:
+        if self.max_missing_pct >= 1.0:
+            return []
+        removed = []
+        n = len(X)
+        for col in candidates:
+            if col not in X.columns:
+                continue
+            missing_pct = X[col].isna().sum() / n
+            if missing_pct > self.max_missing_pct:
+                removed.append(col)
+        return removed
+
     def _remove_low_variance(
         self, X: pd.DataFrame, candidates: list[str]
     ) -> list[str]:
@@ -103,7 +125,7 @@ class FeatureSelector:
             if col not in X.columns:
                 continue
             var = X[col].var()
-            if pd.isna(var) or var < self.variance_threshold:
+            if pd.isna(var) or var <= self.variance_threshold:
                 removed.append(col)
         return removed
 
@@ -233,6 +255,7 @@ class FeatureSelector:
                 "variance": self.variance_threshold,
                 "max_features": self.max_features,
                 "min_features": self.min_features,
+                "max_missing_pct": self.max_missing_pct,
             },
             "selected_features": self.selected_features_,
         }

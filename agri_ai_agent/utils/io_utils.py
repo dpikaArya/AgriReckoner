@@ -22,6 +22,8 @@ def detect_encoding(filepath: Path, n_bytes: int = 10000) -> str:
 
 
 def detect_delimiter(filepath: Path, n_lines: int = 5) -> str:
+    import logging
+    _log = logging.getLogger(__name__)
     if not filepath.exists():
         return ","
     try:
@@ -30,6 +32,7 @@ def detect_delimiter(filepath: Path, n_lines: int = 5) -> str:
         dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
         return dialect.delimiter
     except Exception:
+        _log.debug("Delimiter detection failed for %s, defaulting to comma", filepath)
         return ","
 
 

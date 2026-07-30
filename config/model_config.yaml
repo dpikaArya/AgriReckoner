@@ -58,12 +58,13 @@ metrics:
     - roc_auc
 
 feature_selection:
-  importance_threshold: 0.01
-  correlation_threshold: 0.90
-  variance_threshold: 0.001
-  max_features: 150
+  max_missing_pct: 0.7
+  importance_threshold: 0.001
+  correlation_threshold: 0.95
+  variance_threshold: 1e-12
+  max_features: 200
   min_features: 80
-  n_top_features: 100
+  n_top_features: 150
 
 importance_methods:
   random_forest: true
@@ -79,8 +80,9 @@ feature_engineering:
   remove_if_no_improvement: true
 
 optimization:
-  n_trials: 50
-  timeout_seconds: 300
+  n_trials: 200
+  timeout_seconds: 600
+  min_acceptable_r2: 0.89
 
 ensemble:
   enabled: true
@@ -96,11 +98,17 @@ data_quality:
   prioritize_high_quality: true
 
 validation:
-  cv_folds: 5
+  cv_folds: 10
   spatial_folds: 3
   temporal_folds: 3
   leakage_check: true
   stop_on_leakage: true
+  use_loocv: true
+  loocv_models:
+    - ridge
+    - lasso
+    - random_forest
+    - gradient_boosting
 
 thresholds:
   min_r2: 0.0

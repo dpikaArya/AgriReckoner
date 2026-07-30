@@ -1,11 +1,18 @@
 import hashlib
+import os
 from pathlib import Path
 from typing import Optional
 
+import pandas as pd
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
+
+
+def _get_sg_config(key: str, default: str) -> str:
+    env_key = f"AGRI_SOILGRIDS_{key.upper()}"
+    return os.environ.get(env_key, default)
 
 
 class SoilGridsConnector(ExternalDataConnector):
@@ -19,8 +26,8 @@ class SoilGridsConnector(ExternalDataConnector):
 
     def connect(self) -> bool:
         try:
-            resp = requests.get(f"{self.base_url}/properties", timeout=10)
-            return resp.status_code == 200
+            resp = requests.get(f"{self.base_url}/properties/query?lon=0&lat=0&property=clay&depth=0-5cm", timeout=15)
+            return resp.status_code < 500
         except requests.RequestException:
             return False
 
@@ -53,17 +60,55 @@ class SoilGridsConnector(ExternalDataConnector):
 
     def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
         target_dir.mkdir(parents=True, exist_ok=True)
-        local_path = target_dir / f"soilgrids_{resource_id}.tif"
+        lat = _get_sg_config("latitude", "13.0")
+        lon = _get_sg_config("longitude", "77.5")
+        depth = _get_sg_config("depth", "0-5cm")
+
+        local_path = target_dir / f"soilgrids_{resource_id}_{lat}_{lon}.csv"
         try:
-            url = (
-                f"{self.base_url}/properties/{resource_id}/wcs?"
-                f"service=WCS&version=2.0.1&request=GetCoverage"
-                f"&coverageId={resource_id}_0-5cm_mean"
-                f"&format=image/tiff"
-            )
-            resp = requests.get(url, timeout=120)
+            url = f"{self.base_url}/properties/query"
+            params = {
+                "lon": lon,
+                "lat": lat,
+                "property": resource_id,
+                "depth": depth,
+                "value": "mean",
+            }
+            resp = requests.get(url, params=params, timeout=60)
             resp.raise_for_status()
-            local_path.write_bytes(resp.content)
+            data = resp.json()
+
+            rows = []
+            for layer in data.get("properties", {}).get("layers", []):
+                prop_name = layer.get("name", resource_id)
+                unit = layer.get("unit_measure", {}).get("target_units", "")
+                for d_layer in layer.get("depths", []):
+                    vals = d_layer.get("values", {})
+                    for stat_name in ("mean", "uncertainty"):
+                        stat_val = vals.get(stat_name)
+                        if stat_val is not None:
+                            rows.append({
+                                "Latitude": float(lat),
+                                "Longitude": float(lon),
+                                "Property": prop_name,
+                                "Depth": d_layer.get("label", depth),
+                                "Statistic": stat_name,
+                                "Value": stat_val,
+                                "Unit": unit,
+                            })
+            if not rows:
+                rows.append({
+                    "Latitude": float(lat),
+                    "Longitude": float(lon),
+                    "Property": resource_id,
+                    "Depth": depth,
+                    "Statistic": "mean",
+                    "Value": None,
+                    "Unit": "",
+                })
+            import pandas as pd
+            df = pd.DataFrame(rows)
+            df.to_csv(local_path, index=False)
             return local_path
         except requests.RequestException:
             return None

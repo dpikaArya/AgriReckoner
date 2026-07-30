@@ -10,6 +10,7 @@ from typing import Optional
 import pandas as pd
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
+from agri_ai_agent.external_data.data_enricher import enrich_master
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.external_data.registry import ConnectorRegistry
 from agri_ai_agent.external_data.registry_db import DatasetRegistry
@@ -393,6 +394,15 @@ class ConnectorManager:
             "total_datasets_valid": total_valid,
             "total_duration_sec": round(total_duration, 2),
         }
+
+    @staticmethod
+    def enrich_packages(
+        packages_by_source: dict[str, list[DatasetPackage]],
+        master_df: pd.DataFrame,
+    ) -> pd.DataFrame:
+        """Enrich a master DataFrame by joining external data on spatial/crop keys,
+        rather than just appending rows."""
+        return enrich_master(master_df, packages_by_source)
 
     @staticmethod
     def merge_packages(

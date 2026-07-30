@@ -115,7 +115,6 @@ temp/
 # ===========================
 model_cache/
 ollama/
-.cache/
 sentence_transformers/
 
 # ===========================
@@ -146,7 +145,6 @@ credentials.*
 token.*
 secrets.*
 REFACTOR_NOTES.md
-.venv/
 
 # runtime artifacts (committed outputs/ is the frozen baseline)
 agri_ai_agent/outputs/
@@ -157,12 +155,11 @@ agri_ai_agent/logs/
 
 # Production pipeline artifacts
 reports/
-external_data/
+/external_data/
 deliverables_*.zip
 
 # Generated runtime data (not source)
 database/
-.checkpoints/
 
 # Generated output artifacts
 outputs/AAIF_Layer_Efficiency_Report.txt
@@ -182,3 +179,20 @@ models/stacking_ensemble_info.json
 models/*_optimization_history.json
 models/*_best_params.json
 models/optimization/
+models/*.pkl
+models/*.joblib
+
+# Generated output data files (pipeline artifacts, not source)
+outputs/*.csv
+outputs/**/*.csv
+outputs/*.xlsx
+outputs/**/*.xlsx
+outputs/*.json
+outputs/**/*.json
+outputs/*.docx
+outputs/**/*.docx
+outputs/*.html
+outputs/**/*.html
+
+# Evaluation benchmark artifacts
+evaluation/reports/*.csv

@@ -67,6 +67,16 @@ sources:
       username_env: "KAGGLE_USERNAME"
       key_env: "KAGGLE_KEY"
 
+  HuggingFace:
+    enabled: true
+    base_url: "https://huggingface.co/api/datasets"
+    strategy: huggingface
+    priority: 0
+    timeout_sec: 300
+    retry_max: 3
+    params:
+      search_terms: "agriculture,crop,soil,yield,climate"
+
   ICAR:
     enabled: true
     base_url: "https://krishikosh.egranth.ac.in/api"

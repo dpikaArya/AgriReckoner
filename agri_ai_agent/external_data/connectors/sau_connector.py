@@ -96,7 +96,6 @@ class SAUConnector(ExternalDataConnector):
 
     def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
         target_dir.mkdir(parents=True, exist_ok=True)
-        local_path = target_dir / f"sau_{resource_id}.csv"
         matching = [s for s in _SAU_REGISTRY if s["id"] == resource_id]
         if not matching:
             return None
@@ -108,8 +107,22 @@ class SAUConnector(ExternalDataConnector):
                 timeout=60,
             )
             resp.raise_for_status()
-            local_path.write_bytes(resp.content)
-            return local_path
+
+            content_type = resp.headers.get("Content-Type", "")
+            if "html" in content_type.lower():
+                return None
+
+            if "json" in content_type:
+                import pandas as pd
+                data = resp.json()
+                records = data if isinstance(data, list) else data.get("records", data.get("results", [data]))
+                if isinstance(records, list) and len(records) > 0:
+                    df = pd.DataFrame(records)
+                    local_path = target_dir / f"sau_{resource_id}.parquet"
+                    df.to_parquet(local_path, index=False)
+                    return local_path
+
+            return None
         except requests.RequestException:
             return None
 

@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import sqlite3
 from datetime import datetime
 from pathlib import Path
@@ -8,6 +9,8 @@ from typing import Optional
 import pandas as pd
 
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
+
+logger = logging.getLogger(__name__)
 
 
 class DatasetRegistry:
@@ -272,7 +275,8 @@ class DatasetRegistry:
             }
 
     def close(self):
-        pass
+        """Close registry — connections are per-operation via context manager."""
+        logger.debug("DatasetRegistry closed")
 
     def _row_to_dict(self, row, conn) -> dict:
         if row is None:

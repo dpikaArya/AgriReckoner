@@ -97,4 +97,4 @@ class KaggleConnector(ExternalDataConnector):
         return 0
 
     def close(self) -> None:
-        pass
+        """No resources to release for Kaggle API connector."""

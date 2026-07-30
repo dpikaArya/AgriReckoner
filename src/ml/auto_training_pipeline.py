@@ -43,18 +43,22 @@ class AutoTrainingPipeline:
 
     def _default_config(self) -> dict:
         return {
-            "importance_threshold": 0.01,
-            "correlation_threshold": 0.90,
-            "variance_threshold": 0.001,
-            "max_features": 150,
+            "importance_threshold": 0.001,
+            "correlation_threshold": 0.95,
+            "variance_threshold": 1e-12,
+            "max_features": 200,
             "min_features": 80,
-            "n_trials": 50,
-            "cv_folds": 5,
+            "max_missing_pct": 0.7,
+            "n_trials": 200,
+            "cv_folds": 10,
             "test_size": 0.2,
             "use_shap": True,
             "use_ensemble": True,
             "use_hyperparameter_opt": True,
             "use_data_scoring": True,
+            "min_acceptable_r2": 0.89,
+            "use_loocv": True,
+            "loocv_models": ["ridge", "lasso", "random_forest", "gradient_boosting"],
         }
 
     def run(
@@ -97,6 +101,8 @@ class AutoTrainingPipeline:
 
             step5_hyper = self._step_hyperparameter_optimization(X_filled, y)
             step6_bench = self._step_benchmarking(X_filled, y)
+            self._check_r2_threshold(step6_bench)
+            step6_bench = self._step_loocv_evaluation(X_filled, y, step6_bench)
             step7_ensemble = self._step_ensemble_creation(X_filled, y, step6_bench)
             step8_cv = self._step_cross_validation(step6_bench, X_filled, y, location_col, time_col)
             step9_confidence = self._step_prediction_confidence(step6_bench, step7_ensemble, X_filled, y)
@@ -200,6 +206,7 @@ class AutoTrainingPipeline:
             variance_threshold=self.config["variance_threshold"],
             max_features=self.config["max_features"],
             min_features=self.config["min_features"],
+            max_missing_pct=self.config.get("max_missing_pct", 1.0),
         )
 
         selected = selector.select(
@@ -256,6 +263,83 @@ class AutoTrainingPipeline:
         self.pipeline_state["steps"]["benchmarking"] = summary
         logger.info("Best model: %s", best)
         return {"results": results, "best_name": best, "benchmark": benchmark}
+
+    def _check_r2_threshold(self, benchmark_results: dict):
+        min_r2 = self.config.get("min_acceptable_r2", 0.0)
+        if min_r2 <= 0:
+            return
+        df = benchmark_results.get("results")
+        if df is None or df.empty:
+            return
+        valid = df[df["r2"].notna()]
+        if valid.empty:
+            return
+        best_r2 = valid["r2"].max()
+        best_model = valid.loc[valid["r2"].idxmax(), "model"]
+        self.pipeline_state["steps"]["r2_threshold_check"] = {
+            "best_r2": round(best_r2, 4),
+            "best_model": best_model,
+            "min_acceptable_r2": min_r2,
+            "threshold_met": bool(best_r2 >= min_r2),
+        }
+        if best_r2 >= min_r2:
+            logger.info("R² threshold check PASSED: %.4f >= %.2f (model: %s)", best_r2, min_r2, best_model)
+        else:
+            logger.warning("R² threshold check FAILED: %.4f < %.2f (model: %s)", best_r2, min_r2, best_model)
+            logger.warning("Consider: (1) more data, (2) relaxed thresholds, (3) different target")
+
+    def _step_loocv_evaluation(
+        self, X: pd.DataFrame, y: pd.Series, benchmark_results: dict
+    ) -> dict:
+        if not self.config.get("use_loocv"):
+            return benchmark_results
+        logger.info("--- LOOCV Evaluation ---")
+        from sklearn.model_selection import LeaveOneOut, cross_val_score
+        from sklearn.metrics import make_scorer, r2_score
+        import numpy as np
+
+        loocv_models = self.config.get("loocv_models", ["ridge", "random_forest"])
+        from sklearn.linear_model import Ridge, Lasso
+        from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+
+        model_map = {
+            "ridge": ("Ridge (LOOCV)", Ridge(alpha=1.0, random_state=self.random_state)),
+            "lasso": ("Lasso (LOOCV)", Lasso(alpha=0.01, random_state=self.random_state)),
+            "random_forest": ("Random Forest (LOOCV)", RandomForestRegressor(n_estimators=200, random_state=self.random_state, n_jobs=-1)),
+            "gradient_boosting": ("Gradient Boosting (LOOCV)", GradientBoostingRegressor(n_estimators=200, random_state=self.random_state)),
+        }
+
+        loo = LeaveOneOut()
+        loocv_results = []
+        for key in loocv_models:
+            if key not in model_map:
+                continue
+            name, model = model_map[key]
+            try:
+                r2_scores = cross_val_score(model, X, y, cv=loo, scoring="r2", n_jobs=-1)
+                rmse_scores = cross_val_score(model, X, y, cv=loo, scoring="neg_root_mean_squared_error", n_jobs=-1)
+                mean_r2 = float(np.mean(r2_scores))
+                mean_rmse = float(np.mean(-rmse_scores))
+                loocv_results.append({
+                    "model": name,
+                    "loocv_r2": round(mean_r2, 4),
+                    "loocv_rmse": round(mean_rmse, 4),
+                    "loocv_r2_std": round(float(np.std(r2_scores)), 4),
+                })
+                logger.info("LOOCV %s: R²=%.4f, RMSE=%.4f", name, mean_r2, mean_rmse)
+            except Exception as e:
+                logger.warning("LOOCV %s failed: %s", name, e)
+
+        if loocv_results:
+            best_loocv = max(loocv_results, key=lambda r: r["loocv_r2"])
+            logger.info("Best LOOCV: %s with R²=%.4f", best_loocv["model"], best_loocv["loocv_r2"])
+            self.pipeline_state["steps"]["loocv_evaluation"] = {
+                "results": loocv_results,
+                "best_loocv_model": best_loocv["model"],
+                "best_loocv_r2": best_loocv["loocv_r2"],
+            }
+
+        return benchmark_results
 
     def _step_ensemble_creation(
         self, X: pd.DataFrame, y: pd.Series, benchmark_results: dict

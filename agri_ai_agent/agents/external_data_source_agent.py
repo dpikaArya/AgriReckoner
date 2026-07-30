@@ -11,6 +11,7 @@ from agri_ai_agent.contracts.messages import AgentContract
 from agri_ai_agent.external_data.connector_manager import (
     ConnectorManager,
 )
+from agri_ai_agent.external_data.data_enricher import enrich_master
 from agri_ai_agent.external_data.registry_db import DatasetRegistry
 from agri_ai_agent.knowledge_graph.graph import KnowledgeGraph
 from agri_ai_agent.knowledge_graph.provenance import (
@@ -132,10 +133,15 @@ class ExternalDataSourceAgent(BaseAgent):
         )
         self.log.info("External data source summary written to %s", summary_path)
 
-        merged = integration_impl.merge_packages(packages_by_source, df)
+        if hasattr(integration_impl, "enrich_packages"):
+            merged = integration_impl.enrich_packages(packages_by_source, df)
+            enrich_mode = "enriched (key-based join)"
+        else:
+            merged = integration_impl.merge_packages(packages_by_source, df)
+            enrich_mode = "merged (row append)"
         self.log.info(
-            "External data layer complete: %d packages from %d sources merged into %d rows",
-            len(all_packages), len(healthy), len(merged),
+            "External data layer complete: %d packages from %d sources %s into %d columns",
+            len(all_packages), len(healthy), enrich_mode, len(merged.columns),
         )
         return merged
 
