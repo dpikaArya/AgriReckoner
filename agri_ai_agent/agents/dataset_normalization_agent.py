@@ -31,15 +31,14 @@ class DatasetNormalizationAgent(BaseAgent):
             norm = self._normalize_package(pkg)
             normalized.append(norm)
 
-        if raw_df is not None and not raw_df.empty and not normalized:
-            pkg = self._package_from_dataframe(raw_df, kwargs)
-            normalized.append(pkg)
+        # With no external packages the input itself becomes the package. Its rows are
+        # then already inside `normalized`, so passing the input to the merge as well
+        # would concatenate every row with a copy of itself.
+        wraps_input = not normalized and raw_df is not None and not raw_df.empty
+        if wraps_input:
+            normalized.append(self._package_from_dataframe(raw_df, kwargs))
 
-        if not normalized and raw_df is not None and not raw_df.empty:
-            pkg = self._package_from_dataframe(raw_df, kwargs)
-            normalized.append(pkg)
-
-        merged = self._merge_normalized(normalized, raw_df)
+        merged = self._merge_normalized(normalized, pd.DataFrame() if wraps_input else raw_df)
 
         self._save_artifact(normalized)
         self._write_registry_export(normalized)
