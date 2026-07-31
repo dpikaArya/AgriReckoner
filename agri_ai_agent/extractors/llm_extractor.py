@@ -56,10 +56,70 @@ def build_extraction_schema() -> dict:
     }
 
 
+MAX_PROMPT_CHARS = 120_000
+HEAD_CHARS = 20_000  # title, abstract and methods, where treatment codes are defined
+_WINDOW_CHARS = 3_000  # context kept around each result mention
+
+# Where the numbers live. Results tables in agronomy papers begin well past any short
+# head slice — measured first-table offsets in real open-access papers were 14.7k, 22.3k,
+# 51.5k and 82.0k characters — so a head-only prompt shows the model no results at all.
+_RESULT_MARKERS = (
+    "yield",
+    "grain yield",
+    "table",
+    "treatment",
+    "significant",
+    "kg ha",
+    "t ha",
+    "q ha",
+)
+
+
+def _select_text(text: str) -> str:
+    """Keep the whole paper when it fits, otherwise the head plus the result passages.
+
+    Truncating to the first N characters keeps the title, abstract and introduction and
+    discards every results table, so the model can only report metadata. The head is still
+    needed — it defines what T1..Tn mean — so both are kept rather than either alone.
+    """
+    if len(text) <= MAX_PROMPT_CHARS:
+        return text
+
+    head = text[:HEAD_CHARS]
+    lowered = text.lower()
+    spans: list[tuple[int, int]] = []
+    for marker in _RESULT_MARKERS:
+        start = lowered.find(marker, HEAD_CHARS)
+        while start != -1 and len(spans) < 200:
+            spans.append((max(HEAD_CHARS, start - _WINDOW_CHARS // 2), start + _WINDOW_CHARS))
+            start = lowered.find(marker, start + _WINDOW_CHARS)
+
+    merged: list[list[int]] = []
+    for start, end in sorted(spans):
+        if merged and start <= merged[-1][1]:
+            merged[-1][1] = max(merged[-1][1], end)
+        else:
+            merged.append([start, end])
+
+    budget = MAX_PROMPT_CHARS - len(head)
+    kept: list[str] = []
+    for start, end in merged:
+        chunk = text[start : min(end, start + budget)]
+        if not chunk:
+            break
+        kept.append(chunk)
+        budget -= len(chunk)
+        if budget <= 0:
+            break
+    return head + "\n[...]\n" + "\n[...]\n".join(kept)
+
+
 def _build_user_prompt(text: str) -> str:
     columns = ", ".join(EXTRACTION_COLUMNS)
-    body = text if len(text) <= 12000 else text[:12000]
-    return f"Extract these variables if explicitly stated: {columns}.\n\nPAPER TEXT:\n{body}"
+    return (
+        f"Extract these variables if explicitly stated: {columns}.\n\n"
+        f"PAPER TEXT:\n{_select_text(text)}"
+    )
 
 
 class LLMExtractor:

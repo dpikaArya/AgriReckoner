@@ -23,6 +23,43 @@ def test_schema_lists_registry_columns():
     assert "Soil_pH" in enum and "Nitrogen" in enum
 
 
+def test_a_whole_paper_is_sent_when_it_fits():
+    from agri_ai_agent.extractors.llm_extractor import MAX_PROMPT_CHARS, _select_text
+
+    paper = "a" * (MAX_PROMPT_CHARS - 10)
+    assert _select_text(paper) == paper
+
+
+def test_results_tables_reach_the_model_in_a_long_paper():
+    """Regression: the prompt was cut to the first 12,000 characters.
+
+    Measured first-table offsets in real open-access agronomy papers were 14.7k, 22.3k,
+    51.5k and 82.0k characters, so the model was shown title, abstract and introduction
+    and never a single results table — it could only report metadata.
+    """
+    from agri_ai_agent.extractors.llm_extractor import MAX_PROMPT_CHARS, _select_text
+
+    filler = "Introduction and background prose. " * 4000
+    table = "Table 3 Grain yield of treatments: T1 2450 kg ha-1, T2 3110 kg ha-1."
+    paper = filler + ("padding text. " * 8000) + table + ("more prose. " * 4000)
+    assert len(paper) > MAX_PROMPT_CHARS
+
+    selected = _select_text(paper)
+    assert table in selected
+    assert len(selected) <= MAX_PROMPT_CHARS + 200  # separators only
+
+
+def test_the_head_is_kept_because_it_defines_the_treatment_codes():
+    """T1/T2 mean nothing without the methods section that assigns doses to them."""
+    from agri_ai_agent.extractors.llm_extractor import MAX_PROMPT_CHARS, _select_text
+
+    head = "Methods: T1 = 0 kg N/ha control, T2 = 120 kg N/ha. "
+    paper = head + ("filler prose. " * 20000) + "Table 2 yield T1 2450 T2 3110"
+    assert len(paper) > MAX_PROMPT_CHARS
+    selected = _select_text(paper)
+    assert "T2 = 120 kg N/ha" in selected
+
+
 def test_extractor_parses_structured_output():
     payload = {
         "crop": "Rice",
