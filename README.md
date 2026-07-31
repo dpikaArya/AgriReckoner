@@ -189,9 +189,14 @@ The schema is the single source of truth for harmonised observations. It evolved
 
 ### Evaluation Protocol
 
-- **Sample-size-aware:** n ≥ 30 → Repeated 5×3-fold CV (robust); 8–29 → Leave-One-Out (advisory); < 8 → refuses to report metrics.
+- **Paper-grouped:** when a source-paper identifier is present, whole papers are held out
+  (≥ 10 papers → grouped 5-fold; 3–9 → leave-one-paper-out; < 3 → refuses to report a
+  generalization metric). One paper contributes many treatment rows that share a site, season
+  and soil, so splitting them at random scores the model on a trial it has already seen.
+- **Sample-size-aware:** without paper identifiers, n ≥ 30 → Repeated 5×3-fold CV (robust);
+  8–29 → Leave-One-Out (advisory); < 8 → refuses to report metrics.
 - **Leakage-safe:** name-based + correlation-based (|ρ| ≥ 0.999) leakage detection; `SimpleImputer` fitted **inside each fold** via a `Pipeline`.
-- **Metrics:** R² (mean ± std across folds), RMSE, MAE, MAPE, n, CV scheme, robustness flag.
+- **Metrics:** R² (mean ± std across folds), RMSE, MAE, MAPE, n, n_papers, CV scheme, robustness flag.
 
 ### Trained Artifacts
 
@@ -222,30 +227,37 @@ The schema is the single source of truth for harmonised observations. It evolved
 | External columns added | 0 | **9** (PARAMETER, Year, Month, Value, DOY, Property, Depth, Statistic, Unit) | new capability |
 | Enrichment runtime | ~45 min (LLM-bound) | **~2 min** | **95% faster** |
 
-### Best Models — Yield Prediction (CPY, 5,334 samples, 73 features, 5-fold CV)
+### Model Performance — not yet established
 
-| Model | R² | RMSE | MAE |
-|-------|-----|------|-----|
-| **Extra Trees** | **0.9890** | **898.6** | 291.7 |
-| **XGBoost** | **0.9853** | **1028.0** | 451.1 |
-| **Random Forest** | **0.9845** | **1067.7** | 359.4 |
-| Decision Tree | 0.9758 | 1300.6 | 420.9 |
-| Gradient Boosting | 0.9731 | 1440.8 | 874.0 |
-| Ridge | 0.3068 | 6034.1 | 2066.6 |
+**No validated yield-prediction performance can be reported from this repository yet, because
+there is not yet enough target data to measure one.** The pipeline, the schema, and the
+evaluation machinery are in place; the training corpus is not.
 
-The **Extra Trees** ensemble achieves the best generalization on the large dataset (R² = **0.989**, RMSE = **898.6 kg/ha**), closely followed by **XGBoost** and **Random Forest** — all tree-based ensembles clearly outperform the linear baselines.
+What the committed data currently contains:
 
-### Best Models — Spike-Length Regression (12 samples, 2 features)
+| Table | Rows | Independent papers | Non-null yield |
+|-------|------|--------------------|----------------|
+| `outputs/Universal_Agricultural_ML_Master.csv` | 43 | 43 | `Target_Yield` = **0** |
+| `outputs/treatment_level_extraction.csv` | 121 | 16 | `Yield_per_Plot` = 17, per-hectare = 0 |
+| `outputs/Universal_Agricultural_Schema.csv` | 45 | 5 crops | `Yield_per_Hectare` = 0 |
 
-| Model | R² | RMSE | CV R² |
-|-------|-----|------|-------|
-| **Gradient Boosting** | **1.0000** | **0.0007** | 0.9988 |
-| **Extra Trees** | **1.0000** | 0.0000 | 0.9969 |
-| **Random Forest** | **0.9997** | **0.4824** | 0.9881 |
-| Multiple Linear Regression | 0.9896 | 2.8737 | 0.9764 |
-| Elastic Net | 0.9874 | 3.1578 | 0.9777 |
+Two measurement issues make the effective total smaller still, and both are tracked as issues:
 
-> Small-sample results (n = 12) are advisory; CV R² (Repeated 5-fold) is the trusted ranking signal. **Gradient Boosting** leads with CV R² = **0.9988**.
+- In `Universal_Agricultural_Schema.csv` every measurement column holds only **8 distinct
+  values**, the modal one repeated in 38 of 45 rows — one crop's 8 treatment rows are
+  broadcast across the other crops. The effective independent sample is **8**, not 45.
+- Splitting folds by row rather than by paper flatters every score. On the treatment-level
+  table, the same model moves from **R² = +0.16** (rows split at random) to **R² = −3.36**
+  (leave-one-paper-out) — i.e. worse than predicting the mean once it must generalise to an
+  unseen trial.
+
+Earlier revisions of this section reported R² ≈ 0.99. Those figures were produced by scoring
+models on the rows they were fitted on, with post-harvest outcomes (protein, seed weight,
+spike length) among the predictors, and are not measures of predictive skill. The scripts that
+produced them now apply the shared leakage guard and label in-sample metrics as `*_InSample`.
+
+**Growing the corpus is therefore the prerequisite for any performance claim**, not a
+follow-up to it. See [Data Collection](#data-collection-status) below.
 
 ### Ready Reckoner / Recommendations
 
@@ -257,6 +269,40 @@ The **Extra Trees** ensemble achieves the best generalization on the large datas
 | Environmental score (mean) | 0.70 |
 | Risk distribution | 63 low / 3 moderate / 0 high |
 | Mean recommended dose | 6.17 kg/ha (Jaivik Poshak, bio-NPK) |
+
+These scenarios exercise the fuzzy rule base end to end. They are not agronomic advice: the
+ML yield component they fuse with has no validated skill yet (above), so the doses should be
+read as pipeline output pending agronomic review.
+
+---
+
+## Data Collection Status
+
+The bottleneck is the number of **independent trials**, not the number of columns.
+
+The external data layer (NASA POWER, SoilGrids, FAOSTAT, ISRIC, …) enriches rows that already
+exist — it adds *columns* such as weather and soil properties. It cannot add *observations*.
+In the current 45-row schema those enrichment columns are in fact constant (`Year`, `Country`,
+`Season`, `Location`, `Rainfall`, `Temperature_*` each hold a single distinct value), so they
+carry no information a model can learn from. Growing the corpus means adding trials.
+
+**Where new observations come from, in order of yield per unit effort:**
+
+1. **Treatment-level extraction, not paper-level.** `outputs/treatment_level_extraction.csv`
+   already yields 121 rows from 16 papers (~7.5 rows/paper) because it records one row per
+   treatment. The paper-level table records one row per paper. Routing all extraction through
+   the treatment-level path multiplies the corpus by roughly the number of treatments per trial.
+2. **Open-access bulk supply.** `agriai extract --papers <dir>` runs grounded LLM extraction
+   over a PDF directory. EuropePMC's OA subset can supply agronomy trials in bulk, so the
+   supply of source PDFs is not the limiting factor — routing them through extraction is.
+3. **Public agronomy datasets normalised into UAMS.** Field-trial datasets carry many trials
+   with real yields, and the connector layer already exists to fetch them; each needs a UAMS
+   column mapping and a licence check before use.
+
+**Targets to hit before performance means anything:** ≥ 3 independent papers for any metric at
+all, ≥ 10 for a grouped 5-fold estimate that is labelled robust, and a yield column that
+survives unit checking (see the `t/ha` → `kg/ha` regression in
+`tests/test_yield_unit_extraction.py`).
 
 ---
 
