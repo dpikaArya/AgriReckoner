@@ -1,8 +1,13 @@
 """End-to-end tests for the agent Orchestrator.
 
 Replaces the removed tests that targeted the superseded numbered-agent design.
-These exercise the real 17-agent pipeline on a small dataframe and assert it
-runs to completion and produces the headline columns.
+These exercise the real pipeline on a small dataframe and assert it runs to
+completion and produces the headline columns.
+
+The inputs are synthetic, but the run is still marked ``live``: the pipeline's
+``external_data`` step downloads from external dataset repositories on every
+run, which needs the network and takes tens of minutes. Making that step
+opt-out would let these run in CI, where they belong.
 """
 
 import logging
@@ -12,7 +17,7 @@ import pandas as pd
 import pytest
 
 from agri_ai_agent.config.settings import AgriAISettings
-from agri_ai_agent.orchestrator import Orchestrator
+from agri_ai_agent.orchestrator import PIPELINE_STEPS, Orchestrator
 
 logging.disable(logging.WARNING)
 
@@ -54,7 +59,8 @@ def test_pipeline_runs_end_to_end(synthetic_df, temp_settings):
 
     assert orch.state.status == "completed"
     assert orch.state.failed_agents == []
-    assert len(orch.state.completed_agents) == 17
+    # Derived from the pipeline, not hardcoded: adding an agent should not need a test edit.
+    assert len(orch.state.completed_agents) == len(PIPELINE_STEPS)
     assert len(result) == len(synthetic_df)
 
 
