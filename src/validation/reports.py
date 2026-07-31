@@ -1,6 +1,6 @@
 import json
 import logging
-from datetime import UTC, datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from src.validation.data_quality import DataQualityValidator
@@ -19,7 +19,7 @@ class ValidationReport:
                 "validator": validator_name,
                 "passed": passed,
                 "details": details,
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             }
         )
 
@@ -33,7 +33,7 @@ class ValidationReport:
                 "passed": passed,
                 "failed": failed,
                 "status": "PASS" if failed == 0 else "FAIL",
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": datetime.now(timezone.utc).isoformat(),
             },
             "results": self.results,
         }
