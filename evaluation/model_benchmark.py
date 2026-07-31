@@ -7,7 +7,9 @@ import time
 import warnings
 
 import numpy as np
+import pandas as pd
 
+from agri_ai_agent.ml.leakage import select_feature_columns
 from evaluation.utils import (
     get_master_df,
     write_csv,
@@ -29,25 +31,24 @@ def _prepare_data():
         return None, None, None
 
     target = target_cols[0]
-    exclude = [c for c in target_cols if c != target] + ["Paper_ID", "DOI", "Authors"]
+    exclude = set(target_cols) - {target} | {"Paper_ID", "DOI", "Authors"}
 
-    numeric_df = df.select_dtypes(include=["number"])
-    feature_cols = [c for c in numeric_df.columns if c not in exclude and c != target]
+    # The shared guard drops post-harvest outcomes and target restatements, which a
+    # plain "all numeric columns" selection would feed straight into the model.
+    feature_cols = select_feature_columns(df, target, base_exclude=exclude)
 
-    X = numeric_df[feature_cols].copy()
-    y = numeric_df[target].copy()
+    X = df[feature_cols].apply(pd.to_numeric, errors="coerce")
+    y = pd.to_numeric(df[target], errors="coerce")
 
     X = X.replace([np.inf, -np.inf], np.nan)
-    mask = X.notna().all(axis=1) & y.notna()
-    X = X[mask]
-    y = y[mask]
+    # Only the target must be present. Requiring every feature to be non-null discarded
+    # every row of this sparse literature-derived table; gaps are imputed inside folds.
+    keep = y.notna()
+    X, y = X[keep], y[keep]
+    X = X.dropna(axis=1, how="all")
 
     if len(X) < 5 or len(X.columns) < 2:
         return None, None, None
-
-    for col in X.columns:
-        if X[col].isna().any():
-            X[col] = X[col].fillna(X[col].median())
 
     return X, y, target
 
