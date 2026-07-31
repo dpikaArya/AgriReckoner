@@ -11,6 +11,7 @@ from pathlib import Path
 def run_all():
     start_time = time.time()
     all_results = {}
+    _failures: list[Exception] = []
 
     print("=" * 60)
     print("ADES Evaluation and Benchmarking Framework")
@@ -35,6 +36,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 02
     print("[2/14] Scientific Information Extraction Evaluation...", end=" ")
@@ -53,6 +55,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 03
     print("[3/14] Ontology Mapping Evaluation...", end=" ")
@@ -68,6 +71,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 04
     print("[4/14] Schema Mapping Evaluation...", end=" ")
@@ -80,6 +84,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 05
     print("[5/14] Unit Harmonization Evaluation...", end=" ")
@@ -92,6 +97,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 06
     print("[6/14] Quality Assurance Evaluation...", end=" ")
@@ -104,6 +110,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 07
     print("[7/14] Feature Engineering Evaluation...", end=" ")
@@ -116,6 +123,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 08
     print("[8/14] Leakage Detection Evaluation...", end=" ")
@@ -128,6 +136,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 09
     print("[9/14] Statistical Diagnostics Evaluation...", end=" ")
@@ -140,6 +149,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 10
     print("[10/14] Model Readiness Evaluation...", end=" ")
@@ -160,6 +170,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Stage 11
     print("[11/14] Documentation Evaluation...", end=" ")
@@ -172,6 +183,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # End-to-End
     print("[12/14] End-to-End Pipeline Performance...", end=" ")
@@ -184,6 +196,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Dataset Quality Score
     print("[13/14] Dataset Quality Score...", end=" ")
@@ -196,6 +209,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Model Benchmark
     print("[14/14] Model Benchmark...", end=" ")
@@ -214,6 +228,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Agent Benchmark
     print("[+] Agent Benchmark...", end=" ")
@@ -225,6 +240,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Output Validation
     print("[+] Output Validation...", end=" ")
@@ -237,6 +253,7 @@ def run_all():
         print(f"OK -> {path}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Dashboard
     print("[+] Final Dashboard Generation...", end=" ")
@@ -248,6 +265,7 @@ def run_all():
         print(f"OK -> {dash_results.get('dashboard_html', '')}")
     except Exception as e:
         print(f"FAILED: {e}")
+        _failures.append(e)
 
     # Results summary
     total_time = time.time() - start_time
@@ -297,8 +315,17 @@ def run_all():
     if dash.get("executive_md"):
         print(f"  - {dash['executive_md']}")
 
+    if _failures:
+        # A harness that prints FAILED and exits zero reports a clean run to CI while a
+        # stage is broken. The leakage stage sat silently broken behind exactly this.
+        print(f"\n{len(_failures)} stage(s) failed:")
+        for failure in _failures:
+            print(f"  - {type(failure).__name__}: {failure}")
+    all_results["failed_stages"] = len(_failures)
     return all_results
 
 
 if __name__ == "__main__":
-    run_all()
+    import sys
+
+    sys.exit(1 if run_all().get("failed_stages") else 0)
