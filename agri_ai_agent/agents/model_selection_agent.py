@@ -65,6 +65,26 @@ TARGET_COLUMNS = [
 INNER_CV_FOLDS = 3  # inner GridSearchCV folds for nested cross-validation
 
 
+def _rank_by_generalization(cv_results):
+    """Order candidates by held-out performance, not by their tuning score.
+
+    ``cv_score`` is the score the winning hyperparameters achieved on the folds that chose
+    them, so ranking on it selects whichever model overfits the tuning folds hardest — and
+    that model was then the one persisted as ``best_model_<target>.joblib``. ``r2_mean``
+    comes from nested cross-validation, where the outer fold never influenced the choice,
+    so it is the estimate that answers "which model would do best on an unseen trial".
+    Candidates without a generalization estimate rank below those that have one.
+    """
+
+    def key(result):
+        r2 = result.get("r2_mean")
+        has_honest = r2 is not None and not (isinstance(r2, float) and np.isnan(r2))
+        return (1 if has_honest else 0, r2 if has_honest else result.get("cv_score", float("-inf")))
+
+    scored = [r for r in cv_results if "cv_score" in r or r.get("r2_mean") is not None]
+    return sorted(scored, key=key, reverse=True)
+
+
 def _get_model_pool(n_samples: int, is_classification: bool = False):
     """Return list of (name, model, param_grid) tuples based on sample size."""
     pool = []
@@ -278,11 +298,7 @@ class ModelSelectionAgent(BaseAgent):
             if "best_model" in result:
                 fitted_models[name] = result["best_model"]
 
-        leaderboard = sorted(
-            [r for r in cv_results if "cv_score" in r],
-            key=lambda x: x["cv_score"],
-            reverse=True,
-        )
+        leaderboard = _rank_by_generalization(cv_results)
 
         if leaderboard:
             best_name = leaderboard[0]["model"]
@@ -331,10 +347,23 @@ class ModelSelectionAgent(BaseAgent):
             json.dumps(summary, indent=2, default=str), "model_selection_summary.json"
         )
 
-        if leaderboard and "cv_score" in leaderboard[0]:
-            best_score = leaderboard[0]["cv_score"]
-            df["_model_selection_score"] = best_score
-            self.log.info("Best model: %s (cv_score=%.4f)", leaderboard[0]["model"], best_score)
+        if leaderboard:
+            best = leaderboard[0]
+            honest = best.get("r2_mean")
+            # Record the generalization estimate when there is one; the tuning score is
+            # reported alongside it but must not stand in for it.
+            df["_model_selection_score"] = honest if honest is not None else best.get("cv_score")
+            self.log.info(
+                "Best model: %s (nested r2=%s, tuning score=%s)",
+                best["model"],
+                "n/a" if honest is None else f"{honest:.4f}",
+                "n/a" if best.get("cv_score") is None else f"{best['cv_score']:.4f}",
+            )
+            if honest is None:
+                self.log.warning(
+                    "Ranked on the tuning score: no nested estimate was available, so this "
+                    "ordering is optimistically biased"
+                )
         else:
             self.log.warning("No model achieved a valid CV score")
 
@@ -417,14 +446,22 @@ class ModelSelectionAgent(BaseAgent):
         return KFold(n_splits=n_splits, shuffle=True, random_state=42)
 
     def _tune_in_sample(self, model, param_grid, X, y, cv, scoring, optimize):
-        """Return the optimistic in-sample tuning result (cv_score, best_params, best_model)."""
-        from sklearn.model_selection import GridSearchCV, cross_val_score
+        """Return the optimistic in-sample tuning result (cv_score, best_params, best_model).
 
+        Tuning runs over the same imputing pipeline the nested path uses, so the median is
+        computed inside each fold. Fitting a bare estimator here let the imputer see the
+        whole dataset, which leaks the held-out rows into the values used to train on.
+        """
+        from sklearn.impute import SimpleImputer
+        from sklearn.model_selection import GridSearchCV, cross_val_score
+        from sklearn.pipeline import Pipeline
+
+        pipeline = Pipeline([("impute", SimpleImputer(strategy="median")), ("model", model)])
         with np.errstate(divide="ignore", invalid="ignore"):
             if optimize and param_grid:
                 search = GridSearchCV(
-                    model,
-                    param_grid,
+                    pipeline,
+                    {f"model__{key}": values for key, values in param_grid.items()},
                     cv=cv,
                     scoring=scoring,
                     n_jobs=-1,
@@ -437,9 +474,9 @@ class ModelSelectionAgent(BaseAgent):
                     "cv_score": float(search.best_score_),
                     "best_model": search.best_estimator_,
                 }
-            scores = cross_val_score(model, X, y, cv=cv, scoring=scoring, n_jobs=-1)
-            model.fit(X, y)
-            return {"cv_score": float(np.nanmean(scores)), "best_model": model}
+            scores = cross_val_score(pipeline, X, y, cv=cv, scoring=scoring, n_jobs=-1)
+            pipeline.fit(X, y)
+            return {"cv_score": float(np.nanmean(scores)), "best_model": pipeline}
 
     def _add_generalization_scores(
         self, result, model, param_grid, X, y, outer_cv, n_splits, scoring, optimize
