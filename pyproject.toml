@@ -27,6 +27,7 @@ dependencies = [
     "networkx>=3.0",
     "datasets>=2.14",
     "huggingface-hub>=0.20",
+    "requests>=2.31",
 ]
 
 [project.optional-dependencies]
