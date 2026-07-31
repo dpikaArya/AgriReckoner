@@ -1,13 +1,12 @@
 """Tests for PerformanceTargets — Phase 16."""
 
 import json
-from pathlib import Path
 
 import pytest
 
 from agri_ai_agent.evaluation import (
-    PerformanceValidator,
     TARGETS,
+    PerformanceValidator,
 )
 
 
@@ -45,7 +44,6 @@ def failing_metrics():
 
 
 class TestPerformanceTargets:
-
     def test_targets_defined(self):
         assert len(TARGETS) == 8
         assert "extraction_accuracy" in TARGETS

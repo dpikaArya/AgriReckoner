@@ -28,7 +28,6 @@ import time
 import traceback
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -36,9 +35,9 @@ import pandas as pd
 BASE_DIR = Path(__file__).parent.resolve()
 sys.path.insert(0, str(BASE_DIR))
 
-from agri_ai_agent.config.settings import AgriAISettings
-from agri_ai_agent.external_data.registry_db import DatasetRegistry
-from src.utils.logging_config import setup_logging
+from agri_ai_agent.config.settings import AgriAISettings  # noqa: E402
+from agri_ai_agent.external_data.registry_db import DatasetRegistry  # noqa: E402
+from src.utils.logging_config import setup_logging  # noqa: E402
 
 # ── Settings ────────────────────────────────────────────────────────────
 settings = AgriAISettings()
@@ -94,7 +93,9 @@ def _load_master_datasets() -> pd.DataFrame:
                 logger.info("  Loaded %s: %d rows x %d cols", f.name, len(df), len(df.columns))
             except Exception as e:
                 logger.warning("  Failed to load %s: %s", f.name, e)
-    combined = pd.concat(all_frames, ignore_index=True, sort=False) if all_frames else pd.DataFrame()
+    combined = (
+        pd.concat(all_frames, ignore_index=True, sort=False) if all_frames else pd.DataFrame()
+    )
     logger.info("Combined master dataset: %d rows x %d cols", len(combined), len(combined.columns))
     return combined
 
@@ -150,8 +151,13 @@ def step1_sync_external_data_sources() -> dict:
         results["sources_unhealthy"] = unhealthy
         logger.info("Healthy: %d | Unhealthy: %d", len(healthy), len(unhealthy))
         for s, h in health_results.items():
-            logger.info("  %s: healthy=%s, latency=%.1fms, error=%s",
-                       s, h.is_healthy, h.latency_ms, h.error or "none")
+            logger.info(
+                "  %s: healthy=%s, latency=%.1fms, error=%s",
+                s,
+                h.is_healthy,
+                h.latency_ms,
+                h.error or "none",
+            )
 
         # Detect updates
         updates = manager.detect_all_updates()
@@ -172,8 +178,12 @@ def step1_sync_external_data_sources() -> dict:
                 if h and h.discovered_count <= max_discovery:
                     quick_sources.append(s)
                 else:
-                    logger.info("Skipping %s (%d datasets — exceeds AGRI_MAX_DISCOVERY_PER_SOURCE=%d)",
-                                s, h.discovered_count if h else -1, max_discovery)
+                    logger.info(
+                        "Skipping %s (%d datasets — exceeds AGRI_MAX_DISCOVERY_PER_SOURCE=%d)",
+                        s,
+                        h.discovered_count if h else -1,
+                        max_discovery,
+                    )
             if not quick_sources:
                 logger.warning("No quick-sync sources available after filtering")
                 results["note"] = "No quick-sync sources; all filtered out"
@@ -189,20 +199,19 @@ def step1_sync_external_data_sources() -> dict:
             )
             results["total_duration_sec"] = round(elapsed, 2)
             results["packages_by_source"] = {
-                src: [p.to_dict() for p in pkgs]
-                for src, pkgs in packages_by_source.items()
+                src: [p.to_dict() for p in pkgs] for src, pkgs in packages_by_source.items()
             }
             results["run_logs"] = [
                 {
-                    "source": l.source_name,
-                    "duration_sec": l.duration_sec,
-                    "datasets_found": l.datasets_found,
-                    "datasets_downloaded": l.datasets_downloaded,
-                    "datasets_valid": l.datasets_valid,
-                    "success": l.success,
-                    "errors": l.errors,
+                    "source": log.source_name,
+                    "duration_sec": log.duration_sec,
+                    "datasets_found": log.datasets_found,
+                    "datasets_downloaded": log.datasets_downloaded,
+                    "datasets_valid": log.datasets_valid,
+                    "success": log.success,
+                    "errors": log.errors,
                 }
-                for l in run_logs
+                for log in run_logs
             ]
 
             summary = manager.summarize_runs(run_logs)
@@ -276,7 +285,10 @@ def steps2_9_run_pipeline(external_packages: list = None) -> dict:
                 if safe_df[col].dtype == "object" or str(safe_df[col].dtype) == "string":
                     safe_df[col] = safe_df[col].astype(str)
             safe_df.to_parquet(ext_ckpt, index=False)
-            logger.info("Pre-created external_data checkpoint (%d rows) — pipeline will skip it", len(combined_df))
+            logger.info(
+                "Pre-created external_data checkpoint (%d rows) — pipeline will skip it",
+                len(combined_df),
+            )
         else:
             logger.info("external_data checkpoint already exists — reusing")
 
@@ -303,7 +315,9 @@ def steps2_9_run_pipeline(external_packages: list = None) -> dict:
             for k, v in orchestrator.results.items()
         }
         results["output_rows"] = len(result_df) if result_df is not None else 0
-        results["output_columns"] = len(result_df.columns) if result_df is not None and not result_df.empty else 0
+        results["output_columns"] = (
+            len(result_df.columns) if result_df is not None and not result_df.empty else 0
+        )
         results["duration_sec"] = round(elapsed, 2)
         results["pipeline_results"] = {
             k: {
@@ -315,8 +329,12 @@ def steps2_9_run_pipeline(external_packages: list = None) -> dict:
             for k, v in orchestrator.results.items()
         }
 
-        logger.info("Pipeline complete: status=%s, %d agents completed, %.1fs",
-                    results["status"], len(results["completed_agents"]), elapsed)
+        logger.info(
+            "Pipeline complete: status=%s, %d agents completed, %.1fs",
+            results["status"],
+            len(results["completed_agents"]),
+            elapsed,
+        )
 
         # Save pipeline output
         if result_df is not None and not result_df.empty:
@@ -397,11 +415,13 @@ def step10_benchmark(pipeline_results: dict, step1_results: dict) -> dict:
             except Exception:
                 logger.warning("Failed to read benchmark history, starting fresh", exc_info=True)
                 history = []
-        history.append({
-            "run_id": RUN_ID,
-            "timestamp": datetime.now().isoformat(),
-            "results": results,
-        })
+        history.append(
+            {
+                "run_id": RUN_ID,
+                "timestamp": datetime.now().isoformat(),
+                "results": results,
+            }
+        )
         history_path.parent.mkdir(parents=True, exist_ok=True)
         history_path.write_text(json.dumps(history, indent=2, default=str), encoding="utf-8")
         logger.info("Benchmark history updated: %s (%d runs)", history_path, len(history))
@@ -413,7 +433,9 @@ def step10_benchmark(pipeline_results: dict, step1_results: dict) -> dict:
             "benchmark": results,
         }
         manifest_path = REPORTS_DIR / "benchmark_manifest.json"
-        manifest_path.write_text(json.dumps(benchmark_manifest, indent=2, default=str), encoding="utf-8")
+        manifest_path.write_text(
+            json.dumps(benchmark_manifest, indent=2, default=str), encoding="utf-8"
+        )
         logger.info("Benchmark manifest: %s", manifest_path)
 
     except Exception as e:
@@ -461,7 +483,8 @@ def step11_framework_assessment(
         assessment["sections"]["pipeline_efficiency"] = {
             "pipeline_id": pipe.get("pipeline_id", ""),
             "status": pipe.get("status", "unknown"),
-            "total_agents": len(pipe.get("completed_agents", [])) + len(pipe.get("failed_agents", [])),
+            "total_agents": len(pipe.get("completed_agents", []))
+            + len(pipe.get("failed_agents", [])),
             "agents_completed": len(pipe.get("completed_agents", [])),
             "agents_failed": len(pipe.get("failed_agents", [])),
             "pipeline_duration_sec": pipe.get("duration_sec", 0),
@@ -478,17 +501,20 @@ def step11_framework_assessment(
         }
 
         # Section 4: Knowledge Graph Growth
-        kg_files = list((settings.OUTPUT_DIR).glob("*Knowledge*")) + \
-                   list((settings.OUTPUT_DIR).glob("*knowledge*"))
+        kg_files = list((settings.OUTPUT_DIR).glob("*Knowledge*")) + list(
+            (settings.OUTPUT_DIR).glob("*knowledge*")
+        )
         assessment["sections"]["knowledge_graph"] = {
             "artifact_count": len(kg_files),
             "artifacts": [f.name for f in kg_files],
         }
 
         # Section 5: Observation Growth
-        obs_files = list((settings.OUTPUT_DIR).glob("*Observation*")) + \
-                    list((settings.OUTPUT_DIR).glob("*observation*")) + \
-                    list((settings.OUTPUT_DIR).glob("*Validated_*"))
+        obs_files = (
+            list((settings.OUTPUT_DIR).glob("*Observation*"))
+            + list((settings.OUTPUT_DIR).glob("*observation*"))
+            + list((settings.OUTPUT_DIR).glob("*Validated_*"))
+        )
         assessment["sections"]["observations"] = {
             "observation_files": len(obs_files),
             "files": [f.name for f in obs_files],
@@ -680,14 +706,15 @@ def step12_generate_deliverables(
     return results
 
 
-def _generate_docx(assessment: dict, pipeline_results: dict, benchmark_results: dict, external_results: dict):
+def _generate_docx(
+    assessment: dict, pipeline_results: dict, benchmark_results: dict, external_results: dict
+):
     """Generate framework_assessment.docx"""
     docx_path = REPORTS_DIR / "framework_assessment.docx"
     try:
         from docx import Document
-        from docx.shared import Inches, Pt, RGBColor
-        from docx.enum.text import WD_ALIGN_PARAGRAPH
         from docx.enum.table import WD_TABLE_ALIGNMENT
+        from docx.enum.text import WD_ALIGN_PARAGRAPH
 
         doc = Document()
 
@@ -696,7 +723,7 @@ def _generate_docx(assessment: dict, pipeline_results: dict, benchmark_results: 
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
         doc.add_paragraph(f"Run ID: {RUN_ID}")
         doc.add_paragraph(f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        doc.add_paragraph(f"Framework Version: 2.0.0")
+        doc.add_paragraph("Framework Version: 2.0.0")
         doc.add_paragraph("")
 
         # 1. Executive Summary
@@ -704,19 +731,19 @@ def _generate_docx(assessment: dict, pipeline_results: dict, benchmark_results: 
         pipe = pipeline_results
         bench = benchmark_results
         p = doc.add_paragraph()
-        p.add_run(f"Pipeline Status: ").bold = True
+        p.add_run("Pipeline Status: ").bold = True
         p.add_run(f"{pipe.get('status', 'unknown').upper()}")
         p = doc.add_paragraph()
-        p.add_run(f"Pipeline Duration: ").bold = True
+        p.add_run("Pipeline Duration: ").bold = True
         p.add_run(f"{pipe.get('duration_sec', 0):.1f} seconds")
         p = doc.add_paragraph()
-        p.add_run(f"Agents Completed: ").bold = True
+        p.add_run("Agents Completed: ").bold = True
         p.add_run(f"{len(pipe.get('completed_agents', []))}")
         p = doc.add_paragraph()
-        p.add_run(f"Output Rows: ").bold = True
+        p.add_run("Output Rows: ").bold = True
         p.add_run(f"{pipe.get('output_rows', 0)}")
         p = doc.add_paragraph()
-        p.add_run(f"Models Available: ").bold = True
+        p.add_run("Models Available: ").bold = True
         p.add_run(f"{len(list((BASE_DIR / 'models').glob('*.pkl')))}")
         doc.add_paragraph("")
 
@@ -749,7 +776,10 @@ def _generate_docx(assessment: dict, pipeline_results: dict, benchmark_results: 
         stats_table.style = "Light Grid Accent 1"
         stats_table.alignment = WD_TABLE_ALIGNMENT.CENTER
         stats_data = [
-            ("Total Agents", str(len(pipe.get("completed_agents", [])) + len(pipe.get("failed_agents", [])))),
+            (
+                "Total Agents",
+                str(len(pipe.get("completed_agents", [])) + len(pipe.get("failed_agents", []))),
+            ),
             ("Completed", str(len(pipe.get("completed_agents", [])))),
             ("Failed", str(len(pipe.get("failed_agents", [])))),
             ("Output Rows", str(pipe.get("output_rows", 0))),
@@ -818,7 +848,9 @@ def _generate_docx(assessment: dict, pipeline_results: dict, benchmark_results: 
         doc.add_paragraph("")
 
         # 7. Recommendations
-        recs = assessment.get("sections", {}).get("overall_assessment", {}).get("recommendations", [])
+        recs = (
+            assessment.get("sections", {}).get("overall_assessment", {}).get("recommendations", [])
+        )
         if recs:
             doc.add_heading("7. Recommendations", 1)
             for r in recs:
@@ -865,16 +897,16 @@ def _generate_summary_md(
     recs = assessment.get("sections", {}).get("overall_assessment", {}).get("recommendations", [])
 
     lines = [
-        f"# AAIF Framework Assessment Summary",
-        f"",
+        "# AAIF Framework Assessment Summary",
+        "",
         f"**Run ID:** {RUN_ID}",
         f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        f"**Framework Version:** 2.0.0",
-        f"",
-        f"## Executive Summary",
-        f"",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "**Framework Version:** 2.0.0",
+        "",
+        "## Executive Summary",
+        "",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Pipeline Status | {pipe.get('status', 'unknown').upper()} |",
         f"| Agents Completed | {len(pipe.get('completed_agents', []))} / {len(pipe.get('completed_agents', [])) + len(pipe.get('failed_agents', []))} |",
         f"| Agents Failed | {len(pipe.get('failed_agents', []))} |",
@@ -883,59 +915,69 @@ def _generate_summary_md(
         f"| Output Columns | {pipe.get('output_columns', 0)} |",
         f"| Models Available | {len(list((BASE_DIR / 'models').glob('*.pkl')))} |",
         f"| Success Rate | {bench.get('agents_summary', {}).get('success_rate', 0):.1f}% |",
-        f"",
-        f"## Framework Scores",
-        f"",
-        f"| Category | Score (%) |",
-        f"|----------|-----------|",
+        "",
+        "## Framework Scores",
+        "",
+        "| Category | Score (%) |",
+        "|----------|-----------|",
     ]
     for k, v in scores.items():
         lines.append(f"| {k.replace('_', ' ').title()} | {v} |")
 
-    lines.extend([
-        f"",
-        f"## Recommendations",
-        f"",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Recommendations",
+            "",
+        ]
+    )
     if recs:
         for i, r in enumerate(recs, 1):
             lines.append(f"{i}. {r}")
     else:
         lines.append("No recommendations at this time.")
 
-    lines.extend([
-        f"",
-        f"## External Data Sources",
-        f"",
-        f"- Sources configured: {len(ext.get('sources_configured', []))}",
-        f"- Sources healthy: {len(ext.get('sources_healthy', []))}",
-        f"- Datasets downloaded: {ext.get('datasets_downloaded', 0)}",
-        f"- Datasets validated: {ext.get('datasets_valid', 0)}",
-    ])
+    lines.extend(
+        [
+            "",
+            "## External Data Sources",
+            "",
+            f"- Sources configured: {len(ext.get('sources_configured', []))}",
+            f"- Sources healthy: {len(ext.get('sources_healthy', []))}",
+            f"- Datasets downloaded: {ext.get('datasets_downloaded', 0)}",
+            f"- Datasets validated: {ext.get('datasets_valid', 0)}",
+        ]
+    )
 
-    lines.extend([
-        f"",
-        f"## Completed Agents",
-        f"",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Completed Agents",
+            "",
+        ]
+    )
     for agent in pipe.get("completed_agents", []):
         timing = pipe.get("agent_timings", {}).get(agent, {})
         lines.append(f"- **{agent}** ({timing.get('time_sec', 0):.2f}s)")
 
     if pipe.get("failed_agents"):
-        lines.extend([
-            f"",
-            f"## Failed Agents",
-            f"",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Failed Agents",
+                "",
+            ]
+        )
         for agent in pipe["failed_agents"]:
             lines.append(f"- {agent.get('step', 'unknown')}: {agent.get('errors', [''])[0][:100]}")
 
-    lines.extend([
-        f"",
-        f"## Models",
-        f"",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Models",
+            "",
+        ]
+    )
     for mf in sorted((settings.OUTPUT_DIR / "models").glob("*.pkl")):
         lines.append(f"- {mf.stem} ({round(mf.stat().st_size / 1024, 1)} KB)")
 
@@ -951,7 +993,9 @@ def _generate_pipeline_html(pipeline_results: dict):
     timings = pipe.get("agent_timings", {})
 
     agent_rows = ""
-    for step_key in sorted(set(list(timings.keys()) + completed + [f.get("step", "") for f in failed])):
+    for step_key in sorted(
+        set(list(timings.keys()) + completed + [f.get("step", "") for f in failed])
+    ):
         info = timings.get(step_key, {})
         status = info.get("status", "unknown")
         time_sec = info.get("time_sec", 0)
@@ -967,8 +1011,8 @@ def _generate_pipeline_html(pipeline_results: dict):
     for agent in failed:
         failed_rows += f"""
           <tr>
-            <td>{agent.get('step', '')}</td>
-            <td style="color:#f44336;">{agent.get('errors', [''])[0][:200]}</td>
+            <td>{agent.get("step", "")}</td>
+            <td style="color:#f44336;">{agent.get("errors", [""])[0][:200]}</td>
           </tr>"""
 
     html = f"""<!DOCTYPE html>
@@ -994,17 +1038,17 @@ def _generate_pipeline_html(pipeline_results: dict):
 <body>
 <h1>AAIF Pipeline Execution Log</h1>
 <p><strong>Run ID:</strong> {RUN_ID}</p>
-<p><strong>Date:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
-<p><strong>Pipeline ID:</strong> {pipe.get('pipeline_id', 'N/A')}</p>
-<p><strong>Status:</strong> <span class="status {'status-pass' if pipe.get('status') == 'completed' else 'status-fail'}">{pipe.get('status', 'unknown').upper()}</span></p>
+<p><strong>Date:</strong> {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
+<p><strong>Pipeline ID:</strong> {pipe.get("pipeline_id", "N/A")}</p>
+<p><strong>Status:</strong> <span class="status {"status-pass" if pipe.get("status") == "completed" else "status-fail"}">{pipe.get("status", "unknown").upper()}</span></p>
 
 <div class="summary">
   <h2>Summary</h2>
-  <p>Duration: <strong>{pipe.get('duration_sec', 0):.1f}s</strong></p>
+  <p>Duration: <strong>{pipe.get("duration_sec", 0):.1f}s</strong></p>
   <p>Completed Agents: <strong>{len(completed)}</strong></p>
   <p>Failed Agents: <strong>{len(failed)}</strong></p>
-  <p>Output Rows: <strong>{pipe.get('output_rows', 0)}</strong></p>
-  <p>Output Columns: <strong>{pipe.get('output_columns', 0)}</strong></p>
+  <p>Output Rows: <strong>{pipe.get("output_rows", 0)}</strong></p>
+  <p>Output Columns: <strong>{pipe.get("output_columns", 0)}</strong></p>
 </div>
 
 <h2>Agent Execution Log</h2>
@@ -1013,14 +1057,14 @@ def _generate_pipeline_html(pipeline_results: dict):
 <tbody>{agent_rows}</tbody>
 </table>
 
-{f'<h2>Failed Agents</h2><table><thead><tr><th>Agent</th><th>Error</th></tr></thead><tbody>{failed_rows}</tbody></table>' if failed_rows else ''}
+{f"<h2>Failed Agents</h2><table><thead><tr><th>Agent</th><th>Error</th></tr></thead><tbody>{failed_rows}</tbody></table>" if failed_rows else ""}
 
 <h2>Pipeline Topology</h2>
 <pre style="background:#f5f5f5;padding:15px;overflow-x:auto;">
-repository_sync → external_data → dataset_normalization → dataset_ingestion_bridge → 
-extraction → evidence_fusion → ontology → table_intelligence → schema_population → 
-knowledge_integration → knowledge → observation_generation → validation → 
-feature_store → feature → model_selection → training → prediction → 
+repository_sync → external_data → dataset_normalization → dataset_ingestion_bridge →
+extraction → evidence_fusion → ontology → table_intelligence → schema_population →
+knowledge_integration → knowledge → observation_generation → validation →
+feature_store → feature → model_selection → training → prediction →
 recommendation → fuzzy → benchmark → explainability → ready_reckoner
 </pre>
 
@@ -1042,12 +1086,14 @@ def _generate_training_manifest(pipeline_results: dict):
         "models": [],
     }
     for mf in sorted(model_files):
-        manifest["models"].append({
-            "name": mf.stem,
-            "path": str(mf.relative_to(BASE_DIR)),
-            "size_bytes": mf.stat().st_size,
-            "size_kb": round(mf.stat().st_size / 1024, 1),
-        })
+        manifest["models"].append(
+            {
+                "name": mf.stem,
+                "path": str(mf.relative_to(BASE_DIR)),
+                "size_bytes": mf.stat().st_size,
+                "size_kb": round(mf.stat().st_size / 1024, 1),
+            }
+        )
     manifest_path = REPORTS_DIR / "training_manifest.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, default=str), encoding="utf-8")
     logger.info("Training manifest generated: %s", manifest_path)
@@ -1109,15 +1155,27 @@ def main():
         logger.info("▰  STEP 1: External Data Source Synchronization")
         logger.info("▰" * 40)
         step1_results = step1_sync_external_data_sources()
-        _record_step("step1_external_data_sync", "completed" if "error" not in step1_results else "failed", step1_results)
+        _record_step(
+            "step1_external_data_sync",
+            "completed" if "error" not in step1_results else "failed",
+            step1_results,
+        )
     except Exception as e:
         logger.error("Step 1 CRASHED: %s", e)
-        step1_results = {"error": str(e), "sources_configured": [], "sources_healthy": [],
-                         "sources_unhealthy": [], "datasets_downloaded": 0, "datasets_valid": 0}
+        step1_results = {
+            "error": str(e),
+            "sources_configured": [],
+            "sources_healthy": [],
+            "sources_unhealthy": [],
+            "datasets_downloaded": 0,
+            "datasets_valid": 0,
+        }
         _record_step("step1_external_data_sync", "crashed", {"error": str(e)})
 
     final_summary["steps"]["step1_external_data_sync"] = {
-        "status": production_state["steps"].get("step1_external_data_sync", {}).get("status", "unknown"),
+        "status": production_state["steps"]
+        .get("step1_external_data_sync", {})
+        .get("status", "unknown"),
         "sources_healthy": len(step1_results.get("sources_healthy", [])),
         "datasets_downloaded": step1_results.get("datasets_downloaded", 0),
     }
@@ -1129,6 +1187,7 @@ def main():
             packages_by_source = step1_results.get("packages_by_source", {})
             if packages_by_source:
                 from agri_ai_agent.external_data.connector_manager import ConnectorManager
+
                 mgr = ConnectorManager(
                     registry=DatasetRegistry(settings.DATASET_REGISTRY_PATH),
                     download_dir=settings.EXTERNAL_DATA_DIR,
@@ -1140,11 +1199,17 @@ def main():
                     ckpt_dir.mkdir(parents=True, exist_ok=True)
                     safe_enriched = enriched.copy()
                     for col in safe_enriched.columns:
-                        if safe_enriched[col].dtype == "object" or str(safe_enriched[col].dtype) == "string":
+                        if (
+                            safe_enriched[col].dtype == "object"
+                            or str(safe_enriched[col].dtype) == "string"
+                        ):
                             safe_enriched[col] = safe_enriched[col].astype(str)
                     safe_enriched.to_parquet(ckpt_dir / "external_data.parquet", index=False)
-                    logger.info("Saved enriched master checkpoint with %d columns (%d original + external enrichments)",
-                                len(enriched.columns), len(combined_df.columns) if not combined_df.empty else 0)
+                    logger.info(
+                        "Saved enriched master checkpoint with %d columns (%d original + external enrichments)",
+                        len(enriched.columns),
+                        len(combined_df.columns) if not combined_df.empty else 0,
+                    )
         except Exception as e:
             logger.warning("Could not create enriched checkpoint from Step 1 results: %s", e)
 
@@ -1155,11 +1220,23 @@ def main():
         logger.info("▰  STEPS 2-9: AI Pipeline (23 agents)")
         logger.info("▰" * 40)
         pipeline_results = steps2_9_run_pipeline()
-        _record_step("steps2_9_pipeline", "completed" if pipeline_results.get("status") == "completed" else "failed", pipeline_results)
+        _record_step(
+            "steps2_9_pipeline",
+            "completed" if pipeline_results.get("status") == "completed" else "failed",
+            pipeline_results,
+        )
     except Exception as e:
         logger.error("Steps 2-9 CRASHED: %s", e)
-        pipeline_results = {"status": "crashed", "error": str(e), "completed_agents": [], "failed_agents": [],
-                           "agent_timings": {}, "output_rows": 0, "output_columns": 0, "duration_sec": 0}
+        pipeline_results = {
+            "status": "crashed",
+            "error": str(e),
+            "completed_agents": [],
+            "failed_agents": [],
+            "agent_timings": {},
+            "output_rows": 0,
+            "output_columns": 0,
+            "duration_sec": 0,
+        }
         _record_step("steps2_9_pipeline", "crashed", {"error": str(e)})
 
     final_summary["steps"]["steps2_9_pipeline"] = {
@@ -1193,7 +1270,11 @@ def main():
         logger.info("▰  STEP 11: Framework Assessment")
         logger.info("▰" * 40)
         assessment = step11_framework_assessment(step1_results, pipeline_results, benchmark_results)
-        _record_step("step11_assessment", "completed", {"scores": assessment.get("sections", {}).get("scores", {})})
+        _record_step(
+            "step11_assessment",
+            "completed",
+            {"scores": assessment.get("sections", {}).get("scores", {})},
+        )
     except Exception as e:
         logger.error("Step 11 CRASHED: %s", e)
         assessment = {"error": str(e)}
@@ -1209,7 +1290,9 @@ def main():
         logger.info("▰" * 40)
         logger.info("▰  STEP 12: Generate Deliverables")
         logger.info("▰" * 40)
-        deliverables = step12_generate_deliverables(step1_results, pipeline_results, benchmark_results, assessment)
+        deliverables = step12_generate_deliverables(
+            step1_results, pipeline_results, benchmark_results, assessment
+        )
         _record_step("step12_deliverables", "completed", deliverables)
     except Exception as e:
         logger.error("Step 12 CRASHED: %s", e)
@@ -1224,8 +1307,7 @@ def main():
     # ── Final Summary ──────────────────────────────────────────────────
     overall_elapsed = time.perf_counter() - overall_start
     all_success = all(
-        s.get("status") in ("completed", "success")
-        for s in final_summary["steps"].values()
+        s.get("status") in ("completed", "success") for s in final_summary["steps"].values()
     )
     final_summary["overall_status"] = "completed" if all_success else "completed_with_errors"
     final_summary["total_execution_time_sec"] = round(overall_elapsed, 2)
@@ -1250,20 +1332,30 @@ def main():
     logger.info("╚" + "═" * 58 + "╝")
     logger.info("")
 
-    print(f"\n{'='*60}")
-    print(f"AAIF PRODUCTION RUN COMPLETE")
-    print(f"{'='*60}")
+    print(f"\n{'=' * 60}")
+    print("AAIF PRODUCTION RUN COMPLETE")
+    print(f"{'=' * 60}")
     print(f"  Run ID:       {RUN_ID}")
     print(f"  Status:       {final_summary['overall_status']}")
     print(f"  Duration:     {overall_elapsed:.1f}s")
     print(f"  Reports:      {REPORTS_DIR}")
-    print(f"{'='*60}")
-    print(f"  STEP 1  External Data Sync:     {final_summary['steps'].get('step1_external_data_sync', {}).get('status', 'N/A')}")
-    print(f"  STEPS 2-9 Pipeline (23 agents): {final_summary['steps'].get('steps2_9_pipeline', {}).get('status', 'N/A')}")
-    print(f"  STEP 10 Benchmark:              {final_summary['steps'].get('step10_benchmark', {}).get('status', 'N/A')}")
-    print(f"  STEP 11 Assessment:             {final_summary['steps'].get('step11_assessment', {}).get('status', 'N/A')}")
-    print(f"  STEP 12 Deliverables:           {final_summary['steps'].get('step12_deliverables', {}).get('status', 'N/A')}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
+    print(
+        f"  STEP 1  External Data Sync:     {final_summary['steps'].get('step1_external_data_sync', {}).get('status', 'N/A')}"
+    )
+    print(
+        f"  STEPS 2-9 Pipeline (23 agents): {final_summary['steps'].get('steps2_9_pipeline', {}).get('status', 'N/A')}"
+    )
+    print(
+        f"  STEP 10 Benchmark:              {final_summary['steps'].get('step10_benchmark', {}).get('status', 'N/A')}"
+    )
+    print(
+        f"  STEP 11 Assessment:             {final_summary['steps'].get('step11_assessment', {}).get('status', 'N/A')}"
+    )
+    print(
+        f"  STEP 12 Deliverables:           {final_summary['steps'].get('step12_deliverables', {}).get('status', 'N/A')}"
+    )
+    print(f"{'=' * 60}")
 
     return final_summary
 
@@ -1271,34 +1363,36 @@ def main():
 def _write_final_md(summary, step1_results, pipeline_results, assessment, deliverables):
     pipe = pipeline_results
     ext = step1_results
-    scores = assessment.get("sections", {}).get("scores", {}) if isinstance(assessment, dict) else {}
+    scores = (
+        assessment.get("sections", {}).get("scores", {}) if isinstance(assessment, dict) else {}
+    )
 
     agents_completed = len(pipe.get("completed_agents", []))
     agents_failed = len(pipe.get("failed_agents", []))
-    models_count = len(list((settings.OUTPUT_DIR / "models").glob("*.pkl")))
+    len(list((settings.OUTPUT_DIR / "models").glob("*.pkl")))
 
     lines = [
-        f"# AAIF Production Run — Final Execution Summary",
-        f"",
+        "# AAIF Production Run — Final Execution Summary",
+        "",
         f"**Run ID:** {RUN_ID}",
         f"**Status:** {summary['overall_status']}",
         f"**Total Duration:** {summary['total_execution_time_sec']:.1f} seconds",
         f"**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
-        f"",
-        f"## Dataset Summary",
-        f"",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "",
+        "## Dataset Summary",
+        "",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Master Datasets Available | {len(list(settings.DATA_DIR.glob('*.xlsx')))} |",
         f"| External Sources Configured | {len(ext.get('sources_configured', []))} |",
         f"| External Sources Healthy | {len(ext.get('sources_healthy', []))} |",
         f"| External Datasets Downloaded | {ext.get('datasets_downloaded', 0)} |",
         f"| External Datasets Validated | {ext.get('datasets_valid', 0)} |",
-        f"",
-        f"## Pipeline Statistics",
-        f"",
-        f"| Metric | Value |",
-        f"|--------|-------|",
+        "",
+        "## Pipeline Statistics",
+        "",
+        "| Metric | Value |",
+        "|--------|-------|",
         f"| Pipeline ID | {pipe.get('pipeline_id', 'N/A')} |",
         f"| Pipeline Status | {pipe.get('status', 'unknown')} |",
         f"| Agents Completed | {agents_completed} / {agents_completed + agents_failed} |",
@@ -1306,54 +1400,64 @@ def _write_final_md(summary, step1_results, pipeline_results, assessment, delive
         f"| Pipeline Duration | {pipe.get('duration_sec', 0):.1f}s |",
         f"| Output Rows | {pipe.get('output_rows', 0)} |",
         f"| Output Columns | {pipe.get('output_columns', 0)} |",
-        f"",
-        f"## Models",
-        f"",
-        f"| Model | Size |",
-        f"|-------|------|",
+        "",
+        "## Models",
+        "",
+        "| Model | Size |",
+        "|-------|------|",
     ]
     for mf in sorted((settings.OUTPUT_DIR / "models").glob("*.pkl")):
         lines.append(f"| {mf.stem} | {round(mf.stat().st_size / 1024, 1)} KB |")
 
-    lines.extend([
-        f"",
-        f"## Framework Scores",
-        f"",
-        f"| Category | Score (%) |",
-        f"|----------|-----------|",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Framework Scores",
+            "",
+            "| Category | Score (%) |",
+            "|----------|-----------|",
+        ]
+    )
     for k, v in scores.items():
         lines.append(f"| {k.replace('_', ' ').title()} | {v} |")
 
-    lines.extend([
-        f"",
-        f"## Deliverables Generated",
-        f"",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Deliverables Generated",
+            "",
+        ]
+    )
     for f in sorted(deliverables.get("files_created", [])):
         lines.append(f"- `{f}`")
 
-    lines.extend([
-        f"",
-        f"## Completed Agents",
-        f"",
-    ])
+    lines.extend(
+        [
+            "",
+            "## Completed Agents",
+            "",
+        ]
+    )
     for agent in pipe.get("completed_agents", []):
         timing = pipe.get("agent_timings", {}).get(agent, {})
         lines.append(f"- **{agent}** ({timing.get('time_sec', 0):.2f}s)")
 
     if pipe.get("failed_agents"):
-        lines.extend([
-            f"",
-            f"## Failed Agents",
-            f"",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Failed Agents",
+                "",
+            ]
+        )
         for agent in pipe["failed_agents"]:
-            lines.append(f"- **{agent.get('step', 'unknown')}**: {agent.get('errors', [''])[0][:200]}")
+            lines.append(
+                f"- **{agent.get('step', 'unknown')}**: {agent.get('errors', [''])[0][:200]}"
+            )
 
     lines.append("")
     lines.append("---")
-    lines.append(f"_Generated by AAIF Production Run v2.0.0_")
+    lines.append("_Generated by AAIF Production Run v2.0.0_")
 
     md_path = REPORTS_DIR / "final_execution_summary.md"
     md_path.write_text("\n".join(lines), encoding="utf-8")

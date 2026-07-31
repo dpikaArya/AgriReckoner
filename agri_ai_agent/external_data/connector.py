@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional
 
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.external_data.download_strategy import FormatFilter
@@ -9,14 +8,14 @@ from agri_ai_agent.external_data.registry_db import DatasetRegistry
 
 class ExternalDataConnector(ABC):
     def __init__(self):
-        self._registry: Optional[DatasetRegistry] = None
+        self._registry: DatasetRegistry | None = None
         self._format_filter = FormatFilter()
 
     def set_registry(self, registry: DatasetRegistry):
         self._registry = registry
 
     @property
-    def registry(self) -> Optional[DatasetRegistry]:
+    def registry(self) -> DatasetRegistry | None:
         return self._registry
 
     @property
@@ -25,29 +24,23 @@ class ExternalDataConnector(ABC):
 
     @property
     @abstractmethod
-    def source_name(self) -> str:
-        ...
+    def source_name(self) -> str: ...
 
     @property
     @abstractmethod
-    def base_url(self) -> str:
-        ...
+    def base_url(self) -> str: ...
 
     @abstractmethod
-    def connect(self) -> bool:
-        ...
+    def connect(self) -> bool: ...
 
     @abstractmethod
-    def discover(self, query: Optional[str] = None) -> list[dict]:
-        ...
+    def discover(self, query: str | None = None) -> list[dict]: ...
 
     @abstractmethod
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
-        ...
+    def download(self, resource_id: str, target_dir: Path) -> Path | None: ...
 
     @abstractmethod
-    def validate(self, package: DatasetPackage) -> bool:
-        ...
+    def validate(self, package: DatasetPackage) -> bool: ...
 
     def register(self, package: DatasetPackage) -> str:
         if self._registry is None:
@@ -61,14 +54,12 @@ class ExternalDataConnector(ABC):
         return dataset_id
 
     @abstractmethod
-    def update(self) -> int:
-        ...
+    def update(self) -> int: ...
 
     @abstractmethod
-    def close(self) -> None:
-        ...
+    def close(self) -> None: ...
 
-    def fetch(self, resource_id: str, target_dir: Path) -> Optional[DatasetPackage]:
+    def fetch(self, resource_id: str, target_dir: Path) -> DatasetPackage | None:
         if self._registry:
             existing = self._registry.find(self.source_name, resource_id)
             if existing:

@@ -1,8 +1,6 @@
 import json
-from pathlib import Path
 
 import pandas as pd
-import pytest
 
 from src.validation.reports import ValidationReport, run_all_validations
 from src.validation.schema_validator import ColumnSchema, TableSchema
@@ -66,10 +64,12 @@ class TestValidationReport:
 
 class TestRunAllValidations:
     def test_run_all_validations_orchestrates(self):
-        df = pd.DataFrame({
-            "temp": [1.0, 2.0],
-            "city": ["a", "b"],
-        })
+        df = pd.DataFrame(
+            {
+                "temp": [1.0, 2.0],
+                "city": ["a", "b"],
+            }
+        )
         result = run_all_validations(df)
         assert isinstance(result, dict)
         assert "summary" in result
@@ -77,7 +77,10 @@ class TestRunAllValidations:
         assert result["summary"]["total_checks"] >= 2
 
     def test_run_all_validations_with_schema(self):
-        cols = [ColumnSchema(name="temp", dtype="float64"), ColumnSchema(name="city", dtype="object")]
+        cols = [
+            ColumnSchema(name="temp", dtype="float64"),
+            ColumnSchema(name="city", dtype="object"),
+        ]
         schema = TableSchema(table_name="test", columns=cols)
         df = pd.DataFrame({"temp": [1.0], "city": ["a"]})
         result = run_all_validations(df, schema=schema)
@@ -85,7 +88,7 @@ class TestRunAllValidations:
 
     def test_run_all_validations_writes_output(self, tmp_path):
         df = pd.DataFrame({"a": [1]})
-        result = run_all_validations(df, output_dir=tmp_path)
+        run_all_validations(df, output_dir=tmp_path)
         report_dir = tmp_path / "reports"
         assert (report_dir / "validation_report.json").exists()
         assert (report_dir / "validation_summary.html").exists()

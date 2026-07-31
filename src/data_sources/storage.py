@@ -3,19 +3,24 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 from src.data_sources.config_loader import get_storage_config
 
 
 class ImmutableStorage:
-    def __init__(self, base_dir: Optional[Path] = None):
+    def __init__(self, base_dir: Path | None = None):
         cfg = get_storage_config()
         self._base = base_dir or Path(cfg.get("base_dir", "external_data/raw"))
         self._versioned = cfg.get("versioned", True)
 
-    def store(self, source: str, resource_id: str, version: str,
-              file_path: Path, checksum: Optional[str] = None) -> Path:
+    def store(
+        self,
+        source: str,
+        resource_id: str,
+        version: str,
+        file_path: Path,
+        checksum: str | None = None,
+    ) -> Path:
         if checksum is None:
             checksum = self._sha256(file_path)
         ext = file_path.suffix.lower()
@@ -47,8 +52,7 @@ class ImmutableStorage:
 
         return dest_path
 
-    def resolve(self, source: str, resource_id: str,
-                version: str, checksum: str) -> Optional[Path]:
+    def resolve(self, source: str, resource_id: str, version: str, checksum: str) -> Path | None:
         if self._versioned:
             search_dir = self._base / source / resource_id / f"v{version}"
         else:
@@ -60,8 +64,7 @@ class ImmutableStorage:
                 return fp
         return None
 
-    def version_path(self, source: str, resource_id: str,
-                     version: str) -> Optional[Path]:
+    def version_path(self, source: str, resource_id: str, version: str) -> Path | None:
         if self._versioned:
             p = self._base / source / resource_id / f"v{version}"
         else:
@@ -78,8 +81,9 @@ class ImmutableStorage:
                 versions.append(entry.name[1:])
         return versions
 
-    def dedup_check(self, source: str, resource_id: str,
-                    version: str, file_path: Path) -> Optional[str]:
+    def dedup_check(
+        self, source: str, resource_id: str, version: str, file_path: Path
+    ) -> str | None:
         checksum = self._sha256(file_path)
         existing = self.resolve(source, resource_id, version, checksum)
         return checksum if existing is None else None

@@ -1,24 +1,25 @@
-from pydantic import BaseModel, Field, field_validator
-from typing import Any, Optional, List
-import pandas as pd
 import logging
+from typing import Any
+
+import pandas as pd
+from pydantic import BaseModel, field_validator
 
 
 class ColumnSchema(BaseModel):
     name: str
     dtype: str
     nullable: bool = True
-    min_value: Optional[float] = None
-    max_value: Optional[float] = None
-    allowed_values: Optional[List[Any]] = None
-    unit: Optional[str] = None
+    min_value: float | None = None
+    max_value: float | None = None
+    allowed_values: list[Any] | None = None
+    unit: str | None = None
 
 
 class TableSchema(BaseModel):
     table_name: str
-    columns: List[ColumnSchema]
-    required_columns: Optional[List[str]] = None
-    primary_key: Optional[List[str]] = None
+    columns: list[ColumnSchema]
+    required_columns: list[str] | None = None
+    primary_key: list[str] | None = None
 
     @field_validator("required_columns", mode="before")
     @classmethod
@@ -29,7 +30,7 @@ class TableSchema(BaseModel):
 
 
 class SchemaValidator:
-    def __init__(self, schema: TableSchema, logger: Optional[logging.Logger] = None):
+    def __init__(self, schema: TableSchema, logger: logging.Logger | None = None):
         self.schema = schema
         self.logger = logger or logging.getLogger(__name__)
 
@@ -65,11 +66,13 @@ class SchemaValidator:
             actual_dtype = str(df[col.name].dtype)
             expected_dtype = expected_dtype_map.get(col.dtype)
             if expected_dtype and actual_dtype != expected_dtype:
-                type_mismatches.append({
-                    "column": col.name,
-                    "expected": expected_dtype,
-                    "actual": actual_dtype,
-                })
+                type_mismatches.append(
+                    {
+                        "column": col.name,
+                        "expected": expected_dtype,
+                        "actual": actual_dtype,
+                    }
+                )
                 if not col.nullable:
                     errors.append(
                         f"Column '{col.name}' expects dtype {expected_dtype} but got {actual_dtype}"

@@ -4,7 +4,6 @@ import sqlite3
 from datetime import datetime
 from pathlib import Path
 
-
 VERSIONS_DDL = """
 CREATE TABLE IF NOT EXISTS resource_versions (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,9 +56,14 @@ class VersionHistory:
     def compute_hash(content: str) -> str:
         return hashlib.sha256(content.encode()).hexdigest()[:16]
 
-    def register_version(self, resource_type: str, resource_id: str,
-                         version: str = "", checksum: str = "",
-                         metadata: Optional[dict] = None) -> dict:
+    def register_version(
+        self,
+        resource_type: str,
+        resource_id: str,
+        version: str = "",
+        checksum: str = "",
+        metadata: dict | None = None,
+    ) -> dict:
         conn = self._connect()
         now = datetime.now().isoformat()
         content = f"{resource_type}:{resource_id}:{version}:{checksum}"
@@ -77,16 +81,30 @@ class VersionHistory:
                 "INSERT INTO resource_versions "
                 "(resource_type, resource_id, version, version_hash, checksum, metadata_json, created_at) "
                 "VALUES (?,?,?,?,?,?,?)",
-                (resource_type, resource_id, version, version_hash, checksum,
-                 json.dumps(metadata or {}), now),
+                (
+                    resource_type,
+                    resource_id,
+                    version,
+                    version_hash,
+                    checksum,
+                    json.dumps(metadata or {}),
+                    now,
+                ),
             )
             conn.commit()
         except sqlite3.IntegrityError:
             conn.execute(
                 "UPDATE resource_versions SET version_hash=?, checksum=?, "
                 "metadata_json=?, created_at=? WHERE resource_type=? AND resource_id=? AND version=?",
-                (version_hash, checksum, json.dumps(metadata or {}), now,
-                 resource_type, resource_id, version),
+                (
+                    version_hash,
+                    checksum,
+                    json.dumps(metadata or {}),
+                    now,
+                    resource_type,
+                    resource_id,
+                    version,
+                ),
             )
             conn.commit()
 
@@ -126,15 +144,28 @@ class VersionHistory:
         conn.commit()
         return cur.lastrowid
 
-    def complete_sync(self, sync_id: int, repos_checked: int, repos_changed: int,
-                      stages_executed: list[str], summary: dict):
+    def complete_sync(
+        self,
+        sync_id: int,
+        repos_checked: int,
+        repos_changed: int,
+        stages_executed: list[str],
+        summary: dict,
+    ):
         conn = self._connect()
         now = datetime.now().isoformat()
         conn.execute(
             "UPDATE sync_history SET completed_at=?, repos_checked=?, repos_changed=?, "
             "stages_executed=?, status=?, summary_json=? WHERE id=?",
-            (now, repos_checked, repos_changed, json.dumps(stages_executed),
-             "completed", json.dumps(summary), sync_id),
+            (
+                now,
+                repos_checked,
+                repos_changed,
+                json.dumps(stages_executed),
+                "completed",
+                json.dumps(summary),
+                sync_id,
+            ),
         )
         conn.commit()
 

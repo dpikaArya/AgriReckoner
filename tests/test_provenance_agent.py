@@ -5,8 +5,8 @@ import pandas as pd
 import pytest
 
 from agri_ai_agent.agents.provenance_agent import (
-    ProvenanceAgent,
     EXTRACTION_METHODS,
+    ProvenanceAgent,
 )
 
 
@@ -17,18 +17,19 @@ def agent():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Crop": ["Rice", "Wheat", "Maize"],
-        "Nitrogen": [100.0, np.nan, 80.0],
-        "Phosphorus": [25.0, 20.0, np.nan],
-        "Yield_per_Hectare": [4.5, 3.2, 5.1],
-        "N_x_P_ratio": [4.0, np.nan, np.nan],
-        "N_squared": [10000.0, np.nan, 6400.0],
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice", "Wheat", "Maize"],
+            "Nitrogen": [100.0, np.nan, 80.0],
+            "Phosphorus": [25.0, 20.0, np.nan],
+            "Yield_per_Hectare": [4.5, 3.2, 5.1],
+            "N_x_P_ratio": [4.0, np.nan, np.nan],
+            "N_squared": [10000.0, np.nan, 6400.0],
+        }
+    )
 
 
 class TestProvenanceAgent:
-
     def test_agent_name(self, agent):
         assert agent.agent_name == "ProvenanceAgent"
 
@@ -40,9 +41,14 @@ class TestProvenanceAgent:
     def test_provenance_columns_added(self, agent, sample_df):
         result = agent.process(sample_df)
         for col in [
-            "Provenance_Source", "Provenance_DOI", "Provenance_Method",
-            "Provenance_Confidence", "Provenance_Timestamp", "Provenance_Page",
-            "Provenance_Table", "Provenance_Derived",
+            "Provenance_Source",
+            "Provenance_DOI",
+            "Provenance_Method",
+            "Provenance_Confidence",
+            "Provenance_Timestamp",
+            "Provenance_Page",
+            "Provenance_Table",
+            "Provenance_Derived",
         ]:
             assert col in result.columns
 
@@ -74,7 +80,7 @@ class TestProvenanceAgent:
 
     def test_derived_columns_tagged(self, agent, sample_df):
         result = agent.process(sample_df)
-        assert result.loc[0, "Provenance_Derived"] is True or result.loc[0, "Provenance_Derived"] == True
+        assert result.loc[0, "Provenance_Derived"]
         assert result.loc[0, "Provenance_Method"] == "computed"
 
     def test_missing_values_get_missing_fields_tag(self, agent, sample_df):
@@ -110,6 +116,7 @@ class TestProvenanceAgent:
 
     def test_report_structure(self, agent, sample_df):
         from agri_ai_agent.contracts.messages import AgentContract
+
         agent.contract = AgentContract(agent_name="ProvenanceAgent")
         agent.process(sample_df)
         report = agent.contract.output_data.get("provenance_report", {})
@@ -136,10 +143,12 @@ class TestProvenanceAgent:
         assert any("unknown source" in i for i in result["issues"])
 
     def test_provenance_summary_by_paper(self, agent):
-        df = pd.DataFrame({
-            "Crop": ["Rice", "Wheat"],
-            "Nitrogen": [100, 80],
-        })
+        df = pd.DataFrame(
+            {
+                "Crop": ["Rice", "Wheat"],
+                "Nitrogen": [100, 80],
+            }
+        )
         agent.process(df, source_paper="Paper_A")
         summary = agent.provenance_summary_by_paper(df)
         assert "Paper_A" in summary

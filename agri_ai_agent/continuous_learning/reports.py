@@ -6,8 +6,7 @@ from agri_ai_agent.continuous_learning.change_detector import ChangeSet
 from agri_ai_agent.continuous_learning.version_history import VersionHistory
 
 
-def generate_sync_report(changes: ChangeSet, affected_stages: list[str],
-                         output_dir: Path) -> Path:
+def generate_sync_report(changes: ChangeSet, affected_stages: list[str], output_dir: Path) -> Path:
     report_dir = output_dir / "continuous_learning"
     report_dir.mkdir(parents=True, exist_ok=True)
 

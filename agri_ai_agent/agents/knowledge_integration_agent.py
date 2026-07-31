@@ -6,91 +6,292 @@ data, fills missing environmental and soil variables from built-in or cached
 knowledge, and exposes a local-cache for downstream agents.
 """
 
-import hashlib
 import json
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
-
 
 # ---------------------------------------------------------------------------
 # Built-in reference tables (offline subset of global datasets)
 # ---------------------------------------------------------------------------
 
 CROP_YIELD_RANGES = {
-    "Rice":        {"min": 1.0, "max": 7.5, "unit": "t/ha", "optimal_temp": (22, 32), "optimal_rainfall": (1000, 2000)},
-    "Wheat":       {"min": 0.8, "max": 5.0, "unit": "t/ha", "optimal_temp": (10, 25), "optimal_rainfall": (450, 650)},
-    "Maize":       {"min": 1.5, "max": 12.0, "unit": "t/ha", "optimal_temp": (18, 32), "optimal_rainfall": (500, 800)},
-    "Cotton":      {"min": 0.5, "max": 2.5, "unit": "t/ha", "optimal_temp": (25, 35), "optimal_rainfall": (600, 1200)},
-    "Sugarcane":   {"min": 30.0, "max": 120.0, "unit": "t/ha", "optimal_temp": (20, 35), "optimal_rainfall": (1500, 2500)},
-    "Soybean":     {"min": 0.8, "max": 4.0, "unit": "t/ha", "optimal_temp": (20, 30), "optimal_rainfall": (450, 700)},
-    "Potato":      {"min": 8.0, "max": 45.0, "unit": "t/ha", "optimal_temp": (15, 22), "optimal_rainfall": (500, 700)},
-    "Tomato":      {"min": 10.0, "max": 80.0, "unit": "t/ha", "optimal_temp": (20, 30), "optimal_rainfall": (400, 800)},
-    "Onion":       {"min": 8.0, "max": 35.0, "unit": "t/ha", "optimal_temp": (13, 28), "optimal_rainfall": (350, 650)},
-    "Chilli":      {"min": 3.0, "max": 20.0, "unit": "t/ha", "optimal_temp": (20, 30), "optimal_rainfall": (600, 1200)},
-    "Brinjal":     {"min": 10.0, "max": 50.0, "unit": "t/ha", "optimal_temp": (22, 30), "optimal_rainfall": (500, 1000)},
-    "Okra":        {"min": 5.0, "max": 20.0, "unit": "t/ha", "optimal_temp": (24, 32), "optimal_rainfall": (600, 1000)},
-    "Pea":         {"min": 0.8, "max": 3.0, "unit": "t/ha", "optimal_temp": (10, 20), "optimal_rainfall": (350, 650)},
-    "Groundnut":   {"min": 0.8, "max": 3.0, "unit": "t/ha", "optimal_temp": (25, 30), "optimal_rainfall": (500, 1000)},
-    "Sunflower":   {"min": 0.5, "max": 3.0, "unit": "t/ha", "optimal_temp": (20, 28), "optimal_rainfall": (400, 600)},
-    "Mustard":     {"min": 0.4, "max": 2.0, "unit": "t/ha", "optimal_temp": (15, 25), "optimal_rainfall": (300, 500)},
-    "Sorghum":     {"min": 0.5, "max": 5.0, "unit": "t/ha", "optimal_temp": (25, 31), "optimal_rainfall": (400, 600)},
-    "Pearl Millet": {"min": 0.3, "max": 3.0, "unit": "t/ha", "optimal_temp": (25, 35), "optimal_rainfall": (250, 500)},
-    "Barley":      {"min": 0.8, "max": 4.0, "unit": "t/ha", "optimal_temp": (12, 22), "optimal_rainfall": (300, 500)},
-    "Black Gram":  {"min": 0.3, "max": 1.5, "unit": "t/ha", "optimal_temp": (25, 35), "optimal_rainfall": (400, 650)},
-    "Green Gram":  {"min": 0.3, "max": 1.5, "unit": "t/ha", "optimal_temp": (25, 35), "optimal_rainfall": (300, 500)},
-    "Bengal Gram": {"min": 0.5, "max": 2.5, "unit": "t/ha", "optimal_temp": (15, 25), "optimal_rainfall": (400, 600)},
-    "Rapeseed":    {"min": 0.5, "max": 2.5, "unit": "t/ha", "optimal_temp": (15, 25), "optimal_rainfall": (300, 500)},
-    "Lentil":      {"min": 0.3, "max": 1.5, "unit": "t/ha", "optimal_temp": (15, 25), "optimal_rainfall": (300, 500)},
-    "Cauliflower": {"min": 8.0, "max": 35.0, "unit": "t/ha", "optimal_temp": (15, 22), "optimal_rainfall": (500, 750)},
-    "Cabbage":     {"min": 10.0, "max": 40.0, "unit": "t/ha", "optimal_temp": (15, 20), "optimal_rainfall": (500, 750)},
-    "Carrot":      {"min": 8.0, "max": 35.0, "unit": "t/ha", "optimal_temp": (15, 22), "optimal_rainfall": (400, 600)},
-    "Spinach":     {"min": 5.0, "max": 20.0, "unit": "t/ha", "optimal_temp": (10, 22), "optimal_rainfall": (400, 600)},
+    "Rice": {
+        "min": 1.0,
+        "max": 7.5,
+        "unit": "t/ha",
+        "optimal_temp": (22, 32),
+        "optimal_rainfall": (1000, 2000),
+    },
+    "Wheat": {
+        "min": 0.8,
+        "max": 5.0,
+        "unit": "t/ha",
+        "optimal_temp": (10, 25),
+        "optimal_rainfall": (450, 650),
+    },
+    "Maize": {
+        "min": 1.5,
+        "max": 12.0,
+        "unit": "t/ha",
+        "optimal_temp": (18, 32),
+        "optimal_rainfall": (500, 800),
+    },
+    "Cotton": {
+        "min": 0.5,
+        "max": 2.5,
+        "unit": "t/ha",
+        "optimal_temp": (25, 35),
+        "optimal_rainfall": (600, 1200),
+    },
+    "Sugarcane": {
+        "min": 30.0,
+        "max": 120.0,
+        "unit": "t/ha",
+        "optimal_temp": (20, 35),
+        "optimal_rainfall": (1500, 2500),
+    },
+    "Soybean": {
+        "min": 0.8,
+        "max": 4.0,
+        "unit": "t/ha",
+        "optimal_temp": (20, 30),
+        "optimal_rainfall": (450, 700),
+    },
+    "Potato": {
+        "min": 8.0,
+        "max": 45.0,
+        "unit": "t/ha",
+        "optimal_temp": (15, 22),
+        "optimal_rainfall": (500, 700),
+    },
+    "Tomato": {
+        "min": 10.0,
+        "max": 80.0,
+        "unit": "t/ha",
+        "optimal_temp": (20, 30),
+        "optimal_rainfall": (400, 800),
+    },
+    "Onion": {
+        "min": 8.0,
+        "max": 35.0,
+        "unit": "t/ha",
+        "optimal_temp": (13, 28),
+        "optimal_rainfall": (350, 650),
+    },
+    "Chilli": {
+        "min": 3.0,
+        "max": 20.0,
+        "unit": "t/ha",
+        "optimal_temp": (20, 30),
+        "optimal_rainfall": (600, 1200),
+    },
+    "Brinjal": {
+        "min": 10.0,
+        "max": 50.0,
+        "unit": "t/ha",
+        "optimal_temp": (22, 30),
+        "optimal_rainfall": (500, 1000),
+    },
+    "Okra": {
+        "min": 5.0,
+        "max": 20.0,
+        "unit": "t/ha",
+        "optimal_temp": (24, 32),
+        "optimal_rainfall": (600, 1000),
+    },
+    "Pea": {
+        "min": 0.8,
+        "max": 3.0,
+        "unit": "t/ha",
+        "optimal_temp": (10, 20),
+        "optimal_rainfall": (350, 650),
+    },
+    "Groundnut": {
+        "min": 0.8,
+        "max": 3.0,
+        "unit": "t/ha",
+        "optimal_temp": (25, 30),
+        "optimal_rainfall": (500, 1000),
+    },
+    "Sunflower": {
+        "min": 0.5,
+        "max": 3.0,
+        "unit": "t/ha",
+        "optimal_temp": (20, 28),
+        "optimal_rainfall": (400, 600),
+    },
+    "Mustard": {
+        "min": 0.4,
+        "max": 2.0,
+        "unit": "t/ha",
+        "optimal_temp": (15, 25),
+        "optimal_rainfall": (300, 500),
+    },
+    "Sorghum": {
+        "min": 0.5,
+        "max": 5.0,
+        "unit": "t/ha",
+        "optimal_temp": (25, 31),
+        "optimal_rainfall": (400, 600),
+    },
+    "Pearl Millet": {
+        "min": 0.3,
+        "max": 3.0,
+        "unit": "t/ha",
+        "optimal_temp": (25, 35),
+        "optimal_rainfall": (250, 500),
+    },
+    "Barley": {
+        "min": 0.8,
+        "max": 4.0,
+        "unit": "t/ha",
+        "optimal_temp": (12, 22),
+        "optimal_rainfall": (300, 500),
+    },
+    "Black Gram": {
+        "min": 0.3,
+        "max": 1.5,
+        "unit": "t/ha",
+        "optimal_temp": (25, 35),
+        "optimal_rainfall": (400, 650),
+    },
+    "Green Gram": {
+        "min": 0.3,
+        "max": 1.5,
+        "unit": "t/ha",
+        "optimal_temp": (25, 35),
+        "optimal_rainfall": (300, 500),
+    },
+    "Bengal Gram": {
+        "min": 0.5,
+        "max": 2.5,
+        "unit": "t/ha",
+        "optimal_temp": (15, 25),
+        "optimal_rainfall": (400, 600),
+    },
+    "Rapeseed": {
+        "min": 0.5,
+        "max": 2.5,
+        "unit": "t/ha",
+        "optimal_temp": (15, 25),
+        "optimal_rainfall": (300, 500),
+    },
+    "Lentil": {
+        "min": 0.3,
+        "max": 1.5,
+        "unit": "t/ha",
+        "optimal_temp": (15, 25),
+        "optimal_rainfall": (300, 500),
+    },
+    "Cauliflower": {
+        "min": 8.0,
+        "max": 35.0,
+        "unit": "t/ha",
+        "optimal_temp": (15, 22),
+        "optimal_rainfall": (500, 750),
+    },
+    "Cabbage": {
+        "min": 10.0,
+        "max": 40.0,
+        "unit": "t/ha",
+        "optimal_temp": (15, 20),
+        "optimal_rainfall": (500, 750),
+    },
+    "Carrot": {
+        "min": 8.0,
+        "max": 35.0,
+        "unit": "t/ha",
+        "optimal_temp": (15, 22),
+        "optimal_rainfall": (400, 600),
+    },
+    "Spinach": {
+        "min": 5.0,
+        "max": 20.0,
+        "unit": "t/ha",
+        "optimal_temp": (10, 22),
+        "optimal_rainfall": (400, 600),
+    },
 }
 
 SOIL_PROPERTY_DEFAULTS = {
-    "Alluvial":    {"ph": (6.0, 7.5), "oc": (0.4, 1.2), "n": (80, 200), "p": (10, 30), "k": (100, 250)},
-    "Black":       {"ph": (6.5, 8.0), "oc": (0.3, 0.8), "n": (60, 150), "p": (5, 20), "k": (100, 300)},
-    "Red":         {"ph": (5.5, 7.0), "oc": (0.2, 0.6), "n": (50, 120), "p": (5, 15), "k": (80, 200)},
-    "Laterite":    {"ph": (4.5, 5.5), "oc": (0.3, 0.8), "n": (40, 100), "p": (3, 12), "k": (60, 150)},
-    "Sandy":       {"ph": (5.0, 6.5), "oc": (0.1, 0.4), "n": (20, 80), "p": (3, 10), "k": (40, 120)},
-    "Clay":        {"ph": (6.5, 8.5), "oc": (0.3, 1.0), "n": (60, 180), "p": (8, 25), "k": (120, 300)},
-    "Loamy":       {"ph": (6.0, 7.5), "oc": (0.5, 1.5), "n": (80, 220), "p": (12, 35), "k": (120, 280)},
-    "Sandy Loam":  {"ph": (5.5, 7.0), "oc": (0.3, 0.8), "n": (50, 140), "p": (8, 20), "k": (80, 200)},
-    "Clay Loam":   {"ph": (6.5, 8.0), "oc": (0.4, 1.2), "n": (70, 200), "p": (10, 30), "k": (120, 280)},
+    "Alluvial": {
+        "ph": (6.0, 7.5),
+        "oc": (0.4, 1.2),
+        "n": (80, 200),
+        "p": (10, 30),
+        "k": (100, 250),
+    },
+    "Black": {"ph": (6.5, 8.0), "oc": (0.3, 0.8), "n": (60, 150), "p": (5, 20), "k": (100, 300)},
+    "Red": {"ph": (5.5, 7.0), "oc": (0.2, 0.6), "n": (50, 120), "p": (5, 15), "k": (80, 200)},
+    "Laterite": {"ph": (4.5, 5.5), "oc": (0.3, 0.8), "n": (40, 100), "p": (3, 12), "k": (60, 150)},
+    "Sandy": {"ph": (5.0, 6.5), "oc": (0.1, 0.4), "n": (20, 80), "p": (3, 10), "k": (40, 120)},
+    "Clay": {"ph": (6.5, 8.5), "oc": (0.3, 1.0), "n": (60, 180), "p": (8, 25), "k": (120, 300)},
+    "Loamy": {"ph": (6.0, 7.5), "oc": (0.5, 1.5), "n": (80, 220), "p": (12, 35), "k": (120, 280)},
+    "Sandy Loam": {
+        "ph": (5.5, 7.0),
+        "oc": (0.3, 0.8),
+        "n": (50, 140),
+        "p": (8, 20),
+        "k": (80, 200),
+    },
+    "Clay Loam": {
+        "ph": (6.5, 8.0),
+        "oc": (0.4, 1.2),
+        "n": (70, 200),
+        "p": (10, 30),
+        "k": (120, 280),
+    },
 }
 
 REGIONAL_CLIMATE = {
-    "India":       {"temp_range": (18, 35), "rainfall_range": (500, 2000), "humidity_range": (40, 90)},
-    "USA":         {"temp_range": (5, 38), "rainfall_range": (300, 1500), "humidity_range": (30, 85)},
-    "China":       {"temp_range": (0, 35), "rainfall_range": (200, 1800), "humidity_range": (30, 85)},
-    "Brazil":      {"temp_range": (18, 35), "rainfall_range": (800, 2500), "humidity_range": (50, 90)},
-    "Australia":   {"temp_range": (10, 42), "rainfall_range": (200, 1200), "humidity_range": (20, 80)},
-    "Nigeria":     {"temp_range": (22, 38), "rainfall_range": (500, 2500), "humidity_range": (40, 90)},
-    "Indonesia":   {"temp_range": (22, 34), "rainfall_range": (1500, 4000), "humidity_range": (60, 95)},
-    "Pakistan":    {"temp_range": (10, 45), "rainfall_range": (100, 1000), "humidity_range": (20, 75)},
-    "Bangladesh":  {"temp_range": (15, 35), "rainfall_range": (1200, 2500), "humidity_range": (55, 90)},
-    "Kenya":       {"temp_range": (12, 32), "rainfall_range": (300, 1200), "humidity_range": (30, 85)},
-    "Ethiopia":    {"temp_range": (10, 30), "rainfall_range": (500, 1800), "humidity_range": (30, 85)},
-    "Argentina":   {"temp_range": (5, 38), "rainfall_range": (200, 1200), "humidity_range": (30, 85)},
-    "Thailand":    {"temp_range": (20, 36), "rainfall_range": (1000, 2500), "humidity_range": (55, 90)},
-    "Vietnam":     {"temp_range": (20, 35), "rainfall_range": (1200, 2800), "humidity_range": (60, 90)},
-    "Turkey":      {"temp_range": (5, 38), "rainfall_range": (200, 800), "humidity_range": (30, 75)},
-    "Japan":       {"temp_range": (0, 35), "rainfall_range": (800, 2500), "humidity_range": (50, 90)},
-    "South Korea": {"temp_range": (0, 33), "rainfall_range": (800, 1700), "humidity_range": (50, 85)},
-    "Egypt":       {"temp_range": (12, 42), "rainfall_range": (0, 200), "humidity_range": (20, 60)},
-    "Mexico":      {"temp_range": (10, 38), "rainfall_range": (300, 2000), "humidity_range": (30, 85)},
-    "Germany":     {"temp_range": (0, 30), "rainfall_range": (400, 1200), "humidity_range": (50, 85)},
-    "France":      {"temp_range": (2, 32), "rainfall_range": (400, 1200), "humidity_range": (45, 85)},
-    "UK":          {"temp_range": (0, 25), "rainfall_range": (500, 1500), "humidity_range": (60, 90)},
-    "Canada":      {"temp_range": (-10, 35), "rainfall_range": (300, 1200), "humidity_range": (30, 85)},
-    "Russia":      {"temp_range": (-20, 35), "rainfall_range": (200, 800), "humidity_range": (30, 80)},
+    "India": {"temp_range": (18, 35), "rainfall_range": (500, 2000), "humidity_range": (40, 90)},
+    "USA": {"temp_range": (5, 38), "rainfall_range": (300, 1500), "humidity_range": (30, 85)},
+    "China": {"temp_range": (0, 35), "rainfall_range": (200, 1800), "humidity_range": (30, 85)},
+    "Brazil": {"temp_range": (18, 35), "rainfall_range": (800, 2500), "humidity_range": (50, 90)},
+    "Australia": {
+        "temp_range": (10, 42),
+        "rainfall_range": (200, 1200),
+        "humidity_range": (20, 80),
+    },
+    "Nigeria": {"temp_range": (22, 38), "rainfall_range": (500, 2500), "humidity_range": (40, 90)},
+    "Indonesia": {
+        "temp_range": (22, 34),
+        "rainfall_range": (1500, 4000),
+        "humidity_range": (60, 95),
+    },
+    "Pakistan": {"temp_range": (10, 45), "rainfall_range": (100, 1000), "humidity_range": (20, 75)},
+    "Bangladesh": {
+        "temp_range": (15, 35),
+        "rainfall_range": (1200, 2500),
+        "humidity_range": (55, 90),
+    },
+    "Kenya": {"temp_range": (12, 32), "rainfall_range": (300, 1200), "humidity_range": (30, 85)},
+    "Ethiopia": {"temp_range": (10, 30), "rainfall_range": (500, 1800), "humidity_range": (30, 85)},
+    "Argentina": {"temp_range": (5, 38), "rainfall_range": (200, 1200), "humidity_range": (30, 85)},
+    "Thailand": {
+        "temp_range": (20, 36),
+        "rainfall_range": (1000, 2500),
+        "humidity_range": (55, 90),
+    },
+    "Vietnam": {"temp_range": (20, 35), "rainfall_range": (1200, 2800), "humidity_range": (60, 90)},
+    "Turkey": {"temp_range": (5, 38), "rainfall_range": (200, 800), "humidity_range": (30, 75)},
+    "Japan": {"temp_range": (0, 35), "rainfall_range": (800, 2500), "humidity_range": (50, 90)},
+    "South Korea": {
+        "temp_range": (0, 33),
+        "rainfall_range": (800, 1700),
+        "humidity_range": (50, 85),
+    },
+    "Egypt": {"temp_range": (12, 42), "rainfall_range": (0, 200), "humidity_range": (20, 60)},
+    "Mexico": {"temp_range": (10, 38), "rainfall_range": (300, 2000), "humidity_range": (30, 85)},
+    "Germany": {"temp_range": (0, 30), "rainfall_range": (400, 1200), "humidity_range": (50, 85)},
+    "France": {"temp_range": (2, 32), "rainfall_range": (400, 1200), "humidity_range": (45, 85)},
+    "UK": {"temp_range": (0, 25), "rainfall_range": (500, 1500), "humidity_range": (60, 90)},
+    "Canada": {"temp_range": (-10, 35), "rainfall_range": (300, 1200), "humidity_range": (30, 85)},
+    "Russia": {"temp_range": (-20, 35), "rainfall_range": (200, 800), "humidity_range": (30, 80)},
 }
 
 
@@ -122,9 +323,7 @@ class KnowledgeIntegrationAgent(BaseAgent):
         df, yr_n = self._fill_yield_ranges(df)
         stats["yield_range_filled"] = yr_n
 
-        self.save_text_artifact(
-            json.dumps(stats, indent=2), "knowledge_integration_stats.json"
-        )
+        self.save_text_artifact(json.dumps(stats, indent=2), "knowledge_integration_stats.json")
 
         report_lines = [
             "# Knowledge Integration Report",
@@ -147,8 +346,10 @@ class KnowledgeIntegrationAgent(BaseAgent):
 
         self.log.info(
             "Knowledge integration: crop_annot=%d soil_fill=%d climate_fill=%d yield_fill=%d",
-            stats["crop_yield_annotated"], stats["soil_defaults_filled"],
-            stats["climate_defaults_filled"], stats["yield_range_filled"],
+            stats["crop_yield_annotated"],
+            stats["soil_defaults_filled"],
+            stats["climate_defaults_filled"],
+            stats["yield_range_filled"],
         )
 
         self.dataframe = df
@@ -158,9 +359,14 @@ class KnowledgeIntegrationAgent(BaseAgent):
         if "Crop" not in df.columns:
             return df, 0
         count = 0
-        new_cols_num = ["Crop_Yield_Min", "Crop_Yield_Max",
-                    "Crop_Opt_Temp_Min", "Crop_Opt_Temp_Max",
-                    "Crop_Opt_Rain_Min", "Crop_Opt_Rain_Max"]
+        new_cols_num = [
+            "Crop_Yield_Min",
+            "Crop_Yield_Max",
+            "Crop_Opt_Temp_Min",
+            "Crop_Opt_Temp_Max",
+            "Crop_Opt_Rain_Min",
+            "Crop_Opt_Rain_Max",
+        ]
         for col in new_cols_num:
             if col not in df.columns:
                 df[col] = np.nan
@@ -230,24 +436,42 @@ class KnowledgeIntegrationAgent(BaseAgent):
                     defaults = val
                     break
             if defaults is None:
-                defaults = {"temp_range": (18, 35), "rainfall_range": (500, 1500), "humidity_range": (40, 80)}
+                defaults = {
+                    "temp_range": (18, 35),
+                    "rainfall_range": (500, 1500),
+                    "humidity_range": (40, 80),
+                }
 
             if "Average_Temperature" in df.columns and pd.isna(row.get("Average_Temperature")):
-                df.at[idx, "Average_Temperature"] = (defaults["temp_range"][0] + defaults["temp_range"][1]) / 2
+                df.at[idx, "Average_Temperature"] = (
+                    defaults["temp_range"][0] + defaults["temp_range"][1]
+                ) / 2
                 count += 1
             if "Temperature_Max" in df.columns and pd.isna(row.get("Temperature_Max")):
-                avg = df.at[idx, "Average_Temperature"] if pd.notna(row.get("Average_Temperature")) else np.mean(defaults["temp_range"])
+                avg = (
+                    df.at[idx, "Average_Temperature"]
+                    if pd.notna(row.get("Average_Temperature"))
+                    else np.mean(defaults["temp_range"])
+                )
                 df.at[idx, "Temperature_Max"] = avg + 5.5
                 count += 1
             if "Temperature_Min" in df.columns and pd.isna(row.get("Temperature_Min")):
-                avg = df.at[idx, "Average_Temperature"] if pd.notna(row.get("Average_Temperature")) else np.mean(defaults["temp_range"])
+                avg = (
+                    df.at[idx, "Average_Temperature"]
+                    if pd.notna(row.get("Average_Temperature"))
+                    else np.mean(defaults["temp_range"])
+                )
                 df.at[idx, "Temperature_Min"] = avg - 5.5
                 count += 1
             if "Rainfall" in df.columns and pd.isna(row.get("Rainfall")):
-                df.at[idx, "Rainfall"] = (defaults["rainfall_range"][0] + defaults["rainfall_range"][1]) / 2
+                df.at[idx, "Rainfall"] = (
+                    defaults["rainfall_range"][0] + defaults["rainfall_range"][1]
+                ) / 2
                 count += 1
             if "Humidity" in df.columns and pd.isna(row.get("Humidity")):
-                df.at[idx, "Humidity"] = (defaults["humidity_range"][0] + defaults["humidity_range"][1]) / 2
+                df.at[idx, "Humidity"] = (
+                    defaults["humidity_range"][0] + defaults["humidity_range"][1]
+                ) / 2
                 count += 1
         return df, count
 
@@ -272,18 +496,18 @@ class KnowledgeIntegrationAgent(BaseAgent):
         return df, count
 
     @staticmethod
-    def lookup_crop(crop: str) -> Optional[dict]:
+    def lookup_crop(crop: str) -> dict | None:
         return CROP_YIELD_RANGES.get(crop)
 
     @staticmethod
-    def lookup_soil(soil_type: str) -> Optional[dict]:
+    def lookup_soil(soil_type: str) -> dict | None:
         for key, val in SOIL_PROPERTY_DEFAULTS.items():
             if key.lower() in soil_type.lower():
                 return val
         return SOIL_PROPERTY_DEFAULTS.get("Loamy")
 
     @staticmethod
-    def lookup_climate(country: str) -> Optional[dict]:
+    def lookup_climate(country: str) -> dict | None:
         for key, val in REGIONAL_CLIMATE.items():
             if key.lower() in country.lower():
                 return val

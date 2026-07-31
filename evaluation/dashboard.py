@@ -5,12 +5,11 @@ Pipeline_Benchmark.csv, Executive_Summary.md.
 """
 
 import time
-import json
-import base64
-from pathlib import Path
 
 from evaluation.utils import (
-    REPORTS_DIR, OUTPUT_DIR, write_report, write_csv, safe_mean,
+    REPORTS_DIR,
+    write_csv,
+    write_report,
 )
 
 
@@ -44,7 +43,12 @@ def generate_dashboard(all_results: dict):
     quality = all_results.get("quality_score", {}).get("overall", 0)
     ingestion_score = all_results.get("ingestion", {}).get("completeness", 0) * 100
     extraction_score = all_results.get("extraction", {}).get("avg_f1", 0) * 100
-    schema_score = all_results.get("schema", {}).get("core_coverage", all_results.get("schema", {}).get("mapping_accuracy", 0)) * 100
+    schema_score = (
+        all_results.get("schema", {}).get(
+            "core_coverage", all_results.get("schema", {}).get("mapping_accuracy", 0)
+        )
+        * 100
+    )
     ontology_score = all_results.get("ontology", {}).get("avg_coverage", 0) * 100
     quality_score = all_results.get("qa", {}).get("validation_accuracy", 0) * 100
     feature_score = all_results.get("features", {}).get("feature_count", 0) / 16 * 100
@@ -68,7 +72,9 @@ def generate_dashboard(all_results: dict):
 
     recommendations = []
     if ingestion_score < 50:
-        recommendations.append("Install PDF parser (pdfplumber) and integrate paper ingestion agent")
+        recommendations.append(
+            "Install PDF parser (pdfplumber) and integrate paper ingestion agent"
+        )
     if extraction_score < 50:
         recommendations.append("Implement NLP-based scientific information extraction from PDFs")
     if schema_score < 70:
@@ -113,7 +119,7 @@ def generate_dashboard(all_results: dict):
 </head>
 <body>
 <h1>🌾 ADES Evaluation Dashboard</h1>
-<p style="color:#94a3b8;margin-bottom:1rem;">Agricultural Data Engineering System — Pipeline Benchmark {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+<p style="color:#94a3b8;margin-bottom:1rem;">Agricultural Data Engineering System — Pipeline Benchmark {time.strftime("%Y-%m-%d %H:%M:%S")}</p>
 
 <div class="grid">
   <div class="card">
@@ -124,14 +130,14 @@ def generate_dashboard(all_results: dict):
   </div>
   <div class="card">
     <h3>Pipeline Completion</h3>
-    <div class="value" style="color:{_score_to_color(all_results.get('e2e', {}).get('completion_rate', 0) * 100)};">{all_results.get('e2e', {}).get('completion_rate', 0):.0%}</div>
+    <div class="value" style="color:{_score_to_color(all_results.get("e2e", {}).get("completion_rate", 0) * 100)};">{all_results.get("e2e", {}).get("completion_rate", 0):.0%}</div>
     <div class="grade">12/12 agents completed</div>
-    <div class="bar-container"><div class="bar" style="width:{all_results.get('e2e', {}).get('completion_rate', 0) * 100}%;background:{_score_to_color(all_results.get('e2e', {}).get('completion_rate', 0) * 100)};"></div></div>
+    <div class="bar-container"><div class="bar" style="width:{all_results.get("e2e", {}).get("completion_rate", 0) * 100}%;background:{_score_to_color(all_results.get("e2e", {}).get("completion_rate", 0) * 100)};"></div></div>
   </div>
   <div class="card">
     <h3>Models Benchmarked</h3>
-    <div class="value" style="color:{_score_to_color(all_results.get('model_benchmark', {}).get('success_rate', 0) * 100)};">{all_results.get('model_benchmark', {}).get('trained', 0)}</div>
-    <div class="grade">{all_results.get('model_benchmark', {}).get('failed', 0)} failed</div>
+    <div class="value" style="color:{_score_to_color(all_results.get("model_benchmark", {}).get("success_rate", 0) * 100)};">{all_results.get("model_benchmark", {}).get("trained", 0)}</div>
+    <div class="grade">{all_results.get("model_benchmark", {}).get("failed", 0)} failed</div>
   </div>
   <div class="card">
     <h3>Papers Evaluated</h3>
@@ -152,7 +158,7 @@ def generate_dashboard(all_results: dict):
     <div class="bar-container"><div class="bar" style="width:{score}%;background:{color};"></div></div>
   </div>"""
 
-    html += f"""
+    html += """
 </div>
 
 <h2>Repository Scorecard</h2>
@@ -188,7 +194,7 @@ def generate_dashboard(all_results: dict):
     for name, score in strengths[:3]:
         html += f"""<div class="score-item"><h4>{name}</h4><div class="score" style="color:#22c55e;">{score:.0f}</div></div>"""
 
-    html += f"""
+    html += """
 </div>
 
 <h2>Weaknesses & Bottlenecks</h2>
@@ -199,11 +205,11 @@ def generate_dashboard(all_results: dict):
     else:
         html += """<div class="rec"><h4 style="color:#22c55e;">✅ No critical bottlenecks detected</h4></div>"""
 
-    html += f"""
+    html += """
 <h2>Prioritized Recommendations</h2>
 <ol style="margin-left:1.5rem;">
 """
-    for i, rec in enumerate(recommendations[:8], 1):
+    for _, rec in enumerate(recommendations[:8], 1):
         html += f"""  <li style="margin:0.5rem 0;color:#94a3b8;">{rec}</li>\n"""
 
     html += f"""
@@ -213,15 +219,15 @@ def generate_dashboard(all_results: dict):
 <div class="card">
   <h3>Overall Verdict</h3>
   <div class="value" style="color:{overall_color};">
-    {'✅ PRODUCTION READY' if quality >= 70 else '⚠️ CONDITIONALLY READY' if quality >= 50 else '❌ NOT READY'}
+    {"✅ PRODUCTION READY" if quality >= 70 else "⚠️ CONDITIONALLY READY" if quality >= 50 else "❌ NOT READY"}
   </div>
   <div class="grade">
-    {'The pipeline meets quality thresholds and is suitable for production deployment.' if quality >= 70 else 'Address the recommendations above before declaring production ready.' if quality >= 50 else 'Significant improvements required before production use.'}
+    {"The pipeline meets quality thresholds and is suitable for production deployment." if quality >= 70 else "Address the recommendations above before declaring production ready." if quality >= 50 else "Significant improvements required before production use."}
   </div>
 </div>
 
 <div class="footer">
-  <p>ADES Evaluation Framework v1.0 | Generated {time.strftime('%Y-%m-%d %H:%M:%S')}</p>
+  <p>ADES Evaluation Framework v1.0 | Generated {time.strftime("%Y-%m-%d %H:%M:%S")}</p>
 </div>
 </body>
 </html>"""
@@ -230,7 +236,7 @@ def generate_dashboard(all_results: dict):
     html_path.write_text(html, encoding="utf-8")
 
     scorecard = f"""# Repository Scorecard
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Scores
 | Category | Score | Grade |
@@ -240,19 +246,19 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
         scorecard += f"| {name} | {score:.1f} | {_score_to_grade(score)} |\n"
     scorecard += f"| **Overall** | **{quality:.1f}** | **{_score_to_grade(quality)}** |\n"
 
-    scorecard += f"""
+    scorecard += """
 ## Strengths
 """
     for name, score in strengths[:3]:
         scorecard += f"- {name} ({score:.1f})\n"
 
-    scorecard += f"""
+    scorecard += """
 ## Weaknesses
 """
     for name, score in weaknesses[:3]:
         scorecard += f"- {name} ({score:.1f})\n"
 
-    scorecard += f"""
+    scorecard += """
 ## Bottlenecks
 """
     if bottlenecks:
@@ -261,7 +267,7 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
     else:
         scorecard += "- None\n"
 
-    scorecard += f"""
+    scorecard += """
 ## Recommendations
 """
     for i, rec in enumerate(recommendations[:8], 1):
@@ -269,13 +275,13 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 
     scorecard += f"""
 ## Verdict
-**{'PRODUCTION READY' if quality >= 70 else 'CONDITIONALLY READY' if quality >= 50 else 'NOT READY'}**
+**{"PRODUCTION READY" if quality >= 70 else "CONDITIONALLY READY" if quality >= 50 else "NOT READY"}**
 Overall Score: {quality:.1f}/100
 """
     scorecard_path = write_report("Repository_Scorecard.md", scorecard)
 
     executive = f"""# Executive Summary
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Overview
 The Agricultural Data Engineering System (ADES) evaluation has been completed.
@@ -283,14 +289,14 @@ The system was assessed across 8 key dimensions using 5 agricultural research pa
 
 ## Key Findings
 - **Overall Score**: {quality:.1f}/100 ({_score_to_grade(quality)})
-- **Pipeline Completion**: {all_results.get('e2e', {}).get('completion_rate', 0):.0%}
+- **Pipeline Completion**: {all_results.get("e2e", {}).get("completion_rate", 0):.0%}
 - **Strongest Area**: {strengths[0][0]} ({strengths[0][1]:.1f})
 - **Weakest Area**: {weaknesses[0][0]} ({weaknesses[0][1]:.1f})
 - **Dataset Quality**: {quality:.1f}/100
-- **Models Benchmarked**: {all_results.get('model_benchmark', {}).get('trained', 0)} models trained successfully
+- **Models Benchmarked**: {all_results.get("model_benchmark", {}).get("trained", 0)} models trained successfully
 
 ## Verdict
-**{'PRODUCTION READY' if quality >= 70 else 'CONDITIONALLY READY' if quality >= 50 else 'NOT READY'}**
+**{"PRODUCTION READY" if quality >= 70 else "CONDITIONALLY READY" if quality >= 50 else "NOT READY"}**
 """
     exec_path = write_report("Executive_Summary.md", executive)
 

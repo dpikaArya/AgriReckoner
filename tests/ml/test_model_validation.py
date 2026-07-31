@@ -10,12 +10,14 @@ from src.ml.model_validation.leakage_detector import LeakageDetector
 @pytest.fixture
 def simple_data():
     np.random.seed(42)
-    X = pd.DataFrame({
-        "feature_1": np.random.randn(100),
-        "feature_2": np.random.randn(100),
-        "location": np.random.choice(["A", "B", "C", "D"], 100),
-        "year": np.random.randint(2010, 2020, 100),
-    })
+    X = pd.DataFrame(
+        {
+            "feature_1": np.random.randn(100),
+            "feature_2": np.random.randn(100),
+            "location": np.random.choice(["A", "B", "C", "D"], 100),
+            "year": np.random.randint(2010, 2020, 100),
+        }
+    )
     y = pd.Series(X["feature_1"] * 2 + np.random.randn(100) * 0.5)
     model = RandomForestRegressor(n_estimators=20, random_state=42)
     return model, X, y
@@ -52,17 +54,22 @@ class TestCrossValidation:
 class TestLeakageDetector:
     def test_no_leakage_clean_data(self):
         np.random.seed(42)
-        X = pd.DataFrame({
-            "f1": np.random.randn(50),
-            "f2": np.random.randn(50),
-        })
-        X_unique = pd.concat([
-            X,
-            pd.DataFrame({"f1": np.random.randn(50) + 10, "f2": np.random.randn(50) + 10}),
-        ], ignore_index=True)
+        X = pd.DataFrame(
+            {
+                "f1": np.random.randn(50),
+                "f2": np.random.randn(50),
+            }
+        )
+        X_unique = pd.concat(
+            [
+                X,
+                pd.DataFrame({"f1": np.random.randn(50) + 10, "f2": np.random.randn(50) + 10}),
+            ],
+            ignore_index=True,
+        )
         y = pd.Series(np.random.randn(100))
         detector = LeakageDetector()
-        result = detector.check_all(X_unique, y)
+        detector.check_all(X_unique, y)
         assert not detector.leakage_found_
 
     def test_duplicate_records_detected(self):
@@ -75,10 +82,12 @@ class TestLeakageDetector:
     def test_target_leakage_detected(self):
         np.random.seed(42)
         y = pd.Series(np.random.randn(50))
-        X = pd.DataFrame({
-            "f1": np.random.randn(50),
-            "leaky_feature": y * 0.999 + np.random.randn(50) * 0.001,
-        })
+        X = pd.DataFrame(
+            {
+                "f1": np.random.randn(50),
+                "leaky_feature": y * 0.999 + np.random.randn(50) * 0.001,
+            }
+        )
         detector = LeakageDetector(corr_threshold=0.9)
         result = detector.check_all(X, y)
         assert "target_correlation" in result

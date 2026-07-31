@@ -2,10 +2,9 @@ import json
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -14,7 +13,6 @@ from agri_ai_agent.external_data.data_enricher import enrich_master
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.external_data.registry import ConnectorRegistry
 from agri_ai_agent.external_data.registry_db import DatasetRegistry
-
 from src.data_sources.http_client import HttpClient
 from src.utils.logging_config import log_api_call
 
@@ -27,7 +25,7 @@ class ConnectorHealth:
     is_healthy: bool
     latency_ms: float = 0.0
     discovered_count: int = 0
-    error: Optional[str] = None
+    error: str | None = None
 
 
 @dataclass
@@ -51,7 +49,7 @@ class ConnectorManager:
         max_workers: int = 4,
         retry_max_attempts: int = 3,
         retry_base_delay: float = 2.0,
-        log_dir: Optional[Path] = None,
+        log_dir: Path | None = None,
     ):
         self._registry = registry
         self._download_dir = download_dir
@@ -79,7 +77,8 @@ class ConnectorManager:
         connector = ConnectorRegistry.instantiate(source_name)
         if connector is None:
             return ConnectorHealth(
-                source_name=source_name, is_healthy=False,
+                source_name=source_name,
+                is_healthy=False,
                 error="Connector class not found",
             )
         start = time.perf_counter()
@@ -89,7 +88,8 @@ class ConnectorManager:
             discovered = len(connector.discover()) if ok else 0
             connector.close()
             return ConnectorHealth(
-                source_name=source_name, is_healthy=ok,
+                source_name=source_name,
+                is_healthy=ok,
                 latency_ms=round(latency, 1),
                 discovered_count=discovered,
                 error=None if ok else "connect() returned False",
@@ -98,11 +98,13 @@ class ConnectorManager:
             latency = (time.perf_counter() - start) * 1000
             connector.close()
             return ConnectorHealth(
-                source_name=source_name, is_healthy=False,
-                latency_ms=round(latency, 1), error=str(exc),
+                source_name=source_name,
+                is_healthy=False,
+                latency_ms=round(latency, 1),
+                error=str(exc),
             )
 
-    def health_checks(self, sources: Optional[list[str]] = None) -> dict[str, ConnectorHealth]:
+    def health_checks(self, sources: list[str] | None = None) -> dict[str, ConnectorHealth]:
         selected = sources if sources is not None else self.list_sources()
         if not selected:
             return {}
@@ -115,7 +117,9 @@ class ConnectorManager:
                     results[src] = fut.result()
                 except Exception as exc:
                     results[src] = ConnectorHealth(
-                        source_name=src, is_healthy=False, error=str(exc),
+                        source_name=src,
+                        is_healthy=False,
+                        error=str(exc),
                     )
         return results
 
@@ -124,7 +128,8 @@ class ConnectorManager:
     # ------------------------------------------------------------------
 
     def run_connector(
-        self, source_name: str,
+        self,
+        source_name: str,
     ) -> tuple[str, list[DatasetPackage], ConnectorRunLog]:
         start_time = datetime.now()
         started_at = start_time.isoformat()
@@ -136,10 +141,15 @@ class ConnectorManager:
             completed_at = datetime.now().isoformat()
             duration = (datetime.now() - start_time).total_seconds()
             log_entry = ConnectorRunLog(
-                source_name=source_name, started_at=started_at,
-                completed_at=completed_at, duration_sec=round(duration, 2),
-                datasets_found=0, datasets_downloaded=0, datasets_valid=0,
-                errors=["Connector class not found"], success=False,
+                source_name=source_name,
+                started_at=started_at,
+                completed_at=completed_at,
+                duration_sec=round(duration, 2),
+                datasets_found=0,
+                datasets_downloaded=0,
+                datasets_valid=0,
+                errors=["Connector class not found"],
+                success=False,
             )
             self._write_run_log(log_entry)
             return source_name, packages, log_entry
@@ -151,10 +161,15 @@ class ConnectorManager:
                 completed_at = datetime.now().isoformat()
                 duration = (datetime.now() - start_time).total_seconds()
                 log_entry = ConnectorRunLog(
-                    source_name=source_name, started_at=started_at,
-                    completed_at=completed_at, duration_sec=round(duration, 2),
-                    datasets_found=0, datasets_downloaded=0, datasets_valid=0,
-                    errors=errors, success=False,
+                    source_name=source_name,
+                    started_at=started_at,
+                    completed_at=completed_at,
+                    duration_sec=round(duration, 2),
+                    datasets_found=0,
+                    datasets_downloaded=0,
+                    datasets_valid=0,
+                    errors=errors,
+                    success=False,
                 )
                 self._write_run_log(log_entry)
                 return source_name, packages, log_entry
@@ -172,7 +187,9 @@ class ConnectorManager:
                     existing = self._registry.find(source_name, resource_id)
                     if existing and existing.get("status") == "active":
                         newer = self._registry.check_update(
-                            source_name, resource_id, existing["version"],
+                            source_name,
+                            resource_id,
+                            existing["version"],
                         )
                         if newer is None:
                             self._registry.update_timestamp(existing["dataset_id"])
@@ -192,8 +209,10 @@ class ConnectorManager:
                     continue
 
                 package = DatasetPackage(
-                    source=source_name, resource_id=resource_id,
-                    name=path.stem, download_path=path,
+                    source=source_name,
+                    resource_id=resource_id,
+                    name=path.stem,
+                    download_path=path,
                 )
                 package.data = package.to_dataframe()
                 package.is_valid = connector.validate(package)
@@ -202,7 +221,11 @@ class ConnectorManager:
                     connector.register(package)
                     packages.append(package)
                 else:
-                    ve = "; ".join(package.validation_errors) if package.validation_errors else "validation failed"
+                    ve = (
+                        "; ".join(package.validation_errors)
+                        if package.validation_errors
+                        else "validation failed"
+                    )
                     errors.append(f"{resource_id}: {ve}")
 
             connector.close()
@@ -220,10 +243,14 @@ class ConnectorManager:
         downloaded = len(packages)
         valid = sum(1 for p in packages if p.is_valid)
         log_entry = ConnectorRunLog(
-            source_name=source_name, started_at=started_at,
-            completed_at=completed_at, duration_sec=round(duration, 2),
-            datasets_found=found_count, datasets_downloaded=downloaded,
-            datasets_valid=valid, errors=errors,
+            source_name=source_name,
+            started_at=started_at,
+            completed_at=completed_at,
+            duration_sec=round(duration, 2),
+            datasets_found=found_count,
+            datasets_downloaded=downloaded,
+            datasets_valid=valid,
+            errors=errors,
             success=len(errors) == 0,
         )
         self._write_run_log(log_entry)
@@ -234,7 +261,8 @@ class ConnectorManager:
     # ------------------------------------------------------------------
 
     def run_all(
-        self, sources: Optional[list[str]] = None,
+        self,
+        sources: list[str] | None = None,
     ) -> tuple[dict[str, list[DatasetPackage]], list[ConnectorRunLog]]:
         selected = sources if sources is not None else self.list_sources()
         if not selected:
@@ -255,15 +283,19 @@ class ConnectorManager:
                 except Exception as exc:
                     logger.error("[%s] connector run crashed: %s", src, exc)
                     results[src] = []
-                    logs.append(ConnectorRunLog(
-                        source_name=src,
-                        started_at=datetime.now().isoformat(),
-                        completed_at=datetime.now().isoformat(),
-                        duration_sec=0.0,
-                        datasets_found=0, datasets_downloaded=0,
-                        datasets_valid=0,
-                        errors=[f"thread crashed: {exc}"], success=False,
-                    ))
+                    logs.append(
+                        ConnectorRunLog(
+                            source_name=src,
+                            started_at=datetime.now().isoformat(),
+                            completed_at=datetime.now().isoformat(),
+                            duration_sec=0.0,
+                            datasets_found=0,
+                            datasets_downloaded=0,
+                            datasets_valid=0,
+                            errors=[f"thread crashed: {exc}"],
+                            success=False,
+                        )
+                    )
 
         return results, logs
 
@@ -279,11 +311,13 @@ class ConnectorManager:
             ver = rec.get("version", "1.0.0")
             newer = self._registry.check_update(source_name, rid, ver)
             if newer is not None:
-                updates.append({
-                    "resource_id": rid,
-                    "current_version": ver,
-                    "available_version": newer,
-                })
+                updates.append(
+                    {
+                        "resource_id": rid,
+                        "current_version": ver,
+                        "available_version": newer,
+                    }
+                )
         return updates
 
     def detect_all_updates(self) -> dict[str, list[dict]]:
@@ -311,11 +345,13 @@ class ConnectorManager:
         )
 
     def _download_with_retry(
-        self, connector: ExternalDataConnector,
-        resource_id: str, target_dir: Path,
-    ) -> Optional[Path]:
-        http_client = self._build_http_client(connector)
-        last_exc: Optional[Exception] = None
+        self,
+        connector: ExternalDataConnector,
+        resource_id: str,
+        target_dir: Path,
+    ) -> Path | None:
+        self._build_http_client(connector)
+        last_exc: Exception | None = None
         for attempt in range(1, self._retry_max_attempts + 1):
             try:
                 path = connector.download(resource_id, target_dir)
@@ -333,8 +369,11 @@ class ConnectorManager:
                     delay = self._retry_base_delay * (2 ** (attempt - 1))
                     logger.info(
                         "[%s] retry %d/%d for %s in %.1fs",
-                        connector.source_name, attempt, self._retry_max_attempts,
-                        resource_id, delay,
+                        connector.source_name,
+                        attempt,
+                        self._retry_max_attempts,
+                        resource_id,
+                        delay,
                     )
                     time.sleep(delay)
             except Exception as exc:
@@ -343,8 +382,12 @@ class ConnectorManager:
                     delay = self._retry_base_delay * (2 ** (attempt - 1))
                     logger.warning(
                         "[%s] attempt %d/%d for %s failed: %s — retrying in %.1fs",
-                        connector.source_name, attempt, self._retry_max_attempts,
-                        resource_id, exc, delay,
+                        connector.source_name,
+                        attempt,
+                        self._retry_max_attempts,
+                        resource_id,
+                        exc,
+                        delay,
                     )
                     time.sleep(delay)
                 else:
@@ -358,8 +401,10 @@ class ConnectorManager:
                     )
                     logger.error(
                         "[%s] all %d attempts failed for %s: %s",
-                        connector.source_name, self._retry_max_attempts,
-                        resource_id, exc,
+                        connector.source_name,
+                        self._retry_max_attempts,
+                        resource_id,
+                        exc,
                     )
         if last_exc:
             raise last_exc
@@ -381,11 +426,11 @@ class ConnectorManager:
     @staticmethod
     def summarize_runs(logs: list[ConnectorRunLog]) -> dict:
         total = len(logs)
-        succeeded = sum(1 for l in logs if l.success)
+        succeeded = sum(1 for log in logs if log.success)
         failed = total - succeeded
-        total_downloaded = sum(l.datasets_downloaded for l in logs)
-        total_valid = sum(l.datasets_valid for l in logs)
-        total_duration = sum(l.duration_sec for l in logs)
+        total_downloaded = sum(log.datasets_downloaded for log in logs)
+        total_valid = sum(log.datasets_valid for log in logs)
+        total_duration = sum(log.duration_sec for log in logs)
         return {
             "total_connectors": total,
             "succeeded": succeeded,
@@ -407,12 +452,12 @@ class ConnectorManager:
     @staticmethod
     def merge_packages(
         packages_by_source: dict[str, list[DatasetPackage]],
-        existing_df: Optional[pd.DataFrame] = None,
+        existing_df: pd.DataFrame | None = None,
     ) -> pd.DataFrame:
         frames: list[pd.DataFrame] = []
         if existing_df is not None and not existing_df.empty:
             frames.append(existing_df)
-        for source, pkgs in packages_by_source.items():
+        for _, pkgs in packages_by_source.items():
             for pkg in pkgs:
                 df = pkg.to_dataframe()
                 if df is not None and not df.empty:

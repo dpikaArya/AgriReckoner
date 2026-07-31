@@ -5,10 +5,8 @@ Variable Mapping, Ontology Mapping, Quality Reports, Pipeline Logs.
 """
 
 import time
-from pathlib import Path
 
-from evaluation.utils import OUTPUT_DIR, BASE_DIR, write_report
-
+from evaluation.utils import BASE_DIR, write_report
 
 DOCUMENTATION_FILES = {
     "README.md": "Project README",
@@ -67,7 +65,8 @@ def evaluate_documentation():
         readme_path = BASE_DIR / "README.md"
         content = readme_path.read_text(encoding="utf-8")
         import re
-        links = re.findall(r'\[([^\]]+)\]\(([^)]+)\)', content)
+
+        links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
         for text, link in links:
             if link.startswith(("http", "https", "ftp")):
                 continue
@@ -76,7 +75,7 @@ def evaluate_documentation():
                 broken_links.append((text, link))
 
     report = f"""# Stage 11: Documentation Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Summary
 - Documentation coverage: {coverage:.1%} ({present_count}/{total_docs} files present)

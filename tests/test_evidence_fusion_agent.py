@@ -1,7 +1,6 @@
 """Tests for Evidence Fusion Agent."""
 
 import pandas as pd
-import pytest
 
 from agri_ai_agent.agents.evidence_fusion_agent import EvidenceFusionAgent
 from agri_ai_agent.contracts.messages import AgentContract
@@ -197,9 +196,7 @@ class TestEvidenceFusionAgent:
                 "reader": "pdfminer",
                 "success": True,
                 "confidence": 0.7,
-                "rows": [
-                    {"Source_File": "paper1.pdf", "Treatment": "T1", "Crop": "Wheat"}
-                ],
+                "rows": [{"Source_File": "paper1.pdf", "Treatment": "T1", "Crop": "Wheat"}],
             }
         ]
         contract = self.agent.run(
@@ -224,9 +221,7 @@ class TestEvidenceFusionAgent:
                 "rows": [{"Source_File": "paper1.pdf", "Treatment": "T1"}],
             },
         ]
-        self.agent.process(
-            pd.DataFrame(), stage_results=stage_results, source_file="paper1.pdf"
-        )
+        self.agent.process(pd.DataFrame(), stage_results=stage_results, source_file="paper1.pdf")
         report = self.agent.fusion_report
         assert "stages_input" in report
         assert "stages_successful" in report

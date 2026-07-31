@@ -5,32 +5,53 @@ information. Other agents query this agent for thresholds, optimal ranges,
 and domain-specific lookups.
 """
 
-from typing import Optional
-
-import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 
-
 CROP_PH_RANGES = {
-    "Rice": (5.0, 6.5), "Wheat": (6.0, 7.5), "Maize": (5.5, 7.0),
-    "Sugarcane": (5.5, 7.5), "Cotton": (5.5, 7.0), "Groundnut": (5.5, 7.0),
-    "Potato": (5.0, 6.5), "Tomato": (5.5, 7.0), "Onion": (6.0, 7.0),
-    "Chilli": (5.5, 7.0), "Brinjal": (5.5, 7.0), "Cabbage": (6.0, 7.0),
-    "Cauliflower": (6.0, 7.0), "Okra": (6.0, 7.5), "Pea": (6.0, 7.5),
-    "Bean": (6.0, 7.0), "Soybean": (6.0, 7.0), "Sunflower": (6.0, 7.5),
-    "Mustard": (5.5, 7.0), "Sorghum": (5.5, 7.5), "Pearl Millet": (5.5, 7.5),
-    "Finger Millet": (5.0, 6.5), "Barley": (6.0, 7.5), "Oat": (5.5, 7.0),
+    "Rice": (5.0, 6.5),
+    "Wheat": (6.0, 7.5),
+    "Maize": (5.5, 7.0),
+    "Sugarcane": (5.5, 7.5),
+    "Cotton": (5.5, 7.0),
+    "Groundnut": (5.5, 7.0),
+    "Potato": (5.0, 6.5),
+    "Tomato": (5.5, 7.0),
+    "Onion": (6.0, 7.0),
+    "Chilli": (5.5, 7.0),
+    "Brinjal": (5.5, 7.0),
+    "Cabbage": (6.0, 7.0),
+    "Cauliflower": (6.0, 7.0),
+    "Okra": (6.0, 7.5),
+    "Pea": (6.0, 7.5),
+    "Bean": (6.0, 7.0),
+    "Soybean": (6.0, 7.0),
+    "Sunflower": (6.0, 7.5),
+    "Mustard": (5.5, 7.0),
+    "Sorghum": (5.5, 7.5),
+    "Pearl Millet": (5.5, 7.5),
+    "Finger Millet": (5.0, 6.5),
+    "Barley": (6.0, 7.5),
+    "Oat": (5.5, 7.0),
 }
 
 FERTILIZER_NPK = {
-    "Urea": (46, 0, 0), "DAP": (18, 46, 0), "MOP": (0, 0, 60),
-    "SOP": (0, 0, 50), "SSP": (0, 16, 0), "CAN": (26, 0, 0),
-    "UAN": (32, 0, 0), "10-26-26": (10, 26, 26), "12-32-16": (12, 32, 16),
-    "20-20-0": (20, 20, 0), "15-15-15": (15, 15, 15),
-    "Bio NPK": (5, 5, 5), "Jaivik Khad": (3, 2, 2),
-    "Pori Potash": (0, 0, 15), "Ammonium Sulphate": (21, 0, 0),
+    "Urea": (46, 0, 0),
+    "DAP": (18, 46, 0),
+    "MOP": (0, 0, 60),
+    "SOP": (0, 0, 50),
+    "SSP": (0, 16, 0),
+    "CAN": (26, 0, 0),
+    "UAN": (32, 0, 0),
+    "10-26-26": (10, 26, 26),
+    "12-32-16": (12, 32, 16),
+    "20-20-0": (20, 20, 0),
+    "15-15-15": (15, 15, 15),
+    "Bio NPK": (5, 5, 5),
+    "Jaivik Khad": (3, 2, 2),
+    "Pori Potash": (0, 0, 15),
+    "Ammonium Sulphate": (21, 0, 0),
     "Potassium Sulphate": (0, 0, 50),
 }
 
@@ -56,8 +77,10 @@ WEATHER_THRESHOLDS = {
 }
 
 GROWTH_STAGES = {
-    "seedling": (0, 30), "vegetative": (20, 65),
-    "flowering": (50, 85), "maturity": (75, 120),
+    "seedling": (0, 30),
+    "vegetative": (20, 65),
+    "flowering": (50, 85),
+    "maturity": (75, 120),
 }
 
 
@@ -90,17 +113,13 @@ class KnowledgeAgent(BaseAgent):
             )
 
         if "Nitrogen" in df.columns:
-            df["N_Status"] = df["Nitrogen"].apply(
-                lambda v: self._nutrient_status(v, "Nitrogen")
-            )
+            df["N_Status"] = df["Nitrogen"].apply(lambda v: self._nutrient_status(v, "Nitrogen"))
         if "Phosphorus" in df.columns:
             df["P_Status"] = df["Phosphorus"].apply(
                 lambda v: self._nutrient_status(v, "Phosphorus")
             )
         if "Potassium" in df.columns:
-            df["K_Status"] = df["Potassium"].apply(
-                lambda v: self._nutrient_status(v, "Potassium")
-            )
+            df["K_Status"] = df["Potassium"].apply(lambda v: self._nutrient_status(v, "Potassium"))
 
         if "Fertilizer_Name" in df.columns:
             df["Fertilizer_NPK"] = df["Fertilizer_Name"].apply(
@@ -159,7 +178,13 @@ class KnowledgeAgent(BaseAgent):
         return {
             "rows": len(df),
             "columns": list(df.columns),
-            "annotations_added": ["Optimal_pH_Min", "Optimal_pH_Max",
-                                  "N_Status", "P_Status", "K_Status",
-                                  "Fertilizer_NPK", "Fertilizer_Type"],
+            "annotations_added": [
+                "Optimal_pH_Min",
+                "Optimal_pH_Max",
+                "N_Status",
+                "P_Status",
+                "K_Status",
+                "Fertilizer_NPK",
+                "Fertilizer_Type",
+            ],
         }

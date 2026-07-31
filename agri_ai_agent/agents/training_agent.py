@@ -19,26 +19,67 @@ from agri_ai_agent.ml.evaluation import MIN_ROWS_FOR_METRIC, evaluate_model
 from agri_ai_agent.ml.leakage import drop_suspected_leaks, select_feature_columns
 
 TARGET_COLUMNS = [
-    "Target_Yield", "Target_Fertilizer",
-    "Target_Nitrogen", "Target_Phosphorus", "Target_Potassium",
+    "Target_Yield",
+    "Target_Fertilizer",
+    "Target_Nitrogen",
+    "Target_Phosphorus",
+    "Target_Potassium",
 ]
 
-EXCLUDE_COLS = {
-    "Paper_ID", "DOI", "Journal", "Year", "Authors", "Country",
-    "Crop", "Scientific_Name", "Variety", "Season",
-    "Location", "State", "Site", "Treatment", "Fertilizer_Name",
-    "Organic_Fertilizer", "Biofertilizer", "Application_Method",
-    "Application_Interval", "Feature_Available_Before_Prediction",
-    "Table_Row", "Row_Index", "_source_page", "_reader", "_confidence",
-    "Source_File",
-} | NON_FEATURE_COLS | {v for v in POST_HARVEST_VARIABLES}
+EXCLUDE_COLS = (
+    {
+        "Paper_ID",
+        "DOI",
+        "Journal",
+        "Year",
+        "Authors",
+        "Country",
+        "Crop",
+        "Scientific_Name",
+        "Variety",
+        "Season",
+        "Location",
+        "State",
+        "Site",
+        "Treatment",
+        "Fertilizer_Name",
+        "Organic_Fertilizer",
+        "Biofertilizer",
+        "Application_Method",
+        "Application_Interval",
+        "Feature_Available_Before_Prediction",
+        "Table_Row",
+        "Row_Index",
+        "_source_page",
+        "_reader",
+        "_confidence",
+        "Source_File",
+    }
+    | NON_FEATURE_COLS
+    | {v for v in POST_HARVEST_VARIABLES}
+)
 
 MIN_SAMPLES_FOR_TRAINING = 50
 
 MODEL_REQUIREMENTS = {
-    "XGBoost": {"needs_scaling": False, "needs_encoding": True, "no_missing": True, "min_samples": 50},
-    "Random Forest": {"needs_scaling": False, "needs_encoding": True, "no_missing": False, "min_samples": 30},
-    "Linear Regression": {"needs_scaling": False, "needs_encoding": True, "no_missing": False, "min_samples": 10},
+    "XGBoost": {
+        "needs_scaling": False,
+        "needs_encoding": True,
+        "no_missing": True,
+        "min_samples": 50,
+    },
+    "Random Forest": {
+        "needs_scaling": False,
+        "needs_encoding": True,
+        "no_missing": False,
+        "min_samples": 30,
+    },
+    "Linear Regression": {
+        "needs_scaling": False,
+        "needs_encoding": True,
+        "no_missing": False,
+        "min_samples": 10,
+    },
 }
 
 
@@ -76,14 +117,21 @@ class TrainingAgent(BaseAgent):
                 metrics = evaluate_model(model, X, y)
                 pipeline = self._fit_pipeline(model, X, y)
                 fitted[name] = pipeline
-                model_path = models_dir / f"{name.lower().replace(' ', '_')}_{target_col.lower()}.joblib"
+                model_path = (
+                    models_dir / f"{name.lower().replace(' ', '_')}_{target_col.lower()}.joblib"
+                )
                 import joblib
+
                 joblib.dump(pipeline, model_path)
                 artifacts.append(str(model_path))
                 all_importances.extend(
-                    self._extract_feature_importance(pipeline.named_steps["model"], name, feature_list)
+                    self._extract_feature_importance(
+                        pipeline.named_steps["model"], name, feature_list
+                    )
                 )
-                results.append({"model": name, "target": target_col, **metrics, "model_path": str(model_path)})
+                results.append(
+                    {"model": name, "target": target_col, **metrics, "model_path": str(model_path)}
+                )
                 self.log.info("%s -> %s", name, self._format_metrics(metrics))
             except Exception as e:
                 self.log.warning("Failed to train %s: %s", name, e)
@@ -101,17 +149,23 @@ class TrainingAgent(BaseAgent):
         best = self._best_result(results)
         if best is not None:
             import joblib
+
             yield_model_path = models_dir / "yield_model.pkl"
             joblib.dump(fitted[best["model"]], yield_model_path)
             artifacts.append(str(yield_model_path))
-            self.log.info("Saved yield_model.pkl (%s, %s)", best["model"], self._format_metrics(best))
+            self.log.info(
+                "Saved yield_model.pkl (%s, %s)", best["model"], self._format_metrics(best)
+            )
 
         if artifacts:
             self.contract.artifacts.extend(artifacts)
 
         self.dataframe = df
-        self.log.info("Training complete: %d/%d models scored",
-                      sum(1 for r in results if "r2" in r), len(results))
+        self.log.info(
+            "Training complete: %d/%d models scored",
+            sum(1 for r in results if "r2" in r),
+            len(results),
+        )
         return df
 
     @staticmethod
@@ -119,10 +173,13 @@ class TrainingAgent(BaseAgent):
         """Fit a median-impute + model pipeline on all rows (for persistence/importances)."""
         from sklearn.impute import SimpleImputer
         from sklearn.pipeline import Pipeline
-        pipeline = Pipeline([
-            ("impute", SimpleImputer(strategy="median")),
-            ("model", model.__class__(**model.get_params())),
-        ])
+
+        pipeline = Pipeline(
+            [
+                ("impute", SimpleImputer(strategy="median")),
+                ("model", model.__class__(**model.get_params())),
+            ]
+        )
         return pipeline.fit(X, y)
 
     @staticmethod
@@ -144,6 +201,7 @@ class TrainingAgent(BaseAgent):
     def _get_models(self):
         from sklearn.ensemble import RandomForestRegressor
         from sklearn.linear_model import LinearRegression
+
         try:
             from xgboost import XGBRegressor
         except ImportError:
@@ -151,27 +209,37 @@ class TrainingAgent(BaseAgent):
         models = {}
         if XGBRegressor is not None:
             models["XGBoost"] = XGBRegressor(n_estimators=100, random_state=42, verbosity=0)
-        models["Random Forest"] = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
+        models["Random Forest"] = RandomForestRegressor(
+            n_estimators=100, random_state=42, n_jobs=-1
+        )
         models["Linear Regression"] = LinearRegression()
         return models
 
     def _extract_feature_importance(self, model, model_name, feature_names):
         importances = []
         try:
-            if hasattr(model, 'feature_importances_'):
+            if hasattr(model, "feature_importances_"):
                 vals = model.feature_importances_
-                for feat, imp in zip(feature_names, vals):
-                    importances.append({
-                        "feature": feat, "importance": float(imp),
-                        "model": model_name, "direction": 0,
-                    })
-            elif hasattr(model, 'coef_'):
-                coefs = model.coef_ if hasattr(model.coef_, '__iter__') else [model.coef_]
-                for feat, coef in zip(feature_names, coefs):
-                    importances.append({
-                        "feature": feat, "importance": float(abs(coef)),
-                        "model": model_name, "direction": 1 if coef > 0 else -1,
-                    })
+                for feat, imp in zip(feature_names, vals, strict=True):
+                    importances.append(
+                        {
+                            "feature": feat,
+                            "importance": float(imp),
+                            "model": model_name,
+                            "direction": 0,
+                        }
+                    )
+            elif hasattr(model, "coef_"):
+                coefs = model.coef_ if hasattr(model.coef_, "__iter__") else [model.coef_]
+                for feat, coef in zip(feature_names, coefs, strict=True):
+                    importances.append(
+                        {
+                            "feature": feat,
+                            "importance": float(abs(coef)),
+                            "model": model_name,
+                            "direction": 1 if coef > 0 else -1,
+                        }
+                    )
         except Exception as e:
             self.log.warning("Could not extract importances from %s: %s", model_name, e)
         return importances
@@ -181,18 +249,33 @@ class TrainingAgent(BaseAgent):
         num_cols = df.select_dtypes(include=[np.number]).columns.tolist()
         cat_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
 
-        missing_pct_by_col = df[num_cols].isna().mean() * 100 if num_cols else pd.Series(dtype=float)
-        total_missing_pct = df.isna().sum().sum() / (n_rows * len(df.columns)) * 100 if n_rows * len(df.columns) > 0 else 0
+        missing_pct_by_col = (
+            df[num_cols].isna().mean() * 100 if num_cols else pd.Series(dtype=float)
+        )
+        total_missing_pct = (
+            df.isna().sum().sum() / (n_rows * len(df.columns)) * 100
+            if n_rows * len(df.columns) > 0
+            else 0
+        )
 
         has_high_missing = any(missing_pct_by_col > 10) if len(missing_pct_by_col) else False
-        known_codes = {"Crop_Code", "Season_Code", "Variety_Code", "Fertilizer_Code", "Soil_Texture_Code", "Country_Code"}
+        known_codes = {
+            "Crop_Code",
+            "Season_Code",
+            "Variety_Code",
+            "Fertilizer_Code",
+            "Soil_Texture_Code",
+            "Country_Code",
+        }
         has_unencoded_cat = any(col not in known_codes for col in cat_cols)
 
         issues = []
         if total_missing_pct > 5:
             issues.append(f"Total missing values: {total_missing_pct:.1f}%")
         if has_high_missing:
-            high = [c for c in num_cols if c in missing_pct_by_col.index and missing_pct_by_col[c] > 10]
+            high = [
+                c for c in num_cols if c in missing_pct_by_col.index and missing_pct_by_col[c] > 10
+            ]
             issues.append(f"{len(high)} columns with >10% missing values")
         if has_unencoded_cat:
             issues.append(f"Unencoded categorical variables ({len(cat_cols)} cols)")
@@ -234,7 +317,11 @@ class TrainingAgent(BaseAgent):
             lines.append("- No critical issues detected")
 
         self.save_text_artifact("\n".join(lines), "Model_Readiness_Report.md")
-        self.log.info("Readiness check complete: %d compatible, %d incompatible", len(compatible), len(incompatible))
+        self.log.info(
+            "Readiness check complete: %d compatible, %d incompatible",
+            len(compatible),
+            len(incompatible),
+        )
 
     def _prepare_data(self, df: pd.DataFrame, target_col: str):
         """Build a leakage-safe feature matrix; keep rows with gaps (imputed inside CV)."""
@@ -254,7 +341,8 @@ class TrainingAgent(BaseAgent):
         if dropped:
             self.log.warning(
                 "Dropped %d near-perfect-correlation features (suspected leakage): %s",
-                len(dropped), dropped,
+                len(dropped),
+                dropped,
             )
 
         if len(X) < MIN_ROWS_FOR_METRIC or X.shape[1] < 2:
@@ -272,7 +360,7 @@ class TrainingAgent(BaseAgent):
             robust = "yes" if r.get("robust") else "no (small-n)"
             rows += (
                 f"<tr>"
-                f"<td>{i+1}</td><td>{r['model']}</td>"
+                f"<td>{i + 1}</td><td>{r['model']}</td>"
                 f"<td>{r['r2']}{std}</td><td>{r.get('rmse', 'N/A')}</td>"
                 f"<td>{r.get('n', 'N/A')}</td><td>{r.get('cv_scheme', 'N/A')}</td>"
                 f"<td>{robust}</td>"
@@ -326,7 +414,13 @@ features excluded). Rows flagged <em>not robust</em> are small-n (n&lt;30) and a
                 fi_rows = ""
                 for _, r in fi_top.iterrows():
                     bar_width = int(r["importance"] * 200) if r["importance"] > 0 else 1
-                    direction = "+" if r.get("direction", 0) > 0 else "-" if r.get("direction", 0) < 0 else ""
+                    direction = (
+                        "+"
+                        if r.get("direction", 0) > 0
+                        else "-"
+                        if r.get("direction", 0) < 0
+                        else ""
+                    )
                     fi_rows += (
                         f"<tr><td>{r['model']}</td><td>{r['feature']}</td>"
                         f"<td>{r['importance']:.4f}</td><td>{direction}</td>"
@@ -364,14 +458,16 @@ features excluded). Rows flagged <em>not robust</em> are small-n (n&lt;30) and a
             n_missing = int(df[col].isna().sum())
             missing_pct = round(n_missing / len(df) * 100, 2) if len(df) > 0 else 0
             sample_vals = df[col].dropna().unique()[:5].tolist()
-            rows.append({
-                "Column": col,
-                "Data_Type": dtype,
-                "Unique_Values": n_unique,
-                "Missing_Count": n_missing,
-                "Missing_Pct": missing_pct,
-                "Sample_Values": str(sample_vals),
-            })
+            rows.append(
+                {
+                    "Column": col,
+                    "Data_Type": dtype,
+                    "Unique_Values": n_unique,
+                    "Missing_Count": n_missing,
+                    "Missing_Pct": missing_pct,
+                    "Sample_Values": str(sample_vals),
+                }
+            )
         fdf = pd.DataFrame(rows)
         self.save_artifact(fdf, "Feature_Dictionary.csv")
 

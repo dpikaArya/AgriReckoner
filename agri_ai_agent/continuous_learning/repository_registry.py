@@ -2,8 +2,6 @@ import json
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
-
 
 REPOSITORIES_DDL = """
 CREATE TABLE IF NOT EXISTS repositories (
@@ -27,7 +25,7 @@ class RepositoryRegistry:
     def __init__(self, db_path: Path):
         self.db_path = db_path
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
-        self._conn: Optional[sqlite3.Connection] = None
+        self._conn: sqlite3.Connection | None = None
         self._init_db()
 
     def _connect(self) -> sqlite3.Connection:
@@ -41,8 +39,14 @@ class RepositoryRegistry:
         conn.execute(REPOSITORIES_DDL)
         conn.commit()
 
-    def register(self, name: str, url: str, repo_type: str = "generic",
-                 connector_name: str = "", metadata: Optional[dict] = None) -> dict:
+    def register(
+        self,
+        name: str,
+        url: str,
+        repo_type: str = "generic",
+        connector_name: str = "",
+        metadata: dict | None = None,
+    ) -> dict:
         conn = self._connect()
         now = datetime.now().isoformat()
         existing = self.get(name)
@@ -50,15 +54,13 @@ class RepositoryRegistry:
             conn.execute(
                 "UPDATE repositories SET url=?, repo_type=?, connector_name=?, "
                 "metadata_json=?, updated_at=? WHERE name=?",
-                (url, repo_type, connector_name,
-                 json.dumps(metadata or {}), now, name),
+                (url, repo_type, connector_name, json.dumps(metadata or {}), now, name),
             )
         else:
             conn.execute(
                 "INSERT INTO repositories (name, url, repo_type, connector_name, "
                 "metadata_json, created_at, updated_at) VALUES (?,?,?,?,?,?,?)",
-                (name, url, repo_type, connector_name,
-                 json.dumps(metadata or {}), now, now),
+                (name, url, repo_type, connector_name, json.dumps(metadata or {}), now, now),
             )
         conn.commit()
         return self.get(name)
@@ -72,9 +74,7 @@ class RepositoryRegistry:
 
     def list_enabled(self) -> list[dict]:
         conn = self._connect()
-        rows = conn.execute(
-            "SELECT * FROM repositories WHERE enabled=1 ORDER BY name"
-        ).fetchall()
+        rows = conn.execute("SELECT * FROM repositories WHERE enabled=1 ORDER BY name").fetchall()
         return [dict(r) for r in rows]
 
     def list_all(self) -> list[dict]:

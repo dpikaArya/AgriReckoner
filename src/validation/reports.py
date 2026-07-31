@@ -1,26 +1,27 @@
-from pathlib import Path
-from typing import Optional, List
 import json
 import logging
-from datetime import datetime, UTC
+from datetime import UTC, datetime
+from pathlib import Path
 
-from src.validation.schema_validator import SchemaValidator, TableSchema
 from src.validation.data_quality import DataQualityValidator
-from src.validation.range_validator import RangeValidator
 from src.validation.provenance_validator import ProvenanceValidator
+from src.validation.range_validator import RangeValidator
+from src.validation.schema_validator import SchemaValidator, TableSchema
 
 
 class ValidationReport:
     def __init__(self):
-        self.results: List[dict] = []
+        self.results: list[dict] = []
 
     def add_result(self, validator_name: str, passed: bool, details: dict):
-        self.results.append({
-            "validator": validator_name,
-            "passed": passed,
-            "details": details,
-            "timestamp": datetime.now(UTC).isoformat(),
-        })
+        self.results.append(
+            {
+                "validator": validator_name,
+                "passed": passed,
+                "details": details,
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+        )
 
     def to_dict(self) -> dict:
         total = len(self.results)
@@ -50,11 +51,11 @@ class ValidationReport:
         for r in report["results"]:
             color = "green" if r["passed"] else "red"
             rows_html += f"""
-            <tr style="background-color: {'#e8f5e9' if r['passed'] else '#ffebee'}">
-                <td>{r['validator']}</td>
-                <td style="color: {color}; font-weight: bold;">{'PASS' if r['passed'] else 'FAIL'}</td>
-                <td style="font-size: 0.9em;"><pre style="white-space: pre-wrap; margin: 0;">{json.dumps(r['details'], indent=2, default=str)}</pre></td>
-                <td>{r['timestamp']}</td>
+            <tr style="background-color: {"#e8f5e9" if r["passed"] else "#ffebee"}">
+                <td>{r["validator"]}</td>
+                <td style="color: {color}; font-weight: bold;">{"PASS" if r["passed"] else "FAIL"}</td>
+                <td style="font-size: 0.9em;"><pre style="white-space: pre-wrap; margin: 0;">{json.dumps(r["details"], indent=2, default=str)}</pre></td>
+                <td>{r["timestamp"]}</td>
             </tr>"""
 
         detail_sections = ""
@@ -62,9 +63,9 @@ class ValidationReport:
             color = "green" if r["passed"] else "red"
             detail_sections += f"""
             <div style="margin-bottom: 20px; padding: 10px; border-left: 4px solid {color}; background: #fafafa;">
-                <h3 style="margin: 0 0 5px 0;">{r['validator']} — <span style="color: {color};">{'PASS' if r['passed'] else 'FAIL'}</span></h3>
-                <pre style="background: #f5f5f5; padding: 10px; overflow-x: auto;">{json.dumps(r['details'], indent=2, default=str)}</pre>
-                <p style="font-size: 0.8em; color: #666;">{r['timestamp']}</p>
+                <h3 style="margin: 0 0 5px 0;">{r["validator"]} — <span style="color: {color};">{"PASS" if r["passed"] else "FAIL"}</span></h3>
+                <pre style="background: #f5f5f5; padding: 10px; overflow-x: auto;">{json.dumps(r["details"], indent=2, default=str)}</pre>
+                <p style="font-size: 0.8em; color: #666;">{r["timestamp"]}</p>
             </div>"""
 
         html = f"""<!DOCTYPE html>
@@ -84,8 +85,8 @@ th {{ background: #f0f0f0; }}
 </head>
 <body>
 <h1>Validation Report</h1>
-<p class="status" style="background: {status_color}; color: white;">{report['summary']['status']}</p>
-<p>Generated: {report['summary']['timestamp']}</p>
+<p class="status" style="background: {status_color}; color: white;">{report["summary"]["status"]}</p>
+<p>Generated: {report["summary"]["timestamp"]}</p>
 <table>
 <thead><tr><th>Validator</th><th>Status</th><th>Details</th><th>Timestamp</th></tr></thead>
 <tbody>{rows_html}</tbody>
@@ -109,18 +110,18 @@ th {{ background: #f0f0f0; }}
             f"  Timestamp: {s['timestamp']}",
         ]
         for r in report["results"]:
-            lines.append(f"  [{ 'PASS' if r['passed'] else 'FAIL' }] {r['validator']}")
+            lines.append(f"  [{'PASS' if r['passed'] else 'FAIL'}] {r['validator']}")
         return "\n".join(lines)
 
 
 def run_all_validations(
     df,
-    schema: Optional[TableSchema] = None,
-    metadata: Optional[dict] = None,
-    manifest: Optional[dict] = None,
-    lineage: Optional[dict] = None,
-    output_dir: Optional[Path] = None,
-    logger: Optional[logging.Logger] = None,
+    schema: TableSchema | None = None,
+    metadata: dict | None = None,
+    manifest: dict | None = None,
+    lineage: dict | None = None,
+    output_dir: Path | None = None,
+    logger: logging.Logger | None = None,
 ) -> dict:
     logger = logger or logging.getLogger(__name__)
     report = ValidationReport()
@@ -136,9 +137,8 @@ def run_all_validations(
     dq_validator = DataQualityValidator(logger=logger)
     try:
         dq_result = dq_validator.validate(df)
-        has_issues = (
-            dq_result["duplicate_rows"]["count"] > 0
-            or any(v["count"] > 0 for v in dq_result["missing_values"].values())
+        has_issues = dq_result["duplicate_rows"]["count"] > 0 or any(
+            v["count"] > 0 for v in dq_result["missing_values"].values()
         )
         report.add_result("DataQualityValidator", not has_issues, dq_result)
     except Exception as e:
@@ -167,7 +167,9 @@ def run_all_validations(
     if lineage is not None:
         try:
             lineage_result = prov_validator.validate_lineage(lineage)
-            report.add_result("ProvenanceValidator-Lineage", lineage_result["valid"], lineage_result)
+            report.add_result(
+                "ProvenanceValidator-Lineage", lineage_result["valid"], lineage_result
+            )
         except Exception as e:
             report.add_result("ProvenanceValidator-Lineage", False, {"error": str(e)})
 

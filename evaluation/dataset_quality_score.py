@@ -9,9 +9,12 @@ import time
 from pathlib import Path
 
 from evaluation.utils import (
-    OUTPUT_DIR, write_report, get_master_df, get_uams_cols, load_dataframe,
+    OUTPUT_DIR,
+    get_master_df,
+    get_uams_cols,
+    load_dataframe,
+    write_report,
 )
-import numpy as np
 
 
 def compute_quality_score():
@@ -31,11 +34,31 @@ def compute_quality_score():
     cols_in_schema = []
     try:
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from agri_ai_agent.config.schema import SCHEMA_GROUPS
+
         core_cols_list = []
         for g_name, g_cols in SCHEMA_GROUPS.items():
-            if any(g_name.startswith(p) for p in ["A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N."]):
+            if any(
+                g_name.startswith(p)
+                for p in [
+                    "A.",
+                    "B.",
+                    "C.",
+                    "D.",
+                    "E.",
+                    "F.",
+                    "G.",
+                    "H.",
+                    "I.",
+                    "J.",
+                    "K.",
+                    "L.",
+                    "M.",
+                    "N.",
+                ]
+            ):
                 core_cols_list.extend(g_cols)
         core_set = set(core_cols_list)
         cols_in_core = [c for c in master_df.columns if c in core_set]
@@ -52,19 +75,30 @@ def compute_quality_score():
     if onto_path.exists():
         onto_df = load_dataframe(str(onto_path))
         if onto_df is not None and len(onto_df) > 0:
-            onto_cols = ["AGROVOC", "Crop Ontology", "Plant Ontology",
-                         "Environment Ontology", "Unit Ontology"]
+            onto_cols = [
+                "AGROVOC",
+                "Crop Ontology",
+                "Plant Ontology",
+                "Environment Ontology",
+                "Unit Ontology",
+            ]
             onto_present = sum(
-                1 for c in onto_cols
-                if c in onto_df.columns and onto_df[c].notna().any()
+                1 for c in onto_cols if c in onto_df.columns and onto_df[c].notna().any()
             )
             onto_score = (onto_present / len(onto_cols)) * 10
 
     # 3. Feature completeness (0-15)
-    engineered = ["Growing_Degree_Days", "Heat_Units", "Harvest_Index_Calc",
-                  "Nitrogen_Use_Efficiency", "Water_Use_Efficiency",
-                  "Yield_per_Plant", "Yield_per_Hectare_Calc",
-                  "Temp_x_Rainfall", "N_x_P"]
+    engineered = [
+        "Growing_Degree_Days",
+        "Heat_Units",
+        "Harvest_Index_Calc",
+        "Nitrogen_Use_Efficiency",
+        "Water_Use_Efficiency",
+        "Yield_per_Plant",
+        "Yield_per_Hectare_Calc",
+        "Temp_x_Rainfall",
+        "N_x_P",
+    ]
     existing_eng = [f for f in engineered if f in master_df.columns]
     feature_completeness = len(existing_eng) / len(engineered) if engineered else 0
     feature_score = feature_completeness * 15
@@ -106,14 +140,29 @@ def compute_quality_score():
     has_weather = any(c in master_df.columns for c in ["Temperature_Max", "Rainfall"])
     has_yield_data = any(c in master_df.columns for c in ["Yield_per_Plot", "Target_Yield"])
 
-    repro_factors = [has_paper_meta, has_crop_info, has_location, has_soil, has_weather, has_yield_data]
+    repro_factors = [
+        has_paper_meta,
+        has_crop_info,
+        has_location,
+        has_soil,
+        has_weather,
+        has_yield_data,
+    ]
     repro_score = (sum(repro_factors) / len(repro_factors)) * 15
 
-    overall = min(100, schema_score + onto_score + feature_score + missing_score +
-                  doc_score + ml_score + repro_score)
+    overall = min(
+        100,
+        schema_score
+        + onto_score
+        + feature_score
+        + missing_score
+        + doc_score
+        + ml_score
+        + repro_score,
+    )
 
     report = f"""# Dataset Quality Score
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 Dataset: {n_rows} rows × {n_cols} columns
 
 ## Quality Scorecard

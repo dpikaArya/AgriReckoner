@@ -1,7 +1,6 @@
 """Tests for Table Intelligence Agent."""
 
 import pandas as pd
-import pytest
 
 from agri_ai_agent.agents.table_intelligence_agent import TableIntelligenceAgent
 from agri_ai_agent.contracts.messages import AgentContract
@@ -154,10 +153,12 @@ T2\t4200\t92.3
         assert len(result) == 2
 
     def test_process_dataframe_passthrough(self):
-        df = pd.DataFrame({
-            "Treatment": ["T1", "T2"],
-            "Yield": [3500, 4200],
-        })
+        df = pd.DataFrame(
+            {
+                "Treatment": ["T1", "T2"],
+                "Yield": [3500, 4200],
+            }
+        )
         result = self.agent.process(df)
         assert not result.empty
         assert len(result) == 2

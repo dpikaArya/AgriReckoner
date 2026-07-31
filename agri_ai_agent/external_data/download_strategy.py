@@ -1,11 +1,7 @@
 import logging
-import shutil
 from pathlib import Path
-from typing import Optional
 
 import requests
-
-from agri_ai_agent.external_data.dataset_package import DatasetPackage
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +28,7 @@ def is_structured(fmt: str) -> bool:
 
 class FormatFilter:
     @staticmethod
-    def best(available: list[str]) -> Optional[str]:
+    def best(available: list[str]) -> str | None:
         has = any(is_structured(f) for f in available)
         candidates = [f for f in available if not (f.lower() == "pdf" and has)]
         if not candidates:
@@ -55,7 +51,7 @@ class FormatFilter:
 def try_priority_downloads(
     attempts: list[tuple[str, str, Path]],
     timeout: int = 120,
-) -> Optional[Path]:
+) -> Path | None:
     has_structured = any(is_structured(fmt) for _, fmt, _ in attempts)
     scored = []
     for url, fmt, path in attempts:
@@ -65,7 +61,7 @@ def try_priority_downloads(
         scored.append((p, url, fmt, path))
     scored.sort(key=lambda x: x[0])
 
-    for _, url, fmt, path in attempts:
+    for _, url, fmt, path in scored:
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             resp = requests.get(url, timeout=timeout)
@@ -82,8 +78,8 @@ def try_priority_downloads(
 def download_huggingface_parquet(
     dataset_id: str,
     target_dir: Path,
-    cache_dir: Optional[Path] = None,
-) -> Optional[Path]:
+    cache_dir: Path | None = None,
+) -> Path | None:
     import datasets as hf_datasets
 
     target_dir.mkdir(parents=True, exist_ok=True)
@@ -104,6 +100,9 @@ def download_huggingface_parquet(
     df.to_parquet(parquet_path, index=False)
     logger.info(
         "HF dataset %s (%s split, %d rows) saved to %s",
-        dataset_id, split, len(df), parquet_path,
+        dataset_id,
+        split,
+        len(df),
+        parquet_path,
     )
     return parquet_path

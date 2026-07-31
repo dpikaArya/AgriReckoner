@@ -1,17 +1,18 @@
 import uuid
 from datetime import datetime
-from typing import Optional
 
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import AgentContract
 
-
 OBS_MANDATORY_IDS = [
-    "Dataset_ID", "Document_ID", "Paper_ID",
-    "Experiment_ID", "Treatment_ID", "Observation_ID",
+    "Dataset_ID",
+    "Document_ID",
+    "Paper_ID",
+    "Experiment_ID",
+    "Treatment_ID",
+    "Observation_ID",
 ]
 
 
@@ -33,14 +34,17 @@ class ObservationGenerationAgent(BaseAgent):
         obs_count = len(df)
         self.log.info(
             "[%s] Generated %d observation(s) across %d paper(s) and %d experiment(s)",
-            self.agent_name, obs_count,
+            self.agent_name,
+            obs_count,
             df["Paper_ID"].nunique() if "Paper_ID" in df.columns else 0,
             df["Experiment_ID"].nunique() if "Experiment_ID" in df.columns else 0,
         )
 
-        manifest = df[OBS_MANDATORY_IDS].drop_duplicates() if all(
-            c in df.columns for c in OBS_MANDATORY_IDS
-        ) else pd.DataFrame()
+        manifest = (
+            df[OBS_MANDATORY_IDS].drop_duplicates()
+            if all(c in df.columns for c in OBS_MANDATORY_IDS)
+            else pd.DataFrame()
+        )
         if not manifest.empty:
             self.save_artifact(manifest, "observation_manifest.csv", subdir="observation")
         return df
@@ -55,55 +59,85 @@ class ObservationGenerationAgent(BaseAgent):
         if "Paper_ID" not in df.columns:
             df["Paper_ID"] = "PAPER/DEFAULT"
         else:
-            import numpy as np
             df["Paper_ID"] = df["Paper_ID"].apply(
-                lambda x: f"PAPER/{uuid.uuid4().hex[:8]}"
-                if pd.isna(x) or str(x).strip() == ""
-                else str(x)
+                lambda x: (
+                    f"PAPER/{uuid.uuid4().hex[:8]}"
+                    if pd.isna(x) or str(x).strip() == ""
+                    else str(x)
+                )
             )
 
-        if "Experiment_ID" not in df.columns or df["Experiment_ID"].isna().all() or (df["Experiment_ID"] == "").all():
-            exp_cols = [c for c in ["Location", "Site", "State", "Season", "Year", "Design", "Crop"]
-                       if c in df.columns]
+        if (
+            "Experiment_ID" not in df.columns
+            or df["Experiment_ID"].isna().all()
+            or (df["Experiment_ID"] == "").all()
+        ):
+            exp_cols = [
+                c
+                for c in ["Location", "Site", "State", "Season", "Year", "Design", "Crop"]
+                if c in df.columns
+            ]
             if exp_cols:
                 df["Experiment_ID"] = df.apply(
-                    lambda r: f"{r['Paper_ID']}/exp/"
-                              f"{'_'.join(str(r.get(c, '')).strip() for c in exp_cols if pd.notna(r.get(c, '')))}",
+                    lambda r: (
+                        f"{r['Paper_ID']}/exp/"
+                        f"{'_'.join(str(r.get(c, '')).strip() for c in exp_cols if pd.notna(r.get(c, '')))}"
+                    ),
                     axis=1,
                 )
             else:
                 df["Experiment_ID"] = df.apply(
-                    lambda r: f"{r['Paper_ID']}/exp/0", axis=1,
+                    lambda r: f"{r['Paper_ID']}/exp/0",
+                    axis=1,
                 )
 
-        if "Treatment_ID" not in df.columns or df["Treatment_ID"].isna().all() or (df["Treatment_ID"] == "").all():
-            trt_cols = [c for c in ["Treatment", "Fertilizer_Name", "Dose", "Variety"]
-                       if c in df.columns]
+        if (
+            "Treatment_ID" not in df.columns
+            or df["Treatment_ID"].isna().all()
+            or (df["Treatment_ID"] == "").all()
+        ):
+            trt_cols = [
+                c for c in ["Treatment", "Fertilizer_Name", "Dose", "Variety"] if c in df.columns
+            ]
             if trt_cols:
                 df["Treatment_ID"] = df.apply(
-                    lambda r: f"{r['Experiment_ID']}/trt/"
-                              f"{'_'.join(str(r.get(c, '')).strip() for c in trt_cols if pd.notna(r.get(c, '')))}",
+                    lambda r: (
+                        f"{r['Experiment_ID']}/trt/"
+                        f"{'_'.join(str(r.get(c, '')).strip() for c in trt_cols if pd.notna(r.get(c, '')))}"
+                    ),
                     axis=1,
                 )
             else:
                 df["Treatment_ID"] = df.apply(
-                    lambda r: f"{r['Experiment_ID']}/trt/{uuid.uuid4().hex[:6]}", axis=1,
+                    lambda r: f"{r['Experiment_ID']}/trt/{uuid.uuid4().hex[:6]}",
+                    axis=1,
                 )
 
-        if "Dataset_ID" not in df.columns or df["Dataset_ID"].isna().all() or (df["Dataset_ID"] == "").all():
+        if (
+            "Dataset_ID" not in df.columns
+            or df["Dataset_ID"].isna().all()
+            or (df["Dataset_ID"] == "").all()
+        ):
             df["Dataset_ID"] = df["Paper_ID"].str.replace("/paper", "", regex=False)
 
-        if "Document_ID" not in df.columns or df["Document_ID"].isna().all() or (df["Document_ID"] == "").all():
+        if (
+            "Document_ID" not in df.columns
+            or df["Document_ID"].isna().all()
+            or (df["Document_ID"] == "").all()
+        ):
             df["Document_ID"] = df["Dataset_ID"].apply(lambda d: f"{d}/doc/0")
 
         return df
 
     def _deduplicate_treatments(self, df: pd.DataFrame) -> pd.DataFrame:
-        group_cols = [c for c in ["Paper_ID", "Experiment_ID", "Treatment_ID"]
-                     if c in df.columns]
+        group_cols = [c for c in ["Paper_ID", "Experiment_ID", "Treatment_ID"] if c in df.columns]
 
         if not group_cols or len(group_cols) < 3:
-            if "Observation_ID" not in df.columns or df["Observation_ID"].isna().all() or (df["Observation_ID"] == "").all():
+            if (
+                "Observation_ID" not in df.columns
+                or df["Observation_ID"].isna().all()
+                or (df["Observation_ID"] == "").all()
+            ):
                 df["Observation_ID"] = [f"OBS/{uuid.uuid4().hex[:12]}" for _ in range(len(df))]
             return df
 
@@ -132,13 +166,17 @@ class ObservationGenerationAgent(BaseAgent):
             fused_rows.append(first)
 
         result = pd.DataFrame(fused_rows) if fused_rows else df
-        if "Observation_ID" not in result.columns or result["Observation_ID"].isna().all() or (result["Observation_ID"] == "").all():
-            result["Observation_ID"] = [
-                f"OBS/{uuid.uuid4().hex[:12]}" for _ in range(len(result))
-            ]
+        if (
+            "Observation_ID" not in result.columns
+            or result["Observation_ID"].isna().all()
+            or (result["Observation_ID"] == "").all()
+        ):
+            result["Observation_ID"] = [f"OBS/{uuid.uuid4().hex[:12]}" for _ in range(len(result))]
         return result
 
-    def run(self, df: pd.DataFrame, contract: Optional[AgentContract] = None, **kwargs) -> AgentContract:
+    def run(
+        self, df: pd.DataFrame, contract: AgentContract | None = None, **kwargs
+    ) -> AgentContract:
         self.dataframe = df
         self.contract = contract or AgentContract(agent_name=self.agent_name)
         self.contract.status = "running"
@@ -152,12 +190,20 @@ class ObservationGenerationAgent(BaseAgent):
                 self.contract.completed_at - self.contract.started_at
             ).total_seconds()
             self.contract.output_data = self._build_output(result_df, **kwargs)
-            if all(c in result_df.columns for c in ["Observation_ID", "Experiment_ID", "Treatment_ID"]):
+            if all(
+                c in result_df.columns for c in ["Observation_ID", "Experiment_ID", "Treatment_ID"]
+            ):
                 self.contract.output_data["observation_count"] = len(result_df)
-                self.contract.output_data["experiment_count"] = int(result_df["Experiment_ID"].nunique())
-                self.contract.output_data["treatment_count"] = int(result_df["Treatment_ID"].nunique())
+                self.contract.output_data["experiment_count"] = int(
+                    result_df["Experiment_ID"].nunique()
+                )
+                self.contract.output_data["treatment_count"] = int(
+                    result_df["Treatment_ID"].nunique()
+                )
             self.log.info(
-                "[%s] Completed in %.2fs", self.agent_name, self.contract.execution_time_sec,
+                "[%s] Completed in %.2fs",
+                self.agent_name,
+                self.contract.execution_time_sec,
             )
         except Exception as e:
             self.contract.status = "failed"

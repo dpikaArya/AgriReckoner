@@ -1,12 +1,11 @@
-from pathlib import Path
-from typing import Optional
 import hashlib
 import json
 import logging
+from pathlib import Path
 
 
 class ProvenanceValidator:
-    def __init__(self, logger: Optional[logging.Logger] = None):
+    def __init__(self, logger: logging.Logger | None = None):
         self.logger = logger or logging.getLogger(__name__)
 
     def validate_checksum(
@@ -33,7 +32,9 @@ class ProvenanceValidator:
                 "algorithm": algorithm,
                 "computed_hash": computed,
                 "expected_hash": expected_hash,
-                "error": None if match else f"Hash mismatch: computed={computed}, expected={expected_hash}",
+                "error": None
+                if match
+                else f"Hash mismatch: computed={computed}, expected={expected_hash}",
             }
         except ValueError:
             return {
@@ -49,7 +50,7 @@ class ProvenanceValidator:
             return {"valid": False, "error": f"Manifest file not found: {manifest_path}"}
 
         try:
-            with open(manifest_path, "r", encoding="utf-8") as f:
+            with open(manifest_path, encoding="utf-8") as f:
                 data = json.load(f)
         except json.JSONDecodeError as e:
             return {"valid": False, "error": f"Invalid JSON in manifest: {e}"}

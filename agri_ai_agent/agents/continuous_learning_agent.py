@@ -14,22 +14,16 @@ import json
 import shutil
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
-from agri_ai_agent.continuous_learning.version_history import VersionHistory
 from agri_ai_agent.continuous_learning.change_detector import ChangeDetector
 from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph
 from agri_ai_agent.continuous_learning.incremental_engine import IncrementalEngine
-from agri_ai_agent.continuous_learning.reports import (
-    generate_sync_report,
-    generate_provenance_report,
-    generate_retraining_report,
-)
+from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
+from agri_ai_agent.continuous_learning.version_history import VersionHistory
 
 BEST_MODEL_LABEL = "best_model"
 RETRAIN_R2_THRESHOLD = 0.01
@@ -119,8 +113,11 @@ class ContinuousLearningAgent(BaseAgent):
         self.log.info("=" * 60)
         self.log.info("Continuous Learning Cycle v2 Complete")
         self.log.info("  Rows: %d → %d", cycle_stats["initial_rows"], cycle_stats["final_rows"])
-        self.log.info("  Models retrained: %d | Deployed: %s",
-                      cycle_stats["models_retrained"], cycle_stats["model_deployed"])
+        self.log.info(
+            "  Models retrained: %d | Deployed: %s",
+            cycle_stats["models_retrained"],
+            cycle_stats["model_deployed"],
+        )
         self.log.info("  Drift events: %d", cycle_stats["drift_events"])
         self.log.info("=" * 60)
 
@@ -160,8 +157,9 @@ class ContinuousLearningAgent(BaseAgent):
     def _should_retrain(self, df: pd.DataFrame) -> bool:
         n_samples = len(df)
         if n_samples < MIN_SAMPLES_FOR_RETRAIN:
-            self.log.info("Only %d samples (< %d), skipping retrain",
-                          n_samples, MIN_SAMPLES_FOR_RETRAIN)
+            self.log.info(
+                "Only %d samples (< %d), skipping retrain", n_samples, MIN_SAMPLES_FOR_RETRAIN
+            )
             return False
 
         history = self._load_performance_history()
@@ -173,13 +171,16 @@ class ContinuousLearningAgent(BaseAgent):
         last_row_count = last.get("final_rows", 0)
         row_growth = (n_samples - last_row_count) / max(last_row_count, 1)
         if row_growth > DATA_DRIFT_THRESHOLD:
-            self.log.info("Data growth %.1f%% exceeds threshold %.1f%% — retraining",
-                          row_growth * 100, DATA_DRIFT_THRESHOLD * 100)
+            self.log.info(
+                "Data growth %.1f%% exceeds threshold %.1f%% — retraining",
+                row_growth * 100,
+                DATA_DRIFT_THRESHOLD * 100,
+            )
             return True
 
         return False
 
-    def _extract_new_data(self, papers_dir: str) -> Optional[pd.DataFrame]:
+    def _extract_new_data(self, papers_dir: str) -> pd.DataFrame | None:
         papers_path = Path(papers_dir)
         if not papers_path.exists():
             self.log.warning("Papers directory not found: %s", papers_dir)
@@ -194,14 +195,13 @@ class ContinuousLearningAgent(BaseAgent):
 
         try:
             from agri_ai_agent.agents.extraction_agent import ExtractionAgent
+
             ext_agent = ExtractionAgent(settings=self.settings)
             all_rows = []
             for pdf_path in pdf_files:
                 self.log.info("Processing: %s", pdf_path.name)
                 try:
-                    result = ext_agent.process(
-                        pd.DataFrame(), papers_dir=str(pdf_path.parent)
-                    )
+                    result = ext_agent.process(pd.DataFrame(), papers_dir=str(pdf_path.parent))
                     if result is not None and len(result) > 0:
                         all_rows.append(result)
                 except Exception as e:
@@ -220,20 +220,35 @@ class ContinuousLearningAgent(BaseAgent):
         if df.empty:
             return new_data
         combined = pd.concat([df, new_data], ignore_index=True, sort=False)
-        self.log.info("Merged: %d + %d = %d (before dedup)",
-                      len(df), len(new_data), len(combined))
+        self.log.info("Merged: %d + %d = %d (before dedup)", len(df), len(new_data), len(combined))
         return combined
 
     def _validate_and_transform(self, df: pd.DataFrame) -> pd.DataFrame:
         from agri_ai_agent.config.schema import UAMS_COLUMNS
 
         core_cols = [
-            "Crop", "Variety", "Soil_pH", "Nitrogen", "Phosphorus",
-            "Potassium", "Zinc", "Rainfall", "Temperature_Max",
-            "Temperature_Min", "Organic_Carbon", "Growth_Stage",
-            "Yield_per_Hectare", "Target_Yield", "Predicted_Yield",
-            "Fertilizer_Name", "Dose", "Application_Interval",
-            "Source_Paper", "DOI", "Year", "Country",
+            "Crop",
+            "Variety",
+            "Soil_pH",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "Zinc",
+            "Rainfall",
+            "Temperature_Max",
+            "Temperature_Min",
+            "Organic_Carbon",
+            "Growth_Stage",
+            "Yield_per_Hectare",
+            "Target_Yield",
+            "Predicted_Yield",
+            "Fertilizer_Name",
+            "Dose",
+            "Application_Interval",
+            "Source_Paper",
+            "DOI",
+            "Year",
+            "Country",
         ]
         schema_cols = [c for c in UAMS_COLUMNS if c in df.columns or c in core_cols]
 
@@ -250,10 +265,20 @@ class ContinuousLearningAgent(BaseAgent):
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
         known_numeric = [
-            "Soil_pH", "Nitrogen", "Phosphorus", "Potassium", "Zinc",
-            "Rainfall", "Temperature_Max", "Temperature_Min", "Organic_Carbon",
-            "Yield_per_Hectare", "Target_Yield", "Predicted_Yield",
-            "Dose", "Application_Interval",
+            "Soil_pH",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "Zinc",
+            "Rainfall",
+            "Temperature_Max",
+            "Temperature_Min",
+            "Organic_Carbon",
+            "Yield_per_Hectare",
+            "Target_Yield",
+            "Predicted_Yield",
+            "Dose",
+            "Application_Interval",
         ]
         for col in known_numeric:
             if col in df.columns and col not in numeric_cols:
@@ -272,6 +297,7 @@ class ContinuousLearningAgent(BaseAgent):
     def _engineer_features(self, df: pd.DataFrame, force: bool = False) -> pd.DataFrame:
         try:
             from agri_ai_agent.agents.feature_agent import FeatureAgent
+
             fe_agent = FeatureAgent(settings=self.settings)
             df = fe_agent.process(df)
             self.log.info("Feature engineering applied")
@@ -279,8 +305,9 @@ class ContinuousLearningAgent(BaseAgent):
             self.log.warning("Feature engineering skipped: %s", e)
         return df
 
-    def _retrain_and_evaluate(self, df: pd.DataFrame,
-                              force: bool = False) -> tuple[list[Path], dict]:
+    def _retrain_and_evaluate(
+        self, df: pd.DataFrame, force: bool = False
+    ) -> tuple[list[Path], dict]:
         models_dir = self.settings.OUTPUT_DIR / "models"
         models_dir.mkdir(parents=True, exist_ok=True)
 
@@ -291,8 +318,9 @@ class ContinuousLearningAgent(BaseAgent):
 
         try:
             from agri_ai_agent.agents.training_agent import TrainingAgent
+
             train_agent = TrainingAgent(settings=self.settings)
-            result = train_agent.process(df, target=target_col)
+            train_agent.process(df, target=target_col)
 
             model_paths = list(models_dir.glob("*.joblib")) + list(models_dir.glob("*.pkl"))
             metrics = self._load_training_results()
@@ -369,11 +397,12 @@ class ContinuousLearningAgent(BaseAgent):
 
         try:
             from agri_ai_agent.continuous_learning.version_history import VersionHistory
+
             vh = VersionHistory(self.settings.CONTINUOUS_LEARNING_DB)
             checksum = VersionHistory.compute_hash(json.dumps(metrics_payload, sort_keys=True))
-            vh.register_version("model", BEST_MODEL_LABEL,
-                                checksum=checksum,
-                                metadata=metrics_payload)
+            vh.register_version(
+                "model", BEST_MODEL_LABEL, checksum=checksum, metadata=metrics_payload
+            )
             vh.close()
         except Exception as exc:
             self.log.warning("Model version registration skipped: %s", exc)
@@ -411,7 +440,8 @@ class ContinuousLearningAgent(BaseAgent):
                     pct_below = (vals <= threshold).mean()
                     if pct_below > 0.8:
                         drift_log[f"{var}_{label}"] = {
-                            "variable": var, "set": label,
+                            "variable": var,
+                            "set": label,
                             "threshold": threshold,
                             "pct_below": round(pct_below, 3),
                             "median": float(vals.median()),
@@ -422,7 +452,8 @@ class ContinuousLearningAgent(BaseAgent):
                     pct_above = (vals >= threshold).mean()
                     if pct_above > 0.8:
                         drift_log[f"{var}_{label}"] = {
-                            "variable": var, "set": label,
+                            "variable": var,
+                            "set": label,
                             "threshold": threshold,
                             "pct_above": round(pct_above, 3),
                             "median": float(vals.median()),
@@ -435,29 +466,34 @@ class ContinuousLearningAgent(BaseAgent):
         log_dir.mkdir(parents=True, exist_ok=True)
         path = log_dir / f"drift_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(path, "w") as f:
-            json.dump({
-                "timestamp": datetime.now().isoformat(),
-                "drift_events": len(drift_log),
-                "details": drift_log,
-            }, f, indent=2)
+            json.dump(
+                {
+                    "timestamp": datetime.now().isoformat(),
+                    "drift_events": len(drift_log),
+                    "details": drift_log,
+                },
+                f,
+                indent=2,
+            )
         if self.contract is not None:
             self.contract.artifacts.append(str(path))
 
     def _update_fuzzy_rules(self, df: pd.DataFrame):
         self.log.info("Fuzzy rule update — analyzing data drift")
         try:
-            from agri_ai_agent.rules.membership_functions import VAR_MEMBERSHIPS
             drift_log = self._detect_drift(df)
             if drift_log:
-                self.log.info("Drift detected in %d variables — rule priorities adjusted", len(drift_log))
+                self.log.info(
+                    "Drift detected in %d variables — rule priorities adjusted", len(drift_log)
+                )
         except Exception as e:
             self.log.warning("Fuzzy rule update skipped: %s", e)
 
     def _regenerate_reckoner(self, df: pd.DataFrame, metrics: dict):
         self.log.info("Regenerating ready reckoner")
         try:
-            from agri_ai_agent.agents.recommendation_agent import RecommendationAgent
             from agri_ai_agent.agents.ready_reckoner_agent import ReadyReckonerAgent
+            from agri_ai_agent.agents.recommendation_agent import RecommendationAgent
             from agri_ai_agent.continuous_learning.version_history import VersionHistory
 
             rec_agent = RecommendationAgent(settings=self.settings)
@@ -469,10 +505,12 @@ class ContinuousLearningAgent(BaseAgent):
                 self.contract.artifacts.extend(reck_agent.contract.artifacts)
 
             vh = VersionHistory(self.settings.CONTINUOUS_LEARNING_DB)
-            vh.register_version("reckoner", "ready_reckoner",
-                                checksum=VersionHistory.compute_hash(
-                                    datetime.now().isoformat()),
-                                metadata={"deployed_at": datetime.now().isoformat()})
+            vh.register_version(
+                "reckoner",
+                "ready_reckoner",
+                checksum=VersionHistory.compute_hash(datetime.now().isoformat()),
+                metadata={"deployed_at": datetime.now().isoformat()},
+            )
             vh.close()
         except Exception as e:
             self.log.warning("Reckoner regeneration failed: %s", e)

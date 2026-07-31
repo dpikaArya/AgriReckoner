@@ -1,12 +1,10 @@
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
-
 
 _SAU_REGISTRY = [
     {
@@ -88,13 +86,13 @@ class SAUConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         if query:
             q = query.lower()
             return [sau for sau in _SAU_REGISTRY if q in sau["name"].lower() or q in sau["id"]]
         return list(_SAU_REGISTRY)
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         matching = [s for s in _SAU_REGISTRY if s["id"] == resource_id]
         if not matching:
@@ -114,8 +112,13 @@ class SAUConnector(ExternalDataConnector):
 
             if "json" in content_type:
                 import pandas as pd
+
                 data = resp.json()
-                records = data if isinstance(data, list) else data.get("records", data.get("results", [data]))
+                records = (
+                    data
+                    if isinstance(data, list)
+                    else data.get("records", data.get("results", [data]))
+                )
                 if isinstance(records, list) and len(records) > 0:
                     df = pd.DataFrame(records)
                     local_path = target_dir / f"sau_{resource_id}.parquet"

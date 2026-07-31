@@ -1,13 +1,11 @@
 import json
 import logging
-import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import train_test_split
 
 from src.ml.data_quality.scoring import DatasetScorer
 from src.ml.feature_analysis.correlation_analysis import CorrelationAnalyzer
@@ -26,9 +24,9 @@ logger = logging.getLogger("AutoTrainingPipeline")
 class AutoTrainingPipeline:
     def __init__(
         self,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
         random_state: int = 42,
-        config: Optional[dict[str, Any]] = None,
+        config: dict[str, Any] | None = None,
     ):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -65,10 +63,10 @@ class AutoTrainingPipeline:
         self,
         X: pd.DataFrame,
         y: pd.Series,
-        non_feature_cols: Optional[list[str]] = None,
-        must_keep_features: Optional[list[str]] = None,
-        location_col: Optional[str] = None,
-        time_col: Optional[str] = None,
+        non_feature_cols: list[str] | None = None,
+        must_keep_features: list[str] | None = None,
+        location_col: str | None = None,
+        time_col: str | None = None,
     ) -> dict[str, Any]:
         self.pipeline_state["status"] = "running"
         logger.info("=" * 60)
@@ -88,7 +86,7 @@ class AutoTrainingPipeline:
                 self.pipeline_state["status"] = "failed"
                 return self.pipeline_state
 
-            step2_score = self._step_data_scoring(X, non_feature_cols)
+            self._step_data_scoring(X, non_feature_cols)
             step3_features = self._step_feature_analysis(X, y, non_feature_cols)
             step4_selected = self._step_feature_selection(
                 X, y, step3_features, non_feature_cols, must_keep_features
@@ -99,13 +97,13 @@ class AutoTrainingPipeline:
                 X_selected.median(numeric_only=True)
             )
 
-            step5_hyper = self._step_hyperparameter_optimization(X_filled, y)
+            self._step_hyperparameter_optimization(X_filled, y)
             step6_bench = self._step_benchmarking(X_filled, y)
             self._check_r2_threshold(step6_bench)
             step6_bench = self._step_loocv_evaluation(X_filled, y, step6_bench)
             step7_ensemble = self._step_ensemble_creation(X_filled, y, step6_bench)
-            step8_cv = self._step_cross_validation(step6_bench, X_filled, y, location_col, time_col)
-            step9_confidence = self._step_prediction_confidence(step6_bench, step7_ensemble, X_filled, y)
+            self._step_cross_validation(step6_bench, X_filled, y, location_col, time_col)
+            self._step_prediction_confidence(step6_bench, step7_ensemble, X_filled, y)
 
             self.pipeline_state["status"] = "completed"
             self.pipeline_state["completed_at"] = datetime.now().isoformat()
@@ -131,7 +129,7 @@ class AutoTrainingPipeline:
 
     def _step_data_scoring(
         self, X: pd.DataFrame, non_feature_cols: list[str]
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         logger.info("--- Step 2: Data Scoring ---")
         if not self.config.get("use_data_scoring"):
             logger.info("Data scoring disabled")
@@ -157,6 +155,7 @@ class AutoTrainingPipeline:
             try:
                 if "random_forest" in imp_results:
                     from sklearn.ensemble import RandomForestRegressor
+
                     rf = RandomForestRegressor(n_estimators=100, random_state=self.random_state)
                     rf.fit(X_feat.select_dtypes(include=[np.number]).fillna(0), y)
                     shap_analyzer = ShapAnalyzer(output_dir=self.output_dir)
@@ -165,7 +164,7 @@ class AutoTrainingPipeline:
                 logger.warning("SHAP analysis skipped: %s", e)
 
         corr = CorrelationAnalyzer(output_dir=self.output_dir)
-        corr_result = corr.analyze(X_feat)
+        corr.analyze(X_feat)
 
         summary = {
             "importance": importance.get_feature_summary(),
@@ -210,8 +209,12 @@ class AutoTrainingPipeline:
         )
 
         selected = selector.select(
-            X, y, importance_df=importance_df, shap_df=shap_df,
-            non_feature_cols=non_feature_cols, must_keep=must_keep_features,
+            X,
+            y,
+            importance_df=importance_df,
+            shap_df=shap_df,
+            non_feature_cols=non_feature_cols,
+            must_keep=must_keep_features,
         )
 
         summary = {
@@ -223,9 +226,7 @@ class AutoTrainingPipeline:
         logger.info("Selected %d features from %d", len(selected), len(X.columns))
         return selected
 
-    def _step_hyperparameter_optimization(
-        self, X: pd.DataFrame, y: pd.Series
-    ) -> dict:
+    def _step_hyperparameter_optimization(self, X: pd.DataFrame, y: pd.Series) -> dict:
         logger.info("--- Step 5: Hyperparameter Optimization ---")
         if not self.config.get("use_hyperparameter_opt"):
             logger.info("Hyperparameter optimization disabled")
@@ -250,7 +251,8 @@ class AutoTrainingPipeline:
     def _step_benchmarking(self, X: pd.DataFrame, y: pd.Series) -> dict:
         logger.info("--- Step 6: Model Benchmarking ---")
         benchmark = ModelBenchmark(
-            output_dir=self.output_dir, cv_folds=self.config["cv_folds"],
+            output_dir=self.output_dir,
+            cv_folds=self.config["cv_folds"],
             random_state=self.random_state,
         )
         results = benchmark.benchmark_regression(X, y)
@@ -283,9 +285,13 @@ class AutoTrainingPipeline:
             "threshold_met": bool(best_r2 >= min_r2),
         }
         if best_r2 >= min_r2:
-            logger.info("R² threshold check PASSED: %.4f >= %.2f (model: %s)", best_r2, min_r2, best_model)
+            logger.info(
+                "R² threshold check PASSED: %.4f >= %.2f (model: %s)", best_r2, min_r2, best_model
+            )
         else:
-            logger.warning("R² threshold check FAILED: %.4f < %.2f (model: %s)", best_r2, min_r2, best_model)
+            logger.warning(
+                "R² threshold check FAILED: %.4f < %.2f (model: %s)", best_r2, min_r2, best_model
+            )
             logger.warning("Consider: (1) more data, (2) relaxed thresholds, (3) different target")
 
     def _step_loocv_evaluation(
@@ -294,38 +300,47 @@ class AutoTrainingPipeline:
         if not self.config.get("use_loocv"):
             return benchmark_results
         logger.info("--- LOOCV Evaluation ---")
-        from sklearn.model_selection import LeaveOneOut, cross_val_score
-        from sklearn.metrics import make_scorer, r2_score
         import numpy as np
+        from sklearn.model_selection import LeaveOneOut, cross_val_score
 
         loocv_models = self.config.get("loocv_models", ["ridge", "random_forest"])
-        from sklearn.linear_model import Ridge, Lasso
-        from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+        from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+        from sklearn.linear_model import Lasso, Ridge
 
         model_map = {
             "ridge": ("Ridge (LOOCV)", Ridge(alpha=1.0, random_state=self.random_state)),
             "lasso": ("Lasso (LOOCV)", Lasso(alpha=0.01, random_state=self.random_state)),
-            "random_forest": ("Random Forest (LOOCV)", RandomForestRegressor(n_estimators=200, random_state=self.random_state, n_jobs=-1)),
-            "gradient_boosting": ("Gradient Boosting (LOOCV)", GradientBoostingRegressor(n_estimators=200, random_state=self.random_state)),
+            "random_forest": (
+                "Random Forest (LOOCV)",
+                RandomForestRegressor(n_estimators=200, random_state=self.random_state, n_jobs=-1),
+            ),
+            "gradient_boosting": (
+                "Gradient Boosting (LOOCV)",
+                GradientBoostingRegressor(n_estimators=200, random_state=self.random_state),
+            ),
         }
 
         loo = LeaveOneOut()
-        loocv_results = []
+        loocv_results: list[dict[str, float | str]] = []
         for key in loocv_models:
             if key not in model_map:
                 continue
             name, model = model_map[key]
             try:
                 r2_scores = cross_val_score(model, X, y, cv=loo, scoring="r2", n_jobs=-1)
-                rmse_scores = cross_val_score(model, X, y, cv=loo, scoring="neg_root_mean_squared_error", n_jobs=-1)
+                rmse_scores = cross_val_score(
+                    model, X, y, cv=loo, scoring="neg_root_mean_squared_error", n_jobs=-1
+                )
                 mean_r2 = float(np.mean(r2_scores))
                 mean_rmse = float(np.mean(-rmse_scores))
-                loocv_results.append({
-                    "model": name,
-                    "loocv_r2": round(mean_r2, 4),
-                    "loocv_rmse": round(mean_rmse, 4),
-                    "loocv_r2_std": round(float(np.std(r2_scores)), 4),
-                })
+                loocv_results.append(
+                    {
+                        "model": name,
+                        "loocv_r2": round(mean_r2, 4),
+                        "loocv_rmse": round(mean_rmse, 4),
+                        "loocv_r2_std": round(float(np.std(r2_scores)), 4),
+                    }
+                )
                 logger.info("LOOCV %s: R²=%.4f, RMSE=%.4f", name, mean_r2, mean_rmse)
             except Exception as e:
                 logger.warning("LOOCV %s failed: %s", name, e)
@@ -343,7 +358,7 @@ class AutoTrainingPipeline:
 
     def _step_ensemble_creation(
         self, X: pd.DataFrame, y: pd.Series, benchmark_results: dict
-    ) -> Optional[object]:
+    ) -> object | None:
         logger.info("--- Step 7: Ensemble Creation ---")
         if not self.config.get("use_ensemble"):
             logger.info("Ensemble disabled")
@@ -361,29 +376,45 @@ class AutoTrainingPipeline:
             name = row["model"]
             if name == "Linear Regression":
                 from sklearn.linear_model import LinearRegression
+
                 models[name] = LinearRegression()
             elif name == "Ridge":
                 from sklearn.linear_model import Ridge
+
                 models[name] = Ridge(random_state=self.random_state)
             elif name == "Random Forest":
                 from sklearn.ensemble import RandomForestRegressor
-                models[name] = RandomForestRegressor(n_estimators=100, random_state=self.random_state)
+
+                models[name] = RandomForestRegressor(
+                    n_estimators=100, random_state=self.random_state
+                )
             elif name == "Gradient Boosting":
                 from sklearn.ensemble import GradientBoostingRegressor
-                models[name] = GradientBoostingRegressor(n_estimators=100, random_state=self.random_state)
+
+                models[name] = GradientBoostingRegressor(
+                    n_estimators=100, random_state=self.random_state
+                )
             elif name == "XGBoost":
                 import xgboost
-                models[name] = xgboost.XGBRegressor(n_estimators=100, random_state=self.random_state)
+
+                models[name] = xgboost.XGBRegressor(
+                    n_estimators=100, random_state=self.random_state
+                )
             elif name == "LightGBM":
                 import lightgbm
-                models[name] = lightgbm.LGBMRegressor(n_estimators=100, random_state=self.random_state)
+
+                models[name] = lightgbm.LGBMRegressor(
+                    n_estimators=100, random_state=self.random_state
+                )
 
         if len(models) < 2:
             logger.info("Need at least 2 models for ensemble")
             return None
 
         X_filled = X.select_dtypes(include=[np.number]).fillna(X.median(numeric_only=True))
-        ensemble = WeightedAverageEnsemble(output_dir=Path("models"), random_state=self.random_state)
+        ensemble = WeightedAverageEnsemble(
+            output_dir=Path("models"), random_state=self.random_state
+        )
         ensemble.fit(models, X_filled, y)
         self.pipeline_state["steps"]["ensemble"] = {
             "models": list(models.keys()),
@@ -397,8 +428,8 @@ class AutoTrainingPipeline:
         benchmark_results: dict,
         X: pd.DataFrame,
         y: pd.Series,
-        location_col: Optional[str],
-        time_col: Optional[str],
+        location_col: str | None,
+        time_col: str | None,
     ) -> dict:
         logger.info("--- Step 8: Cross Validation ---")
         best_name = benchmark_results.get("best_name")
@@ -410,35 +441,42 @@ class AutoTrainingPipeline:
             logger.warning("Could not reconstruct best model for CV")
             return {}
 
-        validator = PipelineCrossValidator(output_dir=self.output_dir, random_state=self.random_state)
+        validator = PipelineCrossValidator(
+            output_dir=self.output_dir, random_state=self.random_state
+        )
         X_filled = X.select_dtypes(include=[np.number]).fillna(X.median(numeric_only=True))
         results = validator.validate_all(model, X_filled, y, location_col, time_col)
         self.pipeline_state["steps"]["cross_validation"] = results
         return results
 
-    def _get_best_model(self, benchmark_results: dict) -> Optional[object]:
+    def _get_best_model(self, benchmark_results: dict) -> Any | None:
         best_name = benchmark_results.get("best_name")
         if best_name == "Random Forest":
             from sklearn.ensemble import RandomForestRegressor
+
             return RandomForestRegressor(n_estimators=100, random_state=self.random_state)
         elif best_name == "XGBoost":
             import xgboost
+
             return xgboost.XGBRegressor(n_estimators=100, random_state=self.random_state)
         elif best_name == "LightGBM":
             import lightgbm
+
             return lightgbm.LGBMRegressor(n_estimators=100, random_state=self.random_state)
         elif best_name == "Gradient Boosting":
             from sklearn.ensemble import GradientBoostingRegressor
+
             return GradientBoostingRegressor(n_estimators=100, random_state=self.random_state)
         elif best_name in ("Ridge", "Linear Regression"):
             from sklearn.linear_model import Ridge
+
             return Ridge(random_state=self.random_state)
         return None
 
     def _step_prediction_confidence(
         self,
         benchmark_results: dict,
-        ensemble: Optional[object],
+        ensemble: Any | None,
         X: pd.DataFrame,
         y: pd.Series,
     ):

@@ -31,16 +31,24 @@ def test_target_family_collinearity_is_target_relative():
 
 
 def test_legitimate_predictors_are_not_excluded():
-    for col in ["Nitrogen", "Phosphorus", "Soil_pH", "Rainfall", "Spacing_Plant",
-                "N_x_P", "NPK_ratio_N", "Rainfall_log", "Temp_x_Rainfall"]:
+    for col in [
+        "Nitrogen",
+        "Phosphorus",
+        "Soil_pH",
+        "Rainfall",
+        "Spacing_Plant",
+        "N_x_P",
+        "NPK_ratio_N",
+        "Rainfall_log",
+        "Temp_x_Rainfall",
+    ]:
         assert not is_leaky_feature(col, "Yield_per_Hectare"), col
 
 
 def test_renamed_and_abbreviated_outcome_derivatives_are_leaky():
     """Regression: the feature engineer abbreviates outcome columns (Fruit_Weight ->
     FruitWeight_log, Harvest_Index -> HI_log); those must still be caught."""
-    for col in ["FruitWeight_log", "FruitWeight_squared", "SeedWeight_log",
-                "HI_log", "HI_squared"]:
+    for col in ["FruitWeight_log", "FruitWeight_squared", "SeedWeight_log", "HI_log", "HI_squared"]:
         assert is_leaky_feature(col, "Yield_per_Hectare"), col
 
 
@@ -51,24 +59,33 @@ def test_strip_engineered():
 
 
 def test_select_feature_columns_drops_leaks():
-    df = pd.DataFrame({
-        "Nitrogen": [1.0, 2.0, 3.0], "Soil_pH": [6.5, 7.0, 6.0], "Rainfall": [100, 200, 150],
-        "Yield_per_Hectare": [10, 20, 15], "Yield_x_N": [10, 40, 45], "Predicted_Yield": [9, 19, 14],
-    })
+    df = pd.DataFrame(
+        {
+            "Nitrogen": [1.0, 2.0, 3.0],
+            "Soil_pH": [6.5, 7.0, 6.0],
+            "Rainfall": [100, 200, 150],
+            "Yield_per_Hectare": [10, 20, 15],
+            "Yield_x_N": [10, 40, 45],
+            "Predicted_Yield": [9, 19, 14],
+        }
+    )
     feats = select_feature_columns(df, "Yield_per_Hectare")
     assert set(feats) == {"Nitrogen", "Soil_pH", "Rainfall"}
 
 
 def test_drop_suspected_leaks_removes_near_perfect_corr():
     from agri_ai_agent.ml.leakage import drop_suspected_leaks
+
     rng = np.random.default_rng(0)
     n = 30
     y = pd.Series(rng.normal(size=n))
-    X = pd.DataFrame({
-        "leak": y + rng.normal(scale=1e-7, size=n),        # ~identical to target
-        "unrelated": rng.normal(size=n),
-        "signal": y * 0.5 + rng.normal(scale=1.0, size=n),  # correlated but not perfect
-    })
+    X = pd.DataFrame(
+        {
+            "leak": y + rng.normal(scale=1e-7, size=n),  # ~identical to target
+            "unrelated": rng.normal(size=n),
+            "signal": y * 0.5 + rng.normal(scale=1.0, size=n),  # correlated but not perfect
+        }
+    )
     cleaned, dropped = drop_suspected_leaks(X, y)
     assert dropped == ["leak"]
     assert "unrelated" in cleaned.columns and "signal" in cleaned.columns
@@ -77,12 +94,16 @@ def test_drop_suspected_leaks_removes_near_perfect_corr():
 def test_permuted_target_kills_perfect_fit():
     """A model using only safe features cannot achieve R2=1 by memorizing the target."""
     from sklearn.linear_model import LinearRegression
+
     rng = np.random.default_rng(0)
     n = 40
-    df = pd.DataFrame({
-        "Nitrogen": rng.normal(size=n), "Soil_pH": rng.normal(size=n),
-        "Yield_per_Hectare": rng.normal(size=n),
-    })
+    df = pd.DataFrame(
+        {
+            "Nitrogen": rng.normal(size=n),
+            "Soil_pH": rng.normal(size=n),
+            "Yield_per_Hectare": rng.normal(size=n),
+        }
+    )
     df["Yield_x_N"] = df["Yield_per_Hectare"] * df["Nitrogen"]  # leaky
     feats = select_feature_columns(df, "Yield_per_Hectare")
     assert "Yield_x_N" not in feats
@@ -93,5 +114,7 @@ def test_permuted_target_kills_perfect_fit():
 
 if __name__ == "__main__":
     import sys
+
     import pytest
+
     sys.exit(pytest.main([__file__, "-q"]))

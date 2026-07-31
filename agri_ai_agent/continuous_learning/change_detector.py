@@ -3,7 +3,6 @@ from datetime import datetime
 from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
 from agri_ai_agent.continuous_learning.version_history import VersionHistory
 
-
 CHANGE_SOURCE_DATA = "data"
 CHANGE_SOURCE_NONE = "none"
 
@@ -115,5 +114,3 @@ class ChangeDetector:
 
     def _probe_version(self, repo_name: str) -> str:
         return datetime.now().strftime("%Y%m%d_%H%M%S")
-
-

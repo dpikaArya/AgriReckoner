@@ -1,7 +1,6 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -10,11 +9,11 @@ logger = logging.getLogger("CorrelationAnalyzer")
 
 
 class CorrelationAnalyzer:
-    def __init__(self, output_dir: Optional[Path] = None, threshold: float = 0.9):
+    def __init__(self, output_dir: Path | None = None, threshold: float = 0.9):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.threshold = threshold
-        self.corr_matrix_: Optional[pd.DataFrame] = None
+        self.corr_matrix_: pd.DataFrame | None = None
         self.high_corr_pairs_: list[tuple[str, str, float]] = []
 
     def analyze(self, df: pd.DataFrame) -> dict:
@@ -76,7 +75,7 @@ class CorrelationAnalyzer:
         for col in upper.columns:
             if any(upper[col] >= self.threshold):
                 if col not in to_drop:
-                    correlated_with = upper.index[upper[col] >= self.threshold].tolist()
+                    upper.index[upper[col] >= self.threshold].tolist()
                     to_drop.add(col)
         return sorted(to_drop)
 

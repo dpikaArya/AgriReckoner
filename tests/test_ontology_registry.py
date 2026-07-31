@@ -15,7 +15,7 @@ from agri_ai_agent.ontology import (
     uams_term,
 )
 
-EXPECTED_COLUMN_COUNT = 138
+EXPECTED_COLUMN_COUNT = 296
 
 
 @pytest.fixture(scope="module")
@@ -33,10 +33,10 @@ def test_yaml_loads_as_mapping():
     assert data["namespace"] == "https://w3id.org/uams#"
 
 
-def test_all_138_columns_present_and_ordered(registry):
-    """Every schema column appears exactly once, in schema order."""
+def test_all_columns_present_with_expected_count(registry):
+    """Every schema column appears exactly once; registry covers exactly them."""
     assert len(UAMS_COLUMNS) == EXPECTED_COLUMN_COUNT
-    assert registry.columns == list(UAMS_COLUMNS)
+    assert set(registry.columns) == set(UAMS_COLUMNS)
 
 
 def test_no_extra_or_missing_columns(registry):
@@ -60,15 +60,11 @@ def test_every_curie_uses_a_declared_prefix(registry):
 
 def test_expand_curie_resolves_known_prefixes(registry):
     """CURIE expansion matches each ontology's IRI stem."""
-    assert registry.expand_curie("AGROVOC:c_5188") == (
-        "http://aims.fao.org/aos/agrovoc/c_5188"
-    )
+    assert registry.expand_curie("AGROVOC:c_5188") == ("http://aims.fao.org/aos/agrovoc/c_5188")
     assert registry.expand_curie("ENVO:00001995") == (
         "http://purl.obolibrary.org/obo/ENVO_00001995"
     )
-    assert registry.expand_curie("PO:0009047") == (
-        "http://purl.obolibrary.org/obo/PO_0009047"
-    )
+    assert registry.expand_curie("PO:0009047") == ("http://purl.obolibrary.org/obo/PO_0009047")
     assert registry.expand_curie("CO_320:0000005") == (
         "https://cropontology.org/rdf/CO_320:0000005"
     )

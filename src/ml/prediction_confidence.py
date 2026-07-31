@@ -1,7 +1,5 @@
-import json
 import logging
 from enum import Enum
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -16,7 +14,7 @@ class RiskLevel(str, Enum):
 
 
 class PredictionConfidence:
-    def __init__(self, confidence_thresholds: Optional[dict[str, float]] = None):
+    def __init__(self, confidence_thresholds: dict[str, float] | None = None):
         self.confidence_thresholds = confidence_thresholds or {
             "high": 0.8,
             "medium": 0.5,
@@ -27,7 +25,7 @@ class PredictionConfidence:
         model,
         X: pd.DataFrame,
         y_pred: np.ndarray,
-        y_actual: Optional[np.ndarray] = None,
+        y_actual: np.ndarray | None = None,
         method: str = "ensemble",
     ) -> pd.DataFrame:
         if method == "ensemble":
@@ -38,14 +36,14 @@ class PredictionConfidence:
             return self._residual_confidence(model, X, y_pred, y_actual)
         return self._ensemble_confidence(model, X, y_pred)
 
-    def _ensemble_confidence(
-        self, model, X: pd.DataFrame, y_pred: np.ndarray
-    ) -> pd.DataFrame:
+    def _ensemble_confidence(self, model, X: pd.DataFrame, y_pred: np.ndarray) -> pd.DataFrame:
         if hasattr(model, "estimators_"):
-            base_preds = np.column_stack([
-                est.predict(X.select_dtypes(include=[np.number]).fillna(0))
-                for est in model.estimators_
-            ])
+            base_preds = np.column_stack(
+                [
+                    est.predict(X.select_dtypes(include=[np.number]).fillna(0))
+                    for est in model.estimators_
+                ]
+            )
             pred_std = base_preds.std(axis=1)
             mean_pred = base_preds.mean(axis=1)
             cv = pred_std / (np.abs(mean_pred) + 1e-6)
@@ -57,15 +55,16 @@ class PredictionConfidence:
 
         return self._build_result(y_pred, confidence)
 
-    def _quantile_confidence(
-        self, model, X: pd.DataFrame, y_pred: np.ndarray
-    ) -> pd.DataFrame:
+    def _quantile_confidence(self, model, X: pd.DataFrame, y_pred: np.ndarray) -> pd.DataFrame:
         try:
             from sklearn.ensemble import GradientBoostingRegressor
+
             if isinstance(model, GradientBoostingRegressor):
-                preds = np.column_stack([
-                    model.train_score_,
-                ])
+                preds = np.column_stack(
+                    [
+                        model.train_score_,
+                    ]
+                )
             else:
                 preds = np.column_stack([y_pred * 0.9, y_pred * 1.1])
         except Exception:
@@ -79,7 +78,7 @@ class PredictionConfidence:
         return self._build_result(y_pred, confidence, lower, upper)
 
     def _residual_confidence(
-        self, model, X: pd.DataFrame, y_pred: np.ndarray, y_actual: Optional[np.ndarray]
+        self, model, X: pd.DataFrame, y_pred: np.ndarray, y_actual: np.ndarray | None
     ) -> pd.DataFrame:
         if y_actual is None:
             return self._ensemble_confidence(model, X, y_pred)
@@ -93,8 +92,8 @@ class PredictionConfidence:
         self,
         y_pred: np.ndarray,
         confidence: np.ndarray,
-        lower: Optional[np.ndarray] = None,
-        upper: Optional[np.ndarray] = None,
+        lower: np.ndarray | None = None,
+        upper: np.ndarray | None = None,
     ) -> pd.DataFrame:
         confidence = np.clip(confidence, 0, 1)
         result = pd.DataFrame({"prediction": y_pred, "confidence": confidence})

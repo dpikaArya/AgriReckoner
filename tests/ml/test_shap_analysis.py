@@ -9,11 +9,13 @@ from src.ml.feature_analysis.shap_analysis import ShapAnalyzer
 @pytest.fixture
 def trained_model_and_data():
     np.random.seed(42)
-    X = pd.DataFrame({
-        "feature_1": np.random.randn(100),
-        "feature_2": np.random.randn(100),
-        "feature_3": np.random.randn(100),
-    })
+    X = pd.DataFrame(
+        {
+            "feature_1": np.random.randn(100),
+            "feature_2": np.random.randn(100),
+            "feature_3": np.random.randn(100),
+        }
+    )
     y = pd.Series(X["feature_1"] * 2 + X["feature_2"] * 0.5 + np.random.randn(100) * 0.1)
     model = RandomForestRegressor(n_estimators=20, random_state=42)
     model.fit(X, y)

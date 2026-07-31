@@ -51,5 +51,7 @@ def test_large_n_is_robust_with_spread():
 
 if __name__ == "__main__":
     import sys
+
     import pytest
+
     sys.exit(pytest.main([__file__, "-q"]))

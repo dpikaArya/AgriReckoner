@@ -86,10 +86,10 @@ def render_markdown(registry: dict) -> str:
 def _parse_args(argv: list[str]) -> argparse.Namespace:
     """Parse command-line arguments."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--registry", default=str(DEFAULT_REGISTRY_PATH),
-                        help="Path to the ontology YAML.")
-    parser.add_argument("--out", default=None,
-                        help="Output path; prints to stdout when omitted.")
+    parser.add_argument(
+        "--registry", default=str(DEFAULT_REGISTRY_PATH), help="Path to the ontology YAML."
+    )
+    parser.add_argument("--out", default=None, help="Output path; prints to stdout when omitted.")
     return parser.parse_args(argv)
 
 

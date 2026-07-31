@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import re
 from difflib import SequenceMatcher
-from typing import Optional
 
 import pandas as pd
 
@@ -131,7 +130,7 @@ def _normalise(name: str) -> str:
     return re.sub(r"[^a-z0-9_]", "", name.lower().replace(" ", "_").replace("-", "_"))
 
 
-def map_column(source: str, col_name: str) -> Optional[str]:
+def map_column(source: str, col_name: str) -> str | None:
     source_map = KNOWN_SOURCE_MAPS.get(source, {})
     if col_name in source_map:
         return source_map[col_name]
@@ -140,7 +139,7 @@ def map_column(source: str, col_name: str) -> Optional[str]:
         return source_map[norm]
     if norm in _normalized_uams:
         return _normalized_uams[norm]
-    best_match: Optional[str] = None
+    best_match: str | None = None
     best_score = 0.0
     for uams_norm, uams_col in _normalized_uams.items():
         score = SequenceMatcher(None, norm, uams_norm).ratio()

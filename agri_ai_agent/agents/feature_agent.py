@@ -6,16 +6,16 @@ All engineered features are built in a dict and joined in a single
 pd.concat to avoid DataFrame fragmentation (PerformanceWarning).
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 from scipy import stats
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import LabelEncoder
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.config.schema import (
-    POST_HARVEST_VARIABLES, PRE_HARVEST_MEASUREMENTS, NON_FEATURE_COLS,
+    NON_FEATURE_COLS,
+    PRE_HARVEST_MEASUREMENTS,
 )
 
 CATEGORICAL_ENCODING_MAP = {
@@ -65,7 +65,7 @@ class FeatureAgent(BaseAgent):
 
             _add("Growing_Degree_Days", np.maximum(0, tmean - tbase))
             _add("Heat_Units", np.maximum(0, tmax - tbase))
-            _add("Temp_squared", tmean ** 2)
+            _add("Temp_squared", tmean**2)
             _add("Stress_Index", np.abs(tmean - 25.0) / 25.0)
             _add("Temp_Range", tmax - tmin)
             _add("Temp_CV", np.where(tmean > 0, (tmax - tmin) / tmean, 0))
@@ -78,9 +78,13 @@ class FeatureAgent(BaseAgent):
             _add("Rainfall_Anomaly", rainfall - rainfall.mean())
             _add("Rainfall_log", np.log1p(rainfall.clip(lower=0)))
             _add("Rainfall_sqrt", np.sqrt(rainfall.clip(lower=0)))
-            _add("Rainfall_squared", rainfall ** 2)
-            _add("Rainfall_Bin", pd.cut(rainfall, bins=[0, 200, 500, 1000, 5000, 10000],
-                                        labels=[0, 1, 2, 3, 4]).astype(float))
+            _add("Rainfall_squared", rainfall**2)
+            _add(
+                "Rainfall_Bin",
+                pd.cut(
+                    rainfall, bins=[0, 200, 500, 1000, 5000, 10000], labels=[0, 1, 2, 3, 4]
+                ).astype(float),
+            )
             _add("Rainfall_100_bin", (rainfall / 100).round() * 100)
 
         if "Rainfall" in df.columns and "Temperature_Max" in df.columns:
@@ -94,19 +98,19 @@ class FeatureAgent(BaseAgent):
             n = _num("Nitrogen")
             _add("N_log", np.log1p(n.clip(lower=0)))
             _add("N_sqrt", np.sqrt(n.clip(lower=0)))
-            _add("N_squared", n ** 2)
+            _add("N_squared", n**2)
             _add("N_category", pd.cut(n, bins=5, labels=[0, 1, 2, 3, 4]).astype(float))
 
         if "Phosphorus" in df.columns:
             p = _num("Phosphorus")
             _add("P_log", np.log1p(p.clip(lower=0)))
-            _add("P_squared", p ** 2)
+            _add("P_squared", p**2)
             _add("P_category", pd.cut(p, bins=5, labels=[0, 1, 2, 3, 4]).astype(float))
 
         if "Potassium" in df.columns:
             k = _num("Potassium")
             _add("K_log", np.log1p(k.clip(lower=0)))
-            _add("K_squared", k ** 2)
+            _add("K_squared", k**2)
             _add("K_category", pd.cut(k, bins=5, labels=[0, 1, 2, 3, 4]).astype(float))
 
         if all(c in df.columns for c in ["Nitrogen", "Phosphorus", "Potassium"]):
@@ -124,7 +128,7 @@ class FeatureAgent(BaseAgent):
 
         if "Soil_pH" in df.columns:
             ph = _num("Soil_pH")
-            _add("Soil_pH_squared", ph ** 2)
+            _add("Soil_pH_squared", ph**2)
             _add("Soil_pH_neutral", np.abs(ph - 7.0))
             _add("Soil_pH_acidic", np.where(ph < 6.5, 1, 0))
             _add("Soil_pH_alkaline", np.where(ph > 7.5, 1, 0))
@@ -146,17 +150,24 @@ class FeatureAgent(BaseAgent):
             bm = _num("Biomass_Yield")
             _add("Biomass_log", np.log1p(bm.clip(lower=0)))
             _add("Biomass_sqrt", np.sqrt(bm.clip(lower=0)))
-            _add("Biomass_squared", bm ** 2)
+            _add("Biomass_squared", bm**2)
 
         if "Humidity" in df.columns and "Temperature_Max" in df.columns:
             hum, tmax = _num("Humidity"), _num("Temperature_Max")
-            _add("Disease_Risk_Index", np.where(
-                (hum > 80) & (tmax > 25), 1.0,
-                np.where((hum > 60) & (tmax > 20), 0.5, 0.0)))
-            _add("Humidity_squared", hum ** 2)
+            _add(
+                "Disease_Risk_Index",
+                np.where(
+                    (hum > 80) & (tmax > 25), 1.0, np.where((hum > 60) & (tmax > 20), 0.5, 0.0)
+                ),
+            )
+            _add("Humidity_squared", hum**2)
             _add("Humidity_log", np.log1p(hum.clip(lower=0)))
 
-        if "Yield_per_Plot" in df.columns and "Yield_per_Hectare" not in df.columns and "Plot_Size" in df.columns:
+        if (
+            "Yield_per_Plot" in df.columns
+            and "Yield_per_Hectare" not in df.columns
+            and "Plot_Size" in df.columns
+        ):
             ps, yp = _num("Plot_Size"), _num("Yield_per_Plot")
             with np.errstate(divide="ignore", invalid="ignore"):
                 _add("Yield_per_Hectare_Calc", np.where(ps > 0, yp / ps * 10000, np.nan))
@@ -170,14 +181,16 @@ class FeatureAgent(BaseAgent):
             ph = _num("Plant_Height_cm")
             _add("Height_log", np.log1p(ph.clip(lower=0)))
             _add("Height_sqrt", np.sqrt(ph.clip(lower=0)))
-            _add("Height_squared", ph ** 2)
+            _add("Height_squared", ph**2)
 
         if "SPAD" in df.columns:
             spad = _num("SPAD")
             _add("SPAD_log", np.log1p(spad.clip(lower=0)))
-            _add("SPAD_squared", spad ** 2)
-            _add("SPAD_category", pd.cut(spad, bins=[0, 20, 35, 50, 100],
-                                         labels=[0, 1, 2, 3]).astype(float))
+            _add("SPAD_squared", spad**2)
+            _add(
+                "SPAD_category",
+                pd.cut(spad, bins=[0, 20, 35, 50, 100], labels=[0, 1, 2, 3]).astype(float),
+            )
 
         if all(c in df.columns for c in ["Plant_Height_cm", "Leaf_Area_cm2"]):
             _add("Height_x_LeafArea", _num("Plant_Height_cm") * _num("Leaf_Area_cm2"))
@@ -207,8 +220,16 @@ class FeatureAgent(BaseAgent):
         if "EC" in df.columns and "Soil_pH" in df.columns:
             _add("EC_x_pH", _num("EC") * _num("Soil_pH"))
 
-        for col in ["Plant_Height_cm", "SPAD", "Shoot_Biomass_g", "Root_Biomass_g",
-                     "Leaf_Area_cm2", "Fruit_Weight", "100_Seed_Weight", "Harvest_Index"]:
+        for col in [
+            "Plant_Height_cm",
+            "SPAD",
+            "Shoot_Biomass_g",
+            "Root_Biomass_g",
+            "Leaf_Area_cm2",
+            "Fruit_Weight",
+            "100_Seed_Weight",
+            "Harvest_Index",
+        ]:
             if col in df.columns:
                 vals = _num(col)
                 if vals.min() >= 0:
@@ -217,9 +238,11 @@ class FeatureAgent(BaseAgent):
         if "EC" in df.columns:
             ec = _num("EC")
             _add("EC_log", np.log1p(ec.clip(lower=0)))
-            _add("EC_squared", ec ** 2)
-            _add("EC_category", pd.cut(ec, bins=[0, 0.5, 1.5, 4, 100],
-                                       labels=[0, 1, 2, 3]).astype(float))
+            _add("EC_squared", ec**2)
+            _add(
+                "EC_category",
+                pd.cut(ec, bins=[0, 0.5, 1.5, 4, 100], labels=[0, 1, 2, 3]).astype(float),
+            )
 
         if "Rainfall" in df.columns and "Soil_pH" in df.columns:
             _add("Rainfall_x_pH", _num("Rainfall") * _num("Soil_pH"))
@@ -275,7 +298,7 @@ class FeatureAgent(BaseAgent):
         if "Leaf_Area_cm2" in df.columns:
             la = _num("Leaf_Area_cm2")
             _add("LA_log", np.log1p(la.clip(lower=0)))
-            _add("LA_squared", la ** 2)
+            _add("LA_squared", la**2)
 
         if "Shoot_Biomass_g" in df.columns:
             _add("ShootBiomass_log", np.log1p(_num("Shoot_Biomass_g").clip(lower=0)))
@@ -297,21 +320,21 @@ class FeatureAgent(BaseAgent):
             fw = _num("Fruit_Weight")
             _add("FruitWeight_log", np.log1p(fw.clip(lower=0)))
             _add("FruitWeight_sqrt", np.sqrt(fw.clip(lower=0)))
-            _add("FruitWeight_squared", fw ** 2)
+            _add("FruitWeight_squared", fw**2)
 
         if "100_Seed_Weight" in df.columns:
             sw = _num("100_Seed_Weight")
             _add("SeedWeight_log", np.log1p(sw.clip(lower=0)))
-            _add("SeedWeight_squared", sw ** 2)
+            _add("SeedWeight_squared", sw**2)
 
         if "Harvest_Index" in df.columns:
             hi = _num("Harvest_Index")
-            _add("HI_squared", hi ** 2)
+            _add("HI_squared", hi**2)
             _add("HI_log", np.log1p(hi.clip(lower=0)))
 
         if "Average_Temperature" in df.columns:
             tavg = _num("Average_Temperature")
-            _add("Tavg_squared", tavg ** 2)
+            _add("Tavg_squared", tavg**2)
             _add("Tavg_log", np.log1p(tavg.clip(lower=0)))
 
         if all(c in df.columns for c in ["Nitrogen", "Phosphorus", "Potassium", "Soil_pH"]):
@@ -372,11 +395,16 @@ class FeatureAgent(BaseAgent):
         leak_df = pd.DataFrame(feature_labels, columns=["Feature", "Availability"])
 
         if "Feature_Available_Before_Prediction" not in df.columns:
-            df["Feature_Available_Before_Prediction"] = leak_df["Availability"].map(
-                lambda x: x == "AVAILABLE_BEFORE_PREDICTION"
-            ).astype(str).str.upper()
+            df["Feature_Available_Before_Prediction"] = (
+                leak_df["Availability"]
+                .map(lambda x: x == "AVAILABLE_BEFORE_PREDICTION")
+                .astype(str)
+                .str.upper()
+            )
 
-        self.log.info("Leakage: %d leaked, %d non-feature, %d safe", len(leaked), len(non_feature), len(safe))
+        self.log.info(
+            "Leakage: %d leaked, %d non-feature, %d safe", len(leaked), len(non_feature), len(safe)
+        )
 
         if leaked:
             self.save_artifact(pd.DataFrame({"leaked_feature": leaked}), "Leakage_Report.csv")
@@ -392,15 +420,17 @@ class FeatureAgent(BaseAgent):
                 valid = df[src_col].dropna().unique()
                 le.fit(valid)
                 df[tgt_col] = df[src_col].map(
-                    lambda x: le.transform([x])[0] if pd.notna(x) else pd.NA
+                    lambda x, le=le: le.transform([x])[0] if pd.notna(x) else pd.NA
                 )
                 for i, cls in enumerate(le.classes_):
-                    encoding_records.append({
-                        "original_column": src_col,
-                        "encoded_column": tgt_col,
-                        "original_value": cls,
-                        "encoded_value": int(i),
-                    })
+                    encoding_records.append(
+                        {
+                            "original_column": src_col,
+                            "encoded_column": tgt_col,
+                            "original_value": cls,
+                            "encoded_value": int(i),
+                        }
+                    )
                 self.log.info("Encoded %s -> %s (%d classes)", src_col, tgt_col, len(le.classes_))
 
         if encoding_records:
@@ -437,25 +467,27 @@ class FeatureAgent(BaseAgent):
                 except Exception as e:
                     self.log.debug("Shapiro test failed for %s: %s", col, e)
 
-            stats_rows.append({
-                "Variable": col,
-                "N": n,
-                "Mean": round(mean, 4),
-                "Median": round(median, 4),
-                "Variance": round(variance, 4),
-                "Std_Dev": round(std, 4),
-                "Min": round(float(vals.min()), 4),
-                "Max": round(float(vals.max()), 4),
-                "Skewness": round(skew, 4),
-                "Kurtosis": round(kurt, 4),
-                "Missing_Count": missing,
-                "Missing_Pct": missing_pct,
-                "Normality_Stat": round(float(norm_stat), 4),
-                "Normality_p": round(float(norm_p), 4),
-                "Q1": round(float(vals.quantile(0.25)), 4),
-                "Q3": round(float(vals.quantile(0.75)), 4),
-                "IQR": round(float(vals.quantile(0.75) - vals.quantile(0.25)), 4),
-            })
+            stats_rows.append(
+                {
+                    "Variable": col,
+                    "N": n,
+                    "Mean": round(mean, 4),
+                    "Median": round(median, 4),
+                    "Variance": round(variance, 4),
+                    "Std_Dev": round(std, 4),
+                    "Min": round(float(vals.min()), 4),
+                    "Max": round(float(vals.max()), 4),
+                    "Skewness": round(skew, 4),
+                    "Kurtosis": round(kurt, 4),
+                    "Missing_Count": missing,
+                    "Missing_Pct": missing_pct,
+                    "Normality_Stat": round(float(norm_stat), 4),
+                    "Normality_p": round(float(norm_p), 4),
+                    "Q1": round(float(vals.quantile(0.25)), 4),
+                    "Q3": round(float(vals.quantile(0.75)), 4),
+                    "IQR": round(float(vals.quantile(0.75) - vals.quantile(0.25)), 4),
+                }
+            )
 
         if stats_rows:
             self.save_artifact(pd.DataFrame(stats_rows), "Statistical_Profile.csv")
@@ -464,8 +496,10 @@ class FeatureAgent(BaseAgent):
             corr_df = df[num_cols].corr(method="pearson")
             self.save_artifact(corr_df, "Correlation_Matrix.csv")
 
-        vif_df = self._calculate_vif(df, num_cols) if len(num_cols) >= 2 else pd.DataFrame(
-            {"Variable": num_cols, "VIF": [1.0]}
+        vif_df = (
+            self._calculate_vif(df, num_cols)
+            if len(num_cols) >= 2
+            else pd.DataFrame({"Variable": num_cols, "VIF": [1.0]})
         )
         self.save_artifact(vif_df, "VIF_Report.csv")
 
@@ -507,14 +541,16 @@ class FeatureAgent(BaseAgent):
             missing = int(df[col].isna().sum())
             total = len(df)
             pct = round(missing / total * 100, 2) if total > 0 else 0
-            rows.append({
-                "Column": col,
-                "Total": total,
-                "Missing": missing,
-                "Missing_Pct": pct,
-                "Available": total - missing,
-                "Available_Pct": round(100 - pct, 2),
-            })
+            rows.append(
+                {
+                    "Column": col,
+                    "Total": total,
+                    "Missing": missing,
+                    "Missing_Pct": pct,
+                    "Available": total - missing,
+                    "Available_Pct": round(100 - pct, 2),
+                }
+            )
         return pd.DataFrame(rows)
 
     def _generate_outlier_profile(self, df: pd.DataFrame, num_cols: list) -> pd.DataFrame:
@@ -530,16 +566,18 @@ class FeatureAgent(BaseAgent):
                     upper = q3 + 1.5 * iqr
                     outlier_count = int(((vals < lower) | (vals > upper)).sum())
                     outlier_pct = round(outlier_count / len(vals) * 100, 2)
-                    rows.append({
-                        "Column": col,
-                        "Q1": round(q1, 4),
-                        "Q3": round(q3, 4),
-                        "IQR": round(iqr, 4),
-                        "Lower_Fence": round(lower, 4),
-                        "Upper_Fence": round(upper, 4),
-                        "Outlier_Count": outlier_count,
-                        "Outlier_Pct": outlier_pct,
-                    })
+                    rows.append(
+                        {
+                            "Column": col,
+                            "Q1": round(q1, 4),
+                            "Q3": round(q3, 4),
+                            "IQR": round(iqr, 4),
+                            "Lower_Fence": round(lower, 4),
+                            "Upper_Fence": round(upper, 4),
+                            "Outlier_Count": outlier_count,
+                            "Outlier_Pct": outlier_pct,
+                        }
+                    )
         return pd.DataFrame(rows)
 
     def _build_output(self, df: pd.DataFrame, **kwargs) -> dict:

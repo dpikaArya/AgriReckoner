@@ -48,7 +48,9 @@ def load_master_datasets(data_dir: Path) -> pd.DataFrame:
                 log.info("  Loaded %s: %d rows x %d cols", f.name, len(df), len(df.columns))
             except Exception as e:
                 log.warning("  Failed %s: %s", f.name, e)
-    combined = pd.concat(all_frames, ignore_index=True, sort=False) if all_frames else pd.DataFrame()
+    combined = (
+        pd.concat(all_frames, ignore_index=True, sort=False) if all_frames else pd.DataFrame()
+    )
     log.info("Combined master: %d rows x %d cols", len(combined), len(combined.columns))
     return combined
 
@@ -108,7 +110,12 @@ def enrich_with_external_data(df: pd.DataFrame) -> pd.DataFrame:
         if h and h.discovered_count <= max_discovery:
             quick_sources.append(s)
         else:
-            log.info("Skipping %s (%d datasets > %d max)", s, h.discovered_count if h else -1, max_discovery)
+            log.info(
+                "Skipping %s (%d datasets > %d max)",
+                s,
+                h.discovered_count if h else -1,
+                max_discovery,
+            )
 
     if not quick_sources:
         log.warning("No quick-sync sources — skipping enrichment")
@@ -123,8 +130,13 @@ def enrich_with_external_data(df: pd.DataFrame) -> pd.DataFrame:
     if packages_by_source:
         result = enrich_master(df, packages_by_source)
         uams_present = [c for c in UAMS_COLUMNS if c in result.columns]
-        log.info("Enriched: %d rows x %d cols | UAMS matched: %d/%d",
-                 len(result), len(result.columns), len(uams_present), len(UAMS_COLUMNS))
+        log.info(
+            "Enriched: %d rows x %d cols | UAMS matched: %d/%d",
+            len(result),
+            len(result.columns),
+            len(uams_present),
+            len(UAMS_COLUMNS),
+        )
         new_cols = [c for c in result.columns if c not in df.columns]
         if new_cols:
             log.info("New external columns (%d): %s", len(new_cols), new_cols)
@@ -240,7 +252,7 @@ if __name__ == "__main__":
                 break
         df = run_pipeline(path, use_external_data=use_ext)
         save_schema(df)
-        print(f"\nUniversal Schema generated successfully.")
+        print("\nUniversal Schema generated successfully.")
         print(f"  Rows: {len(df)}")
         print(f"  Columns: {len(df.columns)}")
         print(f"  External data: {'enabled [OK]' if use_ext else 'disabled'}")

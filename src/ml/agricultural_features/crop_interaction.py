@@ -1,7 +1,5 @@
 import logging
-from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 logger = logging.getLogger("CropEnvironmentInteraction")
@@ -11,9 +9,7 @@ class CropEnvironmentInteraction:
     def __init__(self):
         self.generated_features_: list[str] = []
 
-    def compute_all(
-        self, df: pd.DataFrame, target: Optional[str] = None
-    ) -> pd.DataFrame:
+    def compute_all(self, df: pd.DataFrame, target: str | None = None) -> pd.DataFrame:
         result = df.copy()
         result = self.crop_duration_temperature(result)
         result = self.rainfall_critical_growth(result)
@@ -24,9 +20,9 @@ class CropEnvironmentInteraction:
 
     def crop_duration_temperature(self, df: pd.DataFrame) -> pd.DataFrame:
         t_avg = self._find_col(df, ["Average_Temperature", "Temp_avg", "Avg_Temp"])
-        duration = self._find_col(df, [
-            "Crop_Duration_days", "Duration_days", "Growing_Period", "Crop_Duration"
-        ])
+        duration = self._find_col(
+            df, ["Crop_Duration_days", "Duration_days", "Growing_Period", "Crop_Duration"]
+        )
         gdd = self._find_col(df, ["GDD_Base10", "Growing_Degree_Days"])
 
         if t_avg is not None and duration is not None:
@@ -38,15 +34,19 @@ class CropEnvironmentInteraction:
             self.generated_features_.append("Thermal_Time_Efficiency")
 
         if t_avg is not None:
-            df["Temp_Stress_Accumulated"] = (df[t_avg] - 35).clip(lower=0).cumsum() if len(df) > 1 else (df[t_avg] - 35).clip(lower=0)
+            df["Temp_Stress_Accumulated"] = (
+                (df[t_avg] - 35).clip(lower=0).cumsum()
+                if len(df) > 1
+                else (df[t_avg] - 35).clip(lower=0)
+            )
             self.generated_features_.append("Temp_Stress_Accumulated")
 
         return df
 
     def rainfall_critical_growth(self, df: pd.DataFrame) -> pd.DataFrame:
-        rainfall = self._find_col(df, [
-            "Rainfall_mm", "Rainfall", "Precipitation", "Annual_Rainfall"
-        ])
+        rainfall = self._find_col(
+            df, ["Rainfall_mm", "Rainfall", "Precipitation", "Annual_Rainfall"]
+        )
         if rainfall is None:
             return df
 
@@ -68,18 +68,14 @@ class CropEnvironmentInteraction:
         return df
 
     def soil_climate_interaction(self, df: pd.DataFrame) -> pd.DataFrame:
-        fertility = self._find_col(df, [
-            "Soil_Fertility_Index", "Fertility_Index"
-        ])
+        fertility = self._find_col(df, ["Soil_Fertility_Index", "Fertility_Index"])
         t_avg = self._find_col(df, ["Average_Temperature", "Temp_avg", "Avg_Temp"])
-        rainfall = self._find_col(df, [
-            "Rainfall_mm", "Rainfall", "Precipitation"
-        ])
+        rainfall = self._find_col(df, ["Rainfall_mm", "Rainfall", "Precipitation"])
 
         if fertility is not None and t_avg is not None:
-            df["Soil_Climate_Interaction"] = df[fertility] * (
-                df[t_avg] / df[t_avg].max()
-            ).clip(0, 1)
+            df["Soil_Climate_Interaction"] = df[fertility] * (df[t_avg] / df[t_avg].max()).clip(
+                0, 1
+            )
             self.generated_features_.append("Soil_Climate_Interaction")
 
         if fertility is not None and rainfall is not None:
@@ -94,9 +90,7 @@ class CropEnvironmentInteraction:
 
         return df
 
-    def nutrient_yield_response(
-        self, df: pd.DataFrame, target: Optional[str] = None
-    ) -> pd.DataFrame:
+    def nutrient_yield_response(self, df: pd.DataFrame, target: str | None = None) -> pd.DataFrame:
         n = self._find_col(df, ["Nitrogen_kg_ha", "N", "Total_Nitrogen"])
         p = self._find_col(df, ["Phosphorus_kg_ha", "P", "Available_Phosphorus"])
         k = self._find_col(df, ["Potassium_kg_ha", "K", "Available_Potassium"])
@@ -116,9 +110,9 @@ class CropEnvironmentInteraction:
         return df
 
     def crop_water_productivity(self, df: pd.DataFrame) -> pd.DataFrame:
-        rainfall = self._find_col(df, [
-            "Rainfall_mm", "Rainfall", "Precipitation", "Annual_Rainfall"
-        ])
+        rainfall = self._find_col(
+            df, ["Rainfall_mm", "Rainfall", "Precipitation", "Annual_Rainfall"]
+        )
         yield_col = self._find_col(df, ["Yield_per_Hectare", "Yield", "Grain_Yield"])
 
         if rainfall is not None and yield_col is not None:
@@ -131,7 +125,7 @@ class CropEnvironmentInteraction:
 
         return df
 
-    def _find_col(self, df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
+    def _find_col(self, df: pd.DataFrame, candidates: list[str]) -> str | None:
         for c in candidates:
             if c in df.columns:
                 return c

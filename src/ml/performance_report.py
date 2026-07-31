@@ -2,13 +2,13 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger("PerformanceReport")
 
 
 class PerformanceReport:
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.before: dict[str, Any] = {}
@@ -44,20 +44,12 @@ class PerformanceReport:
             if before_features > 0
             else 0
         )
-        r2_improvement = (
-            (after_r2 - before_r2) / abs(before_r2) * 100
-            if before_r2 != 0
-            else 0
-        )
+        r2_improvement = (after_r2 - before_r2) / abs(before_r2) * 100 if before_r2 != 0 else 0
         time_reduction = (
-            (before_time - after_time) / max(before_time, 1) * 100
-            if before_time > 0
-            else 0
+            (before_time - after_time) / max(before_time, 1) * 100 if before_time > 0 else 0
         )
         rmse_reduction = (
-            (before_rmse - after_rmse) / max(before_rmse, 1) * 100
-            if before_rmse > 0
-            else 0
+            (before_rmse - after_rmse) / max(before_rmse, 1) * 100 if before_rmse > 0 else 0
         )
         quality_improvement = (
             (after_quality - before_quality) / max(before_quality, 1) * 100
@@ -99,9 +91,9 @@ class PerformanceReport:
         o = report["optimized"]
         imp = report["improvements"]
 
-        return f"""# {report['report_title']}
+        return f"""# {report["report_title"]}
 
-**Generated:** {report['generated_at']}
+**Generated:** {report["generated_at"]}
 
 ---
 
@@ -109,43 +101,42 @@ class PerformanceReport:
 
 | Metric | Value |
 |--------|-------|
-| Total Features | {b['total_features']} |
-| R² Score | {b['r2_score']} |
-| RMSE | {b['rmse']} |
-| Training Time | {b['training_time_sec']}s |
-| Data Quality Score | {b['data_quality_score']} |
+| Total Features | {b["total_features"]} |
+| R² Score | {b["r2_score"]} |
+| RMSE | {b["rmse"]} |
+| Training Time | {b["training_time_sec"]}s |
+| Data Quality Score | {b["data_quality_score"]} |
 
 ## After Optimization
 
 | Metric | Value |
 |--------|-------|
-| Total Features | {o['total_features']} |
-| R² Score | {o['r2_score']} |
-| RMSE | {o['rmse']} |
-| Training Time | {o['training_time_sec']}s |
-| Data Quality Score | {o['data_quality_score']} |
-| Best Model | {o.get('best_model', 'N/A')} |
-| Ensemble R² | {o.get('ensemble_r2', 'N/A')} |
+| Total Features | {o["total_features"]} |
+| R² Score | {o["r2_score"]} |
+| RMSE | {o["rmse"]} |
+| Training Time | {o["training_time_sec"]}s |
+| Data Quality Score | {o["data_quality_score"]} |
+| Best Model | {o.get("best_model", "N/A")} |
+| Ensemble R² | {o.get("ensemble_r2", "N/A")} |
 
 ## Improvements
 
 | Metric | Improvement |
 |--------|-------------|
-| Feature Reduction | {imp['feature_reduction_pct']}% |
-| R² Improvement | {imp['r2_improvement_pct']}% |
-| Training Time Reduction | {imp['training_time_reduction_pct']}% |
-| RMSE Reduction | {imp['rmse_reduction_pct']}% |
-| Data Quality Improvement | {imp['data_quality_improvement_pct']}% |
+| Feature Reduction | {imp["feature_reduction_pct"]}% |
+| R² Improvement | {imp["r2_improvement_pct"]}% |
+| Training Time Reduction | {imp["training_time_reduction_pct"]}% |
+| RMSE Reduction | {imp["rmse_reduction_pct"]}% |
+| Data Quality Improvement | {imp["data_quality_improvement_pct"]}% |
 
 ## Top 10 Features
 
-{chr(10).join(f'{i+1}. {f}' for i, f in enumerate(o.get('feature_importance_top_10', [])))}
+{chr(10).join(f"{i + 1}. {f}" for i, f in enumerate(o.get("feature_importance_top_10", [])))}
 """
 
-    def _render_docx(self, report: dict) -> Optional[str]:
+    def _render_docx(self, report: dict) -> str | None:
         try:
             from docx import Document
-            from docx.shared import Inches, Pt
         except ImportError:
             logger.info("python-docx not available; skipping .docx output")
             return None
@@ -186,7 +177,7 @@ class PerformanceReport:
         logger.info("Saved report to %s", path)
         return str(path)
 
-    def _save(self, report: dict, md: str, docx_path: Optional[str]):
+    def _save(self, report: dict, md: str, docx_path: str | None):
         json_path = self.output_dir / "AI_framework_efficiency_report.json"
         json_path.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
 

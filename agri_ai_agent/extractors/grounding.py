@@ -77,7 +77,9 @@ if __name__ == "__main__":
     bad_echo = ground_field(ExtractedField("Soil_pH", 9.9, None, "The soil pH was 6.8."))
     assert bad_echo.status == "rejected" and "not found" in bad_echo.reject_reason
     # unit conversion: 4.2 t/ha grounds to 4200 kg/ha and passes the kg/ha range
-    yield_t = ground_field(ExtractedField("Yield_per_Hectare", 4.2, "t ha-1", "yield was 4.2 t ha-1"))
+    yield_t = ground_field(
+        ExtractedField("Yield_per_Hectare", 4.2, "t ha-1", "yield was 4.2 t ha-1")
+    )
     assert yield_t.status == "reported" and abs(yield_t.value_canonical - 4200) < 1e-6
     # 13.4 g/kg organic carbon = 1.34%, now accepted (was wrongly rejected before)
     oc = ground_field(ExtractedField("Organic_Carbon", 13.4, "g kg-1", "OC 13.4 g kg-1"))
@@ -85,5 +87,11 @@ if __name__ == "__main__":
     # incompatible unit: soil N in g/kg is not the column's kg/ha rate
     incompat = ground_field(ExtractedField("Nitrogen", 1.2, "g kg-1", "N 1.2 g kg-1"))
     assert incompat.status == "rejected" and "incompatible" in incompat.reject_reason
-    print("grounding smoke OK -> yield", yield_t.value_canonical, "| OC", oc.value_canonical,
-          "| N", incompat.reject_reason)
+    print(
+        "grounding smoke OK -> yield",
+        yield_t.value_canonical,
+        "| OC",
+        oc.value_canonical,
+        "| N",
+        incompat.reject_reason,
+    )

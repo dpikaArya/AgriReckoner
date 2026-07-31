@@ -1,6 +1,4 @@
-import json
 import time
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -57,6 +55,7 @@ class TestRequestCache:
     @pytest.fixture
     def cache(self, tmp_path):
         from src.data_sources.cache import RequestCache
+
         return RequestCache(cache_dir=tmp_path / "cache", ttl_hours=1)
 
     def test_set_and_get(self, cache):
@@ -90,12 +89,15 @@ class TestRequestCache:
 class TestHttpClientRequests:
     def test_get_uses_cache_on_hit(self, client):
         cache_key = client._cache.make_key("/test", {})
-        client._cache.set(cache_key, {
-            "status_code": 200,
-            "headers": {"content-type": "text/plain"},
-            "content": "cached response",
-            "encoding": "utf-8",
-        })
+        client._cache.set(
+            cache_key,
+            {
+                "status_code": 200,
+                "headers": {"content-type": "text/plain"},
+                "content": "cached response",
+                "encoding": "utf-8",
+            },
+        )
         resp = client.get("/test", use_cache=True)
         assert resp.status_code == 200
         assert resp.text == "cached response"

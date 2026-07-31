@@ -1,7 +1,6 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -13,7 +12,7 @@ logger = logging.getLogger("FeatureImportanceAnalyzer")
 class FeatureImportanceAnalyzer:
     def __init__(
         self,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
         random_state: int = 42,
         n_estimators: int = 100,
     ):
@@ -22,7 +21,7 @@ class FeatureImportanceAnalyzer:
         self.random_state = random_state
         self.n_estimators = n_estimators
         self.importances_: dict[str, pd.DataFrame] = {}
-        self.ranked_features_: Optional[pd.DataFrame] = None
+        self.ranked_features_: pd.DataFrame | None = None
 
     def compute_all(
         self,
@@ -76,22 +75,24 @@ class FeatureImportanceAnalyzer:
         self._save_results()
         return results
 
-    def _random_forest_importance(
-        self, X: pd.DataFrame, y: pd.Series
-    ) -> pd.DataFrame:
+    def _random_forest_importance(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         model = RandomForestRegressor(
             n_estimators=self.n_estimators,
             random_state=self.random_state,
             n_jobs=-1,
         )
         model.fit(X, y)
-        return pd.DataFrame(
-            {
-                "feature": X.columns,
-                "importance": model.feature_importances_,
-                "method": "random_forest",
-            }
-        ).sort_values("importance", ascending=False).reset_index(drop=True)
+        return (
+            pd.DataFrame(
+                {
+                    "feature": X.columns,
+                    "importance": model.feature_importances_,
+                    "method": "random_forest",
+                }
+            )
+            .sort_values("importance", ascending=False)
+            .reset_index(drop=True)
+        )
 
     def _xgboost_importance(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         import xgboost as xgb
@@ -104,13 +105,17 @@ class FeatureImportanceAnalyzer:
         )
         model.fit(X, y)
         gain = model.feature_importances_
-        return pd.DataFrame(
-            {
-                "feature": X.columns,
-                "importance": gain,
-                "method": "xgboost",
-            }
-        ).sort_values("importance", ascending=False).reset_index(drop=True)
+        return (
+            pd.DataFrame(
+                {
+                    "feature": X.columns,
+                    "importance": gain,
+                    "method": "xgboost",
+                }
+            )
+            .sort_values("importance", ascending=False)
+            .reset_index(drop=True)
+        )
 
     def _lightgbm_importance(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         import lightgbm as lgb
@@ -122,13 +127,17 @@ class FeatureImportanceAnalyzer:
             n_jobs=-1,
         )
         model.fit(X, y)
-        return pd.DataFrame(
-            {
-                "feature": X.columns,
-                "importance": model.feature_importances_,
-                "method": "lightgbm",
-            }
-        ).sort_values("importance", ascending=False).reset_index(drop=True)
+        return (
+            pd.DataFrame(
+                {
+                    "feature": X.columns,
+                    "importance": model.feature_importances_,
+                    "method": "lightgbm",
+                }
+            )
+            .sort_values("importance", ascending=False)
+            .reset_index(drop=True)
+        )
 
     def _catboost_importance(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         from catboost import CatBoostRegressor
@@ -139,17 +148,19 @@ class FeatureImportanceAnalyzer:
             verbose=False,
         )
         model.fit(X, y)
-        return pd.DataFrame(
-            {
-                "feature": X.columns,
-                "importance": model.feature_importances_,
-                "method": "catboost",
-            }
-        ).sort_values("importance", ascending=False).reset_index(drop=True)
+        return (
+            pd.DataFrame(
+                {
+                    "feature": X.columns,
+                    "importance": model.feature_importances_,
+                    "method": "catboost",
+                }
+            )
+            .sort_values("importance", ascending=False)
+            .reset_index(drop=True)
+        )
 
-    def _aggregate_rankings(
-        self, results: dict[str, pd.DataFrame]
-    ) -> pd.DataFrame:
+    def _aggregate_rankings(self, results: dict[str, pd.DataFrame]) -> pd.DataFrame:
         if not results:
             return pd.DataFrame()
 
@@ -159,7 +170,13 @@ class FeatureImportanceAnalyzer:
             .agg(["mean", "std", "max", "count"])
             .reset_index()
         )
-        agg.columns = ["feature", "mean_importance", "std_importance", "max_importance", "model_count"]
+        agg.columns = [
+            "feature",
+            "mean_importance",
+            "std_importance",
+            "max_importance",
+            "model_count",
+        ]
         agg["rank"] = agg["mean_importance"].rank(ascending=False).astype(int)
         agg = agg.sort_values("rank").reset_index(drop=True)
         n = len(agg)
@@ -171,7 +188,6 @@ class FeatureImportanceAnalyzer:
         return agg
 
     def _save_results(self):
-        import json
 
         path = self.output_dir / "feature_importance.json"
         if self.ranked_features_ is not None and not self.ranked_features_.empty:

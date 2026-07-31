@@ -5,18 +5,23 @@ multicollinearity, target imbalance, feature importance readiness.
 """
 
 import time
-from pathlib import Path
 
-from evaluation.utils import OUTPUT_DIR, write_report, get_master_df, get_uams_cols
 import numpy as np
-import pandas as pd
 
+from evaluation.utils import get_master_df, write_report
 
 EVALUATED_MODELS = [
-    "Multiple Linear Regression", "Polynomial Regression",
-    "Random Forest", "Extra Trees", "XGBoost", "LightGBM",
-    "CatBoost", "Support Vector Regression",
-    "Neural Networks", "LSTM", "Transformer",
+    "Multiple Linear Regression",
+    "Polynomial Regression",
+    "Random Forest",
+    "Extra Trees",
+    "XGBoost",
+    "LightGBM",
+    "CatBoost",
+    "Support Vector Regression",
+    "Neural Networks",
+    "LSTM",
+    "Transformer",
 ]
 
 
@@ -36,22 +41,22 @@ def evaluate_model_readiness():
     total_missing = int(master_df.isna().sum().sum())
     missing_pct = total_missing / (n_rows * n_cols) * 100 if n_rows * n_cols > 0 else 0
 
-    high_missing_cols = [
-        c for c in master_df.columns
-        if master_df[c].isna().mean() > 0.1
+    high_missing_cols = [c for c in master_df.columns if master_df[c].isna().mean() > 0.1]
+    cat_unencoded = [
+        c for c in cat_df.columns if not c.endswith("_Code") and c not in ["Paper_ID", "DOI"]
     ]
-    cat_unencoded = [c for c in cat_df.columns
-                     if not c.endswith("_Code") and c not in ["Paper_ID", "DOI"]]
 
     numeric_cols_for_vif = numeric_df.columns.tolist()
     vif_issues = False
     if len(numeric_cols_for_vif) > 2:
         corr = numeric_df.corr().abs()
         upper = corr.where(np.triu(np.ones(corr.shape), k=1).astype(bool))
-        high_vif = [(upper.columns[c], upper.columns[r])
-                     for c in range(len(upper.columns))
-                     for r in range(c + 1, len(upper.columns))
-                     if not np.isnan(upper.iloc[r, c]) and upper.iloc[r, c] > 0.9]
+        high_vif = [
+            (upper.columns[c], upper.columns[r])
+            for c in range(len(upper.columns))
+            for r in range(c + 1, len(upper.columns))
+            if not np.isnan(upper.iloc[r, c]) and upper.iloc[r, c] > 0.9
+        ]
         vif_issues = len(high_vif) > 0
 
     target_imbalance = False
@@ -68,6 +73,7 @@ def evaluate_model_readiness():
                             target_imbalance = True
                 except Exception as e:
                     import logging
+
                     logging.getLogger("Stage10").debug("Imbalance check failed for %s: %s", t, e)
 
     model_readiness = {}
@@ -100,7 +106,7 @@ def evaluate_model_readiness():
     not_ready_count = sum(1 for v in model_readiness.values() if v["readiness"] == "not_ready")
 
     report = f"""# Stage 10: Model Readiness Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 Dataset: {n_rows} rows × {n_cols} columns
 
 ## Summary
@@ -110,13 +116,19 @@ Dataset: {n_rows} rows × {n_cols} columns
 - Missing values: {missing_pct:.1f}%
 - Unencoded categorical columns: {len(cat_unencoded)}
 - High missing value columns: {len(high_missing_cols)}
-- Multicollinearity: {'Yes' if vif_issues else 'No'}
-- Target imbalance: {'Yes' if target_imbalance else 'No'}
+- Multicollinearity: {"Yes" if vif_issues else "No"}
+- Target imbalance: {"Yes" if target_imbalance else "No"}
 
 ## Model Readiness
 """
     for model, info in model_readiness.items():
-        icon = "✅" if info["readiness"] == "ready" else "⚠️" if info["readiness"] == "conditional" else "❌"
+        icon = (
+            "✅"
+            if info["readiness"] == "ready"
+            else "⚠️"
+            if info["readiness"] == "conditional"
+            else "❌"
+        )
         report += f"| {icon} | {model} | {info['readiness']} | {', '.join(info['issues']) if info['issues'] else 'None'} |\n"
 
     report += f"""

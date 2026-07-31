@@ -9,26 +9,41 @@ evidence tracking, risk/economic/environmental scores.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 
-
 RECOMMENDATION_COLS = [
-    "Crop", "Variety", "Location", "Country", "Soil_pH",
-    "Nitrogen", "Phosphorus", "Potassium",
-    "Rainfall", "Average_Temperature", "Humidity",
-    "Predicted_Yield", "Expected_Biomass", "Expected_Plant_Height",
-    "Recommended_Fertilizer", "Recommended_Dose",
+    "Crop",
+    "Variety",
+    "Location",
+    "Country",
+    "Soil_pH",
+    "Nitrogen",
+    "Phosphorus",
+    "Potassium",
+    "Rainfall",
+    "Average_Temperature",
+    "Humidity",
+    "Predicted_Yield",
+    "Expected_Biomass",
+    "Expected_Plant_Height",
+    "Recommended_Fertilizer",
+    "Recommended_Dose",
     "Recommended_Application_Interval",
-    "Expected_Yield_Increase", "Expected_Yield_Increase_Pct",
-    "Confidence_Score", "Economic_Score", "Environmental_Score",
-    "Risk_Score", "Top_Alternatives",
-    "Fuzzy_N_Action", "Fuzzy_P_Action", "Fuzzy_K_Action",
-    "Fuzzy_Risk", "Recommendation_Summary",
+    "Expected_Yield_Increase",
+    "Expected_Yield_Increase_Pct",
+    "Confidence_Score",
+    "Economic_Score",
+    "Environmental_Score",
+    "Risk_Score",
+    "Top_Alternatives",
+    "Fuzzy_N_Action",
+    "Fuzzy_P_Action",
+    "Fuzzy_K_Action",
+    "Fuzzy_Risk",
+    "Recommendation_Summary",
 ]
 
 
@@ -56,7 +71,7 @@ class ReadyReckonerAgent(BaseAgent):
     def _reckoner_data(self, df: pd.DataFrame) -> pd.DataFrame:
         cols = [c for c in RECOMMENDATION_COLS if c in df.columns]
         if not cols:
-            return df.iloc[:, :min(6, len(df.columns))].copy()
+            return df.iloc[:, : min(6, len(df.columns))].copy()
         return df[cols].copy()
 
     def _safe_val(self, v):
@@ -128,7 +143,7 @@ class ReadyReckonerAgent(BaseAgent):
                     color = "#27ae60" if v >= 0.7 else "#f39c12" if v >= 0.4 else "#e74c3c"
                     cells += f'<td style="color:{color};font-weight:600">{v:.3f}</td>'
                 elif c == "Economic_Score" and isinstance(v, (int, float)):
-                    cells += f'<td>{v:.3f}</td>'
+                    cells += f"<td>{v:.3f}</td>"
                 elif isinstance(v, float):
                     cells += f"<td>{v:.3f}</td>"
                 else:
@@ -224,6 +239,7 @@ tr:nth-child(even) {{ background: #f9f9f9; }}
         pdf_path = reck_dir / "report.pdf"
         try:
             import weasyprint
+
             weasyprint.HTML(string=html).write_pdf(pdf_path)
             if self.contract is not None:
                 self.contract.artifacts.append(str(pdf_path))
@@ -238,8 +254,14 @@ tr:nth-child(even) {{ background: #f9f9f9; }}
             vc = df["Recommended_Fertilizer"].value_counts()
             stats["fertilizer_distribution"] = vc.to_dict()
 
-        for col in ["Confidence_Score", "Economic_Score", "Environmental_Score", "Risk_Score",
-                     "Expected_Yield_Increase", "Recommended_Dose"]:
+        for col in [
+            "Confidence_Score",
+            "Economic_Score",
+            "Environmental_Score",
+            "Risk_Score",
+            "Expected_Yield_Increase",
+            "Recommended_Dose",
+        ]:
             if col in df.columns:
                 s = df[col].dropna()
                 if len(s) > 0:

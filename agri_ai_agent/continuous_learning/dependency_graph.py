@@ -1,5 +1,4 @@
-
-
+from agri_ai_agent.continuous_learning.change_detector import ChangeSet
 
 STAGE_DATASET_REGISTRATION = "dataset_registration"
 STAGE_KNOWLEDGE_GRAPH_UPDATE = "knowledge_graph_update"
@@ -25,15 +24,22 @@ ALL_USER_STAGES = [
 
 PIPELINE_STAGE_MAP = {
     STAGE_DATASET_REGISTRATION: [
-        "external_data", "dataset_normalization", "dataset_ingestion_bridge",
+        "external_data",
+        "dataset_normalization",
+        "dataset_ingestion_bridge",
     ],
     STAGE_KNOWLEDGE_GRAPH_UPDATE: [
-        "external_data", "dataset_normalization",
+        "external_data",
+        "dataset_normalization",
     ],
     STAGE_AI_EXTRACTION: [
-        "extraction", "evidence_fusion", "ontology",
-        "table_intelligence", "schema_population",
-        "knowledge_integration", "knowledge",
+        "extraction",
+        "evidence_fusion",
+        "ontology",
+        "table_intelligence",
+        "schema_population",
+        "knowledge_integration",
+        "knowledge",
     ],
     STAGE_OBSERVATION_GENERATION: [
         "observation_generation",
@@ -42,15 +48,21 @@ PIPELINE_STAGE_MAP = {
         "validation",
     ],
     STAGE_FEATURE_ENGINEERING: [
-        "feature_store", "feature",
+        "feature_store",
+        "feature",
     ],
     STAGE_MODEL_DRIFT_DETECTION: [],
     STAGE_INCREMENTAL_RETRAINING: [
-        "model_selection", "training",
+        "model_selection",
+        "training",
     ],
     STAGE_READY_RECKONER_UPDATE: [
-        "prediction", "recommendation", "fuzzy",
-        "benchmark", "explainability", "ready_reckoner",
+        "prediction",
+        "recommendation",
+        "fuzzy",
+        "benchmark",
+        "explainability",
+        "ready_reckoner",
     ],
 }
 
@@ -63,14 +75,16 @@ class DependencyGraph:
             return affected
 
         if changes.has_data_changes:
-            affected.extend([
-                STAGE_DATASET_REGISTRATION,
-                STAGE_KNOWLEDGE_GRAPH_UPDATE,
-                STAGE_AI_EXTRACTION,
-                STAGE_OBSERVATION_GENERATION,
-                STAGE_VALIDATION,
-                STAGE_FEATURE_ENGINEERING,
-            ])
+            affected.extend(
+                [
+                    STAGE_DATASET_REGISTRATION,
+                    STAGE_KNOWLEDGE_GRAPH_UPDATE,
+                    STAGE_AI_EXTRACTION,
+                    STAGE_OBSERVATION_GENERATION,
+                    STAGE_VALIDATION,
+                    STAGE_FEATURE_ENGINEERING,
+                ]
+            )
 
         if changes.has_data_changes or changes.has_model_changes:
             affected.append(STAGE_MODEL_DRIFT_DETECTION)

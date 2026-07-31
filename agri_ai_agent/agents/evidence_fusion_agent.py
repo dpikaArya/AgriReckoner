@@ -7,16 +7,14 @@ Replaces the legacy aaif/extraction/validation_agent.py for the pipeline.
 
 import os
 import re
-import json
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.contracts.messages import AgentContract
 from agri_ai_agent.config.settings import AgriAISettings
-
+from agri_ai_agent.contracts.messages import AgentContract
 
 READER_CONFIDENCE_WEIGHTS = {
     "pdfminer": 0.70,
@@ -37,15 +35,18 @@ UNIT_CONVERSIONS = {
 }
 
 YIELD_COLS = [
-    "Yield_per_Plot", "Yield_per_Hectare", "Yield_per_Acre",
-    "Biomass_Yield", "Harvest_Index",
+    "Yield_per_Plot",
+    "Yield_per_Hectare",
+    "Yield_per_Acre",
+    "Biomass_Yield",
+    "Harvest_Index",
 ]
 
 TID_CLEAN = re.compile(r"[†‡*]")
 
 
 class EvidenceFusionAgent(BaseAgent):
-    def __init__(self, settings: Optional[AgriAISettings] = None, **kwargs):
+    def __init__(self, settings: AgriAISettings | None = None, **kwargs):
         super().__init__(settings=settings, **kwargs)
         self.fusion_report: dict[str, Any] = {}
 
@@ -93,7 +94,7 @@ class EvidenceFusionAgent(BaseAgent):
     def run(
         self,
         df: pd.DataFrame,
-        contract: Optional[AgentContract] = None,
+        contract: AgentContract | None = None,
         **kwargs,
     ) -> AgentContract:
         contract = contract or AgentContract(agent_name=self.agent_name)
@@ -126,9 +127,7 @@ class EvidenceFusionAgent(BaseAgent):
                 evidence_row["_reader"] = reader
                 evidence_row["_reader_confidence"] = base_conf
                 evidence_row["_stage_confidence"] = sr_conf
-                evidence_row["_fused_confidence"] = round(
-                    (base_conf * 0.6 + sr_conf * 0.4), 4
-                )
+                evidence_row["_fused_confidence"] = round((base_conf * 0.6 + sr_conf * 0.4), 4)
                 evidence_row["_source_file"] = row.get("Source_File", "")
                 all_evidence.append(evidence_row)
         return all_evidence
@@ -156,8 +155,13 @@ class EvidenceFusionAgent(BaseAgent):
                 all_columns.update(ev.keys())
 
             skip_cols = {
-                "_reader", "_reader_confidence", "_stage_confidence",
-                "_fused_confidence", "_source_file", "Source_File", "Treatment",
+                "_reader",
+                "_reader_confidence",
+                "_stage_confidence",
+                "_fused_confidence",
+                "_source_file",
+                "Source_File",
+                "Treatment",
             }
 
             for col in all_columns - skip_cols:
@@ -196,9 +200,7 @@ class EvidenceFusionAgent(BaseAgent):
                     all_vals = [c["value"] for c in candidates]
                     if all(isinstance(v, (int, float)) for v in all_vals):
                         provenance[col]["values_tried"] = all_vals
-                        provenance[col]["mean"] = round(
-                            sum(all_vals) / len(all_vals), 4
-                        )
+                        provenance[col]["mean"] = round(sum(all_vals) / len(all_vals), 4)
 
             merged["_provenance"] = provenance
             merged["_evidence_count"] = len(evidence_list)
@@ -206,9 +208,7 @@ class EvidenceFusionAgent(BaseAgent):
                 set(ev.get("_reader", "unknown") for ev in evidence_list)
             )
 
-            confs = [
-                ev.get("_fused_confidence", 0.5) for ev in evidence_list
-            ]
+            confs = [ev.get("_fused_confidence", 0.5) for ev in evidence_list]
             merged["_fused_confidence"] = round(sum(confs) / len(confs), 4)
 
             fused_rows.append(merged)
@@ -245,18 +245,36 @@ class EvidenceFusionAgent(BaseAgent):
             else:
                 existing = seen[key]
                 n_new = sum(
-                    1 for k, v in r.items()
+                    1
+                    for k, v in r.items()
                     if v is not None
-                    and k not in ("Treatment", "Source_File", "_reader", "_confidence",
-                                  "_provenance", "_evidence_count", "_readers_used",
-                                  "_fused_confidence")
+                    and k
+                    not in (
+                        "Treatment",
+                        "Source_File",
+                        "_reader",
+                        "_confidence",
+                        "_provenance",
+                        "_evidence_count",
+                        "_readers_used",
+                        "_fused_confidence",
+                    )
                 )
                 n_old = sum(
-                    1 for k, v in existing.items()
+                    1
+                    for k, v in existing.items()
                     if v is not None
-                    and k not in ("Treatment", "Source_File", "_reader", "_confidence",
-                                  "_provenance", "_evidence_count", "_readers_used",
-                                  "_fused_confidence")
+                    and k
+                    not in (
+                        "Treatment",
+                        "Source_File",
+                        "_reader",
+                        "_confidence",
+                        "_provenance",
+                        "_evidence_count",
+                        "_readers_used",
+                        "_fused_confidence",
+                    )
                 )
                 if n_new > n_old:
                     seen[key] = r
@@ -321,7 +339,10 @@ class EvidenceFusionAgent(BaseAgent):
         if df is None or df.empty:
             return
         for col in [
-            "_provenance", "_evidence_count", "_readers_used", "_fused_confidence",
+            "_provenance",
+            "_evidence_count",
+            "_readers_used",
+            "_fused_confidence",
         ]:
             if col not in df.columns:
                 df[col] = None

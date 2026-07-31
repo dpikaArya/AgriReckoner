@@ -1,12 +1,10 @@
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any
 
-import numpy as np
 import pandas as pd
-from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.model_selection import cross_val_score, KFold
+from sklearn.model_selection import cross_val_score
 
 logger = logging.getLogger("HyperparameterOptimizer")
 
@@ -16,11 +14,11 @@ REGRESSION_METRICS = ["rmse", "mae", "r2", "mape"]
 class HyperparameterOptimizer:
     def __init__(
         self,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
         n_trials: int = 50,
         cv_folds: int = 5,
         random_state: int = 42,
-        timeout_seconds: Optional[int] = None,
+        timeout_seconds: int | None = None,
     ):
         self.output_dir = Path(output_dir) if output_dir else Path("models/optimization")
         self.output_dir.mkdir(parents=True, exist_ok=True)
@@ -33,7 +31,7 @@ class HyperparameterOptimizer:
 
     def optimize_xgboost(self, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
         try:
-            import optuna
+            import optuna  # noqa: F401
         except ImportError:
             logger.warning("optuna not installed; using default XGBoost params")
             return self._default_xgboost_params()
@@ -58,7 +56,7 @@ class HyperparameterOptimizer:
 
     def optimize_lightgbm(self, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
         try:
-            import optuna
+            import optuna  # noqa: F401
         except ImportError:
             logger.warning("optuna not installed; using default LightGBM params")
             return self._default_lightgbm_params()
@@ -83,7 +81,7 @@ class HyperparameterOptimizer:
 
     def optimize_random_forest(self, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
         try:
-            import optuna
+            import optuna  # noqa: F401
         except ImportError:
             logger.warning("optuna not installed; using default RF params")
             return self._default_rf_params()
@@ -94,9 +92,7 @@ class HyperparameterOptimizer:
                 "max_depth": trial.suggest_int("max_depth", 3, 30),
                 "min_samples_split": trial.suggest_int("min_samples_split", 2, 20),
                 "min_samples_leaf": trial.suggest_int("min_samples_leaf", 1, 20),
-                "max_features": trial.suggest_categorical(
-                    "max_features", ["sqrt", "log2", None]
-                ),
+                "max_features": trial.suggest_categorical("max_features", ["sqrt", "log2", None]),
                 "random_state": self.random_state,
                 "n_jobs": -1,
             }
@@ -106,7 +102,7 @@ class HyperparameterOptimizer:
 
     def optimize_catboost(self, X: pd.DataFrame, y: pd.Series) -> dict[str, Any]:
         try:
-            import optuna
+            import optuna  # noqa: F401
         except ImportError:
             logger.warning("optuna not installed; using default CatBoost params")
             return self._default_catboost_params()
@@ -124,39 +120,42 @@ class HyperparameterOptimizer:
 
         return self._run_study("catboost", objective)
 
-    def optimize_all(
-        self, X: pd.DataFrame, y: pd.Series
-    ) -> dict[str, dict[str, Any]]:
+    def optimize_all(self, X: pd.DataFrame, y: pd.Series) -> dict[str, dict[str, Any]]:
         return {
             "xgboost": self.optimize_xgboost(X, y),
             "lightgbm": self.optimize_lightgbm(X, y),
             "random_forest": self.optimize_random_forest(X, y),
         }
 
-    def _cv_score(
-        self, model_type: str, X: pd.DataFrame, y: pd.Series, params: dict
-    ) -> float:
+    def _cv_score(self, model_type: str, X: pd.DataFrame, y: pd.Series, params: dict) -> float:
         if len(X) < self.cv_folds:
             return -1e6
 
         try:
             if model_type == "xgb":
                 import xgboost as xgb
+
                 model = xgb.XGBRegressor(**params)
             elif model_type == "lgb":
                 import lightgbm as lgb
+
                 model = lgb.LGBMRegressor(**params)
             elif model_type == "rf":
                 from sklearn.ensemble import RandomForestRegressor
+
                 model = RandomForestRegressor(**params)
             elif model_type == "catboost":
                 from catboost import CatBoostRegressor
+
                 model = CatBoostRegressor(**params)
             else:
                 return -1e6
 
             scores = cross_val_score(
-                model, X, y, cv=min(self.cv_folds, len(X)),
+                model,
+                X,
+                y,
+                cv=min(self.cv_folds, len(X)),
                 scoring="neg_root_mean_squared_error",
                 n_jobs=-1,
             )
@@ -165,9 +164,7 @@ class HyperparameterOptimizer:
             logger.warning("CV score failed for %s: %s", model_type, e)
             return -1e6
 
-    def _run_study(
-        self, name: str, objective
-    ) -> dict[str, Any]:
+    def _run_study(self, name: str, objective) -> dict[str, Any]:
         import optuna
 
         study = optuna.create_study(
@@ -193,9 +190,7 @@ class HyperparameterOptimizer:
 
     def _save_study(self, name: str, study):
         params_path = self.output_dir / f"{name}_best_params.json"
-        params_path.write_text(
-            json.dumps(study.best_params, indent=2), encoding="utf-8"
-        )
+        params_path.write_text(json.dumps(study.best_params, indent=2), encoding="utf-8")
 
         history = [
             {

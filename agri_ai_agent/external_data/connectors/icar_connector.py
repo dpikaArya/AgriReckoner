@@ -1,6 +1,5 @@
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -25,7 +24,7 @@ class ICARConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         search_term = query or "agriculture"
         try:
             resp = requests.get(
@@ -37,33 +36,37 @@ class ICARConnector(ExternalDataConnector):
             data = resp.json()
             results = []
             for item in data.get("results", data.get("records", [])):
-                results.append({
-                    "id": item.get("id", ""),
-                    "name": item.get("title", ""),
-                    "description": (item.get("abstract") or item.get("description", ""))[:200],
-                    "authors": item.get("authors", []),
-                    "year": item.get("year", ""),
-                    "type": item.get("type", "thesis"),
-                })
+                results.append(
+                    {
+                        "id": item.get("id", ""),
+                        "name": item.get("title", ""),
+                        "description": (item.get("abstract") or item.get("description", ""))[:200],
+                        "authors": item.get("authors", []),
+                        "year": item.get("year", ""),
+                        "type": item.get("type", "thesis"),
+                    }
+                )
             return results
         except requests.RequestException:
             return []
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
 
-        result = try_priority_downloads([
-            (
-                f"{self.base_url}/records/{resource_id}/metadata/csv",
-                "csv",
-                target_dir / f"icar_{resource_id}.csv",
-            ),
-            (
-                f"https://krishikosh.egranth.ac.in/bitstream/{resource_id}/1/fulltext.pdf",
-                "pdf",
-                target_dir / f"icar_{resource_id}.pdf",
-            ),
-        ])
+        result = try_priority_downloads(
+            [
+                (
+                    f"{self.base_url}/records/{resource_id}/metadata/csv",
+                    "csv",
+                    target_dir / f"icar_{resource_id}.csv",
+                ),
+                (
+                    f"https://krishikosh.egranth.ac.in/bitstream/{resource_id}/1/fulltext.pdf",
+                    "pdf",
+                    target_dir / f"icar_{resource_id}.pdf",
+                ),
+            ]
+        )
         return result
 
     def validate(self, package: DatasetPackage) -> bool:

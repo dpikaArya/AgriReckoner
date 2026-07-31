@@ -3,24 +3,24 @@ Fuzzy membership functions for agricultural variables.
 Supports triangular, trapezoidal, gaussian, and shouldered shapes.
 """
 
-from typing import Union
-
 import numpy as np
 
 
-def triangle(x: Union[float, np.ndarray], a: float, b: float, c: float) -> Union[float, np.ndarray]:
+def triangle(x: float | np.ndarray, a: float, b: float, c: float) -> float | np.ndarray:
     return np.maximum(0, np.minimum((x - a) / (b - a + 1e-10), (c - x) / (c - b + 1e-10)))
 
 
-def trapezoid(x: Union[float, np.ndarray], a: float, b: float, c: float, d: float) -> Union[float, np.ndarray]:
-    return np.maximum(0, np.minimum(np.minimum((x - a) / (b - a + 1e-10), 1), (d - x) / (d - c + 1e-10)))
+def trapezoid(x: float | np.ndarray, a: float, b: float, c: float, d: float) -> float | np.ndarray:
+    return np.maximum(
+        0, np.minimum(np.minimum((x - a) / (b - a + 1e-10), 1), (d - x) / (d - c + 1e-10))
+    )
 
 
-def gaussian(x: Union[float, np.ndarray], mean: float, sigma: float) -> Union[float, np.ndarray]:
+def gaussian(x: float | np.ndarray, mean: float, sigma: float) -> float | np.ndarray:
     return np.exp(-0.5 * ((x - mean) / sigma) ** 2)
 
 
-def shouldered_s(x: Union[float, np.ndarray], a: float, b: float) -> Union[float, np.ndarray]:
+def shouldered_s(x: float | np.ndarray, a: float, b: float) -> float | np.ndarray:
     """S-shaped (high) shoulder: 0 at a, rising to 1 at b, then flat at 1."""
     x = np.asarray(x, dtype=float)
     result = np.zeros_like(x)
@@ -31,7 +31,7 @@ def shouldered_s(x: Union[float, np.ndarray], a: float, b: float) -> Union[float
     return result
 
 
-def shouldered_z(x: Union[float, np.ndarray], a: float, b: float) -> Union[float, np.ndarray]:
+def shouldered_z(x: float | np.ndarray, a: float, b: float) -> float | np.ndarray:
     """Z-shaped (low) shoulder: 1 at x <= a, falling to 0 at x >= b."""
     return 1 - shouldered_s(x, a, b)
 

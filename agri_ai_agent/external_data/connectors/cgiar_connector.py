@@ -1,6 +1,5 @@
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -28,7 +27,7 @@ class CGIARConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         url = "https://huggingface.co/api/datasets?search=CGIAR"
         if query:
             url += f"+{query}"
@@ -48,7 +47,7 @@ class CGIARConnector(ExternalDataConnector):
         except requests.RequestException:
             return []
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
 
         path = download_huggingface_parquet(resource_id, target_dir)
@@ -56,18 +55,20 @@ class CGIARConnector(ExternalDataConnector):
             return path
 
         safe_name = resource_id.replace("/", "_")
-        return try_priority_downloads([
-            (
-                f"https://huggingface.co/datasets/{resource_id}/resolve/main/data/train-00000-of-00001.parquet",
-                "parquet",
-                target_dir / f"cgiar_{safe_name}.parquet",
-            ),
-            (
-                f"https://huggingface.co/datasets/{resource_id}/resolve/main/data.csv",
-                "csv",
-                target_dir / f"cgiar_{safe_name}.csv",
-            ),
-        ])
+        return try_priority_downloads(
+            [
+                (
+                    f"https://huggingface.co/datasets/{resource_id}/resolve/main/data/train-00000-of-00001.parquet",
+                    "parquet",
+                    target_dir / f"cgiar_{safe_name}.parquet",
+                ),
+                (
+                    f"https://huggingface.co/datasets/{resource_id}/resolve/main/data.csv",
+                    "csv",
+                    target_dir / f"cgiar_{safe_name}.csv",
+                ),
+            ]
+        )
 
     def validate(self, package: DatasetPackage) -> bool:
         package.validation_errors.clear()

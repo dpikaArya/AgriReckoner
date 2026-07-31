@@ -15,7 +15,6 @@ Defines and validates pipeline performance targets:
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 TARGETS = {
     "extraction_accuracy": {"min": 0.95, "direction": ">="},
@@ -30,7 +29,7 @@ TARGETS = {
 
 
 class PerformanceValidator:
-    def __init__(self, targets: Optional[dict] = None):
+    def __init__(self, targets: dict | None = None):
         self.targets = targets or TARGETS
         self._results: dict[str, dict] = {}
 
@@ -79,13 +78,15 @@ class PerformanceValidator:
         failures = []
         for name, result in self._results.items():
             if not result["passed"]:
-                failures.append({
-                    "metric": name,
-                    "actual": result["actual"],
-                    "threshold": result["threshold"],
-                    "direction": result["direction"],
-                    "gap": result["gap"],
-                })
+                failures.append(
+                    {
+                        "metric": name,
+                        "actual": result["actual"],
+                        "threshold": result["threshold"],
+                        "direction": result["direction"],
+                        "gap": result["gap"],
+                    }
+                )
         return failures
 
     def get_passed(self) -> list[str]:
@@ -95,9 +96,9 @@ class PerformanceValidator:
         lines = ["=" * 70, "Performance Targets Validation", "=" * 70]
         for name, result in self._results.items():
             status = "PASS" if result["passed"] else "FAIL"
-            threshold_str = f"{result['direction']} {result['threshold']*100:.1f}%"
+            threshold_str = f"{result['direction']} {result['threshold'] * 100:.1f}%"
             lines.append(
-                f"  [{status}] {name:.<45s} {result['actual']*100:.1f}% (target: {threshold_str})"
+                f"  [{status}] {name:.<45s} {result['actual'] * 100:.1f}% (target: {threshold_str})"
             )
         passed = sum(1 for r in self._results.values() if r["passed"])
         total = len(self._results)

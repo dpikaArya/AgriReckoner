@@ -1,10 +1,9 @@
+import hashlib
 import json
 import time
-import hashlib
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
 
 import pandas as pd
 
@@ -22,13 +21,13 @@ class ExperimentTracker:
         self,
         experiment_name: str = "agri_ai_training",
         tracking_uri: str = "mlruns",
-        run_name: str = None,
+        run_name: str | None = None,
     ):
         self.experiment_name = experiment_name
         self.tracking_uri = tracking_uri
         self.run_name = run_name
-        self._run_id = None
-        self._start_time = None
+        self._run_id: str | None = None
+        self._start_time: float | None = None
 
         if MLFLOW_AVAILABLE:
             mlflow.set_tracking_uri(tracking_uri)
@@ -38,11 +37,9 @@ class ExperimentTracker:
                 mlflow.create_experiment(experiment_name)
                 mlflow.set_experiment(experiment_name)
         else:
-            warnings.warn(
-                "MLflow is not installed. Logging to local files instead."
-            )
+            warnings.warn("MLflow is not installed. Logging to local files instead.", stacklevel=2)
 
-    def start_run(self, run_name: str = None) -> Optional[str]:
+    def start_run(self, run_name: str | None = None) -> str | None:
         self._start_time = time.time()
         effective_run_name = run_name or self.run_name
 
@@ -51,7 +48,7 @@ class ExperimentTracker:
             self._run_id = run.info.run_id
             return self._run_id
 
-        self._run_id = effective_run_name or f"run_{int(self._start_time)}"
+        self._run_id = effective_run_name or f"run_{int(self._start_time or 0)}"
         return self._run_id
 
     def end_run(self):
@@ -87,7 +84,7 @@ class ExperimentTracker:
         with open(path, "w") as f:
             json.dump(existing, f, indent=2)
 
-    def log_metrics(self, metrics: dict, step: int = None):
+    def log_metrics(self, metrics: dict, step: int | None = None):
         if MLFLOW_AVAILABLE:
             mlflow.log_metrics(metrics, step=step)
             return
@@ -171,9 +168,7 @@ class ExperimentTracker:
         with open(path, "w") as f:
             json.dump(info, f, indent=2)
 
-    def get_best_run(
-        self, experiment_name: str, metric: str = "r2"
-    ) -> dict:
+    def get_best_run(self, experiment_name: str, metric: str = "r2") -> dict:
         if MLFLOW_AVAILABLE:
             exp = mlflow.get_experiment_by_name(experiment_name)
             if exp is None:
@@ -189,9 +184,7 @@ class ExperimentTracker:
             return {
                 "run_id": best.get("run_id"),
                 "params": {
-                    k.replace("params.", ""): v
-                    for k, v in best.items()
-                    if k.startswith("params.")
+                    k.replace("params.", ""): v for k, v in best.items() if k.startswith("params.")
                 },
                 "metrics": {
                     k.replace("metrics.", ""): v
@@ -199,9 +192,7 @@ class ExperimentTracker:
                     if k.startswith("metrics.")
                 },
                 "tags": {
-                    k.replace("tags.", ""): v
-                    for k, v in best.items()
-                    if k.startswith("tags.")
+                    k.replace("tags.", ""): v for k, v in best.items() if k.startswith("tags.")
                 },
             }
 
@@ -241,16 +232,14 @@ class ExperimentTracker:
 
         return best_run or {}
 
-    def list_runs(self, experiment_name: str = None) -> list[dict]:
+    def list_runs(self, experiment_name: str | None = None) -> list[dict]:
         exp_name = experiment_name or self.experiment_name
 
         if MLFLOW_AVAILABLE:
             exp = mlflow.get_experiment_by_name(exp_name)
             if exp is None:
                 return []
-            runs = mlflow.search_runs(
-                experiment_ids=[exp.experiment_id]
-            )
+            runs = mlflow.search_runs(experiment_ids=[exp.experiment_id])
             if runs.empty:
                 return []
             result = []
@@ -315,7 +304,7 @@ class ExperimentTracker:
 
         return result
 
-    def save_metrics(self, metrics: dict, path: Path = None) -> Path:
+    def save_metrics(self, metrics: dict, path: Path | None = None) -> Path:
         if path is None:
             path = self._get_run_path() / "metrics.json"
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -323,9 +312,7 @@ class ExperimentTracker:
             json.dump(metrics, f, indent=2)
         return path
 
-    def save_feature_importance(
-        self, importance: dict, path: Path = None
-    ) -> Path:
+    def save_feature_importance(self, importance: dict, path: Path | None = None) -> Path:
         if path is None:
             path = self._get_run_path() / "feature_importance.json"
         path.parent.mkdir(parents=True, exist_ok=True)

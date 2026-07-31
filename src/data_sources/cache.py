@@ -6,7 +6,6 @@ import threading
 import time
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -21,22 +20,18 @@ class RequestCache:
     def _path_for_key(self, key: str) -> Path:
         return self._cache_dir / f"{key}.json"
 
-    def get(self, key: str) -> Optional[dict]:
+    def get(self, key: str) -> dict | None:
         cache_path = self._path_for_key(key)
         if not cache_path.exists():
             return None
         try:
             with self._lock:
-                mtime = datetime.fromtimestamp(
-                    cache_path.stat().st_mtime, tz=timezone.utc
-                )
-                age_hours = (
-                    datetime.now(timezone.utc) - mtime
-                ).total_seconds() / 3600
+                mtime = datetime.fromtimestamp(cache_path.stat().st_mtime, tz=timezone.utc)
+                age_hours = (datetime.now(timezone.utc) - mtime).total_seconds() / 3600
                 if age_hours >= self._ttl_hours:
                     cache_path.unlink(missing_ok=True)
                     return None
-                with open(cache_path, "r", encoding="utf-8") as f:
+                with open(cache_path, encoding="utf-8") as f:
                     data = json.load(f)
             return data
         except Exception as e:
@@ -62,7 +57,7 @@ class RequestCache:
         raw = f"{endpoint}:{serialized}"
         return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
-    def clear(self, older_than_hours: int = None):
+    def clear(self, older_than_hours: int | None = None):
         threshold = older_than_hours if older_than_hours is not None else self._ttl_hours
         cutoff = time.time() - (threshold * 3600)
         with self._lock:
@@ -100,10 +95,12 @@ class RequestCache:
             "total_size_bytes": total_size,
             "oldest": (
                 datetime.fromtimestamp(oldest, tz=timezone.utc).isoformat()
-                if oldest is not None else None
+                if oldest is not None
+                else None
             ),
             "newest": (
                 datetime.fromtimestamp(newest, tz=timezone.utc).isoformat()
-                if newest is not None else None
+                if newest is not None
+                else None
             ),
         }

@@ -29,16 +29,39 @@ OUTCOME_INTERACTION_ROOTS = ("yield", "biomass")
 
 _DUP_SUFFIX = re.compile(r"_\d+$")
 _ENGINEERED_SUFFIXES = (
-    "_calc", "_7d_ma", "_squared", "_cubed", "_log1p", "_log", "_sqrt",
-    "_category", "_bin", "_zscore",
+    "_calc",
+    "_7d_ma",
+    "_squared",
+    "_cubed",
+    "_log1p",
+    "_log",
+    "_sqrt",
+    "_category",
+    "_bin",
+    "_zscore",
 )
 _UNIT_STAGE_SUFFIX = re.compile(r"_(cm2|cm|mm|kg|ha|g|pct|percent|\d+)$")
 
 # Tokens too generic to signal that a feature belongs to a target's family.
-_GENERIC_TOKENS = frozenset({
-    "plant", "per", "of", "the", "and", "ratio", "index", "value",
-    "content", "avg", "mean", "total", "sum", "log", "sqrt",
-})
+_GENERIC_TOKENS = frozenset(
+    {
+        "plant",
+        "per",
+        "of",
+        "the",
+        "and",
+        "ratio",
+        "index",
+        "value",
+        "content",
+        "avg",
+        "mean",
+        "total",
+        "sum",
+        "log",
+        "sqrt",
+    }
+)
 
 
 def strip_engineered(name: str) -> str:
@@ -105,8 +128,10 @@ def _is_outcome_derived(col: str) -> bool:
     if compact_base in _OUTCOME_COMPACT or compact_base in _OUTCOME_ACRONYMS:
         return True
     for signature in _OUTCOME_COMPACT:
-        if len(signature) >= 5 and len(compact_base) >= 4 and (
-            compact_base in signature or signature in compact_base
+        if (
+            len(signature) >= 5
+            and len(compact_base) >= 4
+            and (compact_base in signature or signature in compact_base)
         ):
             return True
     return False
@@ -140,7 +165,8 @@ def select_feature_columns(df, target_col, base_exclude=frozenset()):
     """Return the numeric columns of ``df`` that are safe predictors of ``target_col``."""
     numeric_cols = df.select_dtypes(include="number").columns
     return [
-        col for col in numeric_cols
+        col
+        for col in numeric_cols
         if col != target_col
         and col not in NON_FEATURE_COLS
         and col not in base_exclude
@@ -184,11 +210,17 @@ if __name__ == "__main__":
     assert not is_leaky_feature("Nitrogen", "Yield_per_Hectare")
     assert not is_leaky_feature("Spacing_Plant", "Plant_Height_cm")
 
-    frame = pd.DataFrame({
-        "Nitrogen": [1.0, 2.0], "Soil_pH": [6.5, 7.0], "Rainfall": [100, 200],
-        "Yield_per_Hectare": [10, 20], "Yield_x_N": [10, 40], "Predicted_Yield": [9, 19],
-        "Yield_per_Hectare_1": [10, 20],
-    })
+    frame = pd.DataFrame(
+        {
+            "Nitrogen": [1.0, 2.0],
+            "Soil_pH": [6.5, 7.0],
+            "Rainfall": [100, 200],
+            "Yield_per_Hectare": [10, 20],
+            "Yield_x_N": [10, 40],
+            "Predicted_Yield": [9, 19],
+            "Yield_per_Hectare_1": [10, 20],
+        }
+    )
     feats = select_feature_columns(frame, "Yield_per_Hectare")
     assert set(feats) == {"Nitrogen", "Soil_pH", "Rainfall"}, feats
     print("leakage smoke OK ->", feats)

@@ -2,6 +2,7 @@
 AAIF Model Optimization — Efficiency Benchmark Script
 Runs the full optimization pipeline and reports efficiency metrics.
 """
+
 import json
 import sys
 import time
@@ -12,12 +13,12 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.resolve()))
 
-from src.ml.feature_analysis.feature_importance import FeatureImportanceAnalyzer
 from src.ml.feature_analysis.correlation_analysis import CorrelationAnalyzer
+from src.ml.feature_analysis.feature_importance import FeatureImportanceAnalyzer
 from src.ml.feature_analysis.feature_selector import FeatureSelector
 from src.ml.model_benchmark import ModelBenchmark
-from src.ml.prediction_confidence import PredictionConfidence
 from src.ml.performance_report import PerformanceReport
+from src.ml.prediction_confidence import PredictionConfidence
 
 
 def main():
@@ -34,21 +35,65 @@ def main():
     print(f"Target: {target_col} - {len(df_target)} viable records")
 
     non_feature = [
-        "Paper_ID", "Plot_ID", "Treatment", "Title", "Authors", "DOI",
-        "Journal", "Institution", "Location", "Country", "State", "Site",
-        "Crop", "Variety", "Season", "Design", "Soil_Texture", "Growth_Stage",
-        "Cultivation_Method", "Irrigation_Method", "Fertilizer_Name",
-        "Application_Method", "Previous_Crop", "Intercrop_Name", "Cover_Crop",
-        "Biofertilizer", "Organic_Fertilizer", "Scientific_Name",
-        "Experiment_Objective", "Climate_Zone", "Soil_Class",
-        "Recommendation_Summary", "Recommended_Fertilizer", "Recommended_Dose",
-        "Recommended_Application_Interval", "_source_file", "Block",
-        "Harvest_Date", "Sowing_Date", "Year", "Crop_Code", "Variety_Code",
-        "Season_Code", "Soil_Texture_Code", "Fertilizer_Code", "Country_Code",
-        "Confidence_Score", "Predicted_Yield", "Target_Yield", "Target_Fertilizer",
-        "Target_Nitrogen", "Target_Phosphorus", "Target_Potassium",
-        "Feature_Available_Before_Prediction", "Sample_Size", "Replications",
-        "Expected_Yield_Increase", "Expected_Biomass", "Expected_Plant_Height",
+        "Paper_ID",
+        "Plot_ID",
+        "Treatment",
+        "Title",
+        "Authors",
+        "DOI",
+        "Journal",
+        "Institution",
+        "Location",
+        "Country",
+        "State",
+        "Site",
+        "Crop",
+        "Variety",
+        "Season",
+        "Design",
+        "Soil_Texture",
+        "Growth_Stage",
+        "Cultivation_Method",
+        "Irrigation_Method",
+        "Fertilizer_Name",
+        "Application_Method",
+        "Previous_Crop",
+        "Intercrop_Name",
+        "Cover_Crop",
+        "Biofertilizer",
+        "Organic_Fertilizer",
+        "Scientific_Name",
+        "Experiment_Objective",
+        "Climate_Zone",
+        "Soil_Class",
+        "Recommendation_Summary",
+        "Recommended_Fertilizer",
+        "Recommended_Dose",
+        "Recommended_Application_Interval",
+        "_source_file",
+        "Block",
+        "Harvest_Date",
+        "Sowing_Date",
+        "Year",
+        "Crop_Code",
+        "Variety_Code",
+        "Season_Code",
+        "Soil_Texture_Code",
+        "Fertilizer_Code",
+        "Country_Code",
+        "Confidence_Score",
+        "Predicted_Yield",
+        "Target_Yield",
+        "Target_Fertilizer",
+        "Target_Nitrogen",
+        "Target_Phosphorus",
+        "Target_Potassium",
+        "Feature_Available_Before_Prediction",
+        "Sample_Size",
+        "Replications",
+        "Expected_Yield_Increase",
+        "Expected_Biomass",
+        "Expected_Plant_Height",
     ]
 
     exclude = [c for c in non_feature if c in df_target.columns]
@@ -65,7 +110,7 @@ def main():
     analyzer = FeatureImportanceAnalyzer(output_dir=Path("reports"))
     analyzer.compute_all(X_filled, y, use_xgboost=True, use_lightgbm=False, use_catboost=False)
     ranked = analyzer.ranked_features_
-    t_importance = time.time() - t0
+    time.time() - t0
 
     if ranked is not None and not ranked.empty:
         top10 = ranked.head(10)
@@ -126,9 +171,10 @@ def main():
 
     # ── 6. Ensemble ────────────────────────────────────────────
     print("\n--- PHASE 6: ENSEMBLE ---")
-    from src.ml.ensemble.weighted_average import WeightedAverageEnsemble
-    from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+    from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
     from sklearn.linear_model import Ridge
+
+    from src.ml.ensemble.weighted_average import WeightedAverageEnsemble
 
     models_dict = {}
     if X_sel.shape[1] >= 2:
@@ -139,7 +185,10 @@ def main():
         }
         try:
             import xgboost
-            models_dict["XGBoost"] = xgboost.XGBRegressor(n_estimators=100, random_state=42, verbosity=0)
+
+            models_dict["XGBoost"] = xgboost.XGBRegressor(
+                n_estimators=100, random_state=42, verbosity=0
+            )
         except ImportError:
             pass
 
@@ -164,11 +213,12 @@ def main():
         print(f"Avg confidence: {avg_conf:.1%}")
         print("Risk distribution:")
         for risk, count in sorted(risk_dist.items()):
-            print(f"  {risk}: {count} ({count/len(conf_result)*100:.0f}%)")
+            print(f"  {risk}: {count} ({count / len(conf_result) * 100:.0f}%)")
 
     # ── 8. Leakage Check ───────────────────────────────────────
     print("\n--- PHASE 8: LEAKAGE DETECTION ---")
     from src.ml.model_validation.leakage_detector import LeakageDetector
+
     detector = LeakageDetector(output_dir=Path("reports"))
     leakage = detector.check_all(X_filled, y)
     if detector.leakage_found_:
@@ -259,7 +309,7 @@ def main():
     with open("reports/efficiency_results.json", "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\nResults saved to reports/efficiency_results.json")
+    print("\nResults saved to reports/efficiency_results.json")
     print(md)
 
 

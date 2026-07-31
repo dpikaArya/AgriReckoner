@@ -4,27 +4,35 @@ Evaluates generated features, formula correctness, feature reproducibility.
 """
 
 import time
-from pathlib import Path
-
-from evaluation.utils import OUTPUT_DIR, write_report, get_master_df
 
 import numpy as np
 
+from evaluation.utils import get_master_df, write_report
 
 ENGINEERED_FEATURES = [
-    "Growing_Degree_Days", "Heat_Units", "Harvest_Index_Calc",
-    "Nitrogen_Use_Efficiency", "Water_Use_Efficiency",
-    "Rainfall_Anomaly", "Stress_Index", "Disease_Risk_Index",
-    "Yield_per_Plant", "Yield_per_Plot_Calc", "Yield_per_Hectare_Calc",
-    "Temp_x_Rainfall", "N_x_P", "Temp_squared",
-    "Rainfall_7d_MA", "Temp_7d_MA",
+    "Growing_Degree_Days",
+    "Heat_Units",
+    "Harvest_Index_Calc",
+    "Nitrogen_Use_Efficiency",
+    "Water_Use_Efficiency",
+    "Rainfall_Anomaly",
+    "Stress_Index",
+    "Disease_Risk_Index",
+    "Yield_per_Plant",
+    "Yield_per_Plot_Calc",
+    "Yield_per_Hectare_Calc",
+    "Temp_x_Rainfall",
+    "N_x_P",
+    "Temp_squared",
+    "Rainfall_7d_MA",
+    "Temp_7d_MA",
 ]
 
 
 def evaluate_features():
     master_df = get_master_df()
     n_rows = len(master_df) if master_df is not None else 0
-    n_cols = len(master_df.columns) if master_df is not None else 0
+    len(master_df.columns) if master_df is not None else 0
 
     if master_df is None:
         report = "# Stage 07: Feature Engineering Report\nNo data available.\n"
@@ -40,8 +48,11 @@ def evaluate_features():
         non_null_counts[f] = int(non_null)
 
     calc_accuracy = 1.0
-    if "Growing_Degree_Days" in master_df.columns and \
-       "Temperature_Max" in master_df.columns and "Temperature_Min" in master_df.columns:
+    if (
+        "Growing_Degree_Days" in master_df.columns
+        and "Temperature_Max" in master_df.columns
+        and "Temperature_Min" in master_df.columns
+    ):
         tmax = master_df["Temperature_Max"].dropna()
         tmin = master_df["Temperature_Min"].dropna()
         if len(tmax) > 0 and len(tmin) > 0:
@@ -56,14 +67,14 @@ def evaluate_features():
     total_expected = len(ENGINEERED_FEATURES)
 
     report = f"""# Stage 07: Feature Engineering Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Summary
 - Total engineered features expected: {total_expected}
 - Engineered features generated: {feature_count}
 - Missing features: {len(missing_features)}
 - Calculation accuracy (GDD test): {calc_accuracy:.1%}
-- Feature reproducibility: {'PASS' if calc_accuracy > 0.8 else 'NEEDS IMPROVEMENT'}
+- Feature reproducibility: {"PASS" if calc_accuracy > 0.8 else "NEEDS IMPROVEMENT"}
 
 ## Features Generated ({feature_count})
 """

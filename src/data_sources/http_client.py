@@ -1,10 +1,8 @@
-import json
 import logging
 import random
 import threading
 import time
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -18,7 +16,7 @@ class HttpClient:
     def __init__(
         self,
         base_url: str,
-        api_key: str = None,
+        api_key: str | None = None,
         rate_limit: int = 10,
         rate_period: int = 60,
         cache_dir: Path = Path("data/cache"),
@@ -53,17 +51,11 @@ class HttpClient:
         with self._lock:
             now = time.time()
             cutoff = now - self._rate_period
-            self._request_timestamps = [
-                t for t in self._request_timestamps if t > cutoff
-            ]
+            self._request_timestamps = [t for t in self._request_timestamps if t > cutoff]
             if len(self._request_timestamps) >= self._rate_limit:
-                sleep_for = (
-                    self._request_timestamps[0] + self._rate_period - now
-                )
+                sleep_for = self._request_timestamps[0] + self._rate_period - now
                 if sleep_for > 0:
-                    logger.debug(
-                        "Rate limit reached, sleeping %.2fs", sleep_for
-                    )
+                    logger.debug("Rate limit reached, sleeping %.2fs", sleep_for)
                     time.sleep(sleep_for)
             self._request_timestamps.append(time.time())
 
@@ -83,9 +75,9 @@ class HttpClient:
     def get(
         self,
         endpoint: str,
-        params: dict = None,
-        headers: dict = None,
-        timeout: int = None,
+        params: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
         use_cache: bool = True,
     ) -> requests.Response:
         url = self._build_url(endpoint)
@@ -100,20 +92,14 @@ class HttpClient:
                 resp.status_code = cached.get("status_code", 200)
                 resp.headers.update(cached.get("headers", {}))
                 content = cached.get("content", "")
-                resp._content = (
-                    content.encode("utf-8")
-                    if isinstance(content, str)
-                    else content
-                )
+                resp._content = content.encode("utf-8") if isinstance(content, str) else content
                 resp.url = url
                 resp.encoding = cached.get("encoding", "utf-8")
                 resp.request = requests.Request("GET", url).prepare()
                 return resp
 
         self._cache_misses += 1
-        resp = self._request(
-            "GET", url, params=params, headers=headers, timeout=timeout
-        )
+        resp = self._request("GET", url, params=params, headers=headers, timeout=timeout)
         if use_cache and cache_key and resp.status_code < 400:
             self._cache.set(
                 cache_key,
@@ -129,14 +115,12 @@ class HttpClient:
     def post(
         self,
         endpoint: str,
-        json: dict = None,
-        headers: dict = None,
-        timeout: int = None,
+        json: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
     ) -> requests.Response:
         url = self._build_url(endpoint)
-        return self._request(
-            "POST", url, json=json, headers=headers, timeout=timeout
-        )
+        return self._request("POST", url, json=json, headers=headers, timeout=timeout)
 
     # ------------------------------------------------------------------
     # Core request execution with retry
@@ -146,10 +130,10 @@ class HttpClient:
         self,
         method: str,
         url: str,
-        params: dict = None,
-        json: dict = None,
-        headers: dict = None,
-        timeout: int = None,
+        params: dict | None = None,
+        json: dict | None = None,
+        headers: dict | None = None,
+        timeout: int | None = None,
     ) -> requests.Response:
         timeout = timeout if timeout is not None else self._default_timeout
         merged_headers = dict(self._session.headers)
@@ -162,7 +146,10 @@ class HttpClient:
             start = time.perf_counter()
             logger.debug(
                 "HTTP %s %s (attempt %d/%d)",
-                method, url, attempt + 1, self._max_retries + 1,
+                method,
+                url,
+                attempt + 1,
+                self._max_retries + 1,
             )
             try:
                 resp = self._session.request(
@@ -178,11 +165,7 @@ class HttpClient:
                     self._total_requests += 1
                     self._total_response_time += duration
 
-                log_level = (
-                    logging.WARNING
-                    if resp.status_code >= 400
-                    else logging.INFO
-                )
+                log_level = logging.WARNING if resp.status_code >= 400 else logging.INFO
                 logger.log(
                     log_level,
                     "HTTP %s %s -> %d (%.1fms, attempt %d/%d)",
@@ -203,13 +186,9 @@ class HttpClient:
                     retries=attempt,
                 )
 
-                should_retry_status = (
-                    resp.status_code == 429 or resp.status_code >= 500
-                )
+                should_retry_status = resp.status_code == 429 or resp.status_code >= 500
                 if should_retry_status and attempt < self._max_retries:
-                    delay = (2 ** attempt) * (
-                        1 + random.uniform(-0.25, 0.25)
-                    )
+                    delay = (2**attempt) * (1 + random.uniform(-0.25, 0.25))
                     logger.warning(
                         "Retrying %s %s attempt %d after %.1fs due to status %d",
                         method,
@@ -236,9 +215,7 @@ class HttpClient:
                     self._max_retries + 1,
                 )
                 if attempt < self._max_retries:
-                    delay = (2 ** attempt) * (
-                        1 + random.uniform(-0.25, 0.25)
-                    )
+                    delay = (2**attempt) * (1 + random.uniform(-0.25, 0.25))
                     time.sleep(max(delay, 0.1))
                     continue
                 raise
@@ -261,12 +238,10 @@ class HttpClient:
                     exc,
                 )
                 if attempt < self._max_retries:
-                    delay = (2 ** attempt) * (
-                        1 + random.uniform(-0.25, 0.25)
-                    )
+                    delay = (2**attempt) * (1 + random.uniform(-0.25, 0.25))
                     time.sleep(max(delay, 0.1))
                     continue
-                raise last_exc
+                raise last_exc from None
 
         raise RuntimeError("Unreachable: all retries exhausted")
 

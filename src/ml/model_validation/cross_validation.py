@@ -1,14 +1,12 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import (
     GroupKFold,
     KFold,
-    LeaveOneOut,
     TimeSeriesSplit,
     cross_val_score,
 )
@@ -17,15 +15,13 @@ logger = logging.getLogger("PipelineCrossValidator")
 
 
 class PipelineCrossValidator:
-    def __init__(self, output_dir: Optional[Path] = None, random_state: int = 42):
+    def __init__(self, output_dir: Path | None = None, random_state: int = 42):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.random_state = random_state
         self.results_: dict[str, dict] = {}
 
-    def validate_kfold(
-        self, model, X: pd.DataFrame, y: pd.Series, n_splits: int = 5
-    ) -> dict:
+    def validate_kfold(self, model, X: pd.DataFrame, y: pd.Series, n_splits: int = 5) -> dict:
         if len(X) < n_splits:
             n_splits = max(2, len(X))
 
@@ -60,13 +56,17 @@ class PipelineCrossValidator:
         cv = TimeSeriesSplit(n_splits=n_splits)
         return self._run_cv("temporal", model, X_sorted, y_sorted, cv)
 
-    def _run_cv(
-        self, method: str, model, X: pd.DataFrame, y: pd.Series, cv, groups=None
-    ) -> dict:
+    def _run_cv(self, method: str, model, X: pd.DataFrame, y: pd.Series, cv, groups=None) -> dict:
         X_filled = X.select_dtypes(include=[np.number]).fillna(X.median(numeric_only=True))
 
         try:
-            kwargs = {"X": X_filled, "y": y, "cv": cv, "scoring": "neg_root_mean_squared_error", "n_jobs": -1}
+            kwargs = {
+                "X": X_filled,
+                "y": y,
+                "cv": cv,
+                "scoring": "neg_root_mean_squared_error",
+                "n_jobs": -1,
+            }
             if groups is not None:
                 kwargs["groups"] = groups
 
@@ -109,8 +109,8 @@ class PipelineCrossValidator:
         model,
         X: pd.DataFrame,
         y: pd.Series,
-        location_col: Optional[str] = None,
-        time_col: Optional[str] = None,
+        location_col: str | None = None,
+        time_col: str | None = None,
     ) -> dict:
         results = {}
         results["kfold"] = self.validate_kfold(model, X, y)

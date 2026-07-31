@@ -1,17 +1,17 @@
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import yaml
 
 _CONFIG_PATH = Path(__file__).parent.parent.parent / "config" / "apis.yaml"
 
 
-def load_apis_config(config_path: Optional[Path] = None) -> dict[str, Any]:
+def load_apis_config(config_path: Path | None = None) -> dict[str, Any]:
     path = config_path or _CONFIG_PATH
     if not path.exists():
         return {"sources": {}, "storage": {}, "pipeline": {}}
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         cfg = yaml.safe_load(f) or {}
     return cfg
 

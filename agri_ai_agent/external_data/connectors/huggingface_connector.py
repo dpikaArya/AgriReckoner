@@ -1,17 +1,17 @@
 import hashlib
 import os
 from pathlib import Path
-from typing import Optional
 
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.external_data.download_strategy import (
-    download_huggingface_parquet,
     try_priority_downloads,
 )
+from agri_ai_agent.utils.logging_utils import get_logger
 
+logger = get_logger("HuggingFaceConnector")
 
 DEFAULT_SEARCH_TERMS = [
     "agriculture",
@@ -53,7 +53,7 @@ class HuggingFaceConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         if query:
             search_terms = [query]
         else:
@@ -77,21 +77,23 @@ class HuggingFaceConnector(ExternalDataConnector):
                     ds_id = ds.get("id")
                     if ds_id and ds_id not in seen_ids:
                         seen_ids.add(ds_id)
-                        results.append({
-                            "id": ds_id,
-                            "name": ds_id.split("/")[-1] if "/" in ds_id else ds_id,
-                            "description": ds.get("description", ""),
-                            "downloads": ds.get("downloads", 0),
-                            "updated_at": ds.get("lastModified"),
-                            "tags": ds.get("tags", []),
-                        })
+                        results.append(
+                            {
+                                "id": ds_id,
+                                "name": ds_id.split("/")[-1] if "/" in ds_id else ds_id,
+                                "description": ds.get("description", ""),
+                                "downloads": ds.get("downloads", 0),
+                                "updated_at": ds.get("lastModified"),
+                                "tags": ds.get("tags", []),
+                            }
+                        )
             except requests.RequestException:
                 continue
 
         results.sort(key=lambda x: x.get("downloads", 0), reverse=True)
         return results
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         safe_name = resource_id.replace("/", "_").replace("-", "_")
 
@@ -111,29 +113,32 @@ class HuggingFaceConnector(ExternalDataConnector):
 
         # Try direct parquet download first (fastest)
         safe_name = resource_id.replace("/", "_").replace("-", "_")
-        result = try_priority_downloads([
-            (
-                f"https://huggingface.co/datasets/{resource_id}/resolve/main/data/train-00000-of-00001.parquet",
-                "parquet",
-                target_dir / f"hf_{safe_name}.parquet",
-            ),
-            (
-                f"https://huggingface.co/datasets/{resource_id}/resolve/main/data.csv",
-                "csv",
-                target_dir / f"hf_{safe_name}.csv",
-            ),
-            (
-                f"https://huggingface.co/datasets/{resource_id}/resolve/main/train.csv",
-                "csv",
-                target_dir / f"hf_{safe_name}.csv",
-            ),
-        ])
+        result = try_priority_downloads(
+            [
+                (
+                    f"https://huggingface.co/datasets/{resource_id}/resolve/main/data/train-00000-of-00001.parquet",
+                    "parquet",
+                    target_dir / f"hf_{safe_name}.parquet",
+                ),
+                (
+                    f"https://huggingface.co/datasets/{resource_id}/resolve/main/data.csv",
+                    "csv",
+                    target_dir / f"hf_{safe_name}.csv",
+                ),
+                (
+                    f"https://huggingface.co/datasets/{resource_id}/resolve/main/train.csv",
+                    "csv",
+                    target_dir / f"hf_{safe_name}.csv",
+                ),
+            ]
+        )
         if result is not None:
             return result
 
         # Fallback: use huggingface datasets library with a row limit
         try:
             from datasets import load_dataset
+
             ds = load_dataset(
                 resource_id,
                 split="train",
@@ -146,12 +151,15 @@ class HuggingFaceConnector(ExternalDataConnector):
                 rows.append(row)
             if rows:
                 import pandas as pd
+
                 df = pd.DataFrame(rows)
                 parquet_path = target_dir / f"hf_{safe_name}.parquet"
                 df.to_parquet(parquet_path, index=False)
                 return parquet_path
         except Exception:
-            logger.warning("HuggingFace streaming download failed for %s", resource_id, exc_info=True)
+            logger.warning(
+                "HuggingFace streaming download failed for %s", resource_id, exc_info=True
+            )
         return None
 
     def validate(self, package: DatasetPackage) -> bool:

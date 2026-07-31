@@ -1,6 +1,5 @@
 import json
 from pathlib import Path
-from typing import Optional
 
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.knowledge_graph.graph import KnowledgeGraph
@@ -81,7 +80,8 @@ def update_knowledge_graph(
     repo_id = f"Repository:{pkg.source or pkg.provider}"
     if kg.get_node(repo_id) is None:
         kg.add_node(
-            repo_id, "Repository",
+            repo_id,
+            "Repository",
             name=pkg.source or pkg.provider,
             provider=pkg.provider or pkg.source,
             endpoint_url=endpoint_url or pkg.source_url,
@@ -91,7 +91,8 @@ def update_knowledge_graph(
     dataset_id = f"Dataset:{pkg.dataset_id}"
     if kg.get_node(dataset_id) is None:
         kg.add_node(
-            dataset_id, "Dataset",
+            dataset_id,
+            "Dataset",
             dataset_id=pkg.dataset_id,
             name=pkg.name,
             resource_id=pkg.resource_id,
@@ -109,7 +110,8 @@ def update_knowledge_graph(
     doc_id = f"Document:{pkg.dataset_id}/0"
     if kg.get_node(doc_id) is None:
         kg.add_node(
-            doc_id, "Document",
+            doc_id,
+            "Document",
             dataset_id=pkg.dataset_id,
             document_type=pkg.document_type,
             name=pkg.name,
@@ -127,7 +129,8 @@ def update_knowledge_graph(
         evidence_id = f"Evidence:{pkg.dataset_id}/stats"
         if kg.get_node(evidence_id) is None:
             kg.add_node(
-                evidence_id, "Evidence",
+                evidence_id,
+                "Evidence",
                 dataset_id=pkg.dataset_id,
                 row_count=pkg.row_count,
                 column_count=pkg.column_count,

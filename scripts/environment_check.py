@@ -60,7 +60,7 @@ def check_locked_packages():
 def check_env_vars():
     api_key = os.environ.get("OPENAI_API_KEY")
     if api_key:
-        print(f"[PASS] OPENAI_API_KEY is set")
+        print("[PASS] OPENAI_API_KEY is set")
     else:
         print("[WARN] OPENAI_API_KEY is not set (optional)")
     return True

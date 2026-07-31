@@ -5,17 +5,16 @@ from datetime import datetime
 import pandas as pd
 
 from agri_ai_agent.config.settings import AgriAISettings
-from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
-from agri_ai_agent.continuous_learning.version_history import VersionHistory
 from agri_ai_agent.continuous_learning.change_detector import ChangeDetector, ChangeSet
-from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph, ALL_USER_STAGES
+from agri_ai_agent.continuous_learning.dependency_graph import ALL_USER_STAGES, DependencyGraph
 from agri_ai_agent.continuous_learning.reports import (
-    generate_sync_report,
     generate_provenance_report,
     generate_retraining_report,
+    generate_sync_report,
 )
+from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
+from agri_ai_agent.continuous_learning.version_history import VersionHistory
 from agri_ai_agent.utils.logging_utils import get_logger
-
 
 logger = get_logger("IncrementalEngine")
 
@@ -35,8 +34,7 @@ class IncrementalEngine:
         self._detector = detector
         self._graph = graph
 
-    def execute_cycle(self, df: pd.DataFrame,
-                      run_pipeline_fn=None) -> dict:
+    def execute_cycle(self, df: pd.DataFrame, run_pipeline_fn=None) -> dict:
         cycle_start = time.perf_counter()
         sync_id = self._history.start_sync()
         cycle_stats: dict = {
@@ -68,14 +66,16 @@ class IncrementalEngine:
             cycle_stats["completed_at"] = datetime.now().isoformat()
             cycle_stats["duration_sec"] = round(time.perf_counter() - cycle_start, 2)
             self._history.complete_sync(
-                sync_id, repos_checked, repos_changed,
-                [], cycle_stats,
+                sync_id,
+                repos_checked,
+                repos_changed,
+                [],
+                cycle_stats,
             )
             generate_sync_report(changes, [], self._settings.OUTPUT_DIR)
             return cycle_stats
 
-        logger.info("Changes detected in %d repo(s): %s",
-                     repos_changed, changes.changed_repos)
+        logger.info("Changes detected in %d repo(s): %s", repos_changed, changes.changed_repos)
 
         affected_stages = self._graph.get_affected_stages(changes)
         logger.info("Affected stages: %s", affected_stages)
@@ -86,15 +86,18 @@ class IncrementalEngine:
             for step_key in self._graph.get_pipeline_steps_for_stages(affected_stages):
                 logger.info("Executing pipeline step: %s", step_key)
                 try:
-                    result = run_pipeline_fn(step_key, df)
+                    run_pipeline_fn(step_key, df)
                 except Exception as e:
                     logger.error("Pipeline step %s failed: %s", step_key, e)
 
         sync_stages = cycle_stats.get("stages_executed", [])
         executed_pipeline = self._graph.get_pipeline_steps_for_stages(sync_stages)
         self._history.complete_sync(
-            sync_id, repos_checked, repos_changed,
-            executed_pipeline, cycle_stats,
+            sync_id,
+            repos_checked,
+            repos_changed,
+            executed_pipeline,
+            cycle_stats,
         )
 
         for repo_name in changes.changed_repos:

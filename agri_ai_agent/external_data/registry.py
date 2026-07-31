@@ -1,7 +1,6 @@
 import importlib
 import inspect
 import pkgutil
-from typing import Optional
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.registry_db import DatasetRegistry
@@ -13,14 +12,14 @@ _logger = get_logger("ConnectorRegistry")
 class ConnectorRegistry:
     _connectors: dict[str, type[ExternalDataConnector]] = {}
     _initialized = False
-    _registry: Optional[DatasetRegistry] = None
+    _registry: DatasetRegistry | None = None
 
     @classmethod
     def set_registry(cls, registry: DatasetRegistry):
         cls._registry = registry
 
     @classmethod
-    def discover(cls, package_path: Optional[str] = None) -> dict[str, type[ExternalDataConnector]]:
+    def discover(cls, package_path: str | None = None) -> dict[str, type[ExternalDataConnector]]:
         if cls._initialized:
             return cls._connectors
         base = package_path or __package__ + ".connectors"
@@ -44,7 +43,7 @@ class ConnectorRegistry:
         return cls._connectors
 
     @classmethod
-    def get(cls, source_name: str) -> Optional[type[ExternalDataConnector]]:
+    def get(cls, source_name: str) -> type[ExternalDataConnector] | None:
         if not cls._initialized:
             cls.discover()
         return cls._connectors.get(source_name)
@@ -56,7 +55,7 @@ class ConnectorRegistry:
         return sorted(cls._connectors.keys())
 
     @classmethod
-    def instantiate(cls, source_name: str) -> Optional[ExternalDataConnector]:
+    def instantiate(cls, source_name: str) -> ExternalDataConnector | None:
         connector_cls = cls.get(source_name)
         if connector_cls is None:
             return None

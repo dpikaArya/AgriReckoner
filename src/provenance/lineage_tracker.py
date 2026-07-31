@@ -1,11 +1,9 @@
+import hashlib
 import json
 import uuid
-import hashlib
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
-
 
 STAGES = [
     "api_source",
@@ -25,13 +23,13 @@ class DatasetProvenance:
     query_params: dict
     download_timestamp: str
     version: str
-    doi: Optional[str] = None
+    doi: str | None = None
     license: str = ""
-    authors: Optional[list] = None
+    authors: list | None = None
     citation: str = ""
     file_hash: str = ""
     record_count: int = 0
-    column_schema: Optional[dict] = None
+    column_schema: dict | None = None
     size_bytes: int = 0
 
     def __post_init__(self):
@@ -70,7 +68,7 @@ def generate_metadata(
     column_schema: dict,
     doi: str = "",
     license: str = "",
-    authors: Optional[list] = None,
+    authors: list | None = None,
     citation: str = "",
 ) -> dict:
     if not dataset_name:
@@ -199,7 +197,7 @@ class LineageTracker:
         from_stage: str,
         to_stage: str,
         artifact_path: Path,
-        metadata: Optional[dict] = None,
+        metadata: dict | None = None,
     ) -> None:
         if not dataset_id:
             raise ValueError("dataset_id is required")
@@ -225,7 +223,9 @@ class LineageTracker:
                 break
 
         if dataset_name is None:
-            raise ValueError(f"Dataset with id '{dataset_id}' not found. Call initialize_dataset first.")
+            raise ValueError(
+                f"Dataset with id '{dataset_id}' not found. Call initialize_dataset first."
+            )
 
         transition_record = {
             "dataset_id": dataset_id,
@@ -245,9 +245,7 @@ class LineageTracker:
             raise ValueError("dataset_id is required")
 
         graph = _load_graph(self.lineage_dir)
-        lineage = [
-            record for record in graph if record["dataset_id"] == dataset_id
-        ]
+        lineage = [record for record in graph if record["dataset_id"] == dataset_id]
         if not lineage:
             raise ValueError(f"No lineage records found for dataset id '{dataset_id}'")
         return sorted(lineage, key=lambda r: r["timestamp"])
@@ -259,8 +257,7 @@ class LineageTracker:
         graph = _load_graph(self.lineage_dir)
 
         model_records = [
-            r for r in graph
-            if r.get("dataset_name") == model_name and r["to_stage"] == "model"
+            r for r in graph if r.get("dataset_name") == model_name and r["to_stage"] == "model"
         ]
         if not model_records:
             raise ValueError(f"No model records found for '{model_name}'")
@@ -314,7 +311,7 @@ class LineageTracker:
 
         return sorted(downstream | name_downstream)
 
-    def visualize(self, output_path: Optional[Path] = None) -> str:
+    def visualize(self, output_path: Path | None = None) -> str:
         graph = _load_graph(self.lineage_dir)
         if not graph:
             return "digraph Lineage {}"

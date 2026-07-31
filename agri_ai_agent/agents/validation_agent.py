@@ -7,14 +7,12 @@ Extends BaseAgent and uses AgriAISettings.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.settings import AgriAISettings
-
 
 UNIT_CONVERSIONS = {
     "acre_to_hectare": 0.404686,
@@ -72,15 +70,33 @@ RANGE_CONSTRAINTS = {
 }
 
 BIOLOGICAL_RULES: dict[str, dict] = {
-    "Plant_Height_cm": {"min": 1, "max": 800, "unit": "cm", "crop_ranges": {
-        "wheat": (20, 120), "rice": (50, 150), "maize": (100, 400),
-        "bell pepper": (30, 150), "carrot": (15, 40), "spinach": (15, 50),
-    }},
-    "Yield_per_Hectare": {"min": 100, "max": 20000, "unit": "kg/ha", "crop_ranges": {
-        "wheat": (1000, 8000), "rice": (1500, 10000), "maize": (2000, 12000),
-        "bell pepper": (5000, 80000), "carrot": (10000, 60000),
-        "spinach": (5000, 30000), "chickpea": (800, 3000),
-    }},
+    "Plant_Height_cm": {
+        "min": 1,
+        "max": 800,
+        "unit": "cm",
+        "crop_ranges": {
+            "wheat": (20, 120),
+            "rice": (50, 150),
+            "maize": (100, 400),
+            "bell pepper": (30, 150),
+            "carrot": (15, 40),
+            "spinach": (15, 50),
+        },
+    },
+    "Yield_per_Hectare": {
+        "min": 100,
+        "max": 20000,
+        "unit": "kg/ha",
+        "crop_ranges": {
+            "wheat": (1000, 8000),
+            "rice": (1500, 10000),
+            "maize": (2000, 12000),
+            "bell pepper": (5000, 80000),
+            "carrot": (10000, 60000),
+            "spinach": (5000, 30000),
+            "chickpea": (800, 3000),
+        },
+    },
     "Soil_pH": {"min": 3.0, "max": 10.0, "unit": "pH"},
     "Nitrogen": {"min": 10, "max": 500, "unit": "kg/ha"},
     "Phosphorus": {"min": 5, "max": 200, "unit": "kg/ha"},
@@ -97,7 +113,8 @@ AGRONOMIC_RULES: list[dict] = [
     {
         "name": "yield_biomass_ratio",
         "condition": lambda r: (
-            r.get("Yield_per_Hectare") is not None and r.get("Biomass_Yield") is not None
+            r.get("Yield_per_Hectare") is not None
+            and r.get("Biomass_Yield") is not None
             and r["Biomass_Yield"] > 0
         ),
         "check": lambda r: 0.1 <= (r["Yield_per_Hectare"] / r["Biomass_Yield"]) <= 0.8,
@@ -125,7 +142,8 @@ AGRONOMIC_RULES: list[dict] = [
     {
         "name": "organic_matter_carbon_ratio",
         "condition": lambda r: (
-            r.get("Organic_Matter") is not None and r.get("Organic_Carbon") is not None
+            r.get("Organic_Matter") is not None
+            and r.get("Organic_Carbon") is not None
             and r["Organic_Carbon"] > 0
         ),
         "check": lambda r: 1.0 <= (r["Organic_Matter"] / r["Organic_Carbon"]) <= 2.5,
@@ -154,15 +172,19 @@ class ValidationAgent(BaseAgent):
 
     def __init__(
         self,
-        settings: Optional[AgriAISettings] = None,
-        retry_max: Optional[int] = None,
-        retry_delay: Optional[float] = None,
-        extractions_path: Optional[Path] = None,
-        doc_struct_path: Optional[Path] = None,
+        settings: AgriAISettings | None = None,
+        retry_max: int | None = None,
+        retry_delay: float | None = None,
+        extractions_path: Path | None = None,
+        doc_struct_path: Path | None = None,
     ):
         super().__init__(settings, retry_max, retry_delay)
-        self.extractions_path = extractions_path or self.settings.OUTPUT_DIR / "Scientific_Extractions.json"
-        self.doc_struct_path = doc_struct_path or self.settings.OUTPUT_DIR / "Document_Structures.json"
+        self.extractions_path = (
+            extractions_path or self.settings.OUTPUT_DIR / "Scientific_Extractions.json"
+        )
+        self.doc_struct_path = (
+            doc_struct_path or self.settings.OUTPUT_DIR / "Document_Structures.json"
+        )
 
     @property
     def agent_name(self) -> str:
@@ -190,7 +212,9 @@ class ValidationAgent(BaseAgent):
                 "facts_validated": len(extraction_records),
                 "provenance_records": len(provenance),
                 "conversions": len(conversions),
-                "quality_issues": {k: len(v) if isinstance(v, list) else v for k, v in issues.items()},
+                "quality_issues": {
+                    k: len(v) if isinstance(v, list) else v for k, v in issues.items()
+                },
             }
         return df
 
@@ -201,7 +225,9 @@ class ValidationAgent(BaseAgent):
         for ext in extractions:
             evidence = self._cross_validate(ext, doc_structures)
             if evidence.get("contradicted"):
-                validated.append({**ext, "validation": "REJECTED", "reason": evidence.get("reason", "")})
+                validated.append(
+                    {**ext, "validation": "REJECTED", "reason": evidence.get("reason", "")}
+                )
             else:
                 new_conf = self._compute_confidence(ext, evidence)
                 validated.append({**ext, "validation": "ACCEPTED", "adjusted_confidence": new_conf})
@@ -242,46 +268,65 @@ class ValidationAgent(BaseAgent):
         records = []
         for v in validated:
             paper = v.get("paper", "")
-            records.append({
-                "paper": paper,
-                "doi": doi_map.get(paper, ""),
-                "variable": v.get("variable", ""),
-                "value": v.get("value", ""),
-                "unit": v.get("unit", ""),
-                "page": v.get("page", 1),
-                "table": v.get("table", ""),
-                "row": v.get("row", ""),
-                "column": v.get("column", ""),
-                "figure": v.get("figure", ""),
-                "caption": v.get("source_text", "")[:200],
-                "extraction_timestamp": datetime.now().isoformat(),
-                "agent_version": "1.0.0",
-                "extraction_method": "regex_pattern",
-                "confidence": v.get("adjusted_confidence", v.get("confidence", "low")),
-                "validation": v.get("validation", "ACCEPTED"),
-                "source_text": v.get("source_text", "")[:200],
-                "char_start": v.get("char_start", 0),
-                "char_end": v.get("char_end", 0),
-            })
+            records.append(
+                {
+                    "paper": paper,
+                    "doi": doi_map.get(paper, ""),
+                    "variable": v.get("variable", ""),
+                    "value": v.get("value", ""),
+                    "unit": v.get("unit", ""),
+                    "page": v.get("page", 1),
+                    "table": v.get("table", ""),
+                    "row": v.get("row", ""),
+                    "column": v.get("column", ""),
+                    "figure": v.get("figure", ""),
+                    "caption": v.get("source_text", "")[:200],
+                    "extraction_timestamp": datetime.now().isoformat(),
+                    "agent_version": "1.0.0",
+                    "extraction_method": "regex_pattern",
+                    "confidence": v.get("adjusted_confidence", v.get("confidence", "low")),
+                    "validation": v.get("validation", "ACCEPTED"),
+                    "source_text": v.get("source_text", "")[:200],
+                    "char_start": v.get("char_start", 0),
+                    "char_end": v.get("char_end", 0),
+                }
+            )
         skip_cols = {
-            "Crop_Code", "Season_Code", "Variety_Code", "Fertilizer_Code",
-            "Soil_Texture_Code", "Country_Code", "Feature_Available_Before_Prediction",
+            "Crop_Code",
+            "Season_Code",
+            "Variety_Code",
+            "Fertilizer_Code",
+            "Soil_Texture_Code",
+            "Country_Code",
+            "Feature_Available_Before_Prediction",
         }
         if df is not None:
             known_vars = {r["variable"] for r in records}
             for col in df.columns:
                 if col not in known_vars and col not in skip_cols:
-                    records.append({
-                        "paper": "pipeline_input", "doi": "", "variable": col,
-                        "value": "", "unit": "", "page": 0, "table": "", "row": "",
-                        "column": "", "figure": "",
-                        "caption": "Column from pipeline input dataset",
-                        "extraction_timestamp": datetime.now().isoformat(),
-                        "agent_version": "1.0.0",
-                        "extraction_method": "dataset_import",
-                        "confidence": "high", "validation": "ACCEPTED",
-                        "source_text": "", "char_start": 0, "char_end": 0,
-                    })
+                    records.append(
+                        {
+                            "paper": "pipeline_input",
+                            "doi": "",
+                            "variable": col,
+                            "value": "",
+                            "unit": "",
+                            "page": 0,
+                            "table": "",
+                            "row": "",
+                            "column": "",
+                            "figure": "",
+                            "caption": "Column from pipeline input dataset",
+                            "extraction_timestamp": datetime.now().isoformat(),
+                            "agent_version": "1.0.0",
+                            "extraction_method": "dataset_import",
+                            "confidence": "high",
+                            "validation": "ACCEPTED",
+                            "source_text": "",
+                            "char_start": 0,
+                            "char_end": 0,
+                        }
+                    )
         return records
 
     # ── Unit harmonisation ───────────────────────────────────────────────
@@ -298,19 +343,35 @@ class ValidationAgent(BaseAgent):
         conv = []
         if "Yield_per_Acre" in df.columns and "Yield_per_Hectare" not in df.columns:
             df["Yield_per_Hectare"] = pd.to_numeric(df["Yield_per_Acre"], errors="coerce") * 2.47105
-            conv.append({"from": "Yield_per_Acre", "to": "Yield_per_Hectare",
-                         "factor": 2.47105, "type": "yield",
-                         "rows_affected": int(df["Yield_per_Acre"].notna().sum())})
+            conv.append(
+                {
+                    "from": "Yield_per_Acre",
+                    "to": "Yield_per_Hectare",
+                    "factor": 2.47105,
+                    "type": "yield",
+                    "rows_affected": int(df["Yield_per_Acre"].notna().sum()),
+                }
+            )
         if "Yield_per_Plot" in df.columns:
-            plot_col = next((c for c in ["Plot_Size", "plot_size", "plot_size_m2"] if c in df.columns), None)
+            plot_col = next(
+                (c for c in ["Plot_Size", "plot_size", "plot_size_m2"] if c in df.columns), None
+            )
             if plot_col is not None and "Yield_per_Hectare" not in df.columns:
                 plot_size = pd.to_numeric(df[plot_col], errors="coerce")
                 yield_plot = pd.to_numeric(df["Yield_per_Plot"], errors="coerce")
                 with np.errstate(divide="ignore", invalid="ignore"):
-                    df["Yield_per_Hectare_Calc"] = np.where(plot_size > 0, yield_plot / plot_size * 10000, np.nan)
-                conv.append({"from": f"Yield_per_Plot + {plot_col}", "to": "Yield_per_Hectare_Calc",
-                             "factor": "10000 / plot_size_m2", "type": "yield",
-                             "rows_affected": int(yield_plot.notna().sum())})
+                    df["Yield_per_Hectare_Calc"] = np.where(
+                        plot_size > 0, yield_plot / plot_size * 10000, np.nan
+                    )
+                conv.append(
+                    {
+                        "from": f"Yield_per_Plot + {plot_col}",
+                        "to": "Yield_per_Hectare_Calc",
+                        "factor": "10000 / plot_size_m2",
+                        "type": "yield",
+                        "rows_affected": int(yield_plot.notna().sum()),
+                    }
+                )
         return conv
 
     def _convert_temperature(self, df: pd.DataFrame) -> list:
@@ -320,9 +381,15 @@ class ValidationAgent(BaseAgent):
                 vals = pd.to_numeric(df[col], errors="coerce")
                 if vals.notna().any() and vals.max() > 100:
                     df[col] = (vals - 32) * 5 / 9
-                    conv.append({"from": f"{col} (°F)", "to": f"{col} (°C)",
-                                 "factor": "(°F - 32) × 5/9", "type": "temperature",
-                                 "rows_affected": int(vals.notna().sum())})
+                    conv.append(
+                        {
+                            "from": f"{col} (°F)",
+                            "to": f"{col} (°C)",
+                            "factor": "(°F - 32) × 5/9",
+                            "type": "temperature",
+                            "rows_affected": int(vals.notna().sum()),
+                        }
+                    )
         return conv
 
     def _convert_column_units(self, df: pd.DataFrame) -> list:
@@ -332,13 +399,26 @@ class ValidationAgent(BaseAgent):
             numeric = df[col].dtype in (np.float64, np.int64, float, int)
             if "inch" in col_lower and numeric:
                 df[col] = pd.to_numeric(df[col], errors="coerce") * 2.54
-                conv.append({"from": col, "to": col.replace("inch", "cm").replace("inches", "cm"),
-                             "factor": 2.54, "type": "length",
-                             "rows_affected": int(df[col].notna().sum())})
+                conv.append(
+                    {
+                        "from": col,
+                        "to": col.replace("inch", "cm").replace("inches", "cm"),
+                        "factor": 2.54,
+                        "type": "length",
+                        "rows_affected": int(df[col].notna().sum()),
+                    }
+                )
             if "lb" in col_lower and numeric:
                 df[col] = pd.to_numeric(df[col], errors="coerce") * 0.453592
-                conv.append({"from": col, "to": col + "_kg", "factor": 0.453592,
-                             "type": "mass", "rows_affected": int(df[col].notna().sum())})
+                conv.append(
+                    {
+                        "from": col,
+                        "to": col + "_kg",
+                        "factor": 0.453592,
+                        "type": "mass",
+                        "rows_affected": int(df[col].notna().sum()),
+                    }
+                )
         return conv
 
     def _convert_fertilizer_rates(self, df: pd.DataFrame) -> list:
@@ -348,18 +428,29 @@ class ValidationAgent(BaseAgent):
                 vals = pd.to_numeric(df[col], errors="coerce")
                 if vals.notna().any() and vals.max() < 1:
                     df[col] = vals * 1000
-                    conv.append({"from": f"{col} (low kg/ha)", "to": f"{col} (g/ha)",
-                                 "factor": 1000, "type": "mass",
-                                 "rows_affected": int(vals.notna().sum())})
+                    conv.append(
+                        {
+                            "from": f"{col} (low kg/ha)",
+                            "to": f"{col} (g/ha)",
+                            "factor": 1000,
+                            "type": "mass",
+                            "rows_affected": int(vals.notna().sum()),
+                        }
+                    )
         return conv
 
     # ── Quality assurance ────────────────────────────────────────────────
 
     def _quality_checks(self, df: pd.DataFrame) -> dict:
         issues: dict = {
-            "duplicate_rows": 0, "duplicate_columns": [], "impossible_values": [],
-            "outliers": [], "missing_identifiers": [], "negative_values": [],
-            "range_violations": [], "unit_inconsistencies": [],
+            "duplicate_rows": 0,
+            "duplicate_columns": [],
+            "impossible_values": [],
+            "outliers": [],
+            "missing_identifiers": [],
+            "negative_values": [],
+            "range_violations": [],
+            "unit_inconsistencies": [],
             "ontology_inconsistencies": [],
             "biological_violations": [],
             "agronomic_violations": [],
@@ -387,7 +478,9 @@ class ValidationAgent(BaseAgent):
                 bad = int((vals < lo).sum() + (vals > hi).sum())
                 if bad:
                     issues["impossible_values"].append(f"{col}: {bad} outside [{lo}, {hi}]")
-                    issues["range_violations"].append({"column": col, "min": lo, "max": hi, "violations": bad})
+                    issues["range_violations"].append(
+                        {"column": col, "min": lo, "max": hi, "violations": bad}
+                    )
 
         for col in num_cols:
             vals = df[col].dropna()
@@ -430,11 +523,13 @@ class ValidationAgent(BaseAgent):
             for rule in AGRONOMIC_RULES:
                 try:
                     if rule["condition"](row) and not rule["check"](row):
-                        violations.append(
-                            f"Row {row.name}: {rule['message']} [{rule['severity']}]"
-                        )
+                        violations.append(f"Row {row.name}: {rule['message']} [{rule['severity']}]")
                 except Exception as e:
-                    self.log.debug("Agronomic rule %s failed: %s", rule.get("name", rule.get("message", "?")), e)
+                    self.log.debug(
+                        "Agronomic rule %s failed: %s",
+                        rule.get("name", rule.get("message", "?")),
+                        e,
+                    )
         if len(violations) > 50:
             violations = violations[:50] + [f"... and {len(violations) - 50} more"]
         return violations
@@ -476,7 +571,9 @@ class ValidationAgent(BaseAgent):
             bad = int((tmax < tmin).sum())
             if bad:
                 issues.append(f"Tmax < Tmin in {bad} rows")
-        if all(c in df.columns for c in ["Average_Temperature", "Temperature_Max", "Temperature_Min"]):
+        if all(
+            c in df.columns for c in ["Average_Temperature", "Temperature_Max", "Temperature_Min"]
+        ):
             tavg = pd.to_numeric(df["Average_Temperature"], errors="coerce")
             tmax = pd.to_numeric(df["Temperature_Max"], errors="coerce")
             tmin = pd.to_numeric(df["Temperature_Min"], errors="coerce")
@@ -504,7 +601,9 @@ class ValidationAgent(BaseAgent):
         counts = {"accepted": 0, "rejected": 0}
         for v in validated:
             counts["rejected" if v.get("validation") == "REJECTED" else "accepted"] += 1
-        self.save_text_artifact(self._validation_report(validated, counts), "Evidence_Validation_Report.md")
+        self.save_text_artifact(
+            self._validation_report(validated, counts), "Evidence_Validation_Report.md"
+        )
 
     def _validation_report(self, validated: list, counts: dict) -> str:
         lines = [
@@ -525,8 +624,15 @@ class ValidationAgent(BaseAgent):
     def _save_provenance(self, records: list):
         path = self.settings.OUTPUT_DIR / "Provenance_Registry.json"
         path.write_text(
-            json.dumps({"pipeline": "AgriAI v1.0", "generated_at": datetime.now().isoformat(),
-                        "provenance_records": records}, indent=2, default=str),
+            json.dumps(
+                {
+                    "pipeline": "AgriAI v1.0",
+                    "generated_at": datetime.now().isoformat(),
+                    "provenance_records": records,
+                },
+                indent=2,
+                default=str,
+            ),
             encoding="utf-8",
         )
         if self.contract is not None:
@@ -537,7 +643,9 @@ class ValidationAgent(BaseAgent):
             return
         lines = ["# Unit Conversion Report", f"Generated: {datetime.now().isoformat()}", ""]
         for c in conversions:
-            lines.append(f"- {c['from']} → {c['to']} (×{c['factor']}): {c['rows_affected']} rows [{c['type']}]")
+            lines.append(
+                f"- {c['from']} → {c['to']} (×{c['factor']}): {c['rows_affected']} rows [{c['type']}]"
+            )
         self.save_text_artifact("\n".join(lines), "Unit_Conversion_Report.md")
 
     def _save_quality_reports(self, issues: dict, df: pd.DataFrame):
@@ -547,12 +655,20 @@ class ValidationAgent(BaseAgent):
             f"Rows: {len(df)} | Cols: {len(df.columns)}",
             f"Duplicates: {issues['duplicate_rows']} rows, {len(issues['duplicate_columns'])} cols",
         ]
-        for key in ("impossible_values", "outliers", "outliers_mad", "missing_identifiers",
-                     "negative_values", "unit_inconsistencies", "ontology_inconsistencies",
-                     "biological_violations", "agronomic_violations"):
+        for key in (
+            "impossible_values",
+            "outliers",
+            "outliers_mad",
+            "missing_identifiers",
+            "negative_values",
+            "unit_inconsistencies",
+            "ontology_inconsistencies",
+            "biological_violations",
+            "agronomic_violations",
+        ):
             items = issues.get(key, [])
             if items:
-                lines.append(f"")
+                lines.append("")
                 lines.append(f"## {key.replace('_', ' ').title()}")
                 for item in items[:20]:
                     lines.append(f"- {item}")
@@ -570,13 +686,15 @@ class ValidationAgent(BaseAgent):
             for v in issues["outliers"]:
                 if col in v.split(":")[0]:
                     issues_text.append(v)
-            rows.append({
-                "Column": col,
-                "Data_Type": str(df[col].dtype),
-                "Non_Null_Count": len(df) - missing,
-                "Null_Count": missing,
-                "Null_Pct": round(missing / len(df) * 100, 2) if len(df) else 0,
-                "Unique_Values": int(df[col].nunique()),
-                "Issues": "; ".join(issues_text),
-            })
+            rows.append(
+                {
+                    "Column": col,
+                    "Data_Type": str(df[col].dtype),
+                    "Non_Null_Count": len(df) - missing,
+                    "Null_Count": missing,
+                    "Null_Pct": round(missing / len(df) * 100, 2) if len(df) else 0,
+                    "Unique_Values": int(df[col].nunique()),
+                    "Issues": "; ".join(issues_text),
+                }
+            )
         self.save_artifact(pd.DataFrame(rows), "Validation_Report.csv")

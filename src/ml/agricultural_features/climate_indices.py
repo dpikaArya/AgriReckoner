@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -59,9 +58,9 @@ class ClimateIndices:
         return df
 
     def rainfall_deficit_index(self, df: pd.DataFrame) -> pd.DataFrame:
-        rainfall = self._find_col(df, [
-            "Rainfall_mm", "Rainfall", "Precipitation", "Rain", "Annual_Rainfall"
-        ])
+        rainfall = self._find_col(
+            df, ["Rainfall_mm", "Rainfall", "Precipitation", "Rain", "Annual_Rainfall"]
+        )
         if rainfall is None:
             return df
 
@@ -94,9 +93,7 @@ class ClimateIndices:
 
         t_opt = 25.0
         t_range = 15.0
-        df["Temp_Suitability_Index"] = np.exp(
-            -(((df[t_avg] - t_opt) / t_range) ** 2)
-        )
+        df["Temp_Suitability_Index"] = np.exp(-(((df[t_avg] - t_opt) / t_range) ** 2))
         self.generated_features_.append("Temp_Suitability_Index")
 
         for crop, (t_min, t_max, t_opt_c) in [
@@ -112,7 +109,7 @@ class ClimateIndices:
 
         return df
 
-    def _find_col(self, df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
+    def _find_col(self, df: pd.DataFrame, candidates: list[str]) -> str | None:
         for c in candidates:
             if c in df.columns:
                 return c

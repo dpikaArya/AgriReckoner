@@ -4,20 +4,17 @@ Shared utilities for the evaluation framework.
 
 import json
 import os
-import re
-import time
 import subprocess
 from pathlib import Path
-from datetime import datetime
-from typing import Any, Optional
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 
-def _find_poppler_pdftotext() -> Optional[str]:
+def _find_poppler_pdftotext() -> str | None:
     """Locate pdftotext binary from common install locations."""
     import shutil
+
     found = shutil.which("pdftotext")
     if found:
         return found
@@ -45,10 +42,18 @@ REPORTS_DIR = EVAL_DIR / "reports"
 PAPERS_DIR = BASE_DIR / "DataADES"
 
 PIPELINE_AGENTS = [
-    "ingestion", "schema_mapping", "ontology_mapping",
-    "unit_harmonization", "quality_assurance", "feature_engineering",
-    "leakage_detection", "encoding", "statistical_diagnostics",
-    "model_readiness", "documentation", "export",
+    "ingestion",
+    "schema_mapping",
+    "ontology_mapping",
+    "unit_harmonization",
+    "quality_assurance",
+    "feature_engineering",
+    "leakage_detection",
+    "encoding",
+    "statistical_diagnostics",
+    "model_readiness",
+    "documentation",
+    "export",
 ]
 
 PAPER_FILES = sorted([p.name for p in PAPERS_DIR.glob("*.pdf")]) if PAPERS_DIR.exists() else []
@@ -92,7 +97,7 @@ def load_provenance() -> dict:
     return {}
 
 
-def load_dataframe(path: str) -> Optional[pd.DataFrame]:
+def load_dataframe(path: str) -> pd.DataFrame | None:
     p = Path(path)
     if not p.exists():
         return None
@@ -104,6 +109,7 @@ def load_dataframe(path: str) -> Optional[pd.DataFrame]:
         return pd.read_excel(p, engine="openpyxl")
     elif p.suffix == ".sqlite":
         import sqlite3
+
         conn = sqlite3.connect(p)
         df = pd.read_sql("SELECT * FROM data", conn)
         conn.close()
@@ -111,10 +117,12 @@ def load_dataframe(path: str) -> Optional[pd.DataFrame]:
     return None
 
 
-def get_master_df() -> Optional[pd.DataFrame]:
-    for f in ["Universal_Agricultural_ML_Master.csv",
-              "Universal_Agricultural_ML_Master.parquet",
-              "MachineLearning_Dataset.csv"]:
+def get_master_df() -> pd.DataFrame | None:
+    for f in [
+        "Universal_Agricultural_ML_Master.csv",
+        "Universal_Agricultural_ML_Master.parquet",
+        "MachineLearning_Dataset.csv",
+    ]:
         df = load_dataframe(str(OUTPUT_DIR / f))
         if df is not None:
             return df
@@ -124,8 +132,10 @@ def get_master_df() -> Optional[pd.DataFrame]:
 def get_uams_cols() -> list:
     try:
         import sys
+
         sys.path.insert(0, str(BASE_DIR))
         from agri_ai_agent.config.schema import UAMS_COLUMNS
+
         return UAMS_COLUMNS
     except ImportError:
         return []
@@ -134,13 +144,15 @@ def get_uams_cols() -> list:
 def extract_text_from_pdf(pdf_path: str) -> str:
     try:
         import pdfplumber
+
         with pdfplumber.open(pdf_path) as pdf:
             return "\n".join(page.extract_text() or "" for page in pdf.pages)
     except ImportError:
         pass
     try:
-        import pdfminer
+        import pdfminer  # noqa: F401
         from pdfminer.high_level import extract_text as pdfminer_extract
+
         return pdfminer_extract(pdf_path)
     except ImportError:
         pass
@@ -150,8 +162,10 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         if poppler_bin:
             result = subprocess.run(
                 [poppler_bin, "-layout", pdf_path, "-"],
-                capture_output=True, text=True, timeout=30,
-                creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0),
+                capture_output=True,
+                text=True,
+                timeout=30,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
             )
             if result.returncode == 0 and result.stdout.strip():
                 return result.stdout
@@ -159,6 +173,7 @@ def extract_text_from_pdf(pdf_path: str) -> str:
         pass
     try:
         import PyPDF2
+
         text = []
         with open(pdf_path, "rb") as f:
             reader = PyPDF2.PdfReader(f)
@@ -176,6 +191,7 @@ def extract_tables_from_pdf(pdf_path: str) -> list:
     tables = []
     try:
         import pdfplumber
+
         with pdfplumber.open(pdf_path) as pdf:
             for page in pdf.pages:
                 tbls = page.extract_tables()
@@ -190,6 +206,7 @@ def extract_tables_from_pdf(pdf_path: str) -> list:
 def get_memory_usage() -> dict:
     try:
         import psutil
+
         proc = psutil.Process(os.getpid())
         return {
             "rss_mb": proc.memory_info().rss / 1e6,
@@ -203,6 +220,7 @@ def get_memory_usage() -> dict:
 def get_cpu_usage() -> float:
     try:
         import psutil
+
         return psutil.Process(os.getpid()).cpu_percent(interval=0.1)
     except ImportError:
         return 0.0
@@ -226,7 +244,7 @@ def write_csv(filename: str, data: list[dict]):
 def format_seconds(s: float) -> str:
     if s < 60:
         return f"{s:.2f}s"
-    return f"{s/60:.2f}m"
+    return f"{s / 60:.2f}m"
 
 
 def safe_mean(vals: list) -> float:

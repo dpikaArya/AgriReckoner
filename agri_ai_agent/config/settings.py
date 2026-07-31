@@ -48,9 +48,18 @@ class AgriAISettings:
     INCREMENTAL_MODE: bool = False
 
     def ensure_dirs(self):
-        for d in [self.OUTPUT_DIR, self.PREDICTIONS_DIR, self.RECKONER_DIR,
-                  self.REPORTS_DIR, self.LOG_DIR, self.CONTRACTS_DIR,
-                  self.CHECKPOINT_DIR, self.MODELS_DIR,
-                  self.BENCHMARK_DIR, self.EXPLAINABILITY_DIR,
-                  self.EXTERNAL_DATA_DIR, self.CONTINUOUS_LEARNING_DIR]:
+        for d in [
+            self.OUTPUT_DIR,
+            self.PREDICTIONS_DIR,
+            self.RECKONER_DIR,
+            self.REPORTS_DIR,
+            self.LOG_DIR,
+            self.CONTRACTS_DIR,
+            self.CHECKPOINT_DIR,
+            self.MODELS_DIR,
+            self.BENCHMARK_DIR,
+            self.EXPLAINABILITY_DIR,
+            self.EXTERNAL_DATA_DIR,
+            self.CONTINUOUS_LEARNING_DIR,
+        ]:
             d.mkdir(parents=True, exist_ok=True)

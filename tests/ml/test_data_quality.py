@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -8,25 +7,29 @@ from src.ml.data_quality.scoring import DatasetScorer, QualityTier
 class TestDatasetScorer:
     @pytest.fixture
     def complete_data(self):
-        return pd.DataFrame({
-            "Crop": ["Wheat", "Rice", "Maize"],
-            "Location": ["Field_A", "Field_B", "Field_C"],
-            "Country": ["India", "India", "India"],
-            "Soil_pH": [6.5, 7.0, 5.5],
-            "Organic_Carbon_pct": [0.8, 1.2, 0.5],
-            "Nitrogen_kg_ha": [120, 150, 90],
-            "Average_Temperature": [25, 28, 30],
-            "Rainfall_mm": [800, 1200, 600],
-            "Fertilizer_Name": ["Urea", "DAP", "MOP"],
-            "Yield_per_Hectare": [4.5, 6.0, 3.2],
-        })
+        return pd.DataFrame(
+            {
+                "Crop": ["Wheat", "Rice", "Maize"],
+                "Location": ["Field_A", "Field_B", "Field_C"],
+                "Country": ["India", "India", "India"],
+                "Soil_pH": [6.5, 7.0, 5.5],
+                "Organic_Carbon_pct": [0.8, 1.2, 0.5],
+                "Nitrogen_kg_ha": [120, 150, 90],
+                "Average_Temperature": [25, 28, 30],
+                "Rainfall_mm": [800, 1200, 600],
+                "Fertilizer_Name": ["Urea", "DAP", "MOP"],
+                "Yield_per_Hectare": [4.5, 6.0, 3.2],
+            }
+        )
 
     @pytest.fixture
     def sparse_data(self):
-        return pd.DataFrame({
-            "Crop": ["Wheat", None, None],
-            "Yield_per_Hectare": [4.5, None, None],
-        })
+        return pd.DataFrame(
+            {
+                "Crop": ["Wheat", None, None],
+                "Yield_per_Hectare": [4.5, None, None],
+            }
+        )
 
     def test_high_quality_scored_high(self, complete_data):
         scorer = DatasetScorer()

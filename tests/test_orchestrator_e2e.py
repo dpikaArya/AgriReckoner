@@ -21,18 +21,20 @@ logging.disable(logging.WARNING)
 def synthetic_df():
     rng = np.random.default_rng(0)
     n = 15
-    return pd.DataFrame({
-        "crop": ["Wheat", "Rice", "Maize"] * 5,
-        "season": ["Rabi", "Kharif", "Rabi", "Kharif", "Rabi"] * 3,
-        "tmax_c": rng.uniform(25, 38, n).round(1),
-        "tmin_c": rng.uniform(10, 22, n).round(1),
-        "rainfall_mm": rng.uniform(50, 300, n).round(0),
-        "ph": rng.uniform(5.5, 8.0, n).round(2),
-        "nitrogen_kg_ha": rng.uniform(40, 160, n).round(0),
-        "phosphorus": rng.uniform(10, 60, n).round(0),
-        "potassium": rng.uniform(20, 120, n).round(0),
-        "yield_per_ha": rng.uniform(1500, 5500, n).round(0),
-    })
+    return pd.DataFrame(
+        {
+            "crop": ["Wheat", "Rice", "Maize"] * 5,
+            "season": ["Rabi", "Kharif", "Rabi", "Kharif", "Rabi"] * 3,
+            "tmax_c": rng.uniform(25, 38, n).round(1),
+            "tmin_c": rng.uniform(10, 22, n).round(1),
+            "rainfall_mm": rng.uniform(50, 300, n).round(0),
+            "ph": rng.uniform(5.5, 8.0, n).round(2),
+            "nitrogen_kg_ha": rng.uniform(40, 160, n).round(0),
+            "phosphorus": rng.uniform(10, 60, n).round(0),
+            "potassium": rng.uniform(20, 120, n).round(0),
+            "yield_per_ha": rng.uniform(1500, 5500, n).round(0),
+        }
+    )
 
 
 @pytest.fixture
@@ -45,6 +47,7 @@ def temp_settings(tmp_path):
     return settings
 
 
+@pytest.mark.live
 def test_pipeline_runs_end_to_end(synthetic_df, temp_settings):
     orch = Orchestrator(settings=temp_settings)
     result = orch.run(df=synthetic_df)
@@ -55,6 +58,7 @@ def test_pipeline_runs_end_to_end(synthetic_df, temp_settings):
     assert len(result) == len(synthetic_df)
 
 
+@pytest.mark.live
 def test_pipeline_produces_headline_columns(synthetic_df, temp_settings):
     orch = Orchestrator(settings=temp_settings)
     result = orch.run(df=synthetic_df)
@@ -63,6 +67,7 @@ def test_pipeline_produces_headline_columns(synthetic_df, temp_settings):
         assert col in result.columns, f"missing headline column: {col}"
 
 
+@pytest.mark.live
 def test_input_dataframe_is_not_dropped(synthetic_df, temp_settings):
     """Regression: Orchestrator.run(df=) used to drop the input dataframe."""
     orch = Orchestrator(settings=temp_settings)
@@ -72,4 +77,5 @@ def test_input_dataframe_is_not_dropped(synthetic_df, temp_settings):
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(pytest.main([__file__, "-q"]))

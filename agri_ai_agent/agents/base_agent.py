@@ -11,7 +11,6 @@ import traceback
 from abc import ABC, abstractmethod
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
 
 import pandas as pd
 
@@ -24,31 +23,31 @@ from agri_ai_agent.utils.logging_utils import get_logger
 class BaseAgent(ABC):
     def __init__(
         self,
-        settings: Optional[AgriAISettings] = None,
-        retry_max: Optional[int] = None,
-        retry_delay: Optional[float] = None,
+        settings: AgriAISettings | None = None,
+        retry_max: int | None = None,
+        retry_delay: float | None = None,
     ):
         self.settings = settings or AgriAISettings()
         self.retry_max = retry_max if retry_max is not None else self.settings.AGENT_RETRY_MAX
-        self.retry_delay = retry_delay if retry_delay is not None else self.settings.AGENT_RETRY_DELAY_SEC
+        self.retry_delay = (
+            retry_delay if retry_delay is not None else self.settings.AGENT_RETRY_DELAY_SEC
+        )
         self.log = get_logger(self.__class__.__name__)
-        self.contract: Optional[AgentContract] = None
-        self.dataframe: Optional[pd.DataFrame] = None
-        self.dataset_package: Optional[DatasetPackage] = None
+        self.contract: AgentContract | None = None
+        self.dataframe: pd.DataFrame | None = None
+        self.dataset_package: DatasetPackage | None = None
 
     @property
     @abstractmethod
-    def agent_name(self) -> str:
-        ...
+    def agent_name(self) -> str: ...
 
     @abstractmethod
-    def process(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame:
-        ...
+    def process(self, df: pd.DataFrame, **kwargs) -> pd.DataFrame: ...
 
     def run(
         self,
         df: pd.DataFrame,
-        contract: Optional[AgentContract] = None,
+        contract: AgentContract | None = None,
         **kwargs,
     ) -> AgentContract:
         self.dataframe = df
@@ -59,7 +58,9 @@ class BaseAgent(ABC):
         for attempt in range(1, self.retry_max + 1):
             try:
                 self.contract.retry_count = attempt - 1
-                self.log.info("[%s] Starting (attempt %d/%d)", self.agent_name, attempt, self.retry_max)
+                self.log.info(
+                    "[%s] Starting (attempt %d/%d)", self.agent_name, attempt, self.retry_max
+                )
 
                 result_df = self.process(df, **kwargs)
                 self.dataframe = result_df
@@ -73,14 +74,13 @@ class BaseAgent(ABC):
 
                 self.log.info(
                     "[%s] Completed in %.2fs",
-                    self.agent_name, self.contract.execution_time_sec,
+                    self.agent_name,
+                    self.contract.execution_time_sec,
                 )
                 return self.contract
 
             except Exception as e:
-                self.log.warning(
-                    "[%s] Attempt %d failed: %s", self.agent_name, attempt, e
-                )
+                self.log.warning("[%s] Attempt %d failed: %s", self.agent_name, attempt, e)
                 self.contract.errors.append(f"Attempt {attempt}: {traceback.format_exc()}")
 
                 if attempt < self.retry_max:
@@ -106,6 +106,7 @@ class BaseAgent(ABC):
 
     def _normalize(self, name: str) -> str:
         import re
+
         n = str(name).lower().strip()
         n = re.sub(r"\s+", "_", n)
         n = n.replace("-", "_").replace(".", "")

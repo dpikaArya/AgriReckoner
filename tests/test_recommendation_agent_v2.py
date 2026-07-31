@@ -1,12 +1,14 @@
 """Tests for RecommendationAgent v2 — Phase 9."""
 
 import json
-import numpy as np
+
 import pandas as pd
 import pytest
 
 from agri_ai_agent.agents.recommendation_agent import (
-    RecommendationAgent, CROP_FERTILIZER_PREFS, FERTILIZER_COST_PER_KG,
+    CROP_FERTILIZER_PREFS,
+    FERTILIZER_COST_PER_KG,
+    RecommendationAgent,
 )
 
 
@@ -17,25 +19,26 @@ def agent():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Crop": ["Rice", "Wheat", "Maize", "Tomato"],
-        "Soil_pH": [6.0, 7.2, 5.8, 6.5],
-        "Nitrogen": [30, 100, 80, 60],
-        "Phosphorus": [10, 25, 30, 20],
-        "Potassium": [80, 200, 150, 120],
-        "Rainfall": [1200, 600, 500, 800],
-        "Average_Temperature": [28, 22, 26, 25],
-        "Yield_per_Hectare": [3000, 2500, 4000, 20000],
-        "Predicted_Yield": [3500, 2800, 4500, 25000],
-        "Dose": [120, 100, 150, 80],
-        "N_Status": ["low", "medium", "medium", "medium"],
-        "P_Status": ["low", "medium", "medium", "medium"],
-        "K_Status": ["low", "medium", "medium", "medium"],
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice", "Wheat", "Maize", "Tomato"],
+            "Soil_pH": [6.0, 7.2, 5.8, 6.5],
+            "Nitrogen": [30, 100, 80, 60],
+            "Phosphorus": [10, 25, 30, 20],
+            "Potassium": [80, 200, 150, 120],
+            "Rainfall": [1200, 600, 500, 800],
+            "Average_Temperature": [28, 22, 26, 25],
+            "Yield_per_Hectare": [3000, 2500, 4000, 20000],
+            "Predicted_Yield": [3500, 2800, 4500, 25000],
+            "Dose": [120, 100, 150, 80],
+            "N_Status": ["low", "medium", "medium", "medium"],
+            "P_Status": ["low", "medium", "medium", "medium"],
+            "K_Status": ["low", "medium", "medium", "medium"],
+        }
+    )
 
 
 class TestRecommendationAgentV2:
-
     def test_agent_name(self, agent):
         assert agent.agent_name == "RecommendationAgent"
 
@@ -47,11 +50,17 @@ class TestRecommendationAgentV2:
     def test_all_columns_added(self, agent, sample_df):
         result = agent.process(sample_df)
         required_cols = [
-            "Recommended_Fertilizer", "Recommended_Dose",
-            "Recommended_Application_Interval", "Expected_Yield_Increase",
-            "Expected_Yield_Increase_Pct", "Confidence_Score",
-            "Economic_Score", "Environmental_Score", "Risk_Score",
-            "Top_Alternatives", "Recommendation_Summary",
+            "Recommended_Fertilizer",
+            "Recommended_Dose",
+            "Recommended_Application_Interval",
+            "Expected_Yield_Increase",
+            "Expected_Yield_Increase_Pct",
+            "Confidence_Score",
+            "Economic_Score",
+            "Environmental_Score",
+            "Risk_Score",
+            "Top_Alternatives",
+            "Recommendation_Summary",
         ]
         for col in required_cols:
             assert col in result.columns, f"Missing: {col}"

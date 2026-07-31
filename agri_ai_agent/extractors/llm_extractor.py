@@ -42,7 +42,13 @@ def build_extraction_schema() -> dict:
                         "source_quote": {"type": ["string", "null"]},
                         "model_confidence": {"type": ["number", "null"]},
                     },
-                    "required": ["column", "value", "unit_as_reported", "source_quote", "model_confidence"],
+                    "required": [
+                        "column",
+                        "value",
+                        "unit_as_reported",
+                        "source_quote",
+                        "model_confidence",
+                    ],
                 },
             },
         },
@@ -53,10 +59,7 @@ def build_extraction_schema() -> dict:
 def _build_user_prompt(text: str) -> str:
     columns = ", ".join(EXTRACTION_COLUMNS)
     body = text if len(text) <= 12000 else text[:12000]
-    return (
-        f"Extract these variables if explicitly stated: {columns}.\n\n"
-        f"PAPER TEXT:\n{body}"
-    )
+    return f"Extract these variables if explicitly stated: {columns}.\n\nPAPER TEXT:\n{body}"
 
 
 class LLMExtractor:
@@ -99,7 +102,9 @@ class LLMExtractor:
         )
 
 
-def make_openai_completer(client, model: str = "gpt-4o-mini", temperature: float = 0.0) -> Completer:
+def make_openai_completer(
+    client, model: str = "gpt-4o-mini", temperature: float = 0.0
+) -> Completer:
     """Wrap an OpenAI client into a ``complete(system, user, schema)`` callable."""
 
     def complete(system: str, user: str, schema: dict) -> str:
@@ -118,12 +123,24 @@ def make_openai_completer(client, model: str = "gpt-4o-mini", temperature: float
 
 
 if __name__ == "__main__":
+
     def fake_complete(system, user, schema):
-        return json.dumps({
-            "crop": "Wheat", "doi": "10.1/x", "year": 2021,
-            "fields": [{"column": "Soil_pH", "value": 6.8, "unit_as_reported": None,
-                        "source_quote": "Soil pH was 6.8.", "model_confidence": 0.9}],
-        })
+        return json.dumps(
+            {
+                "crop": "Wheat",
+                "doi": "10.1/x",
+                "year": 2021,
+                "fields": [
+                    {
+                        "column": "Soil_pH",
+                        "value": 6.8,
+                        "unit_as_reported": None,
+                        "source_quote": "Soil pH was 6.8.",
+                        "model_confidence": 0.9,
+                    }
+                ],
+            }
+        )
 
     result = LLMExtractor(fake_complete).extract("Soil pH was 6.8.", "paper1")
     assert result.crop == "Wheat" and result.fields[0].column == "Soil_pH"

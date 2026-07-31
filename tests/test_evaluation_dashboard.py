@@ -8,8 +8,8 @@ import pandas as pd
 import pytest
 
 from agri_ai_agent.dashboard import (
-    EvaluationDashboard,
     METRIC_NAMES,
+    EvaluationDashboard,
 )
 
 
@@ -20,31 +20,41 @@ def dashboard():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Crop": ["Rice", "Wheat", "Maize"],
-        "Nitrogen": [100.0, 80.0, 90.0],
-        "Phosphorus": [25.0, 20.0, np.nan],
-        "Potassium": [150.0, 120.0, 100.0],
-        "Yield_per_Hectare": [4.5, 3.2, 5.1],
-        "Fertilizer_Name": ["Urea", "DAP", "NPK"],
-        "Dose": [50.0, 30.0, 40.0],
-        "Application_Interval": [30, 45, 60],
-        "Recommendation_Confidence": [0.85, 0.72, 0.91],
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice", "Wheat", "Maize"],
+            "Nitrogen": [100.0, 80.0, 90.0],
+            "Phosphorus": [25.0, 20.0, np.nan],
+            "Potassium": [150.0, 120.0, 100.0],
+            "Yield_per_Hectare": [4.5, 3.2, 5.1],
+            "Fertilizer_Name": ["Urea", "DAP", "NPK"],
+            "Dose": [50.0, 30.0, 40.0],
+            "Application_Interval": [30, 45, 60],
+            "Recommendation_Confidence": [0.85, 0.72, 0.91],
+        }
+    )
 
 
 @pytest.fixture
 def schema_columns():
     return [
-        "Crop", "Nitrogen", "Phosphorus", "Potassium",
-        "Yield_per_Hectare", "Fertilizer_Name", "Dose",
-        "Application_Interval", "Soil_pH", "Rainfall",
-        "Temperature_Max", "Temperature_Min", "Organic_Carbon",
+        "Crop",
+        "Nitrogen",
+        "Phosphorus",
+        "Potassium",
+        "Yield_per_Hectare",
+        "Fertilizer_Name",
+        "Dose",
+        "Application_Interval",
+        "Soil_pH",
+        "Rainfall",
+        "Temperature_Max",
+        "Temperature_Min",
+        "Organic_Carbon",
     ]
 
 
 class TestEvaluationDashboard:
-
     def test_initial_state(self, dashboard):
         assert dashboard.metrics == {}
         assert dashboard.details == {}
@@ -127,7 +137,7 @@ class TestEvaluationDashboard:
             {"status": "failed"},
         ]
         rate = dashboard.compute_pipeline_success_rate(results)
-        assert rate == pytest.approx(2/3, abs=0.01)
+        assert rate == pytest.approx(2 / 3, abs=0.01)
 
     def test_compute_pipeline_success_rate_all_success(self, dashboard):
         results = [{"status": "success"}, {"status": "success"}]

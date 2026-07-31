@@ -30,5 +30,7 @@ def test_resolve_duplicate_columns_noop_when_unique():
 
 if __name__ == "__main__":
     import sys
+
     import pytest
+
     sys.exit(pytest.main([__file__, "-q"]))

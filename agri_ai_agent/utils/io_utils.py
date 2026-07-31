@@ -3,31 +3,30 @@ File I/O utilities for dataset ingestion and export.
 """
 
 import csv
-import json
 from pathlib import Path
-from typing import Any, Optional, Union
 
 import pandas as pd
-import numpy as np
 
 
 def detect_encoding(filepath: Path, n_bytes: int = 10000) -> str:
     try:
         import chardet
+
         raw = filepath.read_bytes()[:n_bytes]
         result = chardet.detect(raw)
-        return result.get("encoding", "utf-8")
+        return result.get("encoding") or "utf-8"
     except ImportError:
         return "utf-8"
 
 
 def detect_delimiter(filepath: Path, n_lines: int = 5) -> str:
     import logging
+
     _log = logging.getLogger(__name__)
     if not filepath.exists():
         return ","
     try:
-        with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+        with open(filepath, encoding="utf-8", errors="ignore") as f:
             sample = "".join(f.readline() for _ in range(n_lines))
         dialect = csv.Sniffer().sniff(sample, delimiters=",;\t|")
         return dialect.delimiter
@@ -36,7 +35,7 @@ def detect_delimiter(filepath: Path, n_lines: int = 5) -> str:
         return ","
 
 
-def detect_worksheet(filepath: Path) -> Optional[str]:
+def detect_worksheet(filepath: Path) -> str | None:
     if filepath.suffix.lower() in (".xlsx", ".xls"):
         if not filepath.exists():
             return None
@@ -53,10 +52,10 @@ def detect_worksheet(filepath: Path) -> Optional[str]:
 
 
 def read_dataset(
-    filepath: Union[str, Path],
-    sheet_name: Optional[str] = None,
-    encoding: Optional[str] = None,
-    delimiter: Optional[str] = None,
+    filepath: str | Path,
+    sheet_name: str | None = None,
+    encoding: str | None = None,
+    delimiter: str | None = None,
 ) -> pd.DataFrame:
     filepath = Path(filepath)
     if not filepath.exists():
@@ -84,6 +83,7 @@ def read_dataset(
 
     elif suffix == ".db":
         import sqlite3
+
         conn = sqlite3.connect(str(filepath))
         try:
             tables = pd.read_sql("SELECT name FROM sqlite_master WHERE type='table'", conn)
@@ -96,16 +96,17 @@ def read_dataset(
     elif suffix == ".duckdb":
         try:
             import duckdb
+
             con = duckdb.connect(str(filepath))
             try:
                 tables = con.execute("SELECT table_name FROM information_schema.tables").fetchdf()
                 if len(tables):
-                    return con.execute(f"SELECT * FROM \"{tables.iloc[0, 0]}\"").fetchdf()
+                    return con.execute(f'SELECT * FROM "{tables.iloc[0, 0]}"').fetchdf()
                 return pd.DataFrame()
             finally:
                 con.close()
         except ImportError:
-            raise RuntimeError("duckdb package required to read .duckdb files")
+            raise RuntimeError("duckdb package required to read .duckdb files") from None
 
     else:
         raise ValueError(f"Unsupported file format: {suffix}")
@@ -113,8 +114,8 @@ def read_dataset(
 
 def write_dataframe(
     df: pd.DataFrame,
-    path: Union[str, Path],
-    format: Optional[str] = None,
+    path: str | Path,
+    format: str | None = None,
     **kwargs,
 ) -> Path:
     path = Path(path)
@@ -137,6 +138,7 @@ def write_dataframe(
         df.to_json(path, orient="records", **kwargs)
     elif format == "sqlite":
         import sqlite3
+
         conn = sqlite3.connect(str(path))
         try:
             df.to_sql("data", conn, if_exists="replace", index=False)
@@ -145,13 +147,14 @@ def write_dataframe(
     elif format == "duckdb":
         try:
             import duckdb
+
             con = duckdb.connect(str(path))
             try:
                 con.execute("CREATE TABLE data AS SELECT * FROM df")
             finally:
                 con.close()
         except ImportError:
-            raise RuntimeError("duckdb package required to write .duckdb files")
+            raise RuntimeError("duckdb package required to write .duckdb files") from None
     else:
         raise ValueError(f"Unsupported export format: {format}")
 

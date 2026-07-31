@@ -1,23 +1,19 @@
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import AgentContract
 from agri_ai_agent.external_data.connector_manager import (
     ConnectorManager,
 )
-from agri_ai_agent.external_data.data_enricher import enrich_master
 from agri_ai_agent.external_data.registry_db import DatasetRegistry
 from agri_ai_agent.knowledge_graph.graph import KnowledgeGraph
 from agri_ai_agent.knowledge_graph.provenance import (
-    register_dataset_lineage,
-    write_provenance_artifact,
     update_knowledge_graph,
+    write_provenance_artifact,
 )
 
 
@@ -35,11 +31,14 @@ class ExternalDataSourceAgent(BaseAgent):
         registry_path = kwargs.get("registry_path", self.settings.DATASET_REGISTRY_PATH)
         registry = DatasetRegistry(registry_path)
 
-        use_integration = kwargs.get("use_integration",
-                                     os.getenv("AGRI_USE_DATA_SOURCE_INTEGRATION", "false").lower() == "true")
+        use_integration = kwargs.get(
+            "use_integration",
+            os.getenv("AGRI_USE_DATA_SOURCE_INTEGRATION", "false").lower() == "true",
+        )
 
         if use_integration:
             from src.data_sources.integration import DataSourceIntegration
+
             integration = DataSourceIntegration(
                 registry=registry,
                 download_dir=download_dir,
@@ -88,7 +87,8 @@ class ExternalDataSourceAgent(BaseAgent):
         self.log.info(
             "Connector run complete: %d succeeded, %d failed, "
             "%d datasets downloaded, %d valid, %.1fs total",
-            summary["succeeded"], summary["failed"],
+            summary["succeeded"],
+            summary["failed"],
             summary["total_datasets_downloaded"],
             summary["total_datasets_valid"],
             summary["total_duration_sec"],
@@ -98,7 +98,7 @@ class ExternalDataSourceAgent(BaseAgent):
         results_rows = []
 
         provenance_dir = Path(kwargs.get("provenance_dir", download_dir / "provenance"))
-        kg: Optional[KnowledgeGraph] = kwargs.get("knowledge_graph")
+        kg: KnowledgeGraph | None = kwargs.get("knowledge_graph")
 
         for src, pkgs in packages_by_source.items():
             for pkg in pkgs:
@@ -114,18 +114,25 @@ class ExternalDataSourceAgent(BaseAgent):
                     self.contract.processing_stage = "external_data"
                     self.contract.processing_mode = "download"
                 except Exception as exc:
-                    self.log.warning("[%s] provenance tracking failed for %s/%s: %s",
-                                     self.agent_name, src, pkg.resource_id, exc)
-                results_rows.append({
-                    "source": src,
-                    "resource_id": pkg.resource_id,
-                    "name": pkg.name,
-                    "rows": pkg.row_count,
-                    "columns": pkg.column_count,
-                    "is_valid": pkg.is_valid,
-                    "version": pkg.version,
-                    "download_path": str(pkg.download_path) if pkg.download_path else "",
-                })
+                    self.log.warning(
+                        "[%s] provenance tracking failed for %s/%s: %s",
+                        self.agent_name,
+                        src,
+                        pkg.resource_id,
+                        exc,
+                    )
+                results_rows.append(
+                    {
+                        "source": src,
+                        "resource_id": pkg.resource_id,
+                        "name": pkg.name,
+                        "rows": pkg.row_count,
+                        "columns": pkg.column_count,
+                        "is_valid": pkg.is_valid,
+                        "version": pkg.version,
+                        "download_path": str(pkg.download_path) if pkg.download_path else "",
+                    }
+                )
 
         result_df = pd.DataFrame(results_rows) if results_rows else pd.DataFrame()
         summary_path = self.save_artifact(
@@ -141,11 +148,16 @@ class ExternalDataSourceAgent(BaseAgent):
             enrich_mode = "merged (row append)"
         self.log.info(
             "External data layer complete: %d packages from %d sources %s into %d columns",
-            len(all_packages), len(healthy), enrich_mode, len(merged.columns),
+            len(all_packages),
+            len(healthy),
+            enrich_mode,
+            len(merged.columns),
         )
         return merged
 
-    def run(self, df: pd.DataFrame, contract: Optional[AgentContract] = None, **kwargs) -> AgentContract:
+    def run(
+        self, df: pd.DataFrame, contract: AgentContract | None = None, **kwargs
+    ) -> AgentContract:
         self.dataframe = df
         self.contract = contract or AgentContract(agent_name=self.agent_name)
         self.contract.status = "running"
@@ -161,7 +173,8 @@ class ExternalDataSourceAgent(BaseAgent):
             self.contract.output_data = self._build_output(result_df, **kwargs)
             self.log.info(
                 "[%s] Completed in %.2fs",
-                self.agent_name, self.contract.execution_time_sec,
+                self.agent_name,
+                self.contract.execution_time_sec,
             )
         except Exception as e:
             self.contract.status = "failed"

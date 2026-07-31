@@ -4,10 +4,8 @@ Evaluates AGROVOC, Crop Ontology, Plant Ontology, Environment Ontology, Unit Ont
 """
 
 import time
-from pathlib import Path
 
-from evaluation.utils import OUTPUT_DIR, write_report, load_dataframe
-import pandas as pd
+from evaluation.utils import OUTPUT_DIR, load_dataframe, write_report
 
 
 def evaluate_ontology():
@@ -21,8 +19,13 @@ def evaluate_ontology():
 
     total_entries = len(df)
 
-    required_cols = ["AGROVOC", "Crop Ontology", "Plant Ontology",
-                     "Environment Ontology", "Unit Ontology"]
+    required_cols = [
+        "AGROVOC",
+        "Crop Ontology",
+        "Plant Ontology",
+        "Environment Ontology",
+        "Unit Ontology",
+    ]
     coverage_by_source = {}
     for col in required_cols:
         if col in df.columns:
@@ -46,11 +49,11 @@ def evaluate_ontology():
         if col in df.columns:
             unmapped = df[~df[col].notna() | (df[col].astype(str).str.strip() == "")]
             for _, row in unmapped.iterrows():
-                var = row.get("variable", row.get("Column", row.get("Field", f"row_{_}"))),
+                var = (row.get("variable", row.get("Column", row.get("Field", f"row_{_}"))),)
                 missing_terms.append(f"{var} -> {col}")
 
     report = f"""# Stage 03: Ontology Mapping Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 Total mapped entries: {total_entries}
 
 ## Summary
@@ -84,7 +87,7 @@ Total mapped entries: {total_entries}
 
 def _empty_report(reason: str):
     report = f"""# Stage 03: Ontology Mapping Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 **Error:** {reason}
 
 No ontology mapping data available to evaluate.

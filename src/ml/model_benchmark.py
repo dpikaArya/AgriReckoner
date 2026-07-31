@@ -1,16 +1,15 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import (
-    RandomForestRegressor,
-    RandomForestClassifier,
     GradientBoostingRegressor,
+    RandomForestClassifier,
+    RandomForestRegressor,
 )
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.linear_model import Lasso, LinearRegression, Ridge
 from sklearn.metrics import (
     accuracy_score,
     f1_score,
@@ -21,23 +20,20 @@ from sklearn.metrics import (
     recall_score,
     roc_auc_score,
 )
-from sklearn.model_selection import cross_val_score, KFold
-from sklearn.svm import SVR
+from sklearn.model_selection import cross_val_score
 
 logger = logging.getLogger("ModelBenchmark")
 
 
 class ModelBenchmark:
-    def __init__(self, output_dir: Optional[Path] = None, cv_folds: int = 5, random_state: int = 42):
+    def __init__(self, output_dir: Path | None = None, cv_folds: int = 5, random_state: int = 42):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.cv_folds = cv_folds
         self.random_state = random_state
         self.results_: list[dict] = []
 
-    def benchmark_regression(
-        self, X: pd.DataFrame, y: pd.Series
-    ) -> pd.DataFrame:
+    def benchmark_regression(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         if X.empty or y.empty:
             logger.warning("Empty data for regression benchmark")
             return pd.DataFrame()
@@ -52,25 +48,25 @@ class ModelBenchmark:
                 results.append(result)
             except Exception as e:
                 logger.warning("Benchmark for %s failed: %s", name, e)
-                results.append({
-                    "model": name,
-                    "rmse": None,
-                    "mae": None,
-                    "r2": None,
-                    "mape": None,
-                    "cv_rmse_mean": None,
-                    "cv_rmse_std": None,
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "model": name,
+                        "rmse": None,
+                        "mae": None,
+                        "r2": None,
+                        "mape": None,
+                        "cv_rmse_mean": None,
+                        "cv_rmse_std": None,
+                        "error": str(e),
+                    }
+                )
 
         self.results_ = results
         df = pd.DataFrame(results)
         self._save_results(df, "regression")
         return df
 
-    def benchmark_classification(
-        self, X: pd.DataFrame, y: pd.Series
-    ) -> pd.DataFrame:
+    def benchmark_classification(self, X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         if X.empty or y.empty:
             logger.warning("Empty data for classification benchmark")
             return pd.DataFrame()
@@ -85,15 +81,17 @@ class ModelBenchmark:
                 results.append(result)
             except Exception as e:
                 logger.warning("Benchmark for %s failed: %s", name, e)
-                results.append({
-                    "model": name,
-                    "accuracy": None,
-                    "precision": None,
-                    "recall": None,
-                    "f1": None,
-                    "roc_auc": None,
-                    "error": str(e),
-                })
+                results.append(
+                    {
+                        "model": name,
+                        "accuracy": None,
+                        "precision": None,
+                        "recall": None,
+                        "f1": None,
+                        "roc_auc": None,
+                        "error": str(e),
+                    }
+                )
 
         self.results_ = results
         df = pd.DataFrame(results)
@@ -105,68 +103,103 @@ class ModelBenchmark:
             ("Linear Regression", LinearRegression()),
             ("Ridge", Ridge(alpha=1.0, random_state=self.random_state)),
             ("Lasso", Lasso(alpha=0.01, random_state=self.random_state)),
-            ("Random Forest", RandomForestRegressor(
-                n_estimators=100, random_state=self.random_state, n_jobs=-1
-            )),
-            ("Gradient Boosting", GradientBoostingRegressor(
-                n_estimators=100, random_state=self.random_state
-            )),
+            (
+                "Random Forest",
+                RandomForestRegressor(n_estimators=100, random_state=self.random_state, n_jobs=-1),
+            ),
+            (
+                "Gradient Boosting",
+                GradientBoostingRegressor(n_estimators=100, random_state=self.random_state),
+            ),
         ]
         try:
             import xgboost
-            models.append(("XGBoost", xgboost.XGBRegressor(
-                n_estimators=100, random_state=self.random_state, verbosity=0, n_jobs=-1
-            )))
+
+            models.append(
+                (
+                    "XGBoost",
+                    xgboost.XGBRegressor(
+                        n_estimators=100, random_state=self.random_state, verbosity=0, n_jobs=-1
+                    ),
+                )
+            )
         except ImportError:
             pass
         try:
             import lightgbm
-            models.append(("LightGBM", lightgbm.LGBMRegressor(
-                n_estimators=100, random_state=self.random_state, verbosity=-1, n_jobs=-1
-            )))
+
+            models.append(
+                (
+                    "LightGBM",
+                    lightgbm.LGBMRegressor(
+                        n_estimators=100, random_state=self.random_state, verbosity=-1, n_jobs=-1
+                    ),
+                )
+            )
         except ImportError:
             pass
         try:
             from catboost import CatBoostRegressor
-            models.append(("CatBoost", CatBoostRegressor(
-                iterations=100, random_seed=self.random_state, verbose=False
-            )))
+
+            models.append(
+                (
+                    "CatBoost",
+                    CatBoostRegressor(iterations=100, random_seed=self.random_state, verbose=False),
+                )
+            )
         except ImportError:
             pass
         return models
 
     def _get_classification_models(self) -> list[tuple[str, object]]:
         models = [
-            ("Random Forest", RandomForestClassifier(
-                n_estimators=100, random_state=self.random_state, n_jobs=-1
-            )),
+            (
+                "Random Forest",
+                RandomForestClassifier(n_estimators=100, random_state=self.random_state, n_jobs=-1),
+            ),
         ]
         try:
             import xgboost
-            models.append(("XGBoost", xgboost.XGBClassifier(
-                n_estimators=100, random_state=self.random_state, verbosity=0, n_jobs=-1
-            )))
+
+            models.append(
+                (
+                    "XGBoost",
+                    xgboost.XGBClassifier(
+                        n_estimators=100, random_state=self.random_state, verbosity=0, n_jobs=-1
+                    ),
+                )
+            )
         except ImportError:
             pass
         try:
             import lightgbm
-            models.append(("LightGBM", lightgbm.LGBMClassifier(
-                n_estimators=100, random_state=self.random_state, verbosity=-1, n_jobs=-1
-            )))
+
+            models.append(
+                (
+                    "LightGBM",
+                    lightgbm.LGBMClassifier(
+                        n_estimators=100, random_state=self.random_state, verbosity=-1, n_jobs=-1
+                    ),
+                )
+            )
         except ImportError:
             pass
         try:
             from catboost import CatBoostClassifier
-            models.append(("CatBoost", CatBoostClassifier(
-                iterations=100, random_seed=self.random_state, verbose=False
-            )))
+
+            models.append(
+                (
+                    "CatBoost",
+                    CatBoostClassifier(
+                        iterations=100, random_seed=self.random_state, verbose=False
+                    ),
+                )
+            )
         except ImportError:
             pass
         return models
 
-    def _evaluate_regression(
-        self, name: str, model, X: pd.DataFrame, y: pd.Series
-    ) -> dict:
+    def _evaluate_regression(self, name: str, model, X: pd.DataFrame, y: pd.Series) -> dict:
         from sklearn.model_selection import train_test_split
 
         X_train, X_test, y_train, y_test = train_test_split(
@@ -183,8 +216,12 @@ class ModelBenchmark:
         mape = float((np.abs((y_test - y_pred) / y_test_safe).mean()) * 100)
 
         cv_scores = cross_val_score(
-            model, X, y, cv=min(self.cv_folds, len(X)),
-            scoring="neg_root_mean_squared_error", n_jobs=-1,
+            model,
+            X,
+            y,
+            cv=min(self.cv_folds, len(X)),
+            scoring="neg_root_mean_squared_error",
+            n_jobs=-1,
         )
 
         return {
@@ -197,9 +234,7 @@ class ModelBenchmark:
             "cv_rmse_std": round(float(cv_scores.std()), 4),
         }
 
-    def _evaluate_classification(
-        self, name: str, model, X: pd.DataFrame, y: pd.Series
-    ) -> dict:
+    def _evaluate_classification(self, name: str, model, X: pd.DataFrame, y: pd.Series) -> dict:
         from sklearn.model_selection import train_test_split
         from sklearn.preprocessing import LabelEncoder
 
@@ -215,7 +250,9 @@ class ModelBenchmark:
         result = {
             "model": name,
             "accuracy": round(accuracy_score(y_test, y_pred), 4),
-            "precision": round(precision_score(y_test, y_pred, average="weighted", zero_division=0), 4),
+            "precision": round(
+                precision_score(y_test, y_pred, average="weighted", zero_division=0), 4
+            ),
             "recall": round(recall_score(y_test, y_pred, average="weighted", zero_division=0), 4),
             "f1": round(f1_score(y_test, y_pred, average="weighted", zero_division=0), 4),
         }
@@ -263,7 +300,7 @@ class ModelBenchmark:
         with open(self.output_dir / "model_comparison.json", "w") as f:
             json.dump(all_results, f, indent=2, default=str)
 
-    def _generate_html(self, df: pd.DataFrame, bench_type: str, best: Optional[dict]):
+    def _generate_html(self, df: pd.DataFrame, bench_type: str, best: dict | None):
         metric_cols = [c for c in df.columns if c not in ["model", "error"]]
         html_rows = []
         for _, row in df.iterrows():
@@ -288,13 +325,13 @@ tr:nth-child(even) {{ background-color: #f2f2f2; }}
 </style></head><body>
 <h1>Model Comparison - {bench_type.title()}</h1>
 <table><thead><tr><th>Model</th>{metric_headers}</tr></thead>
-<tbody>{''.join(html_rows)}</tbody></table>
+<tbody>{"".join(html_rows)}</tbody></table>
 </body></html>"""
         path = self.output_dir / f"model_comparison_{bench_type}.html"
         path.write_text(html, encoding="utf-8")
         logger.info("Saved %s comparison HTML to %s", bench_type, path)
 
-    def get_best_model_name(self) -> Optional[str]:
+    def get_best_model_name(self) -> str | None:
         if not self.results_:
             return None
         valid = [r for r in self.results_ if r.get("r2") is not None]

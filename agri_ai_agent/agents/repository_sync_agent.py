@@ -3,15 +3,15 @@ from datetime import datetime
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.contracts.messages import AgentContract
-from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
-from agri_ai_agent.continuous_learning.version_history import VersionHistory
 from agri_ai_agent.continuous_learning.change_detector import ChangeDetector, ChangeSet
 from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph
 from agri_ai_agent.continuous_learning.reports import (
-    generate_sync_report,
     generate_provenance_report,
+    generate_sync_report,
 )
+from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
+from agri_ai_agent.continuous_learning.version_history import VersionHistory
+from agri_ai_agent.contracts.messages import AgentContract
 
 
 class RepositorySyncAgent(BaseAgent):
@@ -42,7 +42,9 @@ class RepositorySyncAgent(BaseAgent):
 
         self.log.info(
             "Checked %d repo(s), %d changed, %d affected stage(s)",
-            len(registry.list_enabled()), len(changes.changed_repos), len(affected_stages),
+            len(registry.list_enabled()),
+            len(changes.changed_repos),
+            len(affected_stages),
         )
 
         self.contract.output_data["repos_checked"] = len(registry.list_enabled())
@@ -84,7 +86,9 @@ class RepositorySyncAgent(BaseAgent):
             ).total_seconds()
             self.contract.output_data = self._build_output(result_df, **kwargs)
             self.log.info(
-                "[%s] Completed in %.2fs", self.agent_name, self.contract.execution_time_sec,
+                "[%s] Completed in %.2fs",
+                self.agent_name,
+                self.contract.execution_time_sec,
             )
         except Exception as e:
             self.contract.status = "failed"

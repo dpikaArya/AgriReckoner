@@ -1,7 +1,6 @@
 """Tests for ExplainabilityAgent — AAIF v2.0."""
 
 import json
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -18,38 +17,45 @@ def agent():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Crop": ["Rice", "Wheat", "Maize"],
-        "Nitrogen": [100.0, 80.0, 90.0],
-        "Phosphorus": [25.0, 20.0, 15.0],
-        "Potassium": [150.0, 120.0, 100.0],
-        "Soil_pH": [6.5, 7.0, 6.8],
-        "Rainfall": [1200, 800, 900],
-        "Temperature_Max": [33, 30, 32],
-        "Temperature_Min": [22, 18, 20],
-        "Yield_per_Hectare": [4.5, 3.2, 5.1],
-        "Target_Yield": [4.8, 3.5, 5.3],
-        "Predicted_Yield": [4.6, 3.3, 5.0],
-        "Fertilizer_Name": ["Urea", "DAP", "NPK"],
-        "Dose": [50.0, 30.0, 40.0],
-        "Application_Interval": [30, 45, 60],
-        "Recommended_Fertilizer": ["Urea", "DAP", "NPK"],
-        "Recommended_Dose": [50.0, 30.0, 40.0],
-        "Confidence_Score": [0.85, 0.72, 0.91],
-        "Source_Paper": ["Paper_A", "Paper_B", "Paper_C"],
-        "Fuzzy_N_Action": ["Apply Urea", "Apply DAP", "Apply NPK"],
-        "Fuzzy_P_Action": ["Maintain", "Increase", "Maintain"],
-        "Fuzzy_K_Action": ["No change", "Apply MOP", "No change"],
-        "Fuzzy_Risk": ["Low", "Medium", "Low"],
-        "Recommendation_Summary": ["Best option for Rice", "Good for Wheat", "Optimal for Maize"],
-        "Top_Alternatives": ['[{"fertilizer":"DAP","dose":30}]',
-                             '[{"fertilizer":"NPK","dose":40}]',
-                             '[{"fertilizer":"Urea","dose":50}]'],
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice", "Wheat", "Maize"],
+            "Nitrogen": [100.0, 80.0, 90.0],
+            "Phosphorus": [25.0, 20.0, 15.0],
+            "Potassium": [150.0, 120.0, 100.0],
+            "Soil_pH": [6.5, 7.0, 6.8],
+            "Rainfall": [1200, 800, 900],
+            "Temperature_Max": [33, 30, 32],
+            "Temperature_Min": [22, 18, 20],
+            "Yield_per_Hectare": [4.5, 3.2, 5.1],
+            "Target_Yield": [4.8, 3.5, 5.3],
+            "Predicted_Yield": [4.6, 3.3, 5.0],
+            "Fertilizer_Name": ["Urea", "DAP", "NPK"],
+            "Dose": [50.0, 30.0, 40.0],
+            "Application_Interval": [30, 45, 60],
+            "Recommended_Fertilizer": ["Urea", "DAP", "NPK"],
+            "Recommended_Dose": [50.0, 30.0, 40.0],
+            "Confidence_Score": [0.85, 0.72, 0.91],
+            "Source_Paper": ["Paper_A", "Paper_B", "Paper_C"],
+            "Fuzzy_N_Action": ["Apply Urea", "Apply DAP", "Apply NPK"],
+            "Fuzzy_P_Action": ["Maintain", "Increase", "Maintain"],
+            "Fuzzy_K_Action": ["No change", "Apply MOP", "No change"],
+            "Fuzzy_Risk": ["Low", "Medium", "Low"],
+            "Recommendation_Summary": [
+                "Best option for Rice",
+                "Good for Wheat",
+                "Optimal for Maize",
+            ],
+            "Top_Alternatives": [
+                '[{"fertilizer":"DAP","dose":30}]',
+                '[{"fertilizer":"NPK","dose":40}]',
+                '[{"fertilizer":"Urea","dose":50}]',
+            ],
+        }
+    )
 
 
 class TestExplainabilityAgent:
-
     def test_agent_name(self, agent):
         assert agent.agent_name == "ExplainabilityAgent"
 
@@ -212,8 +218,9 @@ class TestExplainabilityAgent:
     def test_with_pipeline_results(self, agent, sample_df, tmp_path):
         agent.settings.REPORTS_DIR = tmp_path / "reports"
         results = {
-            "training": AgentContract(agent_name="TrainingAgent", status="success",
-                                       artifacts=["models/xgboost_yield.pkl"]),
+            "training": AgentContract(
+                agent_name="TrainingAgent", status="success", artifacts=["models/xgboost_yield.pkl"]
+            ),
         }
         agent.run(sample_df, pipeline_results=results)
         summary = tmp_path / "reports" / "explainability" / "prediction_explanations.json"
@@ -222,11 +229,13 @@ class TestExplainabilityAgent:
 
     def test_missing_fields_detected(self, agent, tmp_path):
         agent.settings.REPORTS_DIR = tmp_path / "reports"
-        df = pd.DataFrame({
-            "Crop": ["Rice"],
-            "Nitrogen": [np.nan],
-            "Phosphorus": [20.0],
-        })
+        df = pd.DataFrame(
+            {
+                "Crop": ["Rice"],
+                "Nitrogen": [np.nan],
+                "Phosphorus": [20.0],
+            }
+        )
         agent.run(df)
         summary = tmp_path / "reports" / "explainability" / "prediction_explanations.json"
         data = json.loads(summary.read_text(encoding="utf-8"))

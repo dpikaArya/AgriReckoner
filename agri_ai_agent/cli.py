@@ -27,12 +27,20 @@ def main():
 
     learn_parser = sub.add_parser("learn", help="Run continuous learning cycle")
     learn_parser.add_argument("--papers", "-p", required=True, help="Directory with new PDF papers")
-    learn_parser.add_argument("--force-retrain", action="store_true", help="Force retrain even without improvement")
-    learn_parser.add_argument("--update-fuzzy-rules", action="store_true", help="Update fuzzy rules based on data drift")
+    learn_parser.add_argument(
+        "--force-retrain", action="store_true", help="Force retrain even without improvement"
+    )
+    learn_parser.add_argument(
+        "--update-fuzzy-rules", action="store_true", help="Update fuzzy rules based on data drift"
+    )
 
-    extract_parser = sub.add_parser("extract", help="Extract UAMS rows from PDFs via grounded LLM extraction")
+    extract_parser = sub.add_parser(
+        "extract", help="Extract UAMS rows from PDFs via grounded LLM extraction"
+    )
     extract_parser.add_argument("--papers", "-p", required=True, help="Directory of PDF papers")
-    extract_parser.add_argument("--out", "-o", help="Output CSV path (default: OUTPUT_DIR/LLM_Extracted_Schema.csv)")
+    extract_parser.add_argument(
+        "--out", "-o", help="Output CSV path (default: OUTPUT_DIR/LLM_Extracted_Schema.csv)"
+    )
 
     sub.add_parser("version", help="Print version info")
 
@@ -40,6 +48,7 @@ def main():
 
     if args.command == "version":
         from agri_ai_agent import __version__
+
         print(f"AgriAI v{__version__}")
         return
 
@@ -50,6 +59,7 @@ def main():
     settings = AgriAISettings()
     if args.settings:
         import json
+
         with open(args.settings) as f:
             overrides = json.load(f)
         for k, v in overrides.items():

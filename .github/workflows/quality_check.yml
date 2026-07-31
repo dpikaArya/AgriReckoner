@@ -33,7 +33,7 @@ jobs:
         run: ruff format --check .
 
       - name: Run tests
-        run: pytest -v --tb=short --junitxml=test-results.xml --cov=agri_ai_agent --cov-report=term-missing
+        run: pytest -m "not live" -v --tb=short --junitxml=test-results.xml --cov=agri_ai_agent --cov-report=term-missing
 
       - name: Type check with mypy
         run: mypy src/ --ignore-missing-imports

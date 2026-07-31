@@ -10,24 +10,43 @@ Edge types: DESCRIBES, TREATS, GROWS, OBSERVES, YIELDS, HAS_SOIL, HAS_CLIMATE, M
 import json
 from collections import Counter
 from pathlib import Path
-from typing import Optional
 
 import networkx as nx
-import numpy as np
 import pandas as pd
 
+VALID_NODE_TYPES = frozenset(
+    [
+        "Paper",
+        "Treatment",
+        "Crop",
+        "Observation",
+        "Yield",
+        "Soil",
+        "Climate",
+        "Management",
+        "Repository",
+        "Dataset",
+        "Evidence",
+        "Document",
+    ]
+)
 
-VALID_NODE_TYPES = frozenset([
-    "Paper", "Treatment", "Crop", "Observation",
-    "Yield", "Soil", "Climate", "Management",
-    "Repository", "Dataset", "Evidence", "Document",
-])
-
-VALID_EDGE_TYPES = frozenset([
-    "DESCRIBES", "TREATS", "GROWS", "OBSERVES",
-    "YIELDS", "HAS_SOIL", "HAS_CLIMATE", "MANAGES",
-    "PROVIDES", "CONTAINS", "SUPPORTED_BY", "FROM_SOURCE",
-])
+VALID_EDGE_TYPES = frozenset(
+    [
+        "DESCRIBES",
+        "TREATS",
+        "GROWS",
+        "OBSERVES",
+        "YIELDS",
+        "HAS_SOIL",
+        "HAS_CLIMATE",
+        "MANAGES",
+        "PROVIDES",
+        "CONTAINS",
+        "SUPPORTED_BY",
+        "FROM_SOURCE",
+    ]
+)
 
 EDGE_NODE_PAIRS = {
     "DESCRIBES": ("Paper", "Treatment"),
@@ -65,13 +84,17 @@ class KnowledgeGraph:
 
     def add_node(self, node_id: str, node_type: str, **properties):
         if node_type not in VALID_NODE_TYPES:
-            raise ValueError(f"Invalid node type '{node_type}'. Must be one of {sorted(VALID_NODE_TYPES)}")
+            raise ValueError(
+                f"Invalid node type '{node_type}'. Must be one of {sorted(VALID_NODE_TYPES)}"
+            )
         self._graph.add_node(node_id, node_type=node_type, **properties)
         self._node_types[node_id] = node_type
 
     def add_edge(self, source: str, target: str, edge_type: str, **properties):
         if edge_type not in VALID_EDGE_TYPES:
-            raise ValueError(f"Invalid edge type '{edge_type}'. Must be one of {sorted(VALID_EDGE_TYPES)}")
+            raise ValueError(
+                f"Invalid edge type '{edge_type}'. Must be one of {sorted(VALID_EDGE_TYPES)}"
+            )
         expected = EDGE_NODE_PAIRS[edge_type]
         src_type = self._node_types.get(source)
         tgt_type = self._node_types.get(target)
@@ -86,7 +109,7 @@ class KnowledgeGraph:
         self._graph.add_edge(source, target, edge_type=edge_type, **properties)
         self._edge_types[(source, target)] = edge_type
 
-    def get_node(self, node_id: str) -> Optional[dict]:
+    def get_node(self, node_id: str) -> dict | None:
         if node_id in self._graph:
             data = dict(self._graph.nodes[node_id])
             data["id"] = node_id
@@ -121,7 +144,7 @@ class KnowledgeGraph:
             return list(self._graph.predecessors(node_id))
         return list(self._graph.predecessors(node_id)) + list(self._graph.successors(node_id))
 
-    def shortest_path(self, source: str, target: str) -> Optional[list[str]]:
+    def shortest_path(self, source: str, target: str) -> list[str] | None:
         try:
             return nx.shortest_path(self._graph, source, target)
         except (nx.NetworkXNoPath, nx.NodeNotFound):
@@ -156,8 +179,13 @@ class KnowledgeGraph:
             "density": nx.density(self._graph),
         }
 
-    def build_from_dataframe(self, df: pd.DataFrame, paper_col: str = "Source_Paper",
-                              crop_col: str = "Crop", treatment_cols: list[str] | None = None):
+    def build_from_dataframe(
+        self,
+        df: pd.DataFrame,
+        paper_col: str = "Source_Paper",
+        crop_col: str = "Crop",
+        treatment_cols: list[str] | None = None,
+    ):
         if treatment_cols is None:
             treatment_cols = ["Fertilizer_Name", "Dose", "Application_Interval"]
 
@@ -177,8 +205,12 @@ class KnowledgeGraph:
                 country = row.get("Country", "")
                 doi = row.get("DOI", "")
                 self.add_node(
-                    f"Paper:{paper}", "Paper",
-                    title=paper, year=year, country=country, doi=doi,
+                    f"Paper:{paper}",
+                    "Paper",
+                    title=paper,
+                    year=year,
+                    country=country,
+                    doi=doi,
                 )
                 papers_added.add(paper)
 
@@ -220,7 +252,14 @@ class KnowledgeGraph:
             if pd.notna(rf) or pd.notna(tmax):
                 climate_id = f"Climate:{paper}"
                 if climate_id not in [n for n in self._graph.nodes() if n.startswith("Climate:")]:
-                    self.add_node(climate_id, "Climate", rainfall=rf, temp_max=tmax, temp_min=tmin, paper=paper)
+                    self.add_node(
+                        climate_id,
+                        "Climate",
+                        rainfall=rf,
+                        temp_max=tmax,
+                        temp_min=tmin,
+                        paper=paper,
+                    )
                     self.add_edge(f"Paper:{paper}", climate_id, "HAS_CLIMATE")
                     edges_added += 1
 
@@ -229,7 +268,9 @@ class KnowledgeGraph:
                 mgmt_id = f"Management:{gs}"
                 if mgmt_id not in [n for n in self._graph.nodes() if n.startswith("Management:")]:
                     self.add_node(mgmt_id, "Management", growth_stage=gs)
-                for tid in [n for n in self._graph.nodes() if n.startswith("Treatment:") and paper in n]:
+                for tid in [
+                    n for n in self._graph.nodes() if n.startswith("Treatment:") and paper in n
+                ]:
                     if not self._graph.has_edge(tid, mgmt_id):
                         self.add_edge(tid, mgmt_id, "MANAGES")
                         edges_added += 1

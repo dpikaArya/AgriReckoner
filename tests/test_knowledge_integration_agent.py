@@ -5,7 +5,9 @@ import pandas as pd
 import pytest
 
 from agri_ai_agent.agents.knowledge_integration_agent import (
-    KnowledgeIntegrationAgent, CROP_YIELD_RANGES, SOIL_PROPERTY_DEFAULTS, REGIONAL_CLIMATE,
+    REGIONAL_CLIMATE,
+    SOIL_PROPERTY_DEFAULTS,
+    KnowledgeIntegrationAgent,
 )
 
 
@@ -16,23 +18,24 @@ def agent():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Crop": ["Rice", "Wheat", "Maize", "Tomato", "UnknownCrop"],
-        "Country": ["India", "USA", "China", "Brazil", "Nigeria"],
-        "Soil_pH": [6.5, np.nan, 7.0, np.nan, np.nan],
-        "Organic_Carbon": [0.8, np.nan, 0.5, np.nan, np.nan],
-        "Nitrogen": [100, np.nan, np.nan, 80, np.nan],
-        "Phosphorus": [20, np.nan, np.nan, np.nan, 15],
-        "Potassium": [150, np.nan, 200, np.nan, np.nan],
-        "Average_Temperature": [28, np.nan, np.nan, 25, np.nan],
-        "Rainfall": [1200, np.nan, 600, np.nan, np.nan],
-        "Humidity": [75, np.nan, np.nan, np.nan, 60],
-        "Yield_per_Hectare": [4.5, 2.0, np.nan, np.nan, np.nan],
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice", "Wheat", "Maize", "Tomato", "UnknownCrop"],
+            "Country": ["India", "USA", "China", "Brazil", "Nigeria"],
+            "Soil_pH": [6.5, np.nan, 7.0, np.nan, np.nan],
+            "Organic_Carbon": [0.8, np.nan, 0.5, np.nan, np.nan],
+            "Nitrogen": [100, np.nan, np.nan, 80, np.nan],
+            "Phosphorus": [20, np.nan, np.nan, np.nan, 15],
+            "Potassium": [150, np.nan, 200, np.nan, np.nan],
+            "Average_Temperature": [28, np.nan, np.nan, 25, np.nan],
+            "Rainfall": [1200, np.nan, 600, np.nan, np.nan],
+            "Humidity": [75, np.nan, np.nan, np.nan, 60],
+            "Yield_per_Hectare": [4.5, 2.0, np.nan, np.nan, np.nan],
+        }
+    )
 
 
 class TestKnowledgeIntegrationAgent:
-
     def test_agent_name(self, agent):
         assert agent.agent_name == "KnowledgeIntegrationAgent"
 
@@ -43,9 +46,15 @@ class TestKnowledgeIntegrationAgent:
 
     def test_crop_yield_range_columns_added(self, agent, sample_df):
         result = agent.process(sample_df)
-        for col in ["Crop_Yield_Min", "Crop_Yield_Max", "Crop_Yield_Unit",
-                     "Crop_Opt_Temp_Min", "Crop_Opt_Temp_Max",
-                     "Crop_Opt_Rain_Min", "Crop_Opt_Rain_Max"]:
+        for col in [
+            "Crop_Yield_Min",
+            "Crop_Yield_Max",
+            "Crop_Yield_Unit",
+            "Crop_Opt_Temp_Min",
+            "Crop_Opt_Temp_Max",
+            "Crop_Opt_Rain_Min",
+            "Crop_Opt_Rain_Max",
+        ]:
             assert col in result.columns
 
     def test_rice_yield_ranges(self, agent, sample_df):
@@ -80,7 +89,10 @@ class TestKnowledgeIntegrationAgent:
         assert "Yield_Upper_Bound" in result.columns
         assert pd.notna(result.loc[2, "Yield_Lower_Bound"])
         assert pd.notna(result.loc[3, "Yield_Lower_Bound"])
-        assert pd.isna(result.loc[2, "Yield_per_Hectare"]) or result.loc[2, "Yield_per_Hectare"] == result.loc[2, "Yield_per_Hectare"]
+        assert (
+            pd.isna(result.loc[2, "Yield_per_Hectare"])
+            or result.loc[2, "Yield_per_Hectare"] == result.loc[2, "Yield_per_Hectare"]
+        )
 
     def test_existing_values_not_overwritten(self, agent, sample_df):
         result = agent.process(sample_df)
@@ -119,21 +131,25 @@ class TestKnowledgeIntegrationAgent:
         assert "Crop_Yield_Min" not in result.columns
 
     def test_no_missing_values(self, agent):
-        df = pd.DataFrame({
-            "Crop": ["Rice"],
-            "Soil_pH": [6.5],
-            "Average_Temperature": [28],
-            "Rainfall": [1200],
-            "Yield_per_Hectare": [4.5],
-        })
+        df = pd.DataFrame(
+            {
+                "Crop": ["Rice"],
+                "Soil_pH": [6.5],
+                "Average_Temperature": [28],
+                "Rainfall": [1200],
+                "Yield_per_Hectare": [4.5],
+            }
+        )
         result = agent.process(df)
         assert isinstance(result, pd.DataFrame)
 
     def test_multiple_unknown_crops(self, agent):
-        df = pd.DataFrame({
-            "Crop": ["CropX", "CropY"],
-            "Yield_per_Hectare": [np.nan, np.nan],
-        })
+        df = pd.DataFrame(
+            {
+                "Crop": ["CropX", "CropY"],
+                "Yield_per_Hectare": [np.nan, np.nan],
+            }
+        )
         result = agent.process(df)
         assert pd.isna(result.loc[0, "Yield_per_Hectare"])
         assert pd.isna(result.loc[1, "Yield_per_Hectare"])

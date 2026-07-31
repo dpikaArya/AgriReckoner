@@ -7,15 +7,12 @@ and dose-response relationships.
 
 import re
 from collections import defaultdict
-from typing import Any, Optional
+from typing import Any
 
 import pandas as pd
-import numpy as np
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.contracts.messages import AgentContract
 from agri_ai_agent.config.settings import AgriAISettings
-
 
 TABLE_TYPE_PATTERNS: dict[str, list[re.Pattern]] = {
     "treatment": [
@@ -66,8 +63,17 @@ STATISTICAL_FORMATS = {
 }
 
 CONTROL_KEYWORDS = {
-    "control", "ctrl", "check", "ck", "t0", "untreated", "unfertilized",
-    "water_only", "absolute_control", "negative_control", "blank",
+    "control",
+    "ctrl",
+    "check",
+    "ck",
+    "t0",
+    "untreated",
+    "unfertilized",
+    "water_only",
+    "absolute_control",
+    "negative_control",
+    "blank",
 }
 
 DOSE_PATTERN = re.compile(
@@ -77,7 +83,7 @@ DOSE_PATTERN = re.compile(
 
 
 class TableIntelligenceAgent(BaseAgent):
-    def __init__(self, settings: Optional[AgriAISettings] = None, **kwargs):
+    def __init__(self, settings: AgriAISettings | None = None, **kwargs):
         super().__init__(settings=settings, **kwargs)
         self.extraction_report: dict[str, Any] = {}
 
@@ -238,7 +244,7 @@ class TableIntelligenceAgent(BaseAgent):
             extracted.append(record)
         return extracted
 
-    def _find_column(self, headers: list[str], keywords: list[str]) -> Optional[int]:
+    def _find_column(self, headers: list[str], keywords: list[str]) -> int | None:
         for i, header in enumerate(headers):
             header_lower = header.lower()
             for kw in keywords:
@@ -246,7 +252,7 @@ class TableIntelligenceAgent(BaseAgent):
                     return i
         return None
 
-    def _parse_statistical_value(self, value: str) -> Optional[dict]:
+    def _parse_statistical_value(self, value: str) -> dict | None:
         value = str(value).strip()
         if not value or value in ("-", "–", "—", "ns", "NA", "N/A"):
             return None
@@ -291,7 +297,7 @@ class TableIntelligenceAgent(BaseAgent):
 
         return None
 
-    def _parse_numeric(self, value: str) -> Optional[float]:
+    def _parse_numeric(self, value: str) -> float | None:
         s = str(value).strip()
         s = re.sub(r"[†‡*]", "", s)
         s = re.sub(r"\s*±\s*.*", "", s)
@@ -309,7 +315,7 @@ class TableIntelligenceAgent(BaseAgent):
         t = re.sub(r"[†‡*]", "", t)
         return any(kw in t for kw in CONTROL_KEYWORDS)
 
-    def _extract_dose(self, treatment) -> Optional[dict]:
+    def _extract_dose(self, treatment) -> dict | None:
         if not isinstance(treatment, str):
             return None
         match = DOSE_PATTERN.search(treatment)
@@ -323,8 +329,14 @@ class TableIntelligenceAgent(BaseAgent):
 
     def _harmonize_schema(self, df: pd.DataFrame) -> pd.DataFrame:
         essential_cols = [
-            "Source_File", "Treatment", "Table_Type", "_extraction_method",
-            "Is_Control", "Dose_Value", "Dose_Unit", "Dose_Per",
+            "Source_File",
+            "Treatment",
+            "Table_Type",
+            "_extraction_method",
+            "Is_Control",
+            "Dose_Value",
+            "Dose_Unit",
+            "Dose_Per",
         ]
         for col in essential_cols:
             if col not in df.columns:

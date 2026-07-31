@@ -6,11 +6,11 @@ from contextvars import ContextVar
 from datetime import datetime, timezone
 from pathlib import Path
 from types import TracebackType
-from typing import Any, Optional
+from typing import Any
 
-execution_id_var: ContextVar[Optional[str]] = ContextVar("execution_id", default=None)
-dataset_id_var: ContextVar[Optional[str]] = ContextVar("dataset_id", default=None)
-api_source_var: ContextVar[Optional[str]] = ContextVar("api_source", default=None)
+execution_id_var: ContextVar[str | None] = ContextVar("execution_id", default=None)
+dataset_id_var: ContextVar[str | None] = ContextVar("dataset_id", default=None)
+api_source_var: ContextVar[str | None] = ContextVar("api_source", default=None)
 
 _LOG_DIR = Path("logs")
 _APPLICATION_LOG = _LOG_DIR / "application.log"
@@ -47,15 +47,11 @@ class JSONFormatter(logging.Formatter):
             log_entry["exception"] = {
                 "type": record.exc_info[0].__name__,
                 "value": str(record.exc_info[1]),
-                "traceback": "".join(
-                    traceback.format_exception(*record.exc_info)
-                ).splitlines()
+                "traceback": "".join(traceback.format_exception(*record.exc_info)).splitlines()
                 if record.exc_info
                 else None,
             }
-        extra_keys = [
-            k for k in record.__dict__ if k not in log_entry and not k.startswith("_")
-        ]
+        extra_keys = [k for k in record.__dict__ if k not in log_entry and not k.startswith("_")]
         for k in extra_keys:
             try:
                 json.dumps(record.__dict__[k])
@@ -81,7 +77,10 @@ _is_initialized: bool = False
 
 
 def _create_rotating_handler(
-    path: Path, level: int, formatter: logging.Formatter, filters: list[logging.Filter] | None = None
+    path: Path,
+    level: int,
+    formatter: logging.Formatter,
+    filters: list[logging.Filter] | None = None,
 ) -> logging.handlers.RotatingFileHandler:
     path.parent.mkdir(parents=True, exist_ok=True)
     handler = logging.handlers.RotatingFileHandler(
@@ -163,7 +162,9 @@ class LoggerContext:
         self._api_source_token: Any = None
 
     def __enter__(self) -> "LoggerContext":
-        self._execution_id_token = execution_id_var.set(self.execution_id) if self.execution_id else None
+        self._execution_id_token = (
+            execution_id_var.set(self.execution_id) if self.execution_id else None
+        )
         self._dataset_id_token = dataset_id_var.set(self.dataset_id) if self.dataset_id else None
         self._api_source_token = api_source_var.set(self.api_source) if self.api_source else None
         return self

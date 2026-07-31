@@ -10,7 +10,6 @@ Stores history in benchmark/benchmark_history.json and exports reports.
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -19,20 +18,33 @@ from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.contracts.messages import AgentContract
 
 EXTRACTION_METRICS = [
-    "precision", "recall", "f1_score", "cell_accuracy",
-    "table_accuracy", "schema_completeness",
+    "precision",
+    "recall",
+    "f1_score",
+    "cell_accuracy",
+    "table_accuracy",
+    "schema_completeness",
 ]
 TRAINING_METRICS = ["r2", "mae", "rmse", "mape", "cv_score"]
 RECOMMENDATION_METRICS = [
-    "recommendation_confidence", "recommendation_agreement",
-    "coverage", "evidence_support",
+    "recommendation_confidence",
+    "recommendation_agreement",
+    "coverage",
+    "evidence_support",
 ]
 RECKONER_METRICS = [
-    "population_rate", "missing_values", "completeness", "usability_score",
+    "population_rate",
+    "missing_values",
+    "completeness",
+    "usability_score",
 ]
 OVERALL_METRICS = [
-    "pipeline_score", "agent_score", "extraction_score",
-    "model_score", "recommendation_score", "overall_aaif_health",
+    "pipeline_score",
+    "agent_score",
+    "extraction_score",
+    "model_score",
+    "recommendation_score",
+    "overall_aaif_health",
 ]
 
 
@@ -48,8 +60,9 @@ class BenchmarkAgent(BaseAgent):
 
         pipeline_results = kwargs.get("pipeline_results", {})
         reference_df = kwargs.get("reference_df")
-        history_path = kwargs.get("history_path",
-                                   self.settings.OUTPUT_DIR / "benchmark" / "benchmark_history.json")
+        history_path = kwargs.get(
+            "history_path", self.settings.OUTPUT_DIR / "benchmark" / "benchmark_history.json"
+        )
 
         metrics = {}
         metrics["extraction"] = self._compute_extraction_metrics(df, pipeline_results, reference_df)
@@ -71,7 +84,9 @@ class BenchmarkAgent(BaseAgent):
         self._export_reports(metrics)
         self._export_dashboard(metrics)
 
-        self.log.info("Overall AAIF Health: %.1f%%", metrics["overall"]["overall_aaif_health"] * 100)
+        self.log.info(
+            "Overall AAIF Health: %.1f%%", metrics["overall"]["overall_aaif_health"] * 100
+        )
 
         self._last_metrics = metrics
         return df
@@ -82,15 +97,20 @@ class BenchmarkAgent(BaseAgent):
             base["benchmark"] = self._last_metrics
         return base
 
-    def _compute_extraction_metrics(self, df: pd.DataFrame,
-                                     pipeline_results: dict,
-                                     reference_df: Optional[pd.DataFrame]) -> dict:
+    def _compute_extraction_metrics(
+        self, df: pd.DataFrame, pipeline_results: dict, reference_df: pd.DataFrame | None
+    ) -> dict:
         total_cells = df.shape[0] * df.shape[1]
         filled_cells = df.notna().sum().sum()
         cell_accuracy = float(filled_cells / total_cells) if total_cells > 0 else 0.0
 
-        schema_cols = [c for c in df.columns if not c.startswith("Provenance_")
-                       and not c.startswith("Fuzzy_") and not c.startswith("Recommendation_")]
+        schema_cols = [
+            c
+            for c in df.columns
+            if not c.startswith("Provenance_")
+            and not c.startswith("Fuzzy_")
+            and not c.startswith("Recommendation_")
+        ]
         schema_completeness = len(schema_cols) / 138.0 if 138 > 0 else 0.0
 
         if reference_df is not None and len(reference_df) > 0:
@@ -120,8 +140,7 @@ class BenchmarkAgent(BaseAgent):
             "schema_completeness": round(min(schema_completeness, 1.0), 4),
         }
 
-    def _compute_training_metrics(self, df: pd.DataFrame,
-                                   pipeline_results: dict) -> dict:
+    def _compute_training_metrics(self, df: pd.DataFrame, pipeline_results: dict) -> dict:
         target_cols = ["Target_Yield", "Predicted_Yield", "Yield_per_Hectare"]
         target_present = [c for c in target_cols if c in df.columns]
 
@@ -148,7 +167,9 @@ class BenchmarkAgent(BaseAgent):
                 rmse = float(np.sqrt(np.mean((t_common - p_common) ** 2)))
                 mask = t_common > 0
                 if mask.sum() > 0:
-                    mape = float(np.mean(np.abs((t_common[mask] - p_common[mask]) / t_common[mask])) * 100)
+                    mape = float(
+                        np.mean(np.abs((t_common[mask] - p_common[mask]) / t_common[mask])) * 100
+                    )
                 cv_score = r2 * 0.9
 
         return {
@@ -162,7 +183,6 @@ class BenchmarkAgent(BaseAgent):
     def _compute_recommendation_metrics(self, df: pd.DataFrame) -> dict:
         conf_col = "Confidence_Score"
         rec_col = "Recommended_Fertilizer"
-        alt_col = "Top_Alternatives"
 
         avg_conf = 0.0
         if conf_col in df.columns:
@@ -183,7 +203,9 @@ class BenchmarkAgent(BaseAgent):
 
         evidence_support = 0.0
         if "Source_Paper" in df.columns:
-            evidence_support = float(df["Source_Paper"].notna().sum() / len(df)) if len(df) > 0 else 0.0
+            evidence_support = (
+                float(df["Source_Paper"].notna().sum() / len(df)) if len(df) > 0 else 0.0
+            )
 
         return {
             "recommendation_confidence": round(avg_conf, 4),
@@ -193,8 +215,14 @@ class BenchmarkAgent(BaseAgent):
         }
 
     def _compute_reckoner_metrics(self, df: pd.DataFrame) -> dict:
-        key_cols = ["Crop", "Nitrogen", "Phosphorus", "Potassium",
-                     "Recommended_Fertilizer", "Recommended_Dose"]
+        key_cols = [
+            "Crop",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "Recommended_Fertilizer",
+            "Recommended_Dose",
+        ]
         present = [c for c in key_cols if c in df.columns]
 
         if not present:
@@ -245,23 +273,29 @@ class BenchmarkAgent(BaseAgent):
         rec = metrics.get("recommendation", {})
         reck = metrics.get("reckoner", {})
 
-        extraction_score = np.mean([
-            ext.get("cell_accuracy", 0),
-            ext.get("schema_completeness", 0),
-            ext.get("f1_score", 0),
-        ])
+        extraction_score = np.mean(
+            [
+                ext.get("cell_accuracy", 0),
+                ext.get("schema_completeness", 0),
+                ext.get("f1_score", 0),
+            ]
+        )
 
-        model_score = np.mean([
-            train.get("r2", 0),
-            max(0, 1 - train.get("rmse", 1)),
-            max(0, 1 - train.get("mae", 1)),
-        ])
+        model_score = np.mean(
+            [
+                train.get("r2", 0),
+                max(0, 1 - train.get("rmse", 1)),
+                max(0, 1 - train.get("mae", 1)),
+            ]
+        )
 
-        recommendation_score = np.mean([
-            rec.get("recommendation_confidence", 0),
-            rec.get("coverage", 0),
-            rec.get("evidence_support", 0),
-        ])
+        recommendation_score = np.mean(
+            [
+                rec.get("recommendation_confidence", 0),
+                rec.get("coverage", 0),
+                rec.get("evidence_support", 0),
+            ]
+        )
 
         agent_scores = metrics.get("agent_scores", {})
         if agent_scores:
@@ -291,7 +325,7 @@ class BenchmarkAgent(BaseAgent):
                 self.log.debug("Could not load benchmark history: %s", e)
         return []
 
-    def _find_best_run(self, history: list[dict]) -> Optional[dict]:
+    def _find_best_run(self, history: list[dict]) -> dict | None:
         if not history:
             return None
         best = None
@@ -303,8 +337,7 @@ class BenchmarkAgent(BaseAgent):
                 best = run
         return best
 
-    def _compare_runs(self, current: dict, best: Optional[dict],
-                       history: list[dict]) -> dict:
+    def _compare_runs(self, current: dict, best: dict | None, history: list[dict]) -> dict:
         comparison = {
             "is_best": True,
             "improvement_over_best": 0.0,
@@ -365,8 +398,7 @@ class BenchmarkAgent(BaseAgent):
             "model_score": metrics["overall"]["model_score"],
             "overall_health": metrics["overall"]["overall_aaif_health"],
             "agent_performance": {
-                name: s["success"]
-                for name, s in metrics.get("agent_scores", {}).items()
+                name: s["success"] for name, s in metrics.get("agent_scores", {}).items()
             },
             "historical_trend": metrics.get("comparison", {}),
             "timestamp": metrics.get("timestamp", ""),
@@ -384,15 +416,17 @@ class BenchmarkAgent(BaseAgent):
             pct = val * 100
             color = "#4CAF50" if val >= 0.8 else "#FF9800" if val >= 0.5 else "#F44336"
             rows += f"""<tr>
-                <td style="padding:10px;border-bottom:1px solid #eee">{key.replace('_',' ').title()}</td>
+                <td style="padding:10px;border-bottom:1px solid #eee">{key.replace("_", " ").title()}</td>
                 <td style="padding:10px;border-bottom:1px solid #eee;text-align:center">
                     <span style="background:{color};color:white;padding:3px 10px;border-radius:10px">{pct:.1f}%</span>
                 </td></tr>"""
 
         best_info = ""
         if comparison.get("best_timestamp"):
-            best_info = f"<p>Best historical: {comparison.get('best_score',0)*100:.1f}% at {comparison['best_timestamp']}</p>"
-            best_info += f"<p>Improvement: {comparison.get('improvement_over_best',0)*100:+.1f}%</p>"
+            best_info = f"<p>Best historical: {comparison.get('best_score', 0) * 100:.1f}% at {comparison['best_timestamp']}</p>"
+            best_info += (
+                f"<p>Improvement: {comparison.get('improvement_over_best', 0) * 100:+.1f}%</p>"
+            )
 
         return f"""<!DOCTYPE html><html><head><meta charset="utf-8">
 <title>AAIF Benchmark Report</title>
@@ -403,7 +437,7 @@ table{{width:100%;border-collapse:collapse;margin-top:20px}}
 th{{text-align:left;padding:10px;background:#f8f9fa;border-bottom:2px solid #dee2e6}}</style></head>
 <body><div class="container">
 <h1>AAIF Benchmark Report</h1>
-<p>Generated: {metrics.get('timestamp','N/A')}</p>
+<p>Generated: {metrics.get("timestamp", "N/A")}</p>
 <table><thead><tr><th>Metric</th><th>Score</th></tr></thead>
 <tbody>{rows}</tbody></table>
 {best_info}

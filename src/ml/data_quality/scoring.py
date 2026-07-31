@@ -2,7 +2,6 @@ import json
 import logging
 from enum import Enum
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -16,10 +15,10 @@ class QualityTier(str, Enum):
 
 
 class DatasetScorer:
-    def __init__(self, output_dir: Optional[Path] = None):
+    def __init__(self, output_dir: Path | None = None):
         self.output_dir = Path(output_dir) if output_dir else Path("reports")
         self.output_dir.mkdir(parents=True, exist_ok=True)
-        self.scores_: Optional[pd.DataFrame] = None
+        self.scores_: pd.DataFrame | None = None
 
     def score_dataset(self, df: pd.DataFrame) -> pd.DataFrame:
         if df.empty:
@@ -35,8 +34,12 @@ class DatasetScorer:
         scores["yield_score"] = self._score_yield(df)
 
         score_cols = [
-            "crop_score", "location_score", "soil_score",
-            "climate_score", "management_score", "yield_score",
+            "crop_score",
+            "location_score",
+            "soil_score",
+            "climate_score",
+            "management_score",
+            "yield_score",
         ]
         scores["total_score"] = scores[score_cols].sum(axis=1) / len(score_cols)
         scores["tier"] = scores["total_score"].apply(self._assign_tier)
@@ -47,8 +50,13 @@ class DatasetScorer:
 
     def _score_crop(self, df: pd.DataFrame) -> pd.Series:
         crop_cols = [
-            "Crop", "Crop_Type", "Crop_Name", "Crop_Variety",
-            "Crop_Season", "Season", "Crop_Duration_days",
+            "Crop",
+            "Crop_Type",
+            "Crop_Name",
+            "Crop_Variety",
+            "Crop_Season",
+            "Season",
+            "Crop_Duration_days",
         ]
         present = [c for c in crop_cols if c in df.columns]
         if not present:
@@ -58,8 +66,15 @@ class DatasetScorer:
 
     def _score_location(self, df: pd.DataFrame) -> pd.Series:
         loc_cols = [
-            "Location", "Region", "Country", "State", "District",
-            "Latitude", "Longitude", "Altitude_m", "Agro_Ecological_Zone",
+            "Location",
+            "Region",
+            "Country",
+            "State",
+            "District",
+            "Latitude",
+            "Longitude",
+            "Altitude_m",
+            "Agro_Ecological_Zone",
         ]
         present = [c for c in loc_cols if c in df.columns]
         if not present:
@@ -69,9 +84,15 @@ class DatasetScorer:
 
     def _score_soil(self, df: pd.DataFrame) -> pd.Series:
         soil_cols = [
-            "Soil_pH", "Soil_Texture", "Soil_Type", "Organic_Carbon_pct",
-            "Nitrogen_kg_ha", "Phosphorus_kg_ha", "Potassium_kg_ha",
-            "Cation_Exchange_Capacity", "Soil_Depth_cm",
+            "Soil_pH",
+            "Soil_Texture",
+            "Soil_Type",
+            "Organic_Carbon_pct",
+            "Nitrogen_kg_ha",
+            "Phosphorus_kg_ha",
+            "Potassium_kg_ha",
+            "Cation_Exchange_Capacity",
+            "Soil_Depth_cm",
         ]
         present = [c for c in soil_cols if c in df.columns]
         if not present:
@@ -81,9 +102,14 @@ class DatasetScorer:
 
     def _score_climate(self, df: pd.DataFrame) -> pd.Series:
         climate_cols = [
-            "Average_Temperature", "Temperature_Max", "Temperature_Min",
-            "Rainfall_mm", "Humidity_pct", "Solar_Radiation",
-            "Wind_Speed", "Evapotranspiration",
+            "Average_Temperature",
+            "Temperature_Max",
+            "Temperature_Min",
+            "Rainfall_mm",
+            "Humidity_pct",
+            "Solar_Radiation",
+            "Wind_Speed",
+            "Evapotranspiration",
         ]
         present = [c for c in climate_cols if c in df.columns]
         if not present:
@@ -93,9 +119,14 @@ class DatasetScorer:
 
     def _score_management(self, df: pd.DataFrame) -> pd.Series:
         mgmt_cols = [
-            "Fertilizer_Name", "Fertilizer_Type", "Dose_kg_acre",
-            "Irrigation", "Planting_Date", "Harvest_Date",
-            "Planting_Density", "Row_Spacing_cm",
+            "Fertilizer_Name",
+            "Fertilizer_Type",
+            "Dose_kg_acre",
+            "Irrigation",
+            "Planting_Date",
+            "Harvest_Date",
+            "Planting_Density",
+            "Row_Spacing_cm",
         ]
         present = [c for c in mgmt_cols if c in df.columns]
         if not present:
@@ -105,8 +136,12 @@ class DatasetScorer:
 
     def _score_yield(self, df: pd.DataFrame) -> pd.Series:
         yield_cols = [
-            "Yield_per_Hectare", "Yield_per_Plot", "Grain_Yield",
-            "Biomass_yield", "Fruit_Yield", "Seed_Yield",
+            "Yield_per_Hectare",
+            "Yield_per_Plot",
+            "Grain_Yield",
+            "Biomass_yield",
+            "Fruit_Yield",
+            "Seed_Yield",
         ]
         present = [c for c in yield_cols if c in df.columns]
         if not present:
@@ -157,7 +192,8 @@ class DatasetScorer:
                     "mean": round(scores[col].mean(), 4),
                     "std": round(scores[col].std(), 4),
                 }
-                for col in scores.columns if col not in ["total_score", "tier"]
+                for col in scores.columns
+                if col not in ["total_score", "tier"]
             },
         }
         summary_path = self.output_dir / "dataset_quality_summary.json"

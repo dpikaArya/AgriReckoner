@@ -1,7 +1,6 @@
 import hashlib
 import os
 from pathlib import Path
-from typing import Optional
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
@@ -22,42 +21,52 @@ class KaggleConnector(ExternalDataConnector):
         key = os.getenv("KAGGLE_KEY", "")
         return bool(username and key)
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         import subprocess
+
         search_term = query or "agriculture"
         try:
             result = subprocess.run(
                 ["kaggle", "datasets", "list", "--search", search_term, "--csv"],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             if result.returncode != 0:
                 return []
             lines = result.stdout.strip().split("\n")
             if len(lines) < 2:
                 return []
-            header = lines[0].split(",")
+            lines[0].split(",")
             datasets = []
             for line in lines[1:]:
                 parts = line.split(",")
                 if len(parts) >= 2:
-                    datasets.append({
-                        "id": parts[0].strip('"'),
-                        "name": parts[0].strip('"').split("/")[-1] if "/" in parts[0] else parts[0],
-                        "description": parts[1].strip('"') if len(parts) > 1 else "",
-                        "size": parts[3].strip('"') if len(parts) > 3 else "",
-                    })
+                    datasets.append(
+                        {
+                            "id": parts[0].strip('"'),
+                            "name": parts[0].strip('"').split("/")[-1]
+                            if "/" in parts[0]
+                            else parts[0],
+                            "description": parts[1].strip('"') if len(parts) > 1 else "",
+                            "size": parts[3].strip('"') if len(parts) > 3 else "",
+                        }
+                    )
             return datasets
         except Exception as e:
             self.log.debug("Kaggle list_datasets failed: %s", e)
             return []
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         import subprocess
+
         target_dir.mkdir(parents=True, exist_ok=True)
         try:
             subprocess.run(
                 ["kaggle", "datasets", "download", resource_id, "-p", str(target_dir), "--unzip"],
-                capture_output=True, text=True, timeout=300,
+                capture_output=True,
+                text=True,
+                timeout=300,
             )
             all_files = []
             for ext in ["parquet", "arrow", "csv", "json", "xml", "html", "pdf"]:

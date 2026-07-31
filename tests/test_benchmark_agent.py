@@ -1,19 +1,17 @@
 """Tests for BenchmarkAgent — AAIF v2.0."""
 
 import json
-from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
 from agri_ai_agent.agents.benchmark_agent import (
-    BenchmarkAgent,
     EXTRACTION_METRICS,
-    TRAINING_METRICS,
-    RECOMMENDATION_METRICS,
-    RECKONER_METRICS,
     OVERALL_METRICS,
+    RECKONER_METRICS,
+    RECOMMENDATION_METRICS,
+    TRAINING_METRICS,
+    BenchmarkAgent,
 )
 from agri_ai_agent.contracts.messages import AgentContract
 
@@ -25,21 +23,23 @@ def agent():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Crop": ["Rice", "Wheat", "Maize"],
-        "Nitrogen": [100.0, 80.0, 90.0],
-        "Phosphorus": [25.0, 20.0, 15.0],
-        "Potassium": [150.0, 120.0, 100.0],
-        "Soil_pH": [6.5, 7.0, 6.8],
-        "Rainfall": [1200, 800, 900],
-        "Yield_per_Hectare": [4.5, 3.2, 5.1],
-        "Target_Yield": [4.8, 3.5, 5.3],
-        "Predicted_Yield": [4.6, 3.3, 5.0],
-        "Recommended_Fertilizer": ["Urea", "DAP", "NPK"],
-        "Recommended_Dose": [50.0, 30.0, 40.0],
-        "Confidence_Score": [0.85, 0.72, 0.91],
-        "Source_Paper": ["Paper_A", "Paper_B", "Paper_C"],
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice", "Wheat", "Maize"],
+            "Nitrogen": [100.0, 80.0, 90.0],
+            "Phosphorus": [25.0, 20.0, 15.0],
+            "Potassium": [150.0, 120.0, 100.0],
+            "Soil_pH": [6.5, 7.0, 6.8],
+            "Rainfall": [1200, 800, 900],
+            "Yield_per_Hectare": [4.5, 3.2, 5.1],
+            "Target_Yield": [4.8, 3.5, 5.3],
+            "Predicted_Yield": [4.6, 3.3, 5.0],
+            "Recommended_Fertilizer": ["Urea", "DAP", "NPK"],
+            "Recommended_Dose": [50.0, 30.0, 40.0],
+            "Confidence_Score": [0.85, 0.72, 0.91],
+            "Source_Paper": ["Paper_A", "Paper_B", "Paper_C"],
+        }
+    )
 
 
 def _get_report(agent_obj):
@@ -47,7 +47,6 @@ def _get_report(agent_obj):
 
 
 class TestBenchmarkAgent:
-
     def test_agent_name(self, agent):
         assert agent.agent_name == "BenchmarkAgent"
 
@@ -164,7 +163,7 @@ class TestBenchmarkAgent:
 
     def test_empty_dataframe(self, agent):
         df = pd.DataFrame({"Crop": []})
-        contract = agent.run(df)
+        agent.run(df)
         report = _get_report(agent)
         assert report["overall"]["overall_aaif_health"] >= 0.0
 

@@ -1,8 +1,6 @@
 import hashlib
 from pathlib import Path
-from typing import Optional
 
-import pandas as pd
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
@@ -25,7 +23,7 @@ class FAOSTATConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         try:
             resp = requests.get(f"{self.base_url}/QA/QA", timeout=30)
             resp.raise_for_status()
@@ -34,19 +32,25 @@ class FAOSTATConnector(ExternalDataConnector):
             for ds in datasets:
                 code = ds.get("DomainCode", "")
                 name = ds.get("DomainName", "")
-                if query and query.lower() not in name.lower() and query.lower() not in code.lower():
+                if (
+                    query
+                    and query.lower() not in name.lower()
+                    and query.lower() not in code.lower()
+                ):
                     continue
-                results.append({
-                    "id": code,
-                    "name": name,
-                    "description": ds.get("Description", ""),
-                    "updated_at": ds.get("UpdateDate"),
-                })
+                results.append(
+                    {
+                        "id": code,
+                        "name": name,
+                        "description": ds.get("Description", ""),
+                        "updated_at": ds.get("UpdateDate"),
+                    }
+                )
             return results
         except requests.RequestException:
             return []
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         zip_url = f"https://fenixservices.fao.org/faostat/static/bulkdownloads/{resource_id}.zip"
         local_path = target_dir / f"faostat_{resource_id}.zip"
@@ -56,7 +60,9 @@ class FAOSTATConnector(ExternalDataConnector):
             local_path.write_bytes(resp.content)
             return local_path
         except requests.RequestException:
-            csv_url = f"https://fenixservices.fao.org/faostat/static/bulkdownloads/{resource_id}.csv"
+            csv_url = (
+                f"https://fenixservices.fao.org/faostat/static/bulkdownloads/{resource_id}.csv"
+            )
             local_path = local_path.with_suffix(".csv")
             try:
                 resp = requests.get(csv_url, timeout=120)

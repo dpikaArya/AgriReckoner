@@ -1,31 +1,34 @@
-import numpy as np
 import pandas as pd
 import pytest
 
 from src.ml.agricultural_features.climate_indices import ClimateIndices
-from src.ml.agricultural_features.soil_indices import SoilIndices
 from src.ml.agricultural_features.crop_interaction import CropEnvironmentInteraction
+from src.ml.agricultural_features.soil_indices import SoilIndices
 
 
 @pytest.fixture
 def climate_data():
-    return pd.DataFrame({
-        "Average_Temperature": [25, 30, 35, 20, 15],
-        "Temperature_Max": [30, 35, 40, 25, 20],
-        "Temperature_Min": [20, 25, 30, 15, 10],
-        "Rainfall_mm": [800, 1200, 600, 400, 1000],
-    })
+    return pd.DataFrame(
+        {
+            "Average_Temperature": [25, 30, 35, 20, 15],
+            "Temperature_Max": [30, 35, 40, 25, 20],
+            "Temperature_Min": [20, 25, 30, 15, 10],
+            "Rainfall_mm": [800, 1200, 600, 400, 1000],
+        }
+    )
 
 
 @pytest.fixture
 def soil_data():
-    return pd.DataFrame({
-        "Soil_pH": [6.5, 7.0, 5.5, 8.0, 4.5],
-        "Organic_Carbon_pct": [0.8, 1.2, 0.5, 1.5, 0.3],
-        "Nitrogen_kg_ha": [120, 150, 90, 180, 60],
-        "Phosphorus_kg_ha": [50, 30, 20, 60, 15],
-        "Potassium_kg_ha": [250, 180, 150, 300, 100],
-    })
+    return pd.DataFrame(
+        {
+            "Soil_pH": [6.5, 7.0, 5.5, 8.0, 4.5],
+            "Organic_Carbon_pct": [0.8, 1.2, 0.5, 1.5, 0.3],
+            "Nitrogen_kg_ha": [120, 150, 90, 180, 60],
+            "Phosphorus_kg_ha": [50, 30, 20, 60, 15],
+            "Potassium_kg_ha": [250, 180, 150, 300, 100],
+        }
+    )
 
 
 class TestClimateIndices:
@@ -92,35 +95,41 @@ class TestSoilIndices:
 
 class TestCropEnvironmentInteraction:
     def test_crop_duration_temperature(self):
-        df = pd.DataFrame({
-            "Average_Temperature": [25, 30],
-            "Crop_Duration_days": [120, 140],
-        })
+        df = pd.DataFrame(
+            {
+                "Average_Temperature": [25, 30],
+                "Crop_Duration_days": [120, 140],
+            }
+        )
         cei = CropEnvironmentInteraction()
         result = cei.crop_duration_temperature(df.copy())
         assert "Crop_Duration_x_Temp" in result.columns
 
     def test_soil_climate_interaction(self):
-        df = pd.DataFrame({
-            "Soil_Fertility_Index": [0.8, 0.5],
-            "Average_Temperature": [25, 30],
-            "Rainfall_mm": [800, 1200],
-        })
+        df = pd.DataFrame(
+            {
+                "Soil_Fertility_Index": [0.8, 0.5],
+                "Average_Temperature": [25, 30],
+                "Rainfall_mm": [800, 1200],
+            }
+        )
         cei = CropEnvironmentInteraction()
         result = cei.soil_climate_interaction(df.copy())
         assert "Soil_Climate_Interaction" in result.columns
 
     def test_compute_all(self):
-        df = pd.DataFrame({
-            "Average_Temperature": [25, 30],
-            "Crop_Duration_days": [120, 140],
-            "Rainfall_mm": [800, 1200],
-            "Soil_Fertility_Index": [0.8, 0.5],
-            "Nitrogen_kg_ha": [120, 150],
-            "Phosphorus_kg_ha": [50, 30],
-            "Potassium_kg_ha": [250, 180],
-            "Yield_per_Hectare": [4.5, 6.0],
-        })
+        df = pd.DataFrame(
+            {
+                "Average_Temperature": [25, 30],
+                "Crop_Duration_days": [120, 140],
+                "Rainfall_mm": [800, 1200],
+                "Soil_Fertility_Index": [0.8, 0.5],
+                "Nitrogen_kg_ha": [120, 150],
+                "Phosphorus_kg_ha": [50, 30],
+                "Potassium_kg_ha": [250, 180],
+                "Yield_per_Hectare": [4.5, 6.0],
+            }
+        )
         cei = CropEnvironmentInteraction()
         result = cei.compute_all(df)
         generated = [c for c in result.columns if c not in df.columns]

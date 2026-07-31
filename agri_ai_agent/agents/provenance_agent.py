@@ -6,16 +6,11 @@ source (paper/DOI), confidence, extraction_method, unit, timestamp,
 page_number, table_id, and derivation_method for computed columns.
 """
 
-import json
 from datetime import datetime
-from typing import Optional
 
-import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.contracts.messages import AgentContract
-
 
 EXTRACTION_METHODS = {
     "pdfminer": 0.70,
@@ -72,17 +67,30 @@ class ProvenanceAgent(BaseAgent):
         if self.contract is not None:
             self.contract.output_data["provenance_report"] = report
 
-        self.log.info("Provenance coverage: %.1f%% non-null values",
-                       self._coverage_pct(df))
+        self.log.info("Provenance coverage: %.1f%% non-null values", self._coverage_pct(df))
         self.log.info("Total tracked values: %d", self._total_values(df))
 
         return df
 
     def _tag_derived_columns(self, df: pd.DataFrame):
         derived_keywords = [
-            "_log", "_squared", "_sqrt", "_ratio", "_bin", "_category",
-            "_x_", "_interaction", "_NPK", "RUE", "WUE", "HI_",
-            "NUE", "Shoot_Root", "Root_Shoot", "Root_pct", "Shoot_pct",
+            "_log",
+            "_squared",
+            "_sqrt",
+            "_ratio",
+            "_bin",
+            "_category",
+            "_x_",
+            "_interaction",
+            "_NPK",
+            "RUE",
+            "WUE",
+            "HI_",
+            "NUE",
+            "Shoot_Root",
+            "Root_Shoot",
+            "Root_pct",
+            "Shoot_pct",
         ]
         for col in df.columns:
             if any(kw in col for kw in derived_keywords):

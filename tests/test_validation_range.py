@@ -37,20 +37,24 @@ class TestRangeValidator:
         assert result["invalid_pairs"] == 1
 
     def test_temperature_consistency(self, validator):
-        df = pd.DataFrame({
-            "tmin": [10.0, 20.0, 5.0],
-            "tmax": [15.0, 25.0, 3.0],
-        })
+        df = pd.DataFrame(
+            {
+                "tmin": [10.0, 20.0, 5.0],
+                "tmax": [15.0, 25.0, 3.0],
+            }
+        )
         result = validator.validate(df)
         tc = result["_temperature_consistency"]
         assert tc["inconsistent_count"] == 1
         assert tc["consistent_count"] == 2
 
     def test_temperature_consistency_pass(self, validator):
-        df = pd.DataFrame({
-            "tmin": [10.0, 20.0],
-            "tmax": [15.0, 25.0],
-        })
+        df = pd.DataFrame(
+            {
+                "tmin": [10.0, 20.0],
+                "tmax": [15.0, 25.0],
+            }
+        )
         result = validator.validate(df)
         tc = result["_temperature_consistency"]
         assert tc["inconsistent_count"] == 0
@@ -63,10 +67,12 @@ class TestRangeValidator:
         assert result["invalid_pairs"] == 2
 
     def test_auto_column_matching(self, validator):
-        df = pd.DataFrame({
-            "Temperature": [25.0, 30.0],
-            "Rainfall": [100.0, 200.0],
-        })
+        df = pd.DataFrame(
+            {
+                "Temperature": [25.0, 30.0],
+                "Rainfall": [100.0, 200.0],
+            }
+        )
         result = validator.validate(df)
         assert "Temperature" in result
         assert "Rainfall" in result

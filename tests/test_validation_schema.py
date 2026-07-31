@@ -1,7 +1,6 @@
 import pandas as pd
-import pytest
 
-from src.validation.schema_validator import ColumnSchema, TableSchema, SchemaValidator
+from src.validation.schema_validator import ColumnSchema, SchemaValidator, TableSchema
 
 
 class TestColumnSchema:
@@ -23,7 +22,9 @@ class TestTableSchema:
             ColumnSchema(name="rainfall", dtype="float64", nullable=True),
             ColumnSchema(name="city", dtype="object", nullable=True),
         ]
-        schema = TableSchema(table_name="weather", columns=cols, primary_key=["temp"], required_columns=["temp"])
+        schema = TableSchema(
+            table_name="weather", columns=cols, primary_key=["temp"], required_columns=["temp"]
+        )
         assert schema.table_name == "weather"
         assert len(schema.columns) == 3
         assert schema.primary_key == ["temp"]

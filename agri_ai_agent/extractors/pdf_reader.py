@@ -9,6 +9,7 @@ log = logging.getLogger("pdf_reader")
 def read_pdf_text(path) -> str:
     """Return the concatenated text of every page of a PDF."""
     import pdfplumber
+
     with pdfplumber.open(path) as pdf:
         return "\n".join((page.extract_text() or "") for page in pdf.pages)
 
@@ -31,6 +32,7 @@ def read_papers_dir(papers_dir) -> dict:
 
 if __name__ == "__main__":
     import tempfile
+
     empty_dir = tempfile.mkdtemp()
     assert read_papers_dir(empty_dir) == {}
     print("pdf_reader smoke OK -> empty dir yields {}")

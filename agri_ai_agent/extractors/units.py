@@ -46,7 +46,7 @@ def _split_ratio(token: str) -> str:
     """Split a concatenated ratio like 'gkg' -> 'g/kg' using a small unit lexicon."""
     for num in _NUMERATORS:
         if token.startswith(num):
-            rest = token[len(num):]
+            rest = token[len(num) :]
             if rest in _DENOMINATORS:
                 return f"{num}/{rest}"
     return token

@@ -5,11 +5,13 @@ CPU, memory, GPU, peak memory, disk usage.
 """
 
 import time
-from pathlib import Path
 
 from evaluation.utils import (
-    OUTPUT_DIR, load_provenance, write_report, format_seconds,
-    get_memory_usage, get_cpu_usage, PIPELINE_AGENTS,
+    PIPELINE_AGENTS,
+    format_seconds,
+    get_cpu_usage,
+    get_memory_usage,
+    load_provenance,
 )
 
 
@@ -25,7 +27,7 @@ def evaluate_e2e():
     total_retries = 0
     total_errors = 0
 
-    for agent_key, result in results.items():
+    for _, result in results.items():
         total_time += result.get("execution_time_sec", 0)
         total_retries += result.get("retry_count", 0)
         total_errors += len(result.get("errors", []))
@@ -36,7 +38,7 @@ def evaluate_e2e():
     cpu = get_cpu_usage()
 
     report = f"""# End-to-End Pipeline Performance Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Summary
 | Metric | Value |
@@ -48,7 +50,7 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 | Total retries | {total_retries} |
 | Total errors | {total_errors} |
 | Total execution time | {format_seconds(total_time)} |
-| Peak memory (RSS) | {mem.get('rss_mb', 0):.1f} MB |
+| Peak memory (RSS) | {mem.get("rss_mb", 0):.1f} MB |
 | Current CPU usage | {cpu:.1f}% |
 
 ## Per-Agent Execution Times
@@ -73,9 +75,9 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 
     report += f"""
 ## Resource Usage
-- Memory (RSS): {mem.get('rss_mb', 0):.1f} MB
-- Memory (VMS): {mem.get('vms_mb', 0):.1f} MB
-- Memory percent: {mem.get('percent', 0):.1f}%
+- Memory (RSS): {mem.get("rss_mb", 0):.1f} MB
+- Memory (VMS): {mem.get("vms_mb", 0):.1f} MB
+- Memory percent: {mem.get("percent", 0):.1f}%
 - CPU: {cpu:.1f}%
 
 > Note: GPU usage not available on this system.
@@ -87,7 +89,10 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 4. **Add checkpoint recovery** to resume from failures
 5. **Monitor memory** for large dataset ingestion, consider chunking
 """
-    path = write_report("Pipeline_Performance.md", report,)
+    path = write_report(
+        "Pipeline_Performance.md",
+        report,
+    )
     return {
         "completion_rate": completion_rate,
         "total_time": total_time,
@@ -99,6 +104,7 @@ Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
 
 def write_report(filename: str, content: str):
     from evaluation.utils import REPORTS_DIR, ensure_reports_dir
+
     ensure_reports_dir()
     path = REPORTS_DIR / filename
     path.write_text(content, encoding="utf-8")

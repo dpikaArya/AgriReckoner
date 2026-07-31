@@ -1,18 +1,16 @@
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
-from agri_ai_agent.external_data.connector import ExternalDataConnector
-from agri_ai_agent.external_data.connector_manager import ConnectorManager
+from agri_ai_agent.external_data.connector_manager import (
+    ConnectorHealth,
+    ConnectorManager,
+    ConnectorRunLog,
+)
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
-from agri_ai_agent.external_data.registry import ConnectorRegistry
 from agri_ai_agent.external_data.registry_db import DatasetRegistry
-
 from src.data_sources.config_loader import (
     get_pipeline_config,
-    get_source_config,
     get_storage_config,
     is_source_enabled,
 )
@@ -25,16 +23,16 @@ class DataSourceIntegration:
         self,
         registry: DatasetRegistry,
         download_dir: Path,
-        storage_dir: Optional[Path] = None,
-        max_workers: Optional[int] = None,
-        retry_max_attempts: Optional[int] = None,
-        retry_base_delay: Optional[float] = None,
+        storage_dir: Path | None = None,
+        max_workers: int | None = None,
+        retry_max_attempts: int | None = None,
+        retry_base_delay: float | None = None,
     ):
         pipe_cfg = get_pipeline_config()
         self._download_dir = download_dir
-        self._storage = ImmutableStorage(storage_dir or Path(
-            get_storage_config().get("base_dir", "external_data/raw")
-        ))
+        self._storage = ImmutableStorage(
+            storage_dir or Path(get_storage_config().get("base_dir", "external_data/raw"))
+        )
         self._sync = SyncManager(registry)
         self._manager = ConnectorManager(
             registry=registry,
@@ -48,16 +46,16 @@ class DataSourceIntegration:
         all_sources = self._manager.list_sources()
         return [s for s in all_sources if is_source_enabled(s)]
 
-    def health_checks(self, sources: Optional[list[str]] = None
-                      ) -> dict[str, object]:
+    def health_checks(self, sources: list[str] | None = None) -> dict[str, ConnectorHealth]:
         return self._manager.health_checks(sources or self.list_sources())
 
-    def run_all(self, sources: Optional[list[str]] = None
-                ) -> tuple[dict[str, list[DatasetPackage]], list[object]]:
+    def run_all(
+        self, sources: list[str] | None = None
+    ) -> tuple[dict[str, list[DatasetPackage]], list[ConnectorRunLog]]:
         selected = sources if sources is not None else self.list_sources()
         packages_by_source, run_logs = self._manager.run_all(sources=selected)
 
-        for src, pkgs in packages_by_source.items():
+        for _, pkgs in packages_by_source.items():
             for pkg in pkgs:
                 self._immutable_store(pkg)
 
@@ -84,10 +82,12 @@ class DataSourceIntegration:
             pkg.supplementary_files.append(stored)
 
     @staticmethod
-    def summarize_runs(logs: list[object]) -> dict:
+    def summarize_runs(logs: list[ConnectorRunLog]) -> dict:
         return ConnectorManager.summarize_runs(logs)
 
     @staticmethod
-    def merge_packages(packages_by_source: dict[str, list[DatasetPackage]],
-                       existing_df: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+    def merge_packages(
+        packages_by_source: dict[str, list[DatasetPackage]],
+        existing_df: pd.DataFrame | None = None,
+    ) -> pd.DataFrame:
         return ConnectorManager.merge_packages(packages_by_source, existing_df)

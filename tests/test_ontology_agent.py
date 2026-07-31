@@ -1,7 +1,6 @@
 """Tests for Agricultural Ontology Agent."""
 
 import pandas as pd
-import pytest
 
 from agri_ai_agent.agents.ontology_agent import OntologyAgent
 from agri_ai_agent.contracts.messages import AgentContract
@@ -44,30 +43,36 @@ class TestOntologyAgent:
         assert canonical is None
 
     def test_process_renames_columns(self):
-        df = pd.DataFrame({
-            "yield": [100, 200],
-            "plant height": [50, 60],
-            "ph": [6.5, 7.0],
-        })
+        df = pd.DataFrame(
+            {
+                "yield": [100, 200],
+                "plant height": [50, 60],
+                "ph": [6.5, 7.0],
+            }
+        )
         result = self.agent.process(df)
         assert "Yield_per_Hectare" in result.columns
         assert "Plant_Height_cm" in result.columns
         assert "Soil_pH" in result.columns
 
     def test_process_preserves_data(self):
-        df = pd.DataFrame({
-            "yield": [3500.0, 4200.0],
-            "plant height": [85.5, 92.3],
-        })
+        df = pd.DataFrame(
+            {
+                "yield": [3500.0, 4200.0],
+                "plant height": [85.5, 92.3],
+            }
+        )
         result = self.agent.process(df)
         assert result["Yield_per_Hectare"].tolist() == [3500.0, 4200.0]
         assert result["Plant_Height_cm"].tolist() == [85.5, 92.3]
 
     def test_process_handles_duplicate_columns(self):
-        df = pd.DataFrame({
-            "yield": [100, 200],
-            "Yield": [300, 400],
-        })
+        df = pd.DataFrame(
+            {
+                "yield": [100, 200],
+                "Yield": [300, 400],
+            }
+        )
         result = self.agent.process(df)
         assert len(result.columns) == 2
 
@@ -121,11 +126,13 @@ class TestOntologyAgent:
         assert contract.status == "success"
 
     def test_process_mixed_known_unknown_columns(self):
-        df = pd.DataFrame({
-            "yield": [100],
-            "custom_metric": [42],
-            "plant height": [50],
-        })
+        df = pd.DataFrame(
+            {
+                "yield": [100],
+                "custom_metric": [42],
+                "plant height": [50],
+            }
+        )
         result = self.agent.process(df)
         assert "Yield_per_Hectare" in result.columns
         assert "Plant_Height_cm" in result.columns

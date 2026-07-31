@@ -1,6 +1,5 @@
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -24,7 +23,7 @@ class ISRICConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         collections = [
             {
                 "id": "soilgrids",
@@ -47,7 +46,7 @@ class ISRICConnector(ExternalDataConnector):
             collections = [c for c in collections if q in c["name"].lower() or q in c["id"]]
         return collections
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         url = f"{self.base_url}/public/{resource_id}.zip"
         local_path = target_dir / f"isric_{resource_id}.zip"

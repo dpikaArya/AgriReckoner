@@ -19,11 +19,11 @@ logging.basicConfig(
 )
 log = logging.getLogger("Enrichment")
 
-from agri_ai_agent.config.schema import UAMS_COLUMNS, VARIANT_MAP
-from agri_ai_agent.external_data.column_mapper import map_column
-from agri_ai_agent.external_data.connector_manager import ConnectorManager
-from agri_ai_agent.external_data.data_enricher import enrich_master
-from agri_ai_agent.external_data.registry_db import DatasetRegistry
+from agri_ai_agent.config.schema import UAMS_COLUMNS  # noqa: E402
+from agri_ai_agent.external_data.column_mapper import map_column  # noqa: E402
+from agri_ai_agent.external_data.connector_manager import ConnectorManager  # noqa: E402
+from agri_ai_agent.external_data.data_enricher import enrich_master  # noqa: E402
+from agri_ai_agent.external_data.registry_db import DatasetRegistry  # noqa: E402
 
 
 def load_master_datasets(data_dir: Path) -> pd.DataFrame:
@@ -37,18 +37,24 @@ def load_master_datasets(data_dir: Path) -> pd.DataFrame:
                 log.info("  Loaded %s: %d rows x %d cols", f.name, len(df), len(df.columns))
             except Exception as e:
                 log.warning("  Failed %s: %s", f.name, e)
-    combined = pd.concat(all_frames, ignore_index=True, sort=False) if all_frames else pd.DataFrame()
+    combined = (
+        pd.concat(all_frames, ignore_index=True, sort=False) if all_frames else pd.DataFrame()
+    )
     log.info("Combined master: %d rows x %d cols", len(combined), len(combined.columns))
     return combined
 
 
 def main():
-    settings = type("Settings", (), {
-        "DATA_DIR": BASE_DIR / "data" / "master_datasets",
-        "EXTERNAL_DATA_DIR": BASE_DIR / "external_data",
-        "DATASET_REGISTRY_PATH": BASE_DIR / "database" / "dataset_registry.sqlite",
-        "OUTPUT_DIR": BASE_DIR / "outputs",
-    })()
+    settings = type(
+        "Settings",
+        (),
+        {
+            "DATA_DIR": BASE_DIR / "data" / "master_datasets",
+            "EXTERNAL_DATA_DIR": BASE_DIR / "external_data",
+            "DATASET_REGISTRY_PATH": BASE_DIR / "database" / "dataset_registry.sqlite",
+            "OUTPUT_DIR": BASE_DIR / "outputs",
+        },
+    )()
     settings.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # Step 1: Load master datasets
@@ -96,8 +102,14 @@ def main():
     log.info("Healthy: %s", healthy)
     log.info("Unhealthy: %s", unhealthy)
     for s, h in health_results.items():
-        log.info("  %s: healthy=%s latency=%.1fms discovered=%d error=%s",
-                 s, h.is_healthy, h.latency_ms, h.discovered_count, h.error or "none")
+        log.info(
+            "  %s: healthy=%s latency=%.1fms discovered=%d error=%s",
+            s,
+            h.is_healthy,
+            h.latency_ms,
+            h.discovered_count,
+            h.error or "none",
+        )
 
     if not healthy:
         log.error("No healthy sources — aborting")
@@ -116,7 +128,12 @@ def main():
         if h and h.discovered_count <= max_discovery:
             quick_sources.append(s)
         else:
-            log.info("Skipping %s (%d datasets > %d max)", s, h.discovered_count if h else -1, max_discovery)
+            log.info(
+                "Skipping %s (%d datasets > %d max)",
+                s,
+                h.discovered_count if h else -1,
+                max_discovery,
+            )
 
     if not quick_sources:
         log.warning("No quick-sync sources after filtering")
@@ -134,7 +151,13 @@ def main():
     for src, pkgs in packages_by_source.items():
         log.info("  %s: %d package(s)", src, len(pkgs))
         for p in pkgs:
-            log.info("    - %s (valid=%s, rows=%d, cols=%d)", p.resource_id, p.is_valid, p.row_count, p.column_count)
+            log.info(
+                "    - %s (valid=%s, rows=%d, cols=%d)",
+                p.resource_id,
+                p.is_valid,
+                p.row_count,
+                p.column_count,
+            )
 
     # Step 4: Enrich master datasets via spatial/crop join
     log.info("")
@@ -143,7 +166,12 @@ def main():
     log.info("=" * 60)
     if packages_by_source:
         enriched_df = enrich_master(master_df, packages_by_source)
-        log.info("Enriched: %d rows x %d columns (was %d cols)", len(enriched_df), len(enriched_df.columns), len(master_df.columns))
+        log.info(
+            "Enriched: %d rows x %d columns (was %d cols)",
+            len(enriched_df),
+            len(enriched_df.columns),
+            len(master_df.columns),
+        )
 
         # Show new columns
         new_cols = [c for c in enriched_df.columns if c not in master_df.columns]
@@ -163,7 +191,9 @@ def main():
     csv_path = settings.OUTPUT_DIR / "Universal_Agricultural_Schema.csv"
     xlsx_path = settings.OUTPUT_DIR / "Universal_Agricultural_Schema.xlsx"
     enriched_df.to_csv(csv_path, index=False)
-    log.info("Saved CSV: %s (%d cols, %d rows)", csv_path, len(enriched_df.columns), len(enriched_df))
+    log.info(
+        "Saved CSV: %s (%d cols, %d rows)", csv_path, len(enriched_df.columns), len(enriched_df)
+    )
     try:
         enriched_df.to_excel(xlsx_path, index=False)
         log.info("Saved XLSX: %s", xlsx_path)

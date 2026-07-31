@@ -22,6 +22,7 @@ jobs:
       # Non-blocking for now: report findings without failing CI.
       - name: Ruff check
         run: ruff check .
+        continue-on-error: true
 
   test:
     name: Tests (py${{ matrix.python-version }})

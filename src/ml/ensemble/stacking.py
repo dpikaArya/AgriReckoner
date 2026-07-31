@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -14,7 +14,7 @@ logger = logging.getLogger("StackingEnsemble")
 class StackingEnsemble:
     def __init__(
         self,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
         cv_folds: int = 5,
         random_state: int = 42,
     ):
@@ -22,20 +22,22 @@ class StackingEnsemble:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.cv_folds = cv_folds
         self.random_state = random_state
-        self.base_models_: dict[str, object] = {}
+        self.base_models_: dict[str, Any] = {}
         self.meta_model_ = Ridge(alpha=1.0, random_state=random_state)
         self.is_fitted_ = False
 
     def fit(
         self,
-        base_models: dict[str, object],
+        base_models: dict[str, Any],
         X: pd.DataFrame,
         y: pd.Series,
     ):
         self.base_models_ = base_models
         X_filled = X.select_dtypes(include=[np.number]).fillna(X.median(numeric_only=True))
 
-        kf = KFold(n_splits=min(self.cv_folds, len(X_filled)), shuffle=True, random_state=self.random_state)
+        kf = KFold(
+            n_splits=min(self.cv_folds, len(X_filled)), shuffle=True, random_state=self.random_state
+        )
         meta_features = np.zeros((len(X_filled), len(base_models)))
 
         for i, (name, model) in enumerate(base_models.items()):
@@ -56,6 +58,7 @@ class StackingEnsemble:
 
         train_pred = self.meta_model_.predict(meta_features)
         from sklearn.metrics import r2_score
+
         r2 = r2_score(y, train_pred)
         logger.info("Stacking ensemble trained (meta-R2: %.4f)", r2)
         self._save()
@@ -84,7 +87,9 @@ class StackingEnsemble:
             "base_models": list(self.base_models_.keys()),
             "meta_model": type(self.meta_model_).__name__,
             "meta_coefficients": meta_coef,
-            "meta_intercept": float(self.meta_model_.intercept_) if hasattr(self.meta_model_, "intercept_") else 0,
+            "meta_intercept": float(self.meta_model_.intercept_)
+            if hasattr(self.meta_model_, "intercept_")
+            else 0,
         }
         path = self.output_dir / "stacking_ensemble_info.json"
         path.write_text(json.dumps(info, indent=2), encoding="utf-8")

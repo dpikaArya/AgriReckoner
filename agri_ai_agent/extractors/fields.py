@@ -27,13 +27,15 @@ def _build_fields() -> list[ExtractionField]:
         vmin, vmax = validation.get("min"), validation.get("max")
         if vmin is None and vmax is None:
             continue
-        fields.append(ExtractionField(
-            column=column,
-            canonical_unit=entry.get("unit_ucum"),
-            min_value=vmin,
-            max_value=vmax,
-            synonyms=tuple(entry.get("synonyms") or []),
-        ))
+        fields.append(
+            ExtractionField(
+                column=column,
+                canonical_unit=entry.get("unit_ucum"),
+                min_value=vmin,
+                max_value=vmax,
+                synonyms=tuple(entry.get("synonyms") or []),
+            )
+        )
     return fields
 
 

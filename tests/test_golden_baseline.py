@@ -36,10 +36,12 @@ def test_committed_schema_matches_uams_columns():
     if not schema_csv.exists():
         pytest.skip("committed schema CSV absent")
     from agri_ai_agent.config.schema import UAMS_COLUMNS
+
     header = schema_csv.read_text(encoding="utf-8-sig").splitlines()[0].split(",")
-    assert len(header) == len(UAMS_COLUMNS) == 138
+    assert len(header) == len(UAMS_COLUMNS) == 296
 
 
 if __name__ == "__main__":
     import sys
+
     sys.exit(pytest.main([__file__, "-q"]))

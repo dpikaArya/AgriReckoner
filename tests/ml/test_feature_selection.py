@@ -10,7 +10,9 @@ from src.ml.feature_analysis.feature_selector import FeatureSelector
 
 @pytest.fixture
 def synthetic_data():
-    X, y = make_regression(n_samples=200, n_features=50, n_informative=10, noise=0.1, random_state=42)
+    X, y = make_regression(
+        n_samples=200, n_features=50, n_informative=10, noise=0.1, random_state=42
+    )
     df = pd.DataFrame(X, columns=[f"feature_{i}" for i in range(X.shape[1])])
     return df, pd.Series(y, name="target")
 

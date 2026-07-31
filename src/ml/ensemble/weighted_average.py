@@ -1,7 +1,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -12,21 +12,21 @@ logger = logging.getLogger("WeightedAverageEnsemble")
 
 
 class WeightedAverageEnsemble:
-    def __init__(self, output_dir: Optional[Path] = None, random_state: int = 42):
+    def __init__(self, output_dir: Path | None = None, random_state: int = 42):
         self.output_dir = Path(output_dir) if output_dir else Path("models")
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.random_state = random_state
         self.weights_: dict[str, float] = {}
-        self.models_: dict[str, object] = {}
-        self.training_score_: Optional[float] = None
+        self.models_: dict[str, Any] = {}
+        self.training_score_: float | None = None
 
     def fit(
         self,
-        models: dict[str, object],
+        models: dict[str, Any],
         X: pd.DataFrame,
         y: pd.Series,
         auto_weight: bool = True,
-        weights: Optional[dict[str, float]] = None,
+        weights: dict[str, float] | None = None,
     ):
         self.models_ = models
 
@@ -42,7 +42,8 @@ class WeightedAverageEnsemble:
         self.training_score_ = self._calc_ensemble_score(X, y)
         logger.info(
             "Ensemble weights: %s (R2: %.4f)",
-            self.weights_, self.training_score_ or 0,
+            self.weights_,
+            self.training_score_ or 0,
         )
         self._save()
 
@@ -88,7 +89,7 @@ class WeightedAverageEnsemble:
             n = len(scores)
             self.weights_ = {k: 1.0 / n for k in scores}
 
-    def _calc_ensemble_score(self, X: pd.DataFrame, y: pd.Series) -> Optional[float]:
+    def _calc_ensemble_score(self, X: pd.DataFrame, y: pd.Series) -> float | None:
         try:
             y_pred = self.predict(X)
             return float(r2_score(y, y_pred))
@@ -98,11 +99,14 @@ class WeightedAverageEnsemble:
     def _save(self):
         weights_path = self.output_dir / "ensemble_weights.json"
         weights_path.write_text(
-            json.dumps({
-                "weights": self.weights_,
-                "training_r2": self.training_score_,
-                "models": list(self.models_.keys()),
-            }, indent=2),
+            json.dumps(
+                {
+                    "weights": self.weights_,
+                    "training_r2": self.training_score_,
+                    "models": list(self.models_.keys()),
+                },
+                indent=2,
+            ),
             encoding="utf-8",
         )
         logger.info("Saved ensemble weights to %s", weights_path)

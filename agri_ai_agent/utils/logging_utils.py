@@ -5,13 +5,12 @@ Logging utilities for ADES agents.
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 
 def setup_logging(
     name: str = "ades",
     level: str = "INFO",
-    log_dir: Optional[Path] = None,
+    log_dir: Path | None = None,
     log_format: str = "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
 ) -> logging.Logger:
     logger = logging.getLogger(name)

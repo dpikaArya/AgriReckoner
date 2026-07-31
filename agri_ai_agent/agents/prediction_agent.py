@@ -5,37 +5,60 @@ Flow: Current Conditions → Predict Yield → Simulate Fertilizer Options
       → Apply Expert Rules → Final Recommendation
 """
 
-import itertools
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.schema import UAMS_COLUMNS
-from agri_ai_agent.contracts.messages import PredictionResult
 
 INPUT_FEATURE_GROUPS = {
     "Current Soil": [
-        "Soil_pH", "EC", "Organic_Carbon", "Organic_Matter",
-        "Nitrogen", "Phosphorus", "Potassium", "Sulphur",
-        "Iron", "Copper", "Manganese", "Zinc",
-        "Calcium", "Magnesium", "Boron", "Molybdenum",
+        "Soil_pH",
+        "EC",
+        "Organic_Carbon",
+        "Organic_Matter",
+        "Nitrogen",
+        "Phosphorus",
+        "Potassium",
+        "Sulphur",
+        "Iron",
+        "Copper",
+        "Manganese",
+        "Zinc",
+        "Calcium",
+        "Magnesium",
+        "Boron",
+        "Molybdenum",
     ],
     "Crop": [
-        "Crop", "Scientific_Name", "Variety", "Season", "Growth_Duration_Days",
+        "Crop",
+        "Scientific_Name",
+        "Variety",
+        "Season",
+        "Growth_Duration_Days",
     ],
     "Growth Stage": [
-        "Growth_Stage", "Growth_Duration_Days",
+        "Growth_Stage",
+        "Growth_Duration_Days",
     ],
     "Weather": [
-        "Temperature_Max", "Temperature_Min", "Average_Temperature",
-        "Rainfall", "Humidity", "Latitude", "Longitude", "Altitude",
+        "Temperature_Max",
+        "Temperature_Min",
+        "Average_Temperature",
+        "Rainfall",
+        "Humidity",
+        "Latitude",
+        "Longitude",
+        "Altitude",
     ],
     "Present Fertilizer": [
-        "Fertilizer_Name", "Organic_Fertilizer", "Biofertilizer",
-        "Dose", "Application_Method", "Application_Interval",
+        "Fertilizer_Name",
+        "Organic_Fertilizer",
+        "Biofertilizer",
+        "Dose",
+        "Application_Method",
+        "Application_Interval",
     ],
     "Target Yield": [
         "Target_Yield",
@@ -43,16 +66,24 @@ INPUT_FEATURE_GROUPS = {
 }
 
 FERTILIZER_FEATURES = [
-    "Dose", "Application_Interval", "Fertilizer_Code",
-    "Fertilizer_Name", "Organic_Fertilizer", "Biofertilizer",
+    "Dose",
+    "Application_Interval",
+    "Fertilizer_Code",
+    "Fertilizer_Name",
+    "Organic_Fertilizer",
+    "Biofertilizer",
 ]
 
 DOSE_FACTORS = [0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 2.0]
 
 PREDICTION_COLUMNS = [
-    "Predicted_Yield", "Expected_Biomass", "Expected_Plant_Height",
-    "Recommended_Fertilizer", "Recommended_Dose",
-    "Recommended_Application_Interval", "Expected_Yield_Increase",
+    "Predicted_Yield",
+    "Expected_Biomass",
+    "Expected_Plant_Height",
+    "Recommended_Fertilizer",
+    "Recommended_Dose",
+    "Recommended_Application_Interval",
+    "Expected_Yield_Increase",
     "Recommendation_Summary",
 ]
 
@@ -117,8 +148,10 @@ class PredictionAgent(BaseAgent):
         baseline_preds = self._ensemble_predict(yield_model, X, model_registry)
         df["Predicted_Yield"] = baseline_preds
 
-        for col, target in [("Expected_Biomass", "Biomass_Yield"),
-                            ("Expected_Plant_Height", "Plant_Height_cm")]:
+        for col, target in [
+            ("Expected_Biomass", "Biomass_Yield"),
+            ("Expected_Plant_Height", "Plant_Height_cm"),
+        ]:
             preds = self._predict_target(target, X, model_registry)
             if preds is not None:
                 df[col] = preds
@@ -128,7 +161,9 @@ class PredictionAgent(BaseAgent):
         options = self._build_fertilizer_options(df, X, kwargs.get("fertilizer_options"))
 
         # Steps 3-4: Simulate each option and compare
-        comparisons = self._simulate_options(X, yield_model, model_registry, options, baseline_preds)
+        comparisons = self._simulate_options(
+            X, yield_model, model_registry, options, baseline_preds
+        )
 
         # Save comparison tables as artifacts
         self._save_comparison_tables(df, X, options, comparisons)
@@ -167,7 +202,7 @@ class PredictionAgent(BaseAgent):
 
     # ── Step 1: Predict Yield ────────────────────────────────────────
 
-    def _resolve_yield_model(self, model_registry: list) -> Optional[str]:
+    def _resolve_yield_model(self, model_registry: list) -> str | None:
         for name, _ in model_registry:
             if "target_yield" in name.lower():
                 return name
@@ -176,10 +211,12 @@ class PredictionAgent(BaseAgent):
                 return name
         return model_registry[0][0] if model_registry else None
 
-    def _predict_target(self, target_col: str, X: pd.DataFrame,
-                        model_registry: list) -> Optional[np.ndarray]:
+    def _predict_target(
+        self, target_col: str, X: pd.DataFrame, model_registry: list
+    ) -> np.ndarray | None:
         target_models = [
-            (name, m) for name, m in model_registry
+            (name, m)
+            for name, m in model_registry
             if target_col.lower().replace(" ", "_") in name.lower()
         ]
         if not target_models:
@@ -194,8 +231,9 @@ class PredictionAgent(BaseAgent):
             return None
         return np.mean(all_preds, axis=0)
 
-    def _ensemble_predict(self, primary_name: str, X: pd.DataFrame,
-                          model_registry: list) -> np.ndarray:
+    def _ensemble_predict(
+        self, primary_name: str, X: pd.DataFrame, model_registry: list
+    ) -> np.ndarray:
         all_preds = []
         for name, model in model_registry:
             if name == primary_name:
@@ -214,8 +252,9 @@ class PredictionAgent(BaseAgent):
 
     # ── Step 2: Build Fertilizer Options ─────────────────────────────
 
-    def _build_fertilizer_options(self, df: pd.DataFrame, X: pd.DataFrame,
-                                  explicit_options: Optional[list] = None) -> list[dict]:
+    def _build_fertilizer_options(
+        self, df: pd.DataFrame, X: pd.DataFrame, explicit_options: list | None = None
+    ) -> list[dict]:
         if explicit_options:
             self.log.info("Using %d explicit fertilizer options", len(explicit_options))
             return explicit_options
@@ -244,7 +283,9 @@ class PredictionAgent(BaseAgent):
             for factor in DOSE_FACTORS:
                 dose_val = base_dose * factor
                 label = f"Dose_{factor:.0%}"
-                options.append(self._make_option(label, base_name, base_code, dose_val, base_interval))
+                options.append(
+                    self._make_option(label, base_name, base_code, dose_val, base_interval)
+                )
 
         # Try alternative fertilizers from dataset
         if fert_name_col and df[fert_name_col].nunique() > 1:
@@ -255,22 +296,29 @@ class PredictionAgent(BaseAgent):
                 alt_code = alt_row.get(fert_code_col) if fert_code_col else None
                 alt_dose = alt_row.get(dose_col) if dose_col else base_dose
                 alt_interval = alt_row.get(interval_col) if interval_col else base_interval
-                options.append(self._make_option(alt_name, alt_name, alt_code, alt_dose, alt_interval))
+                options.append(
+                    self._make_option(alt_name, alt_name, alt_code, alt_dose, alt_interval)
+                )
 
         self.log.info("Generated %d fertilizer simulation options", len(options))
         return options
 
-    def _get_fertilizer_baseline(self, df: pd.DataFrame) -> Optional[dict]:
+    def _get_fertilizer_baseline(self, df: pd.DataFrame) -> dict | None:
         baseline = {}
         for col in FERTILIZER_FEATURES:
             if col in df.columns:
                 vals = df[col].dropna()
                 if len(vals) > 0:
-                    baseline[col] = vals.iloc[0] if col == "Fertilizer_Name" else (
-                        vals.mode().iloc[0] if col in ("Organic_Fertilizer", "Biofertilizer",
-                                                       "Application_Method")
-                        else vals.median() if np.issubdtype(vals.dtype, np.number)
-                        else vals.iloc[0]
+                    baseline[col] = (
+                        vals.iloc[0]
+                        if col == "Fertilizer_Name"
+                        else (
+                            vals.mode().iloc[0]
+                            if col in ("Organic_Fertilizer", "Biofertilizer", "Application_Method")
+                            else vals.median()
+                            if np.issubdtype(vals.dtype, np.number)
+                            else vals.iloc[0]
+                        )
                     )
         return baseline if baseline else None
 
@@ -285,9 +333,14 @@ class PredictionAgent(BaseAgent):
 
     # ── Steps 3-4: Simulate & Compare ────────────────────────────────
 
-    def _simulate_options(self, X: pd.DataFrame, yield_model_name: str,
-                          model_registry: list, options: list[dict],
-                          baseline: np.ndarray) -> list[list[dict]]:
+    def _simulate_options(
+        self,
+        X: pd.DataFrame,
+        yield_model_name: str,
+        model_registry: list,
+        options: list[dict],
+        baseline: np.ndarray,
+    ) -> list[list[dict]]:
         dose_col = "Dose" if "Dose" in X.columns else None
         fert_code_col = "Fertilizer_Code" if "Fertilizer_Code" in X.columns else None
 
@@ -304,41 +357,47 @@ class PredictionAgent(BaseAgent):
                 pred = self._ensemble_predict(yield_model_name, X_mod, model_registry)
                 yield_val = float(pred[0])
 
-                row_comparisons.append({
-                    "label": opt["label"],
-                    "Fertilizer_Name": opt["Fertilizer_Name"],
-                    "Dose": opt["Dose"],
-                    "Application_Interval": opt["Application_Interval"],
-                    "Predicted_Yield": yield_val,
-                    "Yield_Increase": yield_val - float(baseline[row_idx]),
-                })
+                row_comparisons.append(
+                    {
+                        "label": opt["label"],
+                        "Fertilizer_Name": opt["Fertilizer_Name"],
+                        "Dose": opt["Dose"],
+                        "Application_Interval": opt["Application_Interval"],
+                        "Predicted_Yield": yield_val,
+                        "Yield_Increase": yield_val - float(baseline[row_idx]),
+                    }
+                )
             row_comparisons.sort(key=lambda r: r["Predicted_Yield"], reverse=True)
             all_comparisons.append(row_comparisons)
 
         best_overall = all_comparisons[0][0] if all_comparisons and all_comparisons[0] else {}
-        self.log.info("Top option: %s → yield=%.2f (Δ%+.2f)",
-                      best_overall.get("label", "?"),
-                      best_overall.get("Predicted_Yield", 0),
-                      best_overall.get("Yield_Increase", 0))
+        self.log.info(
+            "Top option: %s → yield=%.2f (Δ%+.2f)",
+            best_overall.get("label", "?"),
+            best_overall.get("Predicted_Yield", 0),
+            best_overall.get("Yield_Increase", 0),
+        )
 
         return all_comparisons
 
     # ── Step 5: Recommend Best ───────────────────────────────────────
 
-    def _recommend_best(self, df: pd.DataFrame,
-                        comparisons: list[list[dict]]) -> pd.DataFrame:
+    def _recommend_best(self, df: pd.DataFrame, comparisons: list[list[dict]]) -> pd.DataFrame:
         for row_idx, row_comparisons in enumerate(comparisons):
             if not row_comparisons:
                 continue
             best = row_comparisons[0]
             df.at[df.index[row_idx], "Recommended_Fertilizer"] = best.get("Fertilizer_Name")
             df.at[df.index[row_idx], "Recommended_Dose"] = best.get("Dose")
-            df.at[df.index[row_idx], "Recommended_Application_Interval"] = best.get("Application_Interval")
+            df.at[df.index[row_idx], "Recommended_Application_Interval"] = best.get(
+                "Application_Interval"
+            )
             df.at[df.index[row_idx], "Expected_Yield_Increase"] = best.get("Yield_Increase")
         return df
 
-    def _compute_confidence(self, df: pd.DataFrame, model_registry: list,
-                            X: pd.DataFrame) -> pd.DataFrame:
+    def _compute_confidence(
+        self, df: pd.DataFrame, model_registry: list, X: pd.DataFrame
+    ) -> pd.DataFrame:
         if len(model_registry) < 2:
             df["Confidence_Score"] = 0.5
             return df
@@ -356,10 +415,12 @@ class PredictionAgent(BaseAgent):
         std_pred = np.std(stacked, axis=1) + 1e-10
         cv = std_pred / np.abs(mean_pred)
         df["Confidence_Score"] = np.clip(1.0 - cv, 0.0, 1.0)
-        self.log.info("Confidence scores: mean=%.3f, min=%.3f, max=%.3f",
-                      df["Confidence_Score"].mean(),
-                      df["Confidence_Score"].min(),
-                      df["Confidence_Score"].max())
+        self.log.info(
+            "Confidence scores: mean=%.3f, min=%.3f, max=%.3f",
+            df["Confidence_Score"].mean(),
+            df["Confidence_Score"].min(),
+            df["Confidence_Score"].max(),
+        )
         return df
 
     # ── Step 6: Expert Rules ──────────────────────────────────────────
@@ -388,8 +449,11 @@ class PredictionAgent(BaseAgent):
         if pd.notna(row.get("Rainfall")):
             state["Rainfall"] = self._quantize(row["Rainfall"], RAINFALL_THRESHOLDS)
         if pd.notna(row.get("Soil_pH")):
-            state["Soil_pH"] = "GOOD" if SOIL_PH_OK[0] <= row["Soil_pH"] <= SOIL_PH_OK[1] else \
-                ("LOW" if row["Soil_pH"] < SOIL_PH_OK[0] else "HIGH")
+            state["Soil_pH"] = (
+                "GOOD"
+                if SOIL_PH_OK[0] <= row["Soil_pH"] <= SOIL_PH_OK[1]
+                else ("LOW" if row["Soil_pH"] < SOIL_PH_OK[0] else "HIGH")
+            )
         return state
 
     def _quantize(self, value: float, thresholds: dict[str, float]) -> str:
@@ -398,7 +462,7 @@ class PredictionAgent(BaseAgent):
                 return label
         return list(thresholds.keys())[-1]
 
-    def _evaluate_rules(self, state: dict[str, str]) -> Optional[dict]:
+    def _evaluate_rules(self, state: dict[str, str]) -> dict | None:
         matched = None
         for rule in sorted(EXPERT_RULES, key=lambda r: r["priority"], reverse=True):
             if all(state.get(var) == val for var, val in rule["conditions"].items()):
@@ -406,8 +470,7 @@ class PredictionAgent(BaseAgent):
                 break
         return matched
 
-    def _apply_actions(self, df: pd.DataFrame, row_idx: int,
-                       actions: dict, row: pd.Series):
+    def _apply_actions(self, df: pd.DataFrame, row_idx: int, actions: dict, row: pd.Series):
         n_act = actions.get("nitrogen", "")
         k_act = actions.get("potash", "")
         irr_act = actions.get("irrigation", "")
@@ -434,29 +497,41 @@ class PredictionAgent(BaseAgent):
                 df.at[row_idx, "Recommended_Dose"] = dose * 0.5
 
         if irr_act == "reduce":
-            interval = row.get("Recommended_Application_Interval") or row.get("Application_Interval")
+            interval = row.get("Recommended_Application_Interval") or row.get(
+                "Application_Interval"
+            )
             if pd.notna(interval) and isinstance(interval, (int, float)):
                 df.at[row_idx, "Recommended_Application_Interval"] = interval * 1.5
             elif pd.isna(interval):
                 df.at[row_idx, "Recommended_Application_Interval"] = 14
         elif irr_act == "increase":
-            interval = row.get("Recommended_Application_Interval") or row.get("Application_Interval")
+            interval = row.get("Recommended_Application_Interval") or row.get(
+                "Application_Interval"
+            )
             if pd.notna(interval) and isinstance(interval, (int, float)):
                 df.at[row_idx, "Recommended_Application_Interval"] = interval * 0.75
 
     # ── Comparison Tables ─────────────────────────────────────────────
 
-    def _save_comparison_tables(self, df: pd.DataFrame, X: pd.DataFrame,
-                                options: list[dict],
-                                comparisons: list[list[dict]]):
+    def _save_comparison_tables(
+        self, df: pd.DataFrame, X: pd.DataFrame, options: list[dict], comparisons: list[list[dict]]
+    ):
         if not comparisons or not comparisons[0]:
             return
 
         rows = []
         for row_idx, row_comparisons in enumerate(comparisons):
             row_conditions = {}
-            for col in ["Soil_pH", "Nitrogen", "Phosphorus", "Potassium",
-                        "Rainfall", "Temperature_Max", "Crop", "Growth_Stage"]:
+            for col in [
+                "Soil_pH",
+                "Nitrogen",
+                "Phosphorus",
+                "Potassium",
+                "Rainfall",
+                "Temperature_Max",
+                "Crop",
+                "Growth_Stage",
+            ]:
                 val = df.iloc[row_idx].get(col) if col in df.columns else X.iloc[row_idx].get(col)
                 if val is not None and not (isinstance(val, float) and np.isnan(val)):
                     row_conditions[col] = val
@@ -468,35 +543,60 @@ class PredictionAgent(BaseAgent):
 
         tbl = pd.DataFrame(rows)
 
-        display_cols = [c for c in ["Soil_pH", "Nitrogen", "Phosphorus",
-                                     "Potassium", "Rainfall", "Temperature_Max",
-                                     "Crop", "Growth_Stage"]
-                        if c in tbl.columns]
-        result_cols = [c for c in ["label", "Fertilizer_Name", "Dose",
-                                    "Application_Interval", "Predicted_Yield",
-                                    "Yield_Increase"]
-                       if c in tbl.columns]
+        display_cols = [
+            c
+            for c in [
+                "Soil_pH",
+                "Nitrogen",
+                "Phosphorus",
+                "Potassium",
+                "Rainfall",
+                "Temperature_Max",
+                "Crop",
+                "Growth_Stage",
+            ]
+            if c in tbl.columns
+        ]
+        result_cols = [
+            c
+            for c in [
+                "label",
+                "Fertilizer_Name",
+                "Dose",
+                "Application_Interval",
+                "Predicted_Yield",
+                "Yield_Increase",
+            ]
+            if c in tbl.columns
+        ]
         table_cols = display_cols + result_cols
         tbl = tbl[[c for c in table_cols if c in tbl.columns]]
 
-        csv_path = self.save_artifact(tbl, "recommendation_comparison.csv", subdir="recommendations")
+        csv_path = self.save_artifact(
+            tbl, "recommendation_comparison.csv", subdir="recommendations"
+        )
         self.log.info("Saved comparison table: %s (%d rows)", csv_path.name, len(tbl))
 
         html = self._render_comparison_html(tbl)
-        html_path = self.save_text_artifact(html, "recommendation_comparison.html", subdir="recommendations")
+        html_path = self.save_text_artifact(
+            html, "recommendation_comparison.html", subdir="recommendations"
+        )
         self.log.info("Saved comparison HTML: %s", html_path.name)
 
     def _render_comparison_html(self, tbl: pd.DataFrame) -> str:
         from datetime import datetime
+
         cols = list(tbl.columns)
         thead = "".join(f"<th>{c}</th>" for c in cols)
         tbody = ""
         for _, row in tbl.iterrows():
-            tbody += "<tr>" + "".join(
-                f"<td>{v:.2f}</td>" if isinstance(v, float)
-                else f"<td>{v}</td>"
-                for v in row
-            ) + "</tr>"
+            tbody += (
+                "<tr>"
+                + "".join(
+                    f"<td>{v:.2f}</td>" if isinstance(v, float) else f"<td>{v}</td>" for v in row
+                )
+                + "</tr>"
+            )
         now = datetime.now().isoformat()
         return f"""<!DOCTYPE html>
 <html lang="en">
@@ -581,7 +681,7 @@ td:last-child, th:last-child {{ font-weight: 600; }}
 
     def _describe_conditions(self, row: pd.Series) -> list[str]:
         desc = []
-        for col, (label, unit, if_low, if_high) in self.SUMMARY_TRIGGERS.items():
+        for col, (label, unit, if_low, _) in self.SUMMARY_TRIGGERS.items():
             val = row.get(col)
             if pd.isna(val):
                 continue
@@ -600,10 +700,19 @@ td:last-child, th:last-child {{ font-weight: 600; }}
                 else:
                     desc.append(f"{label} {val:.0f}{unit} (moderate)")
             else:
-                thresh_low = NITROGEN_THRESHOLDS.get("LOW", 0) if col == "Nitrogen" else (
-                    PHOSPHORUS_THRESHOLDS.get("LOW", 0) if col == "Phosphorus" else (
-                    POTASSIUM_THRESHOLDS.get("LOW", 0) if col == "Potassium" else (
-                    RAINFALL_THRESHOLDS.get("LOW", 0))))
+                thresh_low = (
+                    NITROGEN_THRESHOLDS.get("LOW", 0)
+                    if col == "Nitrogen"
+                    else (
+                        PHOSPHORUS_THRESHOLDS.get("LOW", 0)
+                        if col == "Phosphorus"
+                        else (
+                            POTASSIUM_THRESHOLDS.get("LOW", 0)
+                            if col == "Potassium"
+                            else (RAINFALL_THRESHOLDS.get("LOW", 0))
+                        )
+                    )
+                )
                 if val < thresh_low:
                     desc.append(f"{label} {val:.0f}{unit} ({if_low})")
                 else:
@@ -617,6 +726,7 @@ td:last-child, th:last-child {{ font-weight: 600; }}
             self.log.warning("Models directory not found: %s", models_dir)
             return []
         import joblib
+
         registry = []
         for path in sorted(models_dir.glob("*.joblib")):
             try:
@@ -635,8 +745,9 @@ td:last-child, th:last-child {{ font-weight: 600; }}
                 self.log.warning("Failed to load yield_model.pkl: %s", e)
         return registry
 
-    def _prepare_features(self, df: pd.DataFrame, models_dir: Path) -> Optional[pd.DataFrame]:
+    def _prepare_features(self, df: pd.DataFrame, models_dir: Path) -> pd.DataFrame | None:
         import json
+
         path = models_dir / "feature_list.json"
         if not path.exists():
             self.log.warning("feature_list.json not found")

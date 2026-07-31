@@ -11,8 +11,6 @@ Produces one JSON report per prediction under reports/explainability/.
 
 import json
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -60,18 +58,24 @@ class ExplainabilityAgent(BaseAgent):
             base["avg_confidence"] = self._last_avg_confidence
         return base
 
-    def _explain_row(self, row: pd.Series, idx: int, df: pd.DataFrame,
-                      pipeline_results: dict, model_metrics: dict,
-                      feature_importances: dict) -> dict:
+    def _explain_row(
+        self,
+        row: pd.Series,
+        idx: int,
+        df: pd.DataFrame,
+        pipeline_results: dict,
+        model_metrics: dict,
+        feature_importances: dict,
+    ) -> dict:
         crop = str(row.get("Crop", "Unknown"))
         source_paper = str(row.get("Source_Paper", "Unknown"))
         predicted_yield = self._safe_float(row.get("Predicted_Yield"))
         target_yield = self._safe_float(row.get("Target_Yield"))
         actual_yield = self._safe_float(row.get("Yield_per_Hectare"))
-        confidence = self._safe_float(row.get("Confidence_Score",
-                                        row.get("Recommendation_Confidence", 0.0)))
-        fertilizer = str(row.get("Recommended_Fertilizer",
-                          row.get("Fertilizer_Name", "Unknown")))
+        confidence = self._safe_float(
+            row.get("Confidence_Score", row.get("Recommendation_Confidence", 0.0))
+        )
+        fertilizer = str(row.get("Recommended_Fertilizer", row.get("Fertilizer_Name", "Unknown")))
         dose = self._safe_float(row.get("Recommended_Dose", row.get("Dose", 0.0)))
 
         top_features = self._get_top_features(feature_importances, idx, n=10)
@@ -154,7 +158,9 @@ class ExplainabilityAgent(BaseAgent):
         if not row_imp:
             return []
         sorted_features = sorted(row_imp.items(), key=lambda x: abs(x[1]), reverse=True)[:n]
-        return [{"feature": name, "importance": round(float(imp), 4)} for name, imp in sorted_features]
+        return [
+            {"feature": name, "importance": round(float(imp), 4)} for name, imp in sorted_features
+        ]
 
     def _get_activated_fuzzy_rules(self, row: pd.Series) -> list[dict]:
         rules = []
@@ -162,11 +168,13 @@ class ExplainabilityAgent(BaseAgent):
         for col in fuzzy_cols:
             val = row.get(col)
             if pd.notna(val) and str(val).strip():
-                rules.append({
-                    "rule": col,
-                    "output": str(val),
-                    "category": col.replace("Fuzzy_", ""),
-                })
+                rules.append(
+                    {
+                        "rule": col,
+                        "output": str(val),
+                        "category": col.replace("Fuzzy_", ""),
+                    }
+                )
         n_action = str(row.get("Fuzzy_N_Action", ""))
         p_action = str(row.get("Fuzzy_P_Action", ""))
         k_action = str(row.get("Fuzzy_K_Action", ""))
@@ -182,15 +190,18 @@ class ExplainabilityAgent(BaseAgent):
         return rules
 
     def _compute_uncertainty(self, row: pd.Series, predicted: float, actual: float) -> dict:
-        confidence = self._safe_float(row.get("Confidence_Score",
-                                        row.get("Recommendation_Confidence", 0.5)))
+        confidence = self._safe_float(
+            row.get("Confidence_Score", row.get("Recommendation_Confidence", 0.5))
+        )
         pred_std = 0.0
         if predicted > 0 and actual > 0:
             pred_std = abs(predicted - actual) / predicted
         uncertainty_score = max(0.0, 1.0 - confidence + pred_std * 0.3)
         return {
             "uncertainty_score": round(min(uncertainty_score, 1.0), 4),
-            "confidence_interval_width": round(predicted * (1 - confidence) * 2, 4) if predicted > 0 else 0.0,
+            "confidence_interval_width": round(predicted * (1 - confidence) * 2, 4)
+            if predicted > 0
+            else 0.0,
             "prediction_std": round(pred_std, 4),
         }
 
@@ -232,20 +243,35 @@ class ExplainabilityAgent(BaseAgent):
         }
 
     def _compute_data_quality_score(self, row: pd.Series) -> float:
-        important = ["Crop", "Nitrogen", "Phosphorus", "Potassium", "Soil_pH",
-                      "Yield_per_Hectare", "Rainfall"]
+        important = [
+            "Crop",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "Soil_pH",
+            "Yield_per_Hectare",
+            "Rainfall",
+        ]
         present = sum(1 for c in important if c in row.index and pd.notna(row.get(c)))
         return round(present / len(important), 4) if important else 0.0
 
     def _get_extraction_confidence(self, row: pd.Series) -> float:
-        conf = row.get("Provenance_Confidence",
-                        row.get("Extraction_Confidence", 0.5))
+        conf = row.get("Provenance_Confidence", row.get("Extraction_Confidence", 0.5))
         return self._safe_float(conf)
 
     def _get_missing_fields(self, row: pd.Series) -> list[str]:
         missing = []
-        important = ["Crop", "Nitrogen", "Phosphorus", "Potassium", "Soil_pH",
-                      "Yield_per_Hectare", "Rainfall", "Fertilizer_Name", "Dose"]
+        important = [
+            "Crop",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "Soil_pH",
+            "Yield_per_Hectare",
+            "Rainfall",
+            "Fertilizer_Name",
+            "Dose",
+        ]
         for col in important:
             if col in row.index and pd.isna(row.get(col)):
                 missing.append(col)
@@ -257,10 +283,11 @@ class ExplainabilityAgent(BaseAgent):
             return summary
         fert = str(row.get("Recommended_Fertilizer", row.get("Fertilizer_Name", "")))
         crop = str(row.get("Crop", ""))
-        confidence = self._safe_float(row.get("Confidence_Score",
-                                        row.get("Recommendation_Confidence", 0)))
+        confidence = self._safe_float(
+            row.get("Confidence_Score", row.get("Recommendation_Confidence", 0))
+        )
         if fert and fert != "nan":
-            return f"{fert} recommended for {crop} with {confidence*100:.0f}% confidence based on soil analysis and research evidence."
+            return f"{fert} recommended for {crop} with {confidence * 100:.0f}% confidence based on soil analysis and research evidence."
         return "Insufficient data for recommendation reasoning."
 
     def _get_alternatives(self, row: pd.Series) -> list[dict]:
@@ -294,13 +321,19 @@ class ExplainabilityAgent(BaseAgent):
         for exp in explanations:
             pred_id = exp["prediction_id"]
             for feat in exp.get("feature_importance", {}).get("top_10_variables", []):
-                rows.append({
-                    "prediction_id": pred_id,
-                    "crop": exp.get("crop", ""),
-                    "feature": feat["feature"],
-                    "importance": feat["importance"],
-                })
-        df = pd.DataFrame(rows) if rows else pd.DataFrame(columns=["prediction_id", "crop", "feature", "importance"])
+                rows.append(
+                    {
+                        "prediction_id": pred_id,
+                        "crop": exp.get("crop", ""),
+                        "feature": feat["feature"],
+                        "importance": feat["importance"],
+                    }
+                )
+        df = (
+            pd.DataFrame(rows)
+            if rows
+            else pd.DataFrame(columns=["prediction_id", "crop", "feature", "importance"])
+        )
         path = out / "feature_importance.csv"
         df.to_csv(path, index=False)
         if self.contract is not None:
@@ -319,7 +352,9 @@ class ExplainabilityAgent(BaseAgent):
             "avg_uncertainty": round(float(np.mean(uncertainties)), 4) if uncertainties else 0.0,
             "avg_data_quality": round(float(np.mean(quality_scores)), 4) if quality_scores else 0.0,
             "crop_distribution": {},
-            "model_used": explanations[0]["prediction"]["model_used"] if explanations else "Unknown",
+            "model_used": explanations[0]["prediction"]["model_used"]
+            if explanations
+            else "Unknown",
             "timestamp": datetime.now().isoformat(),
         }
         for exp in explanations:
@@ -336,14 +371,14 @@ h1{{color:#333;border-bottom:2px solid #2196F3;padding-bottom:10px}}
 .metric .label{{font-size:12px;color:#666;margin-top:4px}}</style></head>
 <body><div class="container">
 <h1>AAIF Explainability Dashboard</h1>
-<p>Generated: {dashboard['timestamp']}</p>
-<div class="metric"><div class="value">{dashboard['total_predictions']}</div><div class="label">Predictions</div></div>
-<div class="metric"><div class="value">{dashboard['avg_confidence']*100:.1f}%</div><div class="label">Avg Confidence</div></div>
-<div class="metric"><div class="value">{dashboard['avg_uncertainty']*100:.1f}%</div><div class="label">Avg Uncertainty</div></div>
-<div class="metric"><div class="value">{dashboard['avg_data_quality']*100:.1f}%</div><div class="label">Data Quality</div></div>
-<div class="metric"><div class="value">{dashboard['model_used']}</div><div class="label">Model</div></div>
+<p>Generated: {dashboard["timestamp"]}</p>
+<div class="metric"><div class="value">{dashboard["total_predictions"]}</div><div class="label">Predictions</div></div>
+<div class="metric"><div class="value">{dashboard["avg_confidence"] * 100:.1f}%</div><div class="label">Avg Confidence</div></div>
+<div class="metric"><div class="value">{dashboard["avg_uncertainty"] * 100:.1f}%</div><div class="label">Avg Uncertainty</div></div>
+<div class="metric"><div class="value">{dashboard["avg_data_quality"] * 100:.1f}%</div><div class="label">Data Quality</div></div>
+<div class="metric"><div class="value">{dashboard["model_used"]}</div><div class="label">Model</div></div>
 <h2>Crop Distribution</h2>
-<ul>{"".join(f"<li>{c}: {n}</li>" for c,n in dashboard['crop_distribution'].items())}</ul>
+<ul>{"".join(f"<li>{c}: {n}</li>" for c, n in dashboard["crop_distribution"].items())}</ul>
 </div></body></html>"""
         path = out / "explainability_dashboard.html"
         path.write_text(html, encoding="utf-8")

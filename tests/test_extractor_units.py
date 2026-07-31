@@ -48,5 +48,7 @@ def test_grounding_rejects_soil_concentration_for_rate_column():
 
 if __name__ == "__main__":
     import sys
+
     import pytest
+
     sys.exit(pytest.main([__file__, "-q"]))

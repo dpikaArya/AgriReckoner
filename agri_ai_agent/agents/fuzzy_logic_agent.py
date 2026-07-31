@@ -8,7 +8,6 @@ and natural-language summaries instead of raw numerical predictions.
 """
 
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -24,9 +23,16 @@ DEFAULT_RULES_PATH = RULES_DIR / "fertilizer_rules.yaml"
 N_SAMPLES = 1000
 
 INPUT_VARS = [
-    "Nitrogen", "Phosphorus", "Potassium", "Soil_pH",
-    "Rainfall", "Temperature_Max", "Organic_Carbon",
-    "Growth_Stage", "Zinc", "Yield_Prediction",
+    "Nitrogen",
+    "Phosphorus",
+    "Potassium",
+    "Soil_pH",
+    "Rainfall",
+    "Temperature_Max",
+    "Organic_Carbon",
+    "Growth_Stage",
+    "Zinc",
+    "Yield_Prediction",
 ]
 
 NUTRIENT_ACTION_LABELS = {
@@ -46,8 +52,12 @@ ADJUSTMENT_MAP = {
     "Dose_Adjustment": {"col": "Recommended_Dose", "scale": 1.0},
 }
 
-ADJUST_ACTIONS = ["Nitrogen_Adjustment", "Potash_Adjustment",
-                  "Irrigation_Adjustment", "Dose_Adjustment"]
+ADJUST_ACTIONS = [
+    "Nitrogen_Adjustment",
+    "Potash_Adjustment",
+    "Irrigation_Adjustment",
+    "Dose_Adjustment",
+]
 
 
 class FuzzyAgent(BaseAgent):
@@ -68,8 +78,12 @@ class FuzzyAgent(BaseAgent):
         df = self._infer_yield_prediction(df)
 
         out_cols = [
-            "Fuzzy_N_Action", "Fuzzy_P_Action", "Fuzzy_K_Action",
-            "Fuzzy_Zinc_Action", "Fuzzy_Risk", "Fuzzy_Confidence_Label",
+            "Fuzzy_N_Action",
+            "Fuzzy_P_Action",
+            "Fuzzy_K_Action",
+            "Fuzzy_Zinc_Action",
+            "Fuzzy_Risk",
+            "Fuzzy_Confidence_Label",
             "Fuzzy_Summary",
         ]
         for c in out_cols:
@@ -103,9 +117,11 @@ class FuzzyAgent(BaseAgent):
         if "Yield_Prediction" in df.columns:
             return df
 
-        pred_cols = [c for c in ["Predicted_Yield", "XGBoost_Prediction",
-                                  "Regression_Prediction"]
-                     if c in df.columns]
+        pred_cols = [
+            c
+            for c in ["Predicted_Yield", "XGBoost_Prediction", "Regression_Prediction"]
+            if c in df.columns
+        ]
         if pred_cols:
             df["Yield_Prediction"] = df[pred_cols].mean(axis=1)
         else:
@@ -140,8 +156,7 @@ class FuzzyAgent(BaseAgent):
 
     # ── Numerical engine (Mamdani → centroid) ────────────────────────
 
-    def _evaluate(self, rules: list[dict],
-                  fuzzy_inputs: dict) -> dict[str, dict[str, float]]:
+    def _evaluate(self, rules: list[dict], fuzzy_inputs: dict) -> dict[str, dict[str, float]]:
         fired = {}
         for rule in rules:
             ant = rule.get("antecedents", [])
@@ -169,7 +184,10 @@ class FuzzyAgent(BaseAgent):
 
     def _defuzzify(self, aggregated: dict) -> dict[str, float]:
         from agri_ai_agent.rules.membership_functions import (
-            triangle, trapezoid, shouldered_s, shouldered_z,
+            shouldered_s,
+            shouldered_z,
+            trapezoid,
+            triangle,
         )
 
         crisp = {}
@@ -210,8 +228,9 @@ class FuzzyAgent(BaseAgent):
 
         return crisp
 
-    def _apply_numerical(self, df: pd.DataFrame, row_idx: int,
-                         crisp: dict[str, float], row: pd.Series):
+    def _apply_numerical(
+        self, df: pd.DataFrame, row_idx: int, crisp: dict[str, float], row: pd.Series
+    ):
         n_adj = crisp.get("Nitrogen_Adjustment", 0.5)
         k_adj = crisp.get("Potash_Adjustment", 0.5)
         irr_adj = crisp.get("Irrigation_Adjustment", 0.5)
@@ -222,8 +241,7 @@ class FuzzyAgent(BaseAgent):
             combined = n_adj * 0.4 + k_adj * 0.2 + dose_adj * 0.4
             df.at[row_idx, "Recommended_Dose"] = dose * (0.5 + combined)
 
-        interval = (row.get("Recommended_Application_Interval")
-                    or row.get("Application_Interval"))
+        interval = row.get("Recommended_Application_Interval") or row.get("Application_Interval")
         if pd.notna(interval) and isinstance(interval, (int, float)):
             irr_factor = 2.0 - irr_adj
             df.at[row_idx, "Recommended_Application_Interval"] = interval * irr_factor
@@ -238,8 +256,7 @@ class FuzzyAgent(BaseAgent):
 
     # ── Symbolic engine (per-nutrient actions, risk, confidence) ─────
 
-    def _evaluate_symbolic(self, rules: list[dict],
-                           fuzzy_inputs: dict) -> dict:
+    def _evaluate_symbolic(self, rules: list[dict], fuzzy_inputs: dict) -> dict:
         nutrient_actions: dict[str, list[tuple[str, float, float]]] = {}
         risk_scores: list[tuple[str, float]] = []
         confidence_scores: list[tuple[str, float]] = []
@@ -263,9 +280,7 @@ class FuzzyAgent(BaseAgent):
                     n_name = cons["nutrient"]
                     if n_name not in nutrient_actions:
                         nutrient_actions[n_name] = []
-                    nutrient_actions[n_name].append(
-                        (cons["action"], cons.get("amount", 0), firing)
-                    )
+                    nutrient_actions[n_name].append((cons["action"], cons.get("amount", 0), firing))
                 elif ctype == "risk":
                     risk_scores.append((cons["level"], firing))
                 elif ctype == "confidence":
@@ -284,8 +299,7 @@ class FuzzyAgent(BaseAgent):
         "Zinc": "Fuzzy_Zinc_Action",
     }
 
-    def _apply_symbolic(self, df: pd.DataFrame, row_idx: int,
-                        symbolic: dict, row: pd.Series):
+    def _apply_symbolic(self, df: pd.DataFrame, row_idx: int, symbolic: dict, row: pd.Series):
         nutrient_actions = symbolic.get("nutrient_actions", {})
         risk_scores = symbolic.get("risk_scores", [])
         confidence_scores = symbolic.get("confidence_scores", [])
@@ -297,11 +311,13 @@ class FuzzyAgent(BaseAgent):
 
         df.at[row_idx, "Fuzzy_Risk"] = (
             self._pick_best_label(risk_scores, ["low", "medium", "high"])
-            if risk_scores else "medium"
+            if risk_scores
+            else "medium"
         )
         df.at[row_idx, "Fuzzy_Confidence_Label"] = (
             self._pick_best_label(confidence_scores, ["low", "medium", "high"])
-            if confidence_scores else "medium"
+            if confidence_scores
+            else "medium"
         )
         df.at[row_idx, "Fuzzy_Summary"] = self._build_summary(row_idx, df)
 
@@ -309,7 +325,7 @@ class FuzzyAgent(BaseAgent):
         if not actions:
             return "Maintain"
         by_action: dict[str, list[float]] = {}
-        for action, amount, firing in actions:
+        for action, _, firing in actions:
             if action not in by_action:
                 by_action[action] = []
             by_action[action].append(firing)
@@ -325,8 +341,7 @@ class FuzzyAgent(BaseAgent):
             return f"{label} by {amount:.0f}%"
         return label
 
-    def _pick_best_label(self, scored: list[tuple[str, float]],
-                         order: list[str]) -> str:
+    def _pick_best_label(self, scored: list[tuple[str, float]], order: list[str]) -> str:
         by_label: dict[str, float] = {}
         for label, firing in scored:
             if label not in by_label or firing > by_label[label]:

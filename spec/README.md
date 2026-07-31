@@ -75,6 +75,7 @@ Datasets conforming to UAMS v1.0 are immediately compatible with:
 ```python
 from agri_ai_agent.config.schema import UAMS_COLUMNS, SCHEMA_GROUPS
 
+
 def validate_uams_compliance(df):
     missing = [c for c in UAMS_COLUMNS if c not in df.columns]
     extra = [c for c in df.columns if c not in UAMS_COLUMNS]

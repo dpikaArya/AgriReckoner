@@ -6,15 +6,13 @@ Derives Yield_per_Hectare from Yield_per_Plot + Plot_size,
 Organic_Matter from Organic_Carbon, and other safe derivations.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.contracts.messages import AgentContract
 from agri_ai_agent.config.settings import AgriAISettings
-
 
 DERIVATION_RULES: list[dict[str, Any]] = [
     {
@@ -78,7 +76,9 @@ DERIVATION_RULES: list[dict[str, Any]] = [
         "target": "Leaf_Area_cm2",
         "sources": ["Leaf_Area_30_cm2", "Leaf_Area_60_cm2"],
         "confidence": 0.95,
-        "method": lambda df: df[[c for c in ["Leaf_Area_30_cm2", "Leaf_Area_60_cm2"] if c in df.columns]].max(axis=1),
+        "method": lambda df: df[
+            [c for c in ["Leaf_Area_30_cm2", "Leaf_Area_60_cm2"] if c in df.columns]
+        ].max(axis=1),
         "description": "Leaf_Area_cm2 = max of available leaf area measurements",
     },
     {
@@ -86,7 +86,9 @@ DERIVATION_RULES: list[dict[str, Any]] = [
         "target": "Growing_Degree_Days",
         "sources": ["Average_Temperature", "Growth_Duration_Days"],
         "confidence": 0.96,
-        "method": lambda df: (df["Average_Temperature"] - 10).clip(lower=0) * df["Growth_Duration_Days"],
+        "method": lambda df: (
+            (df["Average_Temperature"] - 10).clip(lower=0) * df["Growth_Duration_Days"]
+        ),
         "description": "GDD = (T_avg - T_base) * Duration, base=10C",
     },
     {
@@ -117,7 +119,7 @@ DERIVATION_RULES: list[dict[str, Any]] = [
 
 
 class SchemaPopulationAgent(BaseAgent):
-    def __init__(self, settings: Optional[AgriAISettings] = None, **kwargs):
+    def __init__(self, settings: AgriAISettings | None = None, **kwargs):
         super().__init__(settings=settings, **kwargs)
         self.population_report: dict[str, Any] = {}
         self.min_confidence = 0.95
@@ -158,22 +160,31 @@ class SchemaPopulationAgent(BaseAgent):
                 df.loc[available_rows, target] = derived[available_rows]
                 n_filled = int(available_rows.sum())
 
-                derivations_applied.append({
-                    "rule": rule["name"],
-                    "target": target,
-                    "sources": sources,
-                    "rows_filled": n_filled,
-                    "confidence": rule["confidence"],
-                    "description": rule["description"],
-                })
+                derivations_applied.append(
+                    {
+                        "rule": rule["name"],
+                        "target": target,
+                        "sources": sources,
+                        "rows_filled": n_filled,
+                        "confidence": rule["confidence"],
+                        "description": rule["description"],
+                    }
+                )
 
                 self.log.info(
                     "[%s] Applied %s: filled %d rows for %s (conf=%.2f)",
-                    self.agent_name, rule["name"], n_filled, target, rule["confidence"],
+                    self.agent_name,
+                    rule["name"],
+                    n_filled,
+                    target,
+                    rule["confidence"],
                 )
             except Exception as e:
                 self.log.warning(
-                    "[%s] Rule %s failed: %s", self.agent_name, rule["name"], e,
+                    "[%s] Rule %s failed: %s",
+                    self.agent_name,
+                    rule["name"],
+                    e,
                 )
 
         self.population_report = {

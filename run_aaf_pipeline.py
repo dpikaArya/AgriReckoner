@@ -9,6 +9,7 @@ Prefer the maintained engine:  ``agriai run --file data.csv``  (agri_ai_agent.or
 
 Retirement criterion: delete this file once the agent pipeline reproduces the golden outputs.
 """
+
 import warnings
 
 warnings.warn(
@@ -17,34 +18,34 @@ warnings.warn(
     stacklevel=2,
 )
 
-import io
-import json
-import os
-import re
-import sqlite3
-import sys
-import time
-import traceback
-from datetime import datetime
-from pathlib import Path
-from typing import Optional
+import json  # noqa: E402
+import re  # noqa: E402
+import sqlite3  # noqa: E402
+import sys  # noqa: E402
+import time  # noqa: E402
+import traceback  # noqa: E402
+from datetime import datetime  # noqa: E402
+from pathlib import Path  # noqa: E402
 
-import numpy as np
-import pandas as pd
-import yaml
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import yaml  # noqa: E402
 
 BASE_DIR = Path(__file__).parent.resolve()
 sys.path.insert(0, str(BASE_DIR))
 sys.path.insert(0, str(BASE_DIR / "agri_ai_agent"))
 
 try:
-    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding="utf-8")
 except Exception:
     pass
 
-from agri_ai_agent.config.settings import AgriAISettings
-from agri_ai_agent.config.schema import UAMS_COLUMNS, POST_HARVEST_VARIABLES, NON_FEATURE_COLS
-from agri_ai_agent.contracts.messages import AgentContract
+from agri_ai_agent.config.schema import (  # noqa: E402
+    NON_FEATURE_COLS,
+    POST_HARVEST_VARIABLES,
+    UAMS_COLUMNS,
+)
+from agri_ai_agent.config.settings import AgriAISettings  # noqa: E402
 
 settings = AgriAISettings()
 settings.ensure_dirs()
@@ -60,50 +61,139 @@ for d in [OUTPUTS_DIR, MODELS_DIR, LOGS_DIR, DB_DIR, FUZZY_DIR]:
     d.mkdir(parents=True, exist_ok=True)
 
 KNOWN_CROPS = {
-    "bell pepper", "capsicum annuum", "capsicum", "black wheat", "triticum aestivum",
-    "carrot", "daucus carota", "cowpea", "vigna unguiculata", "spinach", "spinacia oleracea",
-    "rice", "oryza sativa", "wheat", "triticum", "maize", "zea mays", "corn",
-    "soybean", "glycine max", "potato", "solanum tuberosum", "tomato", "solanum lycopersicum",
-    "chickpea", "cicer arietinum", "pigeonpea", "cajanus cajan", "groundnut", "arachis hypogaea",
-    "mustard", "brassica juncea", "sunflower", "helianthus annuus", "sugarcane", "saccharum",
-    "cotton", "gossypium", "onion", "allium cepa", "chilli", "capsicum frutescens",
-    "gram", "cicer arietinum", "pigeon pea", "black gram", "green gram", "red gram",
-    "barley", "hordeum vulgare", "oat", "avena sativa", "pearl millet", "pennisetum glaucum",
-    "finger millet", "eleusine coracana", "sorghum", "sorghum bicolor", "ragi",
-    "sunflower", "safflower", "carthamus tinctorius", "linseed", "linum usitatissimum",
-    "sesame", "sesamum indicum", "castor", "ricinus communis", "jute", "corchorus",
+    "bell pepper",
+    "capsicum annuum",
+    "capsicum",
+    "black wheat",
+    "triticum aestivum",
+    "carrot",
+    "daucus carota",
+    "cowpea",
+    "vigna unguiculata",
+    "spinach",
+    "spinacia oleracea",
+    "rice",
+    "oryza sativa",
+    "wheat",
+    "triticum",
+    "maize",
+    "zea mays",
+    "corn",
+    "soybean",
+    "glycine max",
+    "potato",
+    "solanum tuberosum",
+    "tomato",
+    "solanum lycopersicum",
+    "chickpea",
+    "cicer arietinum",
+    "pigeonpea",
+    "cajanus cajan",
+    "groundnut",
+    "arachis hypogaea",
+    "mustard",
+    "brassica juncea",
+    "sunflower",
+    "helianthus annuus",
+    "sugarcane",
+    "saccharum",
+    "cotton",
+    "gossypium",
+    "onion",
+    "allium cepa",
+    "chilli",
+    "capsicum frutescens",
+    "gram",
+    "pigeon pea",
+    "black gram",
+    "green gram",
+    "red gram",
+    "barley",
+    "hordeum vulgare",
+    "oat",
+    "avena sativa",
+    "pearl millet",
+    "pennisetum glaucum",
+    "finger millet",
+    "eleusine coracana",
+    "sorghum",
+    "sorghum bicolor",
+    "ragi",
+    "safflower",
+    "carthamus tinctorius",
+    "linseed",
+    "linum usitatissimum",
+    "sesame",
+    "sesamum indicum",
+    "castor",
+    "ricinus communis",
+    "jute",
+    "corchorus",
 }
 
 DESIGN_KEYWORDS = [
-    "randomized block design", "rcbd", "randomized complete block design",
-    "split plot", "split-plot", "crd", "completely randomized design",
-    "latin square", "factorial", "nested design", "strip plot",
-    "augmented design", "alpha lattice", "row column design",
+    "randomized block design",
+    "rcbd",
+    "randomized complete block design",
+    "split plot",
+    "split-plot",
+    "crd",
+    "completely randomized design",
+    "latin square",
+    "factorial",
+    "nested design",
+    "strip plot",
+    "augmented design",
+    "alpha lattice",
+    "row column design",
 ]
 
 MASTER_COLUMN_MAP = {
-    "Paper_ID": "Paper_ID", "Crop": "Crop", "Variety": "Variety",
-    "Treatment": "Treatment", "Fertilizer": "Fertilizer_Name",
+    "Paper_ID": "Paper_ID",
+    "Crop": "Crop",
+    "Variety": "Variety",
+    "Treatment": "Treatment",
+    "Fertilizer": "Fertilizer_Name",
     "Amendment": "Fertilizer_Name",
-    "Dose_kg_acre": "Dose", "Location": "Location", "Country": "Country",
-    "State": "State", "Latitude": "Latitude", "Longitude": "Longitude",
-    "Season": "Season", "Design": "Design", "Experimental_Design": "Design",
-    "Replications": "Replications", "Replicate": "Replications",
-    "Plot_Size_m2": "Plot_Size", "Row_Spacing_cm": "Spacing_Row",
+    "Dose_kg_acre": "Dose",
+    "Location": "Location",
+    "Country": "Country",
+    "State": "State",
+    "Latitude": "Latitude",
+    "Longitude": "Longitude",
+    "Season": "Season",
+    "Design": "Design",
+    "Experimental_Design": "Design",
+    "Replications": "Replications",
+    "Replicate": "Replications",
+    "Plot_Size_m2": "Plot_Size",
+    "Row_Spacing_cm": "Spacing_Row",
     "Plant_Spacing_cm": "Spacing_Plant",
-    "Harvest_Stage": "Growth_Duration_Days", "Harvest_DAS": "Growth_Duration_Days",
+    "Harvest_Stage": "Growth_Duration_Days",
+    "Harvest_DAS": "Growth_Duration_Days",
     "Harvest_Days": "Growth_Duration_Days",
-    "Rainfall_mm": "Rainfall", "Tmax_C": "Temperature_Max",
+    "Rainfall_mm": "Rainfall",
+    "Tmax_C": "Temperature_Max",
     "Tmin_C": "Temperature_Min",
-    "Soil_pH": "Soil_pH", "pH": "Soil_pH",
-    "EC": "EC", "EC_dS_m": "EC",
-    "Organic_Carbon": "Organic_Carbon", "Organic_C": "Organic_Carbon",
-    "Organic_Carbon_%": "Organic_Carbon", "Organic_Matter_%": "Organic_Matter",
-    "Available_N": "Nitrogen", "Nitrogen_kg_ha": "Nitrogen",
-    "Available_P": "Phosphorus", "P2O5_kg_ha": "Phosphorus",
-    "Available_K": "Potassium", "K2O_kg_ha": "Potassium",
-    "Sulphur_ppm": "Sulphur", "Zn_ppm": "Zinc", "Iron_ppm": "Iron",
-    "Mn_ppm": "Manganese", "Cu_ppm": "Copper",
+    "Soil_pH": "Soil_pH",
+    "pH": "Soil_pH",
+    "EC": "EC",
+    "EC_dS_m": "EC",
+    "Organic_Carbon": "Organic_Carbon",
+    "Organic_C": "Organic_Carbon",
+    "Organic_Carbon_%": "Organic_Carbon",
+    "Organic_Matter_%": "Organic_Matter",
+    "Available_N": "Nitrogen",
+    "Nitrogen_kg_ha": "Nitrogen",
+    "Available_P": "Phosphorus",
+    "P2O5_kg_ha": "Phosphorus",
+    "Available_K": "Potassium",
+    "K2O_kg_ha": "Potassium",
+    "Sulphur_ppm": "Sulphur",
+    "Zn_ppm": "Zinc",
+    "Iron_ppm": "Iron",
+    "Mn_ppm": "Manganese",
+    "Cu_ppm": "Copper",
     "PlantHeight_30_cm": "Plant_Height_30_cm",
     "PlantHeight_60_cm": "Plant_Height_60_cm",
     "PlantHeight_90_cm": "Plant_Height_90_cm",
@@ -114,23 +204,31 @@ MASTER_COLUMN_MAP = {
     "LeafArea_90_cm2": "Leaf_Area_90_cm2",
     "LeafArea_120_cm2": "Leaf_Area_cm2",
     "Leaf_Area_cm2": "Leaf_Area_cm2",
-    "Branches_60": "Branches", "Branches_90": "Branches",
+    "Branches_60": "Branches",
+    "Branches_90": "Branches",
     "Flowers_60": "Flowers",
-    "FruitWeight_90_g": "Fruit_Weight", "FruitWeight_120_g": "Fruit_Weight",
+    "FruitWeight_90_g": "Fruit_Weight",
+    "FruitWeight_120_g": "Fruit_Weight",
     "FruitDiameter_90_mm": "Fruit_Diameter_mm",
     "FruitDiameter_120_mm": "Fruit_Diameter_mm",
-    "YieldPlot_90_g": "Yield_per_Plot", "YieldPlot_120_g": "Yield_per_Plot",
+    "YieldPlot_90_g": "Yield_per_Plot",
+    "YieldPlot_120_g": "Yield_per_Plot",
     "Fresh_Weight_g": "Yield_per_Plot",
-    "Shoot_Biomass_g": "Shoot_Biomass_g", "Root_Biomass_g": "Root_Biomass_g",
-    "Shoot_Length_cm": "Shoot_Length_cm", "Root_Length_cm": "Root_Length_cm",
-    "Leaf_Area_cm2": "Leaf_Area_cm2", "No_Leaves": "Leaf_Number",
+    "Shoot_Biomass_g": "Shoot_Biomass_g",
+    "Root_Biomass_g": "Root_Biomass_g",
+    "Shoot_Length_cm": "Shoot_Length_cm",
+    "Root_Length_cm": "Root_Length_cm",
+    "No_Leaves": "Leaf_Number",
     "Root_Diameter_mm": "Root_Diameter_mm",
-    "Chlorophyll_SPAD": "SPAD", "SPAD": "SPAD",
-    "Tillers": "Tillers", "Spike_Length_cm": "Spike_Length",
+    "Chlorophyll_SPAD": "SPAD",
+    "SPAD": "SPAD",
+    "Tillers": "Tillers",
+    "Spike_Length_cm": "Spike_Length",
     "Seeds_per_Spike": "Seeds_per_Spike",
     "Weight_100_Seeds_g": "100_Seed_Weight",
     "Yield_per_Plot_g": "Yield_per_Plot",
-    "Dry_Matter_pct": "Dry_Matter", "Ash_pct": "Ash",
+    "Dry_Matter_pct": "Dry_Matter",
+    "Ash_pct": "Ash",
     "Iron_mgkg": "Iron",
 }
 
@@ -144,6 +242,7 @@ def load_registered_papers() -> set:
     if db_path.exists():
         try:
             import sqlite3
+
             conn = sqlite3.connect(str(db_path))
             try:
                 for row in conn.execute("SELECT paper_name FROM paper_registry").fetchall():
@@ -169,11 +268,13 @@ def extract_text_from_pdf(path: Path) -> str:
     def _extract_pdfminer(p):
         from pdfminer.high_level import extract_text
         from pdfminer.layout import LAParams
+
         la_params = LAParams(detect_vertical=True, all_texts=True)
         return extract_text(str(p), laparams=la_params)
 
     def _extract_pypdf2(p):
         import PyPDF2
+
         parts = []
         with open(p, "rb") as f:
             reader = PyPDF2.PdfReader(f)
@@ -186,12 +287,13 @@ def extract_text_from_pdf(path: Path) -> str:
     def _extract_poppler(p):
         sys.path.insert(0, str(BASE_DIR))
         from aaif.extraction.poppler_reader import PopplerReader
+
         reader = PopplerReader()
         if not reader.available:
             return ""
         result = reader.extract(str(p))
-        meta = result.get('metadata', {})
-        return meta.get('full_text', '')
+        meta = result.get("metadata", {})
+        return meta.get("full_text", "")
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         # Try pdfminer with 30s timeout
@@ -232,22 +334,25 @@ def extract_tables_from_pdf(path: Path) -> list[dict]:
 
     def _extract_with_pdfplumber(p):
         from pdfplumber_extraction import process_pdf
+
         rows, meta = process_pdf(str(p))
         return rows
 
     def _extract_with_enhanced(p):
         from enhanced_extraction import process_one_pdf
+
         rows = process_one_pdf(str(p))
         return rows
 
     def _extract_with_poppler(p):
         sys.path.insert(0, str(BASE_DIR))
         from aaif.extraction.poppler_reader import PopplerReader
+
         reader = PopplerReader()
         if not reader.available:
             return []
         result = reader.extract(str(p))
-        return result.get('rows', [])
+        return result.get("rows", [])
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
         future = executor.submit(_extract_with_pdfplumber, path)
@@ -324,7 +429,7 @@ def detect_doi(text: str) -> str:
 
 def detect_title(text: str) -> str:
     lines = text.split("\n")
-    for i, line in enumerate(lines[:8]):
+    for _, line in enumerate(lines[:8]):
         s = line.strip()
         if len(s) > 20 and any(c.isalpha() for c in s):
             return s[:200]
@@ -418,19 +523,21 @@ def phase1_ingestion() -> pd.DataFrame:
         paper_id = generate_paper_id(pdf_path.name)
 
         if pdf_path.name in registered_names:
-            records.append({
-                "Paper_ID": paper_id,
-                "Paper_Name": pdf_path.name,
-                "Title": "(Previously processed)",
-                "Crop": "",
-                "DOI": "",
-                "Pages": 0,
-                "Words": 0,
-                "Status": "Previously Processed",
-                "Duplicate_Flag": "No",
-                "Duplicate_With": "",
-                "Processing_Time_s": 0,
-            })
+            records.append(
+                {
+                    "Paper_ID": paper_id,
+                    "Paper_Name": pdf_path.name,
+                    "Title": "(Previously processed)",
+                    "Crop": "",
+                    "DOI": "",
+                    "Pages": 0,
+                    "Words": 0,
+                    "Status": "Previously Processed",
+                    "Duplicate_Flag": "No",
+                    "Duplicate_With": "",
+                    "Processing_Time_s": 0,
+                }
+            )
             skipped_previously += 1
             continue
 
@@ -454,6 +561,7 @@ def phase1_ingestion() -> pd.DataFrame:
                 break
             if len(norm_t) > 20 and len(existing_norm) > 20:
                 from difflib import SequenceMatcher
+
                 ratio = SequenceMatcher(None, norm_t, existing_norm).ratio()
                 if ratio > 0.90:
                     dup_flag = "Yes"
@@ -465,19 +573,21 @@ def phase1_ingestion() -> pd.DataFrame:
             all_dois[paper_id] = doi
 
         status = "Duplicate" if dup_flag == "Yes" else "New"
-        records.append({
-            "Paper_ID": paper_id,
-            "Paper_Name": pdf_path.name,
-            "Title": title,
-            "Crop": ", ".join(crops),
-            "DOI": doi,
-            "Pages": n_pages,
-            "Words": word_count,
-            "Status": status,
-            "Duplicate_Flag": dup_flag,
-            "Duplicate_With": dup_with,
-            "Processing_Time_s": duration,
-        })
+        records.append(
+            {
+                "Paper_ID": paper_id,
+                "Paper_Name": pdf_path.name,
+                "Title": title,
+                "Crop": ", ".join(crops),
+                "DOI": doi,
+                "Pages": n_pages,
+                "Words": word_count,
+                "Status": status,
+                "Duplicate_Flag": dup_flag,
+                "Duplicate_With": dup_with,
+                "Processing_Time_s": duration,
+            }
+        )
         log(f"    Crop={crops[0]}, DOI={doi[:40] if doi else 'N/A'}, Status={status}, {duration}s")
 
     ingestion_df = pd.DataFrame(records)
@@ -553,11 +663,15 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         for kw in DESIGN_KEYWORDS:
             if kw in text.lower():
                 design_map = {
-                    "randomized block design": "RBD", "rcbd": "RCBD",
+                    "randomized block design": "RBD",
+                    "rcbd": "RCBD",
                     "randomized complete block design": "RCBD",
-                    "split plot": "Split Plot", "split-plot": "Split Plot",
-                    "crd": "CRD", "completely randomized design": "CRD",
-                    "latin square": "Latin Square", "factorial": "Factorial",
+                    "split plot": "Split Plot",
+                    "split-plot": "Split Plot",
+                    "crd": "CRD",
+                    "completely randomized design": "CRD",
+                    "latin square": "Latin Square",
+                    "factorial": "Factorial",
                     "augmented design": "Augmented",
                 }
                 for k, v in design_map.items():
@@ -571,17 +685,83 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         if rm:
             replications = int(rm.group(1))
 
-        ph_vals = [float(m.group(1)) for m in re.finditer(r"(?:soil\s*)?ph\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE)]
-        ec_vals = [float(m.group(1)) for m in re.finditer(r"(?:ec|electrical\s*conductivity)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE)]
-        oc_vals = [float(m.group(1)) for m in re.finditer(r"(?:organic\s*carbon|oc)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*%?", text, re.IGNORECASE)]
-        n_vals = [float(m.group(1)) for m in re.finditer(r"(?:available\s*nitrogen|total\s*nitrogen|soil\s*nitrogen|nitrogen\s*content)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?", text, re.IGNORECASE)]
+        ph_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:soil\s*)?ph\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE
+            )
+        ]
+        ec_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:ec|electrical\s*conductivity)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))",
+                text,
+                re.IGNORECASE,
+            )
+        ]
+        oc_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:organic\s*carbon|oc)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*%?", text, re.IGNORECASE
+            )
+        ]
+        n_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:available\s*nitrogen|total\s*nitrogen|soil\s*nitrogen|nitrogen\s*content)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
+                text,
+                re.IGNORECASE,
+            )
+        ]
         if not n_vals:
-            n_vals = [float(m.group(1)) for m in re.finditer(r"(?:\bnitrogen)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)", text, re.IGNORECASE)]
-        p_vals = [float(m.group(1)) for m in re.finditer(r"(?:available\s*phosphorus|phosphorus|phosphorous|p2o5)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?", text, re.IGNORECASE)]
-        k_vals = [float(m.group(1)) for m in re.finditer(r"(?:available\s*potassium|potassium|k2o)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?", text, re.IGNORECASE)]
-        tmax_vals = [float(m.group(1)) for m in re.finditer(r"(?:max\s*temp|tmax|temperature\s*max|t\.?\s*max)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE)]
-        tmin_vals = [float(m.group(1)) for m in re.finditer(r"(?:min\s*temp|tmin|temperature\s*min|t\.?\s*min)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE)]
-        rain_vals = [float(m.group(1)) for m in re.finditer(r"(?:rainfall|precipitation|annual\s*rainfall)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:mm)?", text, re.IGNORECASE)]
+            n_vals = [
+                float(m.group(1))
+                for m in re.finditer(
+                    r"(?:\bnitrogen)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)",
+                    text,
+                    re.IGNORECASE,
+                )
+            ]
+        p_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:available\s*phosphorus|phosphorus|phosphorous|p2o5)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
+                text,
+                re.IGNORECASE,
+            )
+        ]
+        k_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:available\s*potassium|potassium|k2o)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
+                text,
+                re.IGNORECASE,
+            )
+        ]
+        tmax_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:max\s*temp|tmax|temperature\s*max|t\.?\s*max)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))",
+                text,
+                re.IGNORECASE,
+            )
+        ]
+        tmin_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:min\s*temp|tmin|temperature\s*min|t\.?\s*min)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))",
+                text,
+                re.IGNORECASE,
+            )
+        ]
+        rain_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:rainfall|precipitation|annual\s*rainfall)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:mm)?",
+                text,
+                re.IGNORECASE,
+            )
+        ]
         yield_vals = []
         for pat in [
             r"(?:yield|grain\s*yield|seed\s*yield|fruit\s*yield|biological\s*yield|economic\s*yield)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|t/ha|q/ha|t|kg|g)",
@@ -591,20 +771,51 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
             r"(?:recorded|observed|measured|obtained)\s*(?:yield|grain\s*yield)\s*(?:of|:|=)\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|t/ha)?",
         ]:
             yield_vals.extend([float(m.group(1)) for m in re.finditer(pat, text, re.IGNORECASE)])
-        height_vals = [float(m.group(1)) for m in re.finditer(r"(?:plant\s*height|height)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*cm", text, re.IGNORECASE)]
-        spad_vals = [float(m.group(1)) for m in re.finditer(r"(?:spad|chlorophyll)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE)]
-        protein_vals = [float(m.group(1)) for m in re.finditer(r"(?:protein|protein\s*content|crude\s*protein)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*%", text, re.IGNORECASE)]
+        height_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:plant\s*height|height)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*cm",
+                text,
+                re.IGNORECASE,
+            )
+        ]
+        spad_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:spad|chlorophyll)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))", text, re.IGNORECASE
+            )
+        ]
+        protein_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:protein|protein\s*content|crude\s*protein)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*%",
+                text,
+                re.IGNORECASE,
+            )
+        ]
 
-        zn_vals = [float(m.group(1)) for m in re.finditer(r"(?:zinc|zn)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:ppm|mg/kg)?", text, re.IGNORECASE)]
-        fe_vals = [float(m.group(1)) for m in re.finditer(r"(?:iron|fe)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:ppm|mg/kg)?", text, re.IGNORECASE)]
+        zn_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:zinc|zn)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:ppm|mg/kg)?", text, re.IGNORECASE
+            )
+        ]
+        fe_vals = [
+            float(m.group(1))
+            for m in re.finditer(
+                r"(?:iron|fe)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:ppm|mg/kg)?", text, re.IGNORECASE
+            )
+        ]
 
         def first_or_none(vals):
             return vals[0] if vals else None
 
         base_row = {
-            "Paper_ID": paper_id, "DOI": doi,
+            "Paper_ID": paper_id,
+            "DOI": doi,
             "Crop": crop.split(",")[0].strip() if crop else "",
-            "Design": design_match, "Replications": replications,
+            "Design": design_match,
+            "Replications": replications,
             "Soil_pH": first_or_none(ph_vals),
             "EC": first_or_none(ec_vals),
             "Organic_Carbon": first_or_none(oc_vals),
@@ -623,11 +834,26 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         }
 
         fertilizers_detected = set()
-        fert_list = ["urea", "dap", "npk", "compost", "vermicompost",
-                      "farmyard manure", "fym", "potassium sulphate",
-                      "ammonium sulphate", "single super phosphate", "ssp",
-                      "muriate of potash", "mop", "biofertilizer",
-                      "rhizobium", "azotobacter", "psb", "pgpr"]
+        fert_list = [
+            "urea",
+            "dap",
+            "npk",
+            "compost",
+            "vermicompost",
+            "farmyard manure",
+            "fym",
+            "potassium sulphate",
+            "ammonium sulphate",
+            "single super phosphate",
+            "ssp",
+            "muriate of potash",
+            "mop",
+            "biofertilizer",
+            "rhizobium",
+            "azotobacter",
+            "psb",
+            "pgpr",
+        ]
         for fert in fert_list:
             pattern = re.compile(re.escape(fert), re.IGNORECASE)
             if pattern.search(text):
@@ -640,8 +866,10 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         base_row["Fertilizer_Name"] = ", ".join(sorted(fertilizers_detected))
 
         all_rows.append(base_row)
-        log(f"    Extracted: pH={base_row['Soil_pH']}, N={base_row['Nitrogen']}, "
-            f"Yield={base_row['Yield_per_Hectare']}, Fert={len(fertilizers_detected)}")
+        log(
+            f"    Extracted: pH={base_row['Soil_pH']}, N={base_row['Nitrogen']}, "
+            f"Yield={base_row['Yield_per_Hectare']}, Fert={len(fertilizers_detected)}"
+        )
 
     if not all_rows:
         log("WARNING: No data extracted from new papers")
@@ -673,41 +901,77 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
         table_df = pd.DataFrame(table_enrichment_rows)
         log(f"  Total table rows from pdfplumber: {len(table_df)}")
 
-        for col in ["Yield_per_Hectare", "Yield_per_Plot", "Plant_Height_cm", "SPAD",
-                     "Soil_pH", "Nitrogen", "Phosphorus", "Potassium", "Zinc", "Iron",
-                     "Protein", "Organic_Carbon", "EC", "Rainfall",
-                     "Temperature_Max", "Temperature_Min", "Fruit_Weight",
-                     "Fruit_Diameter_mm", "Spike_Length", "Seeds_per_Spike",
-                     "100_Seed_Weight", "Biomass_Yield", "Harvest_Index"]:
+        for col in [
+            "Yield_per_Hectare",
+            "Yield_per_Plot",
+            "Plant_Height_cm",
+            "SPAD",
+            "Soil_pH",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
+            "Zinc",
+            "Iron",
+            "Protein",
+            "Organic_Carbon",
+            "EC",
+            "Rainfall",
+            "Temperature_Max",
+            "Temperature_Min",
+            "Fruit_Weight",
+            "Fruit_Diameter_mm",
+            "Spike_Length",
+            "Seeds_per_Spike",
+            "100_Seed_Weight",
+            "Biomass_Yield",
+            "Harvest_Index",
+        ]:
             if col in table_df.columns:
                 for paper_id in table_df["Paper_ID"].unique():
                     if paper_id in new_extract_df["Paper_ID"].values:
                         mask_reg = new_extract_df["Paper_ID"] == paper_id
                         mask_tbl = table_df["Paper_ID"] == paper_id
                         if col in new_extract_df.columns:
-                            reg_val = new_extract_df.loc[mask_reg, col].iloc[0] if mask_reg.any() else None
+                            reg_val = (
+                                new_extract_df.loc[mask_reg, col].iloc[0]
+                                if mask_reg.any()
+                                else None
+                            )
                         else:
                             reg_val = None
                         tbl_vals = table_df.loc[mask_tbl, col].dropna()
                         if (pd.isna(reg_val) or reg_val is None) and len(tbl_vals) > 0:
                             if col in new_extract_df.columns:
                                 new_extract_df.loc[mask_reg, col] = tbl_vals.mean()
-                            log(f"    Enriched {paper_id}.{col} = {tbl_vals.mean():.2f} (from table)")
+                            log(
+                                f"    Enriched {paper_id}.{col} = {tbl_vals.mean():.2f} (from table)"
+                            )
 
         if "Treatment" in table_df.columns:
             for paper_id in table_df["Paper_ID"].unique():
                 if paper_id in new_extract_df["Paper_ID"].values:
-                    treatments = table_df.loc[table_df["Paper_ID"] == paper_id, "Treatment"].dropna().astype(str).unique()
+                    treatments = (
+                        table_df.loc[table_df["Paper_ID"] == paper_id, "Treatment"]
+                        .dropna()
+                        .astype(str)
+                        .unique()
+                    )
                     mask = new_extract_df["Paper_ID"] == paper_id
                     if "Treatment" in new_extract_df.columns:
-                        existing = str(new_extract_df.loc[mask, "Treatment"].iloc[0]) if mask.any() else ""
+                        existing = (
+                            str(new_extract_df.loc[mask, "Treatment"].iloc[0]) if mask.any() else ""
+                        )
                         if not existing or existing == "Control" or existing == "nan":
-                            new_extract_df.loc[mask, "Treatment"] = ", ".join(sorted(treatments)[:5])
+                            new_extract_df.loc[mask, "Treatment"] = ", ".join(
+                                sorted(treatments)[:5]
+                            )
 
     if existing_df is not None and not existing_df.empty:
         combined = pd.concat([existing_df, new_extract_df], ignore_index=True)
         combined = combined.drop_duplicates(subset=["Paper_ID"], keep="last")
-        log(f"Merged: {len(existing_df)} existing + {len(new_extract_df)} new = {len(combined)} total")
+        log(
+            f"Merged: {len(existing_df)} existing + {len(new_extract_df)} new = {len(combined)} total"
+        )
     else:
         combined = new_extract_df
         log(f"No existing cache. Created schema with {len(combined)} rows")
@@ -741,8 +1005,12 @@ def phase4_validation(df: pd.DataFrame) -> dict:
     log("=" * 60)
 
     issues = {
-        "missing_values": {}, "duplicate_records": 0, "impossible_values": [],
-        "outliers": [], "ocr_mistakes": [], "unit_inconsistencies": [],
+        "missing_values": {},
+        "duplicate_records": 0,
+        "impossible_values": [],
+        "outliers": [],
+        "ocr_mistakes": [],
+        "unit_inconsistencies": [],
         "column_consistency": [],
     }
 
@@ -755,13 +1023,21 @@ def phase4_validation(df: pd.DataFrame) -> dict:
     issues["duplicate_records"] = int(df.duplicated().sum())
 
     range_checks = {
-        "Soil_pH": (3.0, 10.0), "EC": (0, 20),
-        "Temperature_Max": (-20, 55), "Temperature_Min": (-30, 50),
-        "Rainfall": (0, 10000), "Yield_per_Hectare": (0, 50000),
-        "Plant_Height_cm": (0, 500), "SPAD": (0, 80),
-        "Protein": (0, 60), "Organic_Carbon": (0, 10),
-        "Nitrogen": (0, 1000), "Phosphorus": (0, 500),
-        "Potassium": (0, 1000), "Zinc": (0, 100), "Iron": (0, 500),
+        "Soil_pH": (3.0, 10.0),
+        "EC": (0, 20),
+        "Temperature_Max": (-20, 55),
+        "Temperature_Min": (-30, 50),
+        "Rainfall": (0, 10000),
+        "Yield_per_Hectare": (0, 50000),
+        "Plant_Height_cm": (0, 500),
+        "SPAD": (0, 80),
+        "Protein": (0, 60),
+        "Organic_Carbon": (0, 10),
+        "Nitrogen": (0, 1000),
+        "Phosphorus": (0, 500),
+        "Potassium": (0, 1000),
+        "Zinc": (0, 100),
+        "Iron": (0, 500),
     }
 
     for col, (lo, hi) in range_checks.items():
@@ -786,9 +1062,12 @@ def phase4_validation(df: pd.DataFrame) -> dict:
 
     for col in df.columns:
         if df[col].dtype == object:
-            strange = df[col].dropna().apply(
-                lambda x: bool(re.search(r"[^a-zA-Z0-9\s.,;:\-()/%]", str(x)))
-            ).sum()
+            strange = (
+                df[col]
+                .dropna()
+                .apply(lambda x: bool(re.search(r"[^a-zA-Z0-9\s.,;:\-()/%]", str(x))))
+                .sum()
+            )
             if strange > 0:
                 issues["ocr_mistakes"].append(f"{col}: {strange} cells with special chars")
 
@@ -800,7 +1079,9 @@ def phase4_validation(df: pd.DataFrame) -> dict:
             issues["column_consistency"].append(f"Tmax<Tmin in {bad} rows")
 
     if "Yield_per_Hectare" in df.columns and "Plant_Height_cm" in df.columns:
-        cols_present = [c for c in df.columns if c in ["Yield_per_Hectare", "Plant_Height_cm", "SPAD"]]
+        cols_present = [
+            c for c in df.columns if c in ["Yield_per_Hectare", "Plant_Height_cm", "SPAD"]
+        ]
         issues["column_consistency"].append(f"Columns with data: {len(cols_present)}")
 
     total_issues = sum(len(v) if isinstance(v, (list, dict)) else 1 for v in issues.values())
@@ -817,15 +1098,17 @@ def phase4_validation(df: pd.DataFrame) -> dict:
         for ov in issues["outliers"]:
             if col in ov.split(":")[0]:
                 col_issues.append(ov)
-        report_rows.append({
-            "Column": col,
-            "Type": str(df[col].dtype),
-            "Non_Null": len(df) - n_missing,
-            "Missing": n_missing,
-            "Missing_Pct": pct_missing,
-            "Unique": int(df[col].nunique()),
-            "Issues": "; ".join(col_issues),
-        })
+        report_rows.append(
+            {
+                "Column": col,
+                "Type": str(df[col].dtype),
+                "Non_Null": len(df) - n_missing,
+                "Missing": n_missing,
+                "Missing_Pct": pct_missing,
+                "Unique": int(df[col].nunique()),
+                "Issues": "; ".join(col_issues),
+            }
+        )
 
     report_df = pd.DataFrame(report_rows)
     report_df.to_excel(OUTPUTS_DIR / "validation_report.xlsx", index=False, engine="openpyxl")
@@ -853,7 +1136,7 @@ def phase5_features(df: pd.DataFrame) -> pd.DataFrame:
         features_added.append("Average_Temperature")
         fdf["Growing_Degree_Days"] = np.maximum(0, tmean - 10)
         features_added.append("Growing_Degree_Days")
-        fdf["Temp_squared"] = tmean ** 2
+        fdf["Temp_squared"] = tmean**2
         features_added.append("Temp_squared")
 
     if "Rainfall" in fdf.columns:
@@ -874,14 +1157,17 @@ def phase5_features(df: pd.DataFrame) -> pd.DataFrame:
         fdf["NPK_Index"] = n + p + k
         features_added.append("NPK_Index")
 
-    if all(c in fdf.columns for c in ["Nitrogen", "Phosphorus", "Potassium", "Zinc", "Iron", "Organic_Carbon"]):
+    if all(
+        c in fdf.columns
+        for c in ["Nitrogen", "Phosphorus", "Potassium", "Zinc", "Iron", "Organic_Carbon"]
+    ):
         fdf["Soil_Fertility_Index"] = (
-            pd.to_numeric(fdf["Nitrogen"], errors="coerce").fillna(0) / 100 +
-            pd.to_numeric(fdf["Phosphorus"], errors="coerce").fillna(0) / 50 +
-            pd.to_numeric(fdf["Potassium"], errors="coerce").fillna(0) / 200 +
-            pd.to_numeric(fdf["Zinc"], errors="coerce").fillna(0) / 5 +
-            pd.to_numeric(fdf["Iron"], errors="coerce").fillna(0) / 50 +
-            (pd.to_numeric(fdf["Organic_Carbon"], errors="coerce").fillna(0) * 2)
+            pd.to_numeric(fdf["Nitrogen"], errors="coerce").fillna(0) / 100
+            + pd.to_numeric(fdf["Phosphorus"], errors="coerce").fillna(0) / 50
+            + pd.to_numeric(fdf["Potassium"], errors="coerce").fillna(0) / 200
+            + pd.to_numeric(fdf["Zinc"], errors="coerce").fillna(0) / 5
+            + pd.to_numeric(fdf["Iron"], errors="coerce").fillna(0) / 50
+            + (pd.to_numeric(fdf["Organic_Carbon"], errors="coerce").fillna(0) * 2)
         )
         features_added.append("Soil_Fertility_Index")
 
@@ -896,8 +1182,15 @@ def phase5_features(df: pd.DataFrame) -> pd.DataFrame:
         features_added.append("Micronutrient_Index")
 
     if "Rainfall" in fdf.columns and "Temperature_Max" in fdf.columns:
-        tmean2 = (pd.to_numeric(fdf["Temperature_Max"], errors="coerce") +
-                  pd.to_numeric(fdf["Temperature_Min"] if "Temperature_Min" in fdf.columns else fdf["Temperature_Max"], errors="coerce")) / 2
+        tmean2 = (
+            pd.to_numeric(fdf["Temperature_Max"], errors="coerce")
+            + pd.to_numeric(
+                fdf["Temperature_Min"]
+                if "Temperature_Min" in fdf.columns
+                else fdf["Temperature_Max"],
+                errors="coerce",
+            )
+        ) / 2
         rf2 = pd.to_numeric(fdf["Rainfall"], errors="coerce")
         fdf["Climate_Index"] = (rf2 / 1000) + (tmean2 / 35)
         features_added.append("Climate_Index")
@@ -962,7 +1255,9 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
         all_data = df.copy()
 
     targets = ["Yield_per_Plot", "Yield_per_Hectare", "Plant_Height_cm", "SPAD", "Shoot_Biomass_g"]
-    available_targets = [t for t in targets if t in all_data.columns and all_data[t].notna().sum() >= 5]
+    available_targets = [
+        t for t in targets if t in all_data.columns and all_data[t].notna().sum() >= 5
+    ]
     if not available_targets:
         for alt in ["Target_Yield", "Yield_per_Plot", "Yield_per_Hectare"]:
             if alt in all_data.columns and all_data[alt].notna().sum() >= 3:
@@ -974,21 +1269,39 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
 
     log(f"Training targets: {available_targets}")
 
-    exclude = {"Paper_ID", "DOI", "Crop", "Treatment", "Fertilizer_Name",
-               "Season", "Variety", "Location", "Site", "State", "Country",
-               "Recommendation_Summary", "Fuzzy_Summary", "_source_file",
-               "Source_File", "Paper_Name", "Title", "Status", "Duplicate_Flag",
-               "Duplicate_With", "Processing_Time_s"}
+    exclude = {
+        "Paper_ID",
+        "DOI",
+        "Crop",
+        "Treatment",
+        "Fertilizer_Name",
+        "Season",
+        "Variety",
+        "Location",
+        "Site",
+        "State",
+        "Country",
+        "Recommendation_Summary",
+        "Fuzzy_Summary",
+        "_source_file",
+        "Source_File",
+        "Paper_Name",
+        "Title",
+        "Status",
+        "Duplicate_Flag",
+        "Duplicate_With",
+        "Processing_Time_s",
+    }
 
-    from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV, KFold
-    from sklearn.linear_model import LinearRegression, Ridge, Lasso, ElasticNet
-    from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-    from sklearn.svm import SVR
-    from sklearn.preprocessing import StandardScaler
+    from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
+    from sklearn.linear_model import ElasticNet, Lasso, LinearRegression, Ridge
     from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+    from sklearn.model_selection import GridSearchCV, cross_val_score, train_test_split
+    from sklearn.svm import SVR
 
     try:
         from xgboost import XGBRegressor
+
         has_xgb = True
     except ImportError:
         has_xgb = False
@@ -1001,11 +1314,15 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
     for target in available_targets:
         log(f"\n  --- Target: {target} ---")
         numeric_df = all_data.select_dtypes(include=[np.number])
-        feature_cols = [c for c in numeric_df.columns
-                       if c not in exclude and c != target
-                       and not c.startswith("Target_")
-                       and c not in POST_HARVEST_VARIABLES
-                       and c not in NON_FEATURE_COLS]
+        feature_cols = [
+            c
+            for c in numeric_df.columns
+            if c not in exclude
+            and c != target
+            and not c.startswith("Target_")
+            and c not in POST_HARVEST_VARIABLES
+            and c not in NON_FEATURE_COLS
+        ]
 
         X = numeric_df[feature_cols].copy()
         y = all_data[target].copy()
@@ -1028,6 +1345,7 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
 
         if X.shape[1] > X.shape[0] // 2:
             from sklearn.feature_selection import SelectKBest, f_regression
+
             zero_var = [c for c in X.columns if X[c].std() == 0]
             if zero_var:
                 X = X.drop(columns=zero_var, errors="ignore")
@@ -1038,11 +1356,17 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
                 try:
                     X_arr = selector.fit_transform(X.values, y.values)
                     selected_mask = selector.get_support()
-                    selected_features = [f for f, m in zip(X.columns, selected_mask) if m]
+                    selected_features = [
+                        f for f, m in zip(X.columns, selected_mask, strict=True) if m
+                    ]
                     X = pd.DataFrame(X_arr, columns=selected_features, index=X.index)
-                    log(f"  Feature selection: {len(selected_features)}/{len(non_null)} features retained")
+                    log(
+                        f"  Feature selection: {len(selected_features)}/{len(non_null)} features retained"
+                    )
                 except Exception as e:
-                    log(f"  Feature selection failed ({e}), using top {min(k, X.shape[1])} features by variance")
+                    log(
+                        f"  Feature selection failed ({e}), using top {min(k, X.shape[1])} features by variance"
+                    )
                     variances = X.var().sort_values(ascending=False)
                     keep = variances.head(min(k, X.shape[1])).index.tolist()
                     X = X[keep]
@@ -1056,8 +1380,12 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
         models_dict["Ridge"] = Ridge(alpha=1.0)
         models_dict["Lasso"] = Lasso(alpha=0.1, max_iter=5000)
         models_dict["ElasticNet"] = ElasticNet(alpha=0.1, l1_ratio=0.5, max_iter=5000)
-        models_dict["RandomForest"] = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42, n_jobs=-1)
-        models_dict["GradientBoosting"] = GradientBoostingRegressor(n_estimators=100, max_depth=3, random_state=42)
+        models_dict["RandomForest"] = RandomForestRegressor(
+            n_estimators=100, max_depth=5, random_state=42, n_jobs=-1
+        )
+        models_dict["GradientBoosting"] = GradientBoostingRegressor(
+            n_estimators=100, max_depth=3, random_state=42
+        )
 
         param_grids["Ridge"] = {"alpha": [0.01, 0.1, 1.0, 10.0]}
         param_grids["Lasso"] = {"alpha": [0.001, 0.01, 0.1, 1.0]}
@@ -1066,7 +1394,9 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
         param_grids["GradientBoosting"] = {"n_estimators": [50, 100], "max_depth": [2, 3, 4]}
 
         if has_xgb:
-            models_dict["XGBoost"] = XGBRegressor(n_estimators=100, max_depth=3, random_state=42, verbosity=0, n_jobs=1)
+            models_dict["XGBoost"] = XGBRegressor(
+                n_estimators=100, max_depth=3, random_state=42, verbosity=0, n_jobs=1
+            )
             param_grids["XGBoost"] = {"n_estimators": [50, 100, 200], "max_depth": [2, 3, 5]}
 
         if len(X) >= 10:
@@ -1084,10 +1414,8 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
         for name, model in models_dict.items():
             try:
                 model.fit(X_train, y_train)
-                fitted = True
             except Exception as e:
                 log(f"    {name} FIT FAILED: {e}")
-                fitted = False
                 continue
 
             try:
@@ -1104,8 +1432,14 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
 
                 if name in param_grids and len(X) >= 10:
                     try:
-                        gs = GridSearchCV(model, param_grids[name], cv=min(3, len(X_train)),
-                                         scoring="r2", n_jobs=-1, error_score="raise")
+                        gs = GridSearchCV(
+                            model,
+                            param_grids[name],
+                            cv=min(3, len(X_train)),
+                            scoring="r2",
+                            n_jobs=-1,
+                            error_score="raise",
+                        )
                         gs.fit(X_train, y_train)
                         best_params = gs.best_params_
                         best_score = round(float(gs.best_score_), 4)
@@ -1119,17 +1453,32 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
 
                 fi = {}
                 if hasattr(model, "feature_importances_"):
-                    fi = dict(zip(list(X.columns), [round(float(x), 4) for x in model.feature_importances_]))
+                    fi = dict(
+                        zip(
+                            list(X.columns),
+                            [round(float(x), 4) for x in model.feature_importances_],
+                            strict=True,
+                        )
+                    )
                 elif hasattr(model, "coef_"):
-                    fi = dict(zip(list(X.columns), [round(float(x), 4) for x in model.coef_]))
+                    fi = dict(
+                        zip(list(X.columns), [round(float(x), 4) for x in model.coef_], strict=True)
+                    )
 
-                target_results.append({
-                    "Model": name, "Target": target,
-                    "MAE": round(mae, 4), "RMSE": round(rmse, 4),
-                    "R2": round(r2, 4), "MAPE": round(mape, 2),
-                    "CV_Mean_R2": cv_mean, "CV_Std_R2": cv_std,
-                    "Best_CV_R2": best_score, "Best_Params": str(best_params),
-                })
+                target_results.append(
+                    {
+                        "Model": name,
+                        "Target": target,
+                        "MAE": round(mae, 4),
+                        "RMSE": round(rmse, 4),
+                        "R2": round(r2, 4),
+                        "MAPE": round(mape, 2),
+                        "CV_Mean_R2": cv_mean,
+                        "CV_Std_R2": cv_std,
+                        "Best_CV_R2": best_score,
+                        "Best_Params": str(best_params),
+                    }
+                )
                 target_cv[name] = {"mean_r2": cv_mean, "std_r2": cv_std}
                 target_fi[name] = fi
                 target_models[name] = model
@@ -1139,19 +1488,25 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
                 log(f"    {name} FAILED: {e}")
 
         if target_results:
+
             def _best_score(r):
                 cv = r.get("CV_Mean_R2", -999)
                 return cv if cv == cv else r.get("R2", -999)  # NaN check
+
             best = max(target_results, key=_best_score)
             best_name = best["Model"]
             best_model = target_models.get(best_name)
             if best_model:
                 best_model.fit(X, y)
 
-            fi_df = pd.DataFrame([
-                {"Feature": k, "Importance": v, "Target": target}
-                for k, v in sorted(target_fi.get(best_name, {}).items(), key=lambda x: -abs(x[1]))
-            ])
+            fi_df = pd.DataFrame(
+                [
+                    {"Feature": k, "Importance": v, "Target": target}
+                    for k, v in sorted(
+                        target_fi.get(best_name, {}).items(), key=lambda x: -abs(x[1])
+                    )
+                ]
+            )
             fi_df.to_csv(OUTPUTS_DIR / f"feature_importance_{target}.csv", index=False)
 
             all_results[target] = target_results
@@ -1160,7 +1515,7 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
             all_models[target] = target_models
 
     results_flat = []
-    for target, results in all_results.items():
+    for _, results in all_results.items():
         results_flat.extend(results)
 
     if results_flat:
@@ -1170,10 +1525,13 @@ def phase6_training(df: pd.DataFrame, master_df: pd.DataFrame = None) -> dict:
         log(f"Model metrics saved: {r_xlsx}")
 
         best_overall = max(results_flat, key=lambda r: r.get("CV_Mean_R2", 0))
-        log(f"\n  BEST MODEL: {best_overall['Model']} on {best_overall['Target']} "
-            f"(CV R2={best_overall['CV_Mean_R2']})")
+        log(
+            f"\n  BEST MODEL: {best_overall['Model']} on {best_overall['Target']} "
+            f"(CV R2={best_overall['CV_Mean_R2']})"
+        )
 
         import joblib
+
         for target, models in all_models.items():
             best_name = max(all_results[target], key=lambda r: r.get("CV_Mean_R2", 0))["Model"]
             if best_name in models:
@@ -1200,7 +1558,6 @@ def phase7_fuzzy(df: pd.DataFrame) -> bool:
     log("=" * 60)
 
     from agri_ai_agent.rules.membership_functions import fuzzify
-    from agri_ai_agent.rules.output_memberships import OUTPUT_MEMBERSHIPS
 
     rules_path = Path(__file__).parent / "agri_ai_agent" / "rules" / "fertilizer_rules.yaml"
     fuzzy_output_path = FUZZY_DIR
@@ -1229,6 +1586,7 @@ def phase7_fuzzy(df: pd.DataFrame) -> bool:
 
     updated_path = fuzzy_output_path / "fertilizer_rules.yaml"
     import shutil
+
     shutil.copy2(rules_path, updated_path)
     log(f"Fertilizer rules copied to: {updated_path}")
 
@@ -1279,14 +1637,21 @@ def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> p
     log("PHASE 8: RECOMMENDATION AGENT")
     log("=" * 60)
 
-    import joblib
-
     trained_models = {}
     if training_metrics and "models" in training_metrics:
         for target, model_dict in training_metrics["models"].items():
-            target_results = [r for r in training_metrics.get("training_results", []) if r.get("Target") == target]
+            target_results = [
+                r for r in training_metrics.get("training_results", []) if r.get("Target") == target
+            ]
             if target_results:
-                best_name = max(target_results, key=lambda r: r.get("CV_Mean_R2", -999) if not np.isnan(r.get("CV_Mean_R2", -999)) else r.get("R2", -999))["Model"]
+                best_name = max(
+                    target_results,
+                    key=lambda r: (
+                        r.get("CV_Mean_R2", -999)
+                        if not np.isnan(r.get("CV_Mean_R2", -999))
+                        else r.get("R2", -999)
+                    ),
+                )["Model"]
                 if best_name in model_dict:
                     trained_models[target] = model_dict[best_name]
 
@@ -1296,26 +1661,58 @@ def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> p
     for idx in rdf.index:
         row = rdf.loc[idx]
 
-        n = pd.to_numeric(row.get("Nitrogen"), errors="coerce") if pd.notna(row.get("Nitrogen")) else None
-        p = pd.to_numeric(row.get("Phosphorus"), errors="coerce") if pd.notna(row.get("Phosphorus")) else None
-        k = pd.to_numeric(row.get("Potassium"), errors="coerce") if pd.notna(row.get("Potassium")) else None
-        ph = pd.to_numeric(row.get("Soil_pH"), errors="coerce") if pd.notna(row.get("Soil_pH")) else None
-        rainfall = pd.to_numeric(row.get("Rainfall"), errors="coerce") if pd.notna(row.get("Rainfall")) else None
-        yield_val = pd.to_numeric(row.get("Yield_per_Hectare"), errors="coerce") if pd.notna(row.get("Yield_per_Hectare")) else None
-        oc = pd.to_numeric(row.get("Organic_Carbon"), errors="coerce") if pd.notna(row.get("Organic_Carbon")) else None
+        n = (
+            pd.to_numeric(row.get("Nitrogen"), errors="coerce")
+            if pd.notna(row.get("Nitrogen"))
+            else None
+        )
+        p = (
+            pd.to_numeric(row.get("Phosphorus"), errors="coerce")
+            if pd.notna(row.get("Phosphorus"))
+            else None
+        )
+        k = (
+            pd.to_numeric(row.get("Potassium"), errors="coerce")
+            if pd.notna(row.get("Potassium"))
+            else None
+        )
+        ph = (
+            pd.to_numeric(row.get("Soil_pH"), errors="coerce")
+            if pd.notna(row.get("Soil_pH"))
+            else None
+        )
+        rainfall = (
+            pd.to_numeric(row.get("Rainfall"), errors="coerce")
+            if pd.notna(row.get("Rainfall"))
+            else None
+        )
+        yield_val = (
+            pd.to_numeric(row.get("Yield_per_Hectare"), errors="coerce")
+            if pd.notna(row.get("Yield_per_Hectare"))
+            else None
+        )
+        oc = (
+            pd.to_numeric(row.get("Organic_Carbon"), errors="coerce")
+            if pd.notna(row.get("Organic_Carbon"))
+            else None
+        )
         zn = pd.to_numeric(row.get("Zinc"), errors="coerce") if pd.notna(row.get("Zinc")) else None
         crop = str(row.get("Crop", "Unknown"))
 
         predicted_yield = None
         if trained_models:
-            for target_name, model in trained_models.items():
+            for _, model in trained_models.items():
                 try:
-                    feature_names = model.feature_names_in_ if hasattr(model, "feature_names_in_") else None
+                    feature_names = (
+                        model.feature_names_in_ if hasattr(model, "feature_names_in_") else None
+                    )
                     if feature_names:
                         feat_vals = []
                         for fn in feature_names:
                             val = row.get(fn)
-                            feat_vals.append(pd.to_numeric(val, errors="coerce") if pd.notna(val) else 0)
+                            feat_vals.append(
+                                pd.to_numeric(val, errors="coerce") if pd.notna(val) else 0
+                            )
                         if any(v != 0 for v in feat_vals):
                             predicted_yield = round(float(model.predict([feat_vals])[0]), 2)
                             break
@@ -1357,7 +1754,11 @@ def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> p
         else:
             interval = "Every 25-30 days"
 
-        expected_yield = predicted_yield if predicted_yield else (round(yield_val * 1.15, 2) if yield_val else None)
+        expected_yield = (
+            predicted_yield
+            if predicted_yield
+            else (round(yield_val * 1.15, 2) if yield_val else None)
+        )
         expected_increase = round(expected_yield * 0.15, 2) if expected_yield else None
 
         conf_score = 0.75
@@ -1379,20 +1780,22 @@ def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> p
             alt_treatments.append("SSP + Urea")
         alt_treatments.append("Organic compost")
 
-        recs.append({
-            "Crop": crop,
-            "Paper_ID": row.get("Paper_ID", ""),
-            "Treatment": row.get("Treatment", ""),
-            "Best_Treatment": best_fert,
-            "Predicted_Yield": predicted_yield,
-            "Expected_Yield_kg_ha": expected_yield,
-            "Yield_Increase_kg_ha": expected_increase,
-            "Confidence_Score": conf_score,
-            "Confidence_Label": conf_label,
-            "Alternative_Treatments": "; ".join(alt_treatments[:3]),
-            "Recommendation": n_rec,
-            "Application_Interval": interval,
-        })
+        recs.append(
+            {
+                "Crop": crop,
+                "Paper_ID": row.get("Paper_ID", ""),
+                "Treatment": row.get("Treatment", ""),
+                "Best_Treatment": best_fert,
+                "Predicted_Yield": predicted_yield,
+                "Expected_Yield_kg_ha": expected_yield,
+                "Yield_Increase_kg_ha": expected_increase,
+                "Confidence_Score": conf_score,
+                "Confidence_Label": conf_label,
+                "Alternative_Treatments": "; ".join(alt_treatments[:3]),
+                "Recommendation": n_rec,
+                "Application_Interval": interval,
+            }
+        )
 
     rec_df = pd.DataFrame(recs)
     rec_path = OUTPUTS_DIR / "recommendations" / "fertilizer_recommendations.xlsx"
@@ -1436,9 +1839,9 @@ def phase9_ready_reckoner(df: pd.DataFrame, rec_df: pd.DataFrame) -> bool:
             tmin = pr.get("Temperature_Min")
             rainfall = pr.get("Rainfall")
             oc = pr.get("Organic_Carbon")
-            yield_ha = pr.get("Yield_per_Hectare")
+            pr.get("Yield_per_Hectare")
         else:
-            ph = n = p = k = tmax = tmin = rainfall = oc = yield_ha = None
+            ph = n = p = k = tmax = tmin = rainfall = oc = None
 
         soil_cond = f"pH {ph}" if pd.notna(ph) else "N/A"
         if pd.notna(n):
@@ -1457,10 +1860,14 @@ def phase9_ready_reckoner(df: pd.DataFrame, rec_df: pd.DataFrame) -> bool:
             climate += f", Rain {rainfall}mm"
 
         method_map = {
-            "Urea": "Soil application (band placement)", "DAP": "Soil application at sowing",
-            "MOP": "Soil application", "NPK": "Broadcast + incorporation",
-            "Compost": "Broadcast + incorporation", "Zinc": "Foliar spray",
-            "SSP": "Soil application at sowing", "Ammonium": "Soil application",
+            "Urea": "Soil application (band placement)",
+            "DAP": "Soil application at sowing",
+            "MOP": "Soil application",
+            "NPK": "Broadcast + incorporation",
+            "Compost": "Broadcast + incorporation",
+            "Zinc": "Foliar spray",
+            "SSP": "Soil application at sowing",
+            "Ammonium": "Soil application",
             "Dolomite": "Soil application (broadcast)",
         }
         app_method = "Soil application"
@@ -1469,18 +1876,20 @@ def phase9_ready_reckoner(df: pd.DataFrame, rec_df: pd.DataFrame) -> bool:
                 app_method = method
                 break
 
-        reckoner_rows.append({
-            "Crop": crop,
-            "Recommended_Treatment": rec.get("Best_Treatment", ""),
-            "Soil_Condition": soil_cond,
-            "Climate_Condition": climate,
-            "Expected_Yield_kg_ha": rec.get("Expected_Yield_kg_ha", ""),
-            "Recommended_Fertilizer": rec.get("Best_Treatment", ""),
-            "Application_Method": app_method,
-            "Application_Interval": rec.get("Application_Interval", ""),
-            "Confidence_Score": rec.get("Confidence_Score", ""),
-            "Recommendation": rec.get("Recommendation", ""),
-        })
+        reckoner_rows.append(
+            {
+                "Crop": crop,
+                "Recommended_Treatment": rec.get("Best_Treatment", ""),
+                "Soil_Condition": soil_cond,
+                "Climate_Condition": climate,
+                "Expected_Yield_kg_ha": rec.get("Expected_Yield_kg_ha", ""),
+                "Recommended_Fertilizer": rec.get("Best_Treatment", ""),
+                "Application_Method": app_method,
+                "Application_Interval": rec.get("Application_Interval", ""),
+                "Confidence_Score": rec.get("Confidence_Score", ""),
+                "Recommendation": rec.get("Recommendation", ""),
+            }
+        )
 
     reckoner_df = pd.DataFrame(reckoner_rows)
 
@@ -1490,6 +1899,7 @@ def phase9_ready_reckoner(df: pd.DataFrame, rec_df: pd.DataFrame) -> bool:
 
     try:
         import weasyprint
+
         html = _render_reckoner_html(reckoner_df)
         pdf_path = OUTPUTS_DIR / "Ready_Reckoner.pdf"
         weasyprint.HTML(string=html).write_pdf(pdf_path)
@@ -1509,10 +1919,13 @@ def _render_reckoner_html(df: pd.DataFrame) -> str:
     thead = "".join(f"<th>{c.replace('_', ' ')}</th>" for c in cols)
     tbody = ""
     for _, row in df.iterrows():
-        tbody += "<tr>" + "".join(
-            f"<td>{v}</td>" if not isinstance(v, float) else f"<td>{v:.2f}</td>"
-            for v in row
-        ) + "</tr>"
+        tbody += (
+            "<tr>"
+            + "".join(
+                f"<td>{v}</td>" if not isinstance(v, float) else f"<td>{v:.2f}</td>" for v in row
+            )
+            + "</tr>"
+        )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><title>AAIF Ready Reckoner</title>
@@ -1528,7 +1941,7 @@ tr:nth-child(even) {{ background: #f9f9f9; }}
 </head>
 <body>
 <h1>AAIF Ready Reckoner</h1>
-<p>Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} | {len(df)} entries</p>
+<p>Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")} | {len(df)} entries</p>
 <table><thead><tr>{thead}</tr></thead><tbody>{tbody}</tbody></table>
 <div class="footer">Agentic Agricultural Intelligence Framework</div>
 </body>
@@ -1584,27 +1997,40 @@ def phase10_continuous_learning(ingestion_df: pd.DataFrame) -> bool:
         if pid in existing:
             cursor.execute(
                 "UPDATE paper_registry SET duplicate_flag=? WHERE paper_id=?",
-                (row["Duplicate_Flag"], pid)
+                (row["Duplicate_Flag"], pid),
             )
             skip_count += 1
             continue
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO paper_registry
             (paper_id, paper_name, title, crop, doi, status, processed_at, pipeline_version, duplicate_flag)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            pid, row["Paper_Name"], row["Title"], row["Crop"],
-            row["DOI"], row["Status"],
-            datetime.now().isoformat(), "1.0.0", row["Duplicate_Flag"]
-        ))
+        """,
+            (
+                pid,
+                row["Paper_Name"],
+                row["Title"],
+                row["Crop"],
+                row["DOI"],
+                row["Status"],
+                datetime.now().isoformat(),
+                "1.0.0",
+                row["Duplicate_Flag"],
+            ),
+        )
         new_count += 1
 
     conn.commit()
 
     total = cursor.execute("SELECT COUNT(*) FROM paper_registry").fetchone()[0]
-    processed = cursor.execute("SELECT COUNT(*) FROM paper_registry WHERE status='New'").fetchone()[0]
-    duplicates = cursor.execute("SELECT COUNT(*) FROM paper_registry WHERE duplicate_flag='Yes'").fetchone()[0]
+    processed = cursor.execute("SELECT COUNT(*) FROM paper_registry WHERE status='New'").fetchone()[
+        0
+    ]
+    duplicates = cursor.execute(
+        "SELECT COUNT(*) FROM paper_registry WHERE duplicate_flag='Yes'"
+    ).fetchone()[0]
     conn.close()
 
     log(f"Paper registry updated: {db_path}")
@@ -1672,11 +2098,11 @@ tr:hover {{ background: #f0faf4; }}
 <div class="container">
 
 <div class="stats">
-<div class="stat"><div class="value">{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else len(p.get('ingestion_df', []))}</div><div class="label">Total PDFs</div></div>
-<div class="stat"><div class="value">{p.get('n_newly_extracted', 0)}</div><div class="label">New Papers Extracted</div></div>
-<div class="stat"><div class="value">{p.get('n_previously_processed', 0)}</div><div class="label">Previously Processed (Skipped)</div></div>
-<div class="stat"><div class="value">{p.get('n_rows_extracted', 0)}</div><div class="label">Total Schema Rows</div></div>
-<div class="stat"><div class="value">{p.get('n_features', 0)}</div><div class="label">Features Created</div></div>
+<div class="stat"><div class="value">{p["ingestion_df"]["total"] if isinstance(p.get("ingestion_df"), dict) else len(p.get("ingestion_df", []))}</div><div class="label">Total PDFs</div></div>
+<div class="stat"><div class="value">{p.get("n_newly_extracted", 0)}</div><div class="label">New Papers Extracted</div></div>
+<div class="stat"><div class="value">{p.get("n_previously_processed", 0)}</div><div class="label">Previously Processed (Skipped)</div></div>
+<div class="stat"><div class="value">{p.get("n_rows_extracted", 0)}</div><div class="label">Total Schema Rows</div></div>
+<div class="stat"><div class="value">{p.get("n_features", 0)}</div><div class="label">Features Created</div></div>
 <div class="stat"><div class="value">{n_models}</div><div class="label">Models Trained</div></div>
 </div>
 
@@ -1684,10 +2110,10 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Phase 1 — Ingestion (Incremental)</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Total PDFs found</td><td>{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else len(p.get('ingestion_df', []))}</td></tr>
-<tr><td>New papers (to extract)</td><td>{p['ingestion_df']['new'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
-<tr><td>Previously processed (skipped)</td><td>{p['ingestion_df'].get('prev_processed', 0) if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
-<tr><td>Duplicates (intra-run)</td><td>{p['ingestion_df']['dups'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
+<tr><td>Total PDFs found</td><td>{p["ingestion_df"]["total"] if isinstance(p.get("ingestion_df"), dict) else len(p.get("ingestion_df", []))}</td></tr>
+<tr><td>New papers (to extract)</td><td>{p["ingestion_df"]["new"] if isinstance(p.get("ingestion_df"), dict) else 0}</td></tr>
+<tr><td>Previously processed (skipped)</td><td>{p["ingestion_df"].get("prev_processed", 0) if isinstance(p.get("ingestion_df"), dict) else 0}</td></tr>
+<tr><td>Duplicates (intra-run)</td><td>{p["ingestion_df"]["dups"] if isinstance(p.get("ingestion_df"), dict) else 0}</td></tr>
 <tr><td>Ingestion report</td><td>outputs/ingestion_report.xlsx</td></tr>
 </table>
 </div>
@@ -1696,9 +2122,9 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Phase 2-3 — AI Extraction &amp; Universal Schema (Incremental)</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>New rows extracted</td><td>{p.get('n_newly_extracted', 0)}</td></tr>
-<tr><td>Total schema rows (merged)</td><td>{p.get('n_rows_extracted', 0)}</td></tr>
-<tr><td>Schema columns</td><td>{p.get('n_schema_cols', 0)}</td></tr>
+<tr><td>New rows extracted</td><td>{p.get("n_newly_extracted", 0)}</td></tr>
+<tr><td>Total schema rows (merged)</td><td>{p.get("n_rows_extracted", 0)}</td></tr>
+<tr><td>Schema columns</td><td>{p.get("n_schema_cols", 0)}</td></tr>
 <tr><td>Universal Schema XLSX</td><td>outputs/Universal_Agricultural_Schema.xlsx</td></tr>
 <tr><td>Universal Schema CSV</td><td>outputs/Universal_Agricultural_Schema.csv</td></tr>
 </table>
@@ -1729,7 +2155,7 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Phase 6 — Model Training</h2>
 <table>
 <tr><th>Model</th><th>R²</th><th>RMSE</th><th>MAE</th><th>MAPE</th></tr>
-""".format(p.get('n_features', 0))
+""".format(p.get("n_features", 0))
 
     for tr in p.get("training", {}).get("training_results", []):
         html += f"<tr><td>{tr.get('Model', '')}</td><td>{tr.get('R2', '')}</td><td>{tr.get('RMSE', '')}</td><td>{tr.get('MAE', '')}</td><td>{tr.get('MAPE', '')}%</td></tr>\n"
@@ -1738,8 +2164,8 @@ tr:hover {{ background: #f0faf4; }}
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
 <tr><td>Best model</td><td>{best_r2}</td></tr>
-<tr><td>Samples trained</td><td>{p.get('training', {}).get('n_samples', 0)}</td></tr>
-<tr><td>Features used</td><td>{p.get('training', {}).get('n_features', 0)}</td></tr>
+<tr><td>Samples trained</td><td>{p.get("training", {}).get("n_samples", 0)}</td></tr>
+<tr><td>Features used</td><td>{p.get("training", {}).get("n_features", 0)}</td></tr>
 <tr><td>XGBoost model</td><td>models/xgboost_model.pkl</td></tr>
 <tr><td>Regression model</td><td>models/regression_model.pkl</td></tr>
 <tr><td>Model metrics</td><td>outputs/model_metrics.xlsx</td></tr>
@@ -1750,8 +2176,8 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Phase 7 — Fuzzy Logic</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Rules</td><td>{p.get('fuzzy_rules', 0)}</td></tr>
-<tr><td>Input variables</td><td>{p.get('fuzzy_inputs', 0)}</td></tr>
+<tr><td>Rules</td><td>{p.get("fuzzy_rules", 0)}</td></tr>
+<tr><td>Input variables</td><td>{p.get("fuzzy_inputs", 0)}</td></tr>
 <tr><td>Rules file</td><td>fuzzy_logic/fertilizer_rules.yaml</td></tr>
 </table>
 </div>
@@ -1760,7 +2186,7 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Phase 8 — Recommendations</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Recommendations generated</td><td>{p.get('n_recommendations', 0)}</td></tr>
+<tr><td>Recommendations generated</td><td>{p.get("n_recommendations", 0)}</td></tr>
 <tr><td>Recommendations file</td><td>outputs/recommendations/fertilizer_recommendations.xlsx</td></tr>
 </table>
 </div>
@@ -1769,7 +2195,7 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Phase 9 — Ready Reckoner</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Entries</td><td>{p.get('n_reckoner_entries', 0)}</td></tr>
+<tr><td>Entries</td><td>{p.get("n_reckoner_entries", 0)}</td></tr>
 <tr><td>Ready Reckoner XLSX</td><td>outputs/Ready_Reckoner.xlsx</td></tr>
 <tr><td>Ready Reckoner PDF</td><td>outputs/Ready_Reckoner.pdf</td></tr>
 </table>
@@ -1780,7 +2206,7 @@ tr:hover {{ background: #f0faf4; }}
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
 <tr><td>Database</td><td>database/paper_registry.sqlite</td></tr>
-<tr><td>Papers registered</td><td>{p.get('n_registered', 0)}</td></tr>
+<tr><td>Papers registered</td><td>{p.get("n_registered", 0)}</td></tr>
 </table>
 </div>
 
@@ -1788,13 +2214,13 @@ tr:hover {{ background: #f0faf4; }}
 <h2>Efficiency Improvement Summary</h2>
 <table>
 <tr><th>Metric</th><th>Value</th></tr>
-<tr><td>Total PDFs in folder</td><td>{p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 0}</td></tr>
-<tr><td>Previously processed (skipped)</td><td>{p.get('n_previously_processed', 0)}</td></tr>
-<tr><td>New papers extracted this run</td><td>{p.get('n_newly_extracted', 0)}</td></tr>
-<tr><td>Skipped ratio</td><td>{round(p.get('n_previously_processed', 0) / max(1, (p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 1)) * 100, 1)}%</td></tr>
-<tr><td>PDF extraction avoided</td><td>{p.get('n_previously_processed', 0)} PDFs x ~30s avg = ~{round(p.get('n_previously_processed', 0) * 30 / 60, 1)} min saved</td></tr>
-<tr><td>Time efficiency gain</td><td>Only {p.get('n_newly_extracted', 0)} of {p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 0} PDFs required extraction ({round(p.get('n_newly_extracted', 0) / max(1, (p['ingestion_df']['total'] if isinstance(p.get('ingestion_df'), dict) else 1)) * 100, 1)}% of total)</td></tr>
-<tr><td>Schema growth</td><td>{p.get('n_rows_extracted', 0)} total rows (incremental merge)</td></tr>
+<tr><td>Total PDFs in folder</td><td>{p["ingestion_df"]["total"] if isinstance(p.get("ingestion_df"), dict) else 0}</td></tr>
+<tr><td>Previously processed (skipped)</td><td>{p.get("n_previously_processed", 0)}</td></tr>
+<tr><td>New papers extracted this run</td><td>{p.get("n_newly_extracted", 0)}</td></tr>
+<tr><td>Skipped ratio</td><td>{round(p.get("n_previously_processed", 0) / max(1, (p["ingestion_df"]["total"] if isinstance(p.get("ingestion_df"), dict) else 1)) * 100, 1)}%</td></tr>
+<tr><td>PDF extraction avoided</td><td>{p.get("n_previously_processed", 0)} PDFs x ~30s avg = ~{round(p.get("n_previously_processed", 0) * 30 / 60, 1)} min saved</td></tr>
+<tr><td>Time efficiency gain</td><td>Only {p.get("n_newly_extracted", 0)} of {p["ingestion_df"]["total"] if isinstance(p.get("ingestion_df"), dict) else 0} PDFs required extraction ({round(p.get("n_newly_extracted", 0) / max(1, (p["ingestion_df"]["total"] if isinstance(p.get("ingestion_df"), dict) else 1)) * 100, 1)}% of total)</td></tr>
+<tr><td>Schema growth</td><td>{p.get("n_rows_extracted", 0)} total rows (incremental merge)</td></tr>
 </table>
 </div>
 
@@ -1806,7 +2232,9 @@ tr:hover {{ background: #f0faf4; }}
         for f in failures:
             html += f'<p><span class="badge badge-danger">FAILED</span> {f}</p>\n'
     else:
-        html += '<p><span class="badge badge-success">All stages completed successfully</span></p>\n'
+        html += (
+            '<p><span class="badge badge-success">All stages completed successfully</span></p>\n'
+        )
 
     html += """
 </div>
@@ -1830,17 +2258,24 @@ def main():
     log("=" * 60)
     overall_start = time.time()
 
-    registered_before = load_registered_papers()
+    load_registered_papers()
 
     phases_state = {
         "ingestion_df": {"total": 0, "new": 0, "dups": 0, "prev_processed": 0},
         "validation": {},
         "training": {},
         "failures": [],
-        "n_crops": 0, "n_rows_extracted": 0, "n_schema_cols": 0,
-        "n_features": 0, "n_recommendations": 0, "n_reckoner_entries": 0,
-        "n_registered": 0, "fuzzy_rules": 0, "fuzzy_inputs": 0,
-        "n_previously_processed": 0, "n_newly_extracted": 0,
+        "n_crops": 0,
+        "n_rows_extracted": 0,
+        "n_schema_cols": 0,
+        "n_features": 0,
+        "n_recommendations": 0,
+        "n_reckoner_entries": 0,
+        "n_registered": 0,
+        "fuzzy_rules": 0,
+        "fuzzy_inputs": 0,
+        "n_previously_processed": 0,
+        "n_newly_extracted": 0,
     }
 
     master_df = pd.DataFrame()
@@ -1940,7 +2375,9 @@ def main():
         if not master_df.empty:
             combine_cols = [c for c in combined_df.columns if c in master_df.columns]
             if combine_cols:
-                combined_df = pd.concat([master_df[combine_cols], combined_df[combine_cols]], ignore_index=True)
+                combined_df = pd.concat(
+                    [master_df[combine_cols], combined_df[combine_cols]], ignore_index=True
+                )
                 combined_df = combined_df.loc[:, ~combined_df.columns.duplicated()]
         if combined_df is not None and not combined_df.empty:
             rec_df = phase8_recommendations(combined_df, training_metrics)
@@ -1951,7 +2388,9 @@ def main():
 
     try:
         if rec_df is not None and not rec_df.empty:
-            combined_df2 = feature_df if feature_df is not None and not feature_df.empty else extract_df
+            combined_df2 = (
+                feature_df if feature_df is not None and not feature_df.empty else extract_df
+            )
             reck_ok = phase9_ready_reckoner(combined_df2, rec_df)
             if reck_ok:
                 phases_state["n_reckoner_entries"] = len(rec_df)
@@ -1969,19 +2408,23 @@ def main():
 
     try:
         generate_final_report(phases_state)
-    except Exception as e:
+    except Exception:
         log(f"FINAL REPORT FAILED: {traceback.format_exc()}")
 
     elapsed = time.time() - overall_start
     prev = phases_state.get("n_previously_processed", 0)
     new_ext = phases_state.get("n_newly_extracted", 0)
-    total_pdfs = phases_state["ingestion_df"]["total"] if isinstance(phases_state.get("ingestion_df"), dict) else 0
+    total_pdfs = (
+        phases_state["ingestion_df"]["total"]
+        if isinstance(phases_state.get("ingestion_df"), dict)
+        else 0
+    )
     skip_pct = round(prev / max(1, total_pdfs) * 100, 1)
 
     log("\n" + "=" * 60)
     log(f"AAIF PIPELINE COMPLETE ({elapsed:.1f}s)")
     log("=" * 60)
-    log(f"\n  EFFICIENCY SUMMARY:")
+    log("\n  EFFICIENCY SUMMARY:")
     log(f"    Total PDFs scanned:     {total_pdfs}")
     log(f"    Previously processed:   {prev} (skipped extraction)")
     log(f"    New papers extracted:   {new_ext}")
@@ -1997,11 +2440,18 @@ def main():
 
 if __name__ == "__main__":
     import argparse
+
     parser = argparse.ArgumentParser(description="AAIF Complete Pipeline Runner")
-    parser.add_argument("--papers", "-p", type=str, default=None,
-                        help="Directory containing research papers (PDFs). Default: Data ADES")
-    parser.add_argument("--force", action="store_true",
-                        help="Force re-extraction by removing cached outputs")
+    parser.add_argument(
+        "--papers",
+        "-p",
+        type=str,
+        default=None,
+        help="Directory containing research papers (PDFs). Default: Data ADES",
+    )
+    parser.add_argument(
+        "--force", action="store_true", help="Force re-extraction by removing cached outputs"
+    )
     args, _ = parser.parse_known_args()
 
     if args.papers:
@@ -2013,9 +2463,14 @@ if __name__ == "__main__":
         log(f"Using papers directory: {PAPERS_DIR}")
 
     if args.force:
-        for f in ["Universal_Agricultural_Schema.csv", "Universal_Agricultural_Schema.xlsx",
-                   "Validated_Extractions.json", "features_dataset.csv",
-                   "model_metrics.xlsx", "feature_importance_Yield_per_Plot.csv"]:
+        for f in [
+            "Universal_Agricultural_Schema.csv",
+            "Universal_Agricultural_Schema.xlsx",
+            "Validated_Extractions.json",
+            "features_dataset.csv",
+            "model_metrics.xlsx",
+            "feature_importance_Yield_per_Plot.csv",
+        ]:
             p = OUTPUTS_DIR / f
             if p.exists():
                 p.unlink()

@@ -1,10 +1,8 @@
-from typing import Optional, Dict, List, Tuple
-import pandas as pd
-import numpy as np
 import logging
 
+import pandas as pd
 
-AGRICULTURAL_RANGES: Dict[str, dict] = {
+AGRICULTURAL_RANGES: dict[str, dict] = {
     "Temperature": {"min": -50, "max": 60, "unit": "°C"},
     "Rainfall": {"min": 0, "max": 10000, "unit": "mm/year"},
     "Humidity": {"min": 0, "max": 100, "unit": "%"},
@@ -24,17 +22,17 @@ AGRICULTURAL_RANGES: Dict[str, dict] = {
 
 
 class RangeValidator:
-    def __init__(self, logger: Optional[logging.Logger] = None):
+    def __init__(self, logger: logging.Logger | None = None):
         self.ranges = AGRICULTURAL_RANGES.copy()
         self.logger = logger or logging.getLogger(__name__)
 
     def validate(
         self,
         df: pd.DataFrame,
-        column_map: Optional[Dict[str, str]] = None,
+        column_map: dict[str, str] | None = None,
     ) -> dict:
         column_map = column_map or {}
-        results = {}
+        results: dict[str, object] = {}
         auto_map = self._auto_detect_columns(df)
 
         resolved = {}
@@ -55,7 +53,7 @@ class RangeValidator:
                 }
                 continue
 
-            violations: List[Tuple[int, float]] = []
+            violations: list[tuple[int, float]] = []
             for idx, val in series.items():
                 if val < r["min"] or val > r["max"]:
                     violations.append((int(idx), float(val)))
@@ -94,7 +92,14 @@ class RangeValidator:
             ln = lon.iloc[idx]
             if pd.isna(lv) or pd.isna(ln):
                 invalid_pairs += 1
-                violations.append((int(lat.index[idx]), float(lv) if not pd.isna(lv) else None, float(ln) if not pd.isna(ln) else None, "null value"))
+                violations.append(
+                    (
+                        int(lat.index[idx]),
+                        float(lv) if not pd.isna(lv) else None,
+                        float(ln) if not pd.isna(ln) else None,
+                        "null value",
+                    )
+                )
                 continue
             lat_ok = lat_range["min"] <= lv <= lat_range["max"]
             lon_ok = lon_range["min"] <= ln <= lon_range["max"]
@@ -118,7 +123,7 @@ class RangeValidator:
             "violations": violations,
         }
 
-    def _auto_detect_columns(self, df: pd.DataFrame) -> Dict[str, str]:
+    def _auto_detect_columns(self, df: pd.DataFrame) -> dict[str, str]:
         mapping = {}
         col_lower = {c: c.lower().replace(" ", "_").replace("-", "_") for c in df.columns}
         rev_map = {v: k for k, v in col_lower.items()}
@@ -135,7 +140,7 @@ class RangeValidator:
                     break
         return mapping
 
-    def _check_temperature_consistency(self, df: pd.DataFrame) -> Optional[dict]:
+    def _check_temperature_consistency(self, df: pd.DataFrame) -> dict | None:
         tmin_col = None
         tmax_col = None
         for c in df.columns:

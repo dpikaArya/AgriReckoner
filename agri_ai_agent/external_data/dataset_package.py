@@ -3,7 +3,6 @@ import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -29,9 +28,9 @@ class DatasetPackage:
     description: str = ""
     version: str = "1.0.0"
     source_url: str = ""
-    download_path: Optional[Path] = None
-    data: Optional[pd.DataFrame] = None
-    downloaded_at: Optional[datetime] = None
+    download_path: Path | None = None
+    data: pd.DataFrame | None = None
+    downloaded_at: datetime | None = None
     row_count: int = 0
     column_count: int = 0
     validation_errors: list[str] = field(default_factory=list)
@@ -57,12 +56,15 @@ class DatasetPackage:
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
     def _compute_checksum(self) -> str:
-        raw = json.dumps({
-            "provider": self.provider or self.source,
-            "resource_id": self.resource_id,
-            "version": self.version,
-            "name": self.name,
-        }, sort_keys=True)
+        raw = json.dumps(
+            {
+                "provider": self.provider or self.source,
+                "resource_id": self.resource_id,
+                "version": self.version,
+                "name": self.name,
+            },
+            sort_keys=True,
+        )
         return hashlib.sha256(raw.encode()).hexdigest()[:16]
 
     def to_dataframe(self) -> pd.DataFrame:
@@ -135,9 +137,16 @@ class DatasetPackage:
         }
 
     @classmethod
-    def from_raw(cls, source: str = "", resource_id: str = "", name: str = "",
-                 download_path: Optional[Path] = None, data: Optional[pd.DataFrame] = None,
-                 metadata: Optional[dict] = None, **kwargs) -> "DatasetPackage":
+    def from_raw(
+        cls,
+        source: str = "",
+        resource_id: str = "",
+        name: str = "",
+        download_path: Path | None = None,
+        data: pd.DataFrame | None = None,
+        metadata: dict | None = None,
+        **kwargs,
+    ) -> "DatasetPackage":
         return cls(
             provider=source,
             source=source,
@@ -146,7 +155,13 @@ class DatasetPackage:
             download_path=download_path,
             data=data,
             metadata=metadata or {},
-            document_type="tabular" if data is not None or (download_path and download_path.suffix.lower() in (".csv", ".xlsx", ".xls", ".parquet", ".json")) else "unknown",
+            document_type="tabular"
+            if data is not None
+            or (
+                download_path
+                and download_path.suffix.lower() in (".csv", ".xlsx", ".xls", ".parquet", ".json")
+            )
+            else "unknown",
             tables=[data] if data is not None else [],
             **kwargs,
         )

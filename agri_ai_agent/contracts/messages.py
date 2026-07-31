@@ -3,10 +3,10 @@ Structured JSON contracts for inter-agent communication.
 Every agent accepts an input contract and returns an output contract.
 """
 
-from dataclasses import dataclass, field, asdict
-from typing import Any, Optional
-from datetime import datetime
 import json
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+from typing import Any
 
 
 def _serialize(obj: Any) -> Any:
@@ -25,8 +25,8 @@ class AgentContract:
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     metadata: dict = field(default_factory=dict)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     execution_time_sec: float = 0.0
     retry_count: int = 0
     dataset_id: str = ""
@@ -213,8 +213,8 @@ class OrchestratorState:
     completed_agents: list[str] = field(default_factory=list)
     failed_agents: list[dict] = field(default_factory=list)
     checkpoint_path: str = ""
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
     def to_dict(self) -> dict:
         return json.loads(json.dumps(asdict(self), default=_serialize))

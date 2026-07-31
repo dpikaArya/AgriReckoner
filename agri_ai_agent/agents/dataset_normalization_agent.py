@@ -2,12 +2,10 @@ import hashlib
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import AgentContract
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
 from agri_ai_agent.knowledge_graph.graph import KnowledgeGraph
@@ -47,7 +45,9 @@ class DatasetNormalizationAgent(BaseAgent):
         self._write_registry_export(normalized)
 
         kg: KnowledgeGraph = kwargs.get("knowledge_graph")
-        provenance_dir = Path(kwargs.get("provenance_dir", self.settings.EXTERNAL_DATA_DIR / "provenance"))
+        provenance_dir = Path(
+            kwargs.get("provenance_dir", self.settings.EXTERNAL_DATA_DIR / "provenance")
+        )
         for pkg in normalized:
             try:
                 if kg is not None:
@@ -56,8 +56,11 @@ class DatasetNormalizationAgent(BaseAgent):
                 doc_lineage = register_document_lineage(pkg)
                 provenance_dir.mkdir(parents=True, exist_ok=True)
                 (provenance_dir / f"lineage_{pkg.dataset_id}.json").write_text(
-                    json.dumps({"dataset_lineage": lineage, "document_lineage": doc_lineage},
-                               indent=2, default=str),
+                    json.dumps(
+                        {"dataset_lineage": lineage, "document_lineage": doc_lineage},
+                        indent=2,
+                        default=str,
+                    ),
                     encoding="utf-8",
                 )
                 self.contract.dataset_id = pkg.dataset_id
@@ -66,12 +69,19 @@ class DatasetNormalizationAgent(BaseAgent):
                 self.contract.processing_stage = "dataset_normalization"
                 self.contract.processing_mode = "normalize"
             except Exception as exc:
-                self.log.warning("[%s] lineage registration failed for %s: %s",
-                                 self.agent_name, pkg.dataset_id, exc)
+                self.log.warning(
+                    "[%s] lineage registration failed for %s: %s",
+                    self.agent_name,
+                    pkg.dataset_id,
+                    exc,
+                )
 
         self.log.info(
             "[%s] Normalized %d package(s) into %d rows x %d cols",
-            self.agent_name, len(normalized), len(merged), len(merged.columns) if not merged.empty else 0,
+            self.agent_name,
+            len(normalized),
+            len(merged),
+            len(merged.columns) if not merged.empty else 0,
         )
         return merged
 
@@ -118,7 +128,9 @@ class DatasetNormalizationAgent(BaseAgent):
     def _package_from_dataframe(self, df: pd.DataFrame, kwargs: dict) -> DatasetPackage:
         provider = kwargs.get("provider", "pipeline_input")
         document_type = "tabular"
-        dataset_id = hashlib.sha256(f"{provider}/{datetime.now().isoformat()}".encode()).hexdigest()[:16]
+        dataset_id = hashlib.sha256(
+            f"{provider}/{datetime.now().isoformat()}".encode()
+        ).hexdigest()[:16]
 
         schema = {
             "columns": list(df.columns),
@@ -174,7 +186,9 @@ class DatasetNormalizationAgent(BaseAgent):
                 return "image"
         return "unknown"
 
-    def _merge_normalized(self, packages: list[DatasetPackage], existing_df: pd.DataFrame) -> pd.DataFrame:
+    def _merge_normalized(
+        self, packages: list[DatasetPackage], existing_df: pd.DataFrame
+    ) -> pd.DataFrame:
         frames = []
         if existing_df is not None and not existing_df.empty:
             frames.append(existing_df)
@@ -203,26 +217,30 @@ class DatasetNormalizationAgent(BaseAgent):
     def _write_registry_export(self, packages: list[DatasetPackage]):
         rows = []
         for pkg in packages:
-            rows.append({
-                "dataset_id": pkg.dataset_id,
-                "provider": pkg.provider or pkg.source,
-                "document_type": pkg.document_type,
-                "rows": pkg.row_count,
-                "columns": pkg.column_count,
-                "tables": len(pkg.tables),
-                "documents": len(pkg.documents),
-                "images": len(pkg.images),
-                "is_valid": pkg.is_valid,
-                "checksum": pkg.checksum,
-                "license": pkg.license,
-                "version": pkg.version,
-            })
+            rows.append(
+                {
+                    "dataset_id": pkg.dataset_id,
+                    "provider": pkg.provider or pkg.source,
+                    "document_type": pkg.document_type,
+                    "rows": pkg.row_count,
+                    "columns": pkg.column_count,
+                    "tables": len(pkg.tables),
+                    "documents": len(pkg.documents),
+                    "images": len(pkg.images),
+                    "is_valid": pkg.is_valid,
+                    "checksum": pkg.checksum,
+                    "license": pkg.license,
+                    "version": pkg.version,
+                }
+            )
         df = pd.DataFrame(rows) if rows else pd.DataFrame()
         if not df.empty:
             path = self.save_artifact(df, "dataset_registry_normalized.csv", subdir="normalization")
             self.log.info("[%s] Registry export → %s", self.agent_name, path)
 
-    def run(self, df: pd.DataFrame, contract: Optional[AgentContract] = None, **kwargs) -> AgentContract:
+    def run(
+        self, df: pd.DataFrame, contract: AgentContract | None = None, **kwargs
+    ) -> AgentContract:
         self.dataframe = df
         self.contract = contract or AgentContract(agent_name=self.agent_name)
         self.contract.status = "running"
@@ -238,7 +256,8 @@ class DatasetNormalizationAgent(BaseAgent):
             self.contract.output_data = self._build_output(result_df, **kwargs)
             self.log.info(
                 "[%s] Completed in %.2fs",
-                self.agent_name, self.contract.execution_time_sec,
+                self.agent_name,
+                self.contract.execution_time_sec,
             )
         except Exception as e:
             self.contract.status = "failed"

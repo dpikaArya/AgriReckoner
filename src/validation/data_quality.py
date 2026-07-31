@@ -1,7 +1,7 @@
-from typing import Optional, List
-import pandas as pd
-import numpy as np
 import logging
+
+import numpy as np
+import pandas as pd
 
 
 class DataQualityValidator:
@@ -9,15 +9,13 @@ class DataQualityValidator:
         self,
         missing_threshold: float = 0.5,
         duplicate_threshold: float = 0.0,
-        logger: Optional[logging.Logger] = None,
+        logger: logging.Logger | None = None,
     ):
         self.missing_threshold = missing_threshold
         self.duplicate_threshold = duplicate_threshold
         self.logger = logger or logging.getLogger(__name__)
 
-    def validate(
-        self, df: pd.DataFrame, key_columns: Optional[List[str]] = None
-    ) -> dict:
+    def validate(self, df: pd.DataFrame, key_columns: list[str] | None = None) -> dict:
         total_rows = len(df)
         total_columns = len(df.columns)
 
@@ -49,9 +47,7 @@ class DataQualityValidator:
         for col in df.select_dtypes(include=[np.number]).columns:
             mask = self.detect_outliers_iqr(df[col].dropna())
             outlier_count = int(mask.sum())
-            outlier_pct = (
-                round(outlier_count / total_rows * 100, 2) if total_rows > 0 else 0.0
-            )
+            outlier_pct = round(outlier_count / total_rows * 100, 2) if total_rows > 0 else 0.0
             outliers[col] = {
                 "count": outlier_count,
                 "percentage": outlier_pct,

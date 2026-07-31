@@ -7,45 +7,42 @@ retries failures, logs operations, and supports checkpoint recovery.
 import json
 import traceback
 from datetime import datetime
-from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
+from agri_ai_agent import __version__
+from agri_ai_agent.agents import (
+    BenchmarkAgent,
+    ContinuousLearningAgent,
+    DatasetIngestionBridgeAgent,
+    DatasetNormalizationAgent,
+    EvidenceFusionAgent,
+    ExplainabilityAgent,
+    ExternalDataSourceAgent,
+    ExtractionAgent,
+    FeatureAgent,
+    FeatureStoreAgent,
+    FuzzyAgent,
+    KnowledgeAgent,
+    KnowledgeIntegrationAgent,
+    ModelSelectionAgent,
+    ObservationGenerationAgent,
+    OntologyAgent,
+    PredictionAgent,
+    ReadyReckonerAgent,
+    RecommendationAgent,
+    RepositorySyncAgent,
+    SchemaPopulationAgent,
+    TableIntelligenceAgent,
+    TrainingAgent,
+    ValidationAgent,
+)
 from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import (
     AgentContract,
     OrchestratorState,
 )
 from agri_ai_agent.utils.logging_utils import get_logger
-from agri_ai_agent import __version__
-
-from agri_ai_agent.agents import (
-    KnowledgeAgent,
-    ExtractionAgent,
-    ValidationAgent,
-    EvidenceFusionAgent,
-    OntologyAgent,
-    TableIntelligenceAgent,
-    SchemaPopulationAgent,
-    FeatureAgent,
-    ModelSelectionAgent,
-    TrainingAgent,
-    PredictionAgent,
-    FuzzyAgent,
-    RecommendationAgent,
-    BenchmarkAgent,
-    ExplainabilityAgent,
-    ReadyReckonerAgent,
-    ContinuousLearningAgent,
-    KnowledgeIntegrationAgent,
-    ExternalDataSourceAgent,
-    DatasetNormalizationAgent,
-    DatasetIngestionBridgeAgent,
-    ObservationGenerationAgent,
-    FeatureStoreAgent,
-    RepositorySyncAgent,
-)
 
 # Ordered so that external data ingestion runs first (PHASE -1), then
 # dataset normalization converts everything into DatasetPackage format, then
@@ -56,13 +53,21 @@ PIPELINE_STEPS = [
     ("repository_sync", RepositorySyncAgent, "Repository Sync & Change Detection"),
     ("external_data", ExternalDataSourceAgent, "External Data Source Layer"),
     ("dataset_normalization", DatasetNormalizationAgent, "Dataset Normalization"),
-    ("dataset_ingestion_bridge", DatasetIngestionBridgeAgent, "Dataset Ingestion Bridge & ID Assignment"),
+    (
+        "dataset_ingestion_bridge",
+        DatasetIngestionBridgeAgent,
+        "Dataset Ingestion Bridge & ID Assignment",
+    ),
     ("extraction", ExtractionAgent, "Extract & Schema"),
     ("evidence_fusion", EvidenceFusionAgent, "Evidence Fusion & Provenance"),
     ("ontology", OntologyAgent, "Ontology Mapping & Normalization"),
     ("table_intelligence", TableIntelligenceAgent, "Table Intelligence & Statistics"),
     ("schema_population", SchemaPopulationAgent, "Schema Population & Inference"),
-    ("knowledge_integration", KnowledgeIntegrationAgent, "Knowledge Integration & Missing Value Fill"),
+    (
+        "knowledge_integration",
+        KnowledgeIntegrationAgent,
+        "Knowledge Integration & Missing Value Fill",
+    ),
     ("knowledge", KnowledgeAgent, "Domain Knowledge"),
     ("observation_generation", ObservationGenerationAgent, "Observation Generation & Hierarchy"),
     ("validation", ValidationAgent, "Validate & Harmonize"),
@@ -80,7 +85,7 @@ PIPELINE_STEPS = [
 
 
 class Orchestrator:
-    def __init__(self, settings: Optional[AgriAISettings] = None):
+    def __init__(self, settings: AgriAISettings | None = None):
         self.settings = settings or AgriAISettings()
         self.settings.ensure_dirs()
         self.log = get_logger("Orchestrator")
@@ -88,12 +93,17 @@ class Orchestrator:
             pipeline_id=datetime.now().strftime("AGRI_%Y%m%d_%H%M%S"),
             started_at=datetime.now(),
         )
-        self.dataframe: Optional[pd.DataFrame] = None
+        self.dataframe: pd.DataFrame | None = None
         self.results: dict[str, AgentContract] = {}
         self.checkpoint_dir = self.settings.CHECKPOINT_DIR
 
-    def run(self, filepath: Optional[str] = None, df: Optional[pd.DataFrame] = None,
-            papers_dir: Optional[str] = None, **kwargs) -> pd.DataFrame:
+    def run(
+        self,
+        filepath: str | None = None,
+        df: pd.DataFrame | None = None,
+        papers_dir: str | None = None,
+        **kwargs,
+    ) -> pd.DataFrame:
         self.log.info("=" * 60)
         self.log.info("AgriAI Pipeline [%s]", self.state.pipeline_id)
         self.log.info("=" * 60)
@@ -126,7 +136,9 @@ class Orchestrator:
                 elif step_key == "dataset_ingestion_bridge":
                     contract = agent.run(df=self.dataframe, packages=packages)
                 elif step_key == "extraction":
-                    contract = agent.run(df=self.dataframe, filepath=filepath, papers_dir=papers_dir)
+                    contract = agent.run(
+                        df=self.dataframe, filepath=filepath, papers_dir=papers_dir
+                    )
                 elif step_key == "benchmark":
                     contract = agent.run(df=self.dataframe, pipeline_results=self.results)
                 elif step_key == "explainability":
@@ -137,20 +149,25 @@ class Orchestrator:
                 self.results[step_key] = contract
 
                 if contract.status == "success":
-                    if hasattr(agent, 'dataframe') and agent.dataframe is not None:
+                    if hasattr(agent, "dataframe") and agent.dataframe is not None:
                         self.dataframe = agent.dataframe
-                    if hasattr(agent, 'dataset_package') and agent.dataset_package is not None:
+                    if hasattr(agent, "dataset_package") and agent.dataset_package is not None:
                         packages = [agent.dataset_package]
                     self.state.completed_agents.append(step_key)
                     if self.settings.CHECKPOINT_ENABLED:
                         self._save_checkpoint(step_key)
                     self.log.info("[%s] OK (%.2fs)", step_name, contract.execution_time_sec)
                 else:
-                    self.state.failed_agents.append({
-                        "step": step_key, "name": step_name,
-                        "errors": contract.errors,
-                    })
-                    self.log.error("[%s] FAILED after %d attempts", step_name, contract.retry_count + 1)
+                    self.state.failed_agents.append(
+                        {
+                            "step": step_key,
+                            "name": step_name,
+                            "errors": contract.errors,
+                        }
+                    )
+                    self.log.error(
+                        "[%s] FAILED after %d attempts", step_name, contract.retry_count + 1
+                    )
                     if not self._should_continue_on_failure(step_key):
                         self.state.status = "failed"
                         self.state.completed_at = datetime.now()
@@ -161,10 +178,13 @@ class Orchestrator:
 
             except Exception as e:
                 self.log.error("[%s] Exception: %s", step_name, e)
-                self.state.failed_agents.append({
-                    "step": step_key, "name": step_name,
-                    "errors": [traceback.format_exc()],
-                })
+                self.state.failed_agents.append(
+                    {
+                        "step": step_key,
+                        "name": step_name,
+                        "errors": [traceback.format_exc()],
+                    }
+                )
                 if not self._should_continue_on_failure(step_key):
                     self.state.status = "failed"
                     self.state.completed_at = datetime.now()
@@ -196,11 +216,11 @@ class Orchestrator:
         return self.dataframe
 
     def _run_incremental_continuous(self, **kwargs) -> AgentContract:
+        from agri_ai_agent.continuous_learning.change_detector import ChangeDetector
+        from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph
         from agri_ai_agent.continuous_learning.incremental_engine import IncrementalEngine
         from agri_ai_agent.continuous_learning.repository_registry import RepositoryRegistry
         from agri_ai_agent.continuous_learning.version_history import VersionHistory
-        from agri_ai_agent.continuous_learning.change_detector import ChangeDetector
-        from agri_ai_agent.continuous_learning.dependency_graph import DependencyGraph
 
         db_path = kwargs.get("continuous_learning_db", self.settings.CONTINUOUS_LEARNING_DB)
         registry = RepositoryRegistry(db_path)
@@ -209,7 +229,7 @@ class Orchestrator:
         graph = DependencyGraph()
         engine = IncrementalEngine(self.settings, registry, history, detector, graph)
 
-        def run_step(step_key: str, df) -> Optional[pd.DataFrame]:
+        def run_step(step_key: str, df) -> pd.DataFrame | None:
             for step in PIPELINE_STEPS:
                 if step[0] == step_key:
                     agent_cls = step[1]
@@ -240,8 +260,11 @@ class Orchestrator:
             processing_mode="incremental",
         )
         contract.output_data = {
-            "cycle_result": {k: v for k, v in cycle_result.items()
-                           if isinstance(v, (str, int, float, bool, list))},
+            "cycle_result": {
+                k: v
+                for k, v in cycle_result.items()
+                if isinstance(v, (str, int, float, bool, list))
+            },
             "stages_executed": cycle_result.get("stages_executed", []),
         }
         return contract
@@ -298,9 +321,13 @@ class Orchestrator:
     def _git_sha():
         """Best-effort current git SHA; None if unavailable."""
         import subprocess
+
         try:
             out = subprocess.run(
-                ["git", "rev-parse", "HEAD"], capture_output=True, text=True, timeout=5,
+                ["git", "rev-parse", "HEAD"],
+                capture_output=True,
+                text=True,
+                timeout=5,
             )
             return out.stdout.strip() or None
         except Exception as e:

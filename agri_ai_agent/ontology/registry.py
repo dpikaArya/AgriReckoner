@@ -153,16 +153,14 @@ class Registry:
         """Record CURIE ownership and append a problem on cross-column reuse."""
         prior = owner.get(curie)
         if prior is not None and prior != column:
-            problems.append(
-                f"CURIE collision: '{curie}' used by both {prior} and {column}"
-            )
+            problems.append(f"CURIE collision: '{curie}' used by both {prior} and {column}")
         else:
             owner[curie] = column
 
 
 if __name__ == "__main__":
     reg = Registry.load()
-    assert len(reg.columns) == 138, len(reg.columns)
+    assert len(reg.columns) == 296, len(reg.columns)
     issues = reg.validate()
     assert issues == [], issues
     assert reg.expand_curie("AGROVOC:c_5188").endswith("agrovoc/c_5188")
@@ -178,4 +176,4 @@ if __name__ == "__main__":
         pass
     else:  # pragma: no cover
         raise AssertionError("unknown prefix should raise")
-    print("registry smoke OK: 138 cols, validate() clean")
+    print("registry smoke OK: 296 cols, validate() clean")

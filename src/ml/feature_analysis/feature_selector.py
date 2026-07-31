@@ -1,7 +1,6 @@
 import json
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -12,7 +11,7 @@ logger = logging.getLogger("FeatureSelector")
 class FeatureSelector:
     def __init__(
         self,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
         importance_threshold: float = 0.01,
         correlation_threshold: float = 0.90,
         variance_threshold: float = 0.001,
@@ -34,11 +33,11 @@ class FeatureSelector:
     def select(
         self,
         X: pd.DataFrame,
-        y: Optional[pd.Series] = None,
-        importance_df: Optional[pd.DataFrame] = None,
-        shap_df: Optional[pd.DataFrame] = None,
-        non_feature_cols: Optional[list[str]] = None,
-        must_keep: Optional[list[str]] = None,
+        y: pd.Series | None = None,
+        importance_df: pd.DataFrame | None = None,
+        shap_df: pd.DataFrame | None = None,
+        non_feature_cols: list[str] | None = None,
+        must_keep: list[str] | None = None,
     ) -> list[str]:
         if X.empty:
             logger.warning("Empty DataFrame for feature selection")
@@ -90,9 +89,7 @@ class FeatureSelector:
             logger.info("After max trim: %d features", len(candidates))
 
         if len(candidates) < self.min_features and must_keep:
-            added = self._restore_from_must_keep(
-                candidates, must_keep, initial_count
-            )
+            added = self._restore_from_must_keep(candidates, must_keep, initial_count)
             candidates = added
             logger.info("After restoring must-keep: %d features", len(candidates))
 
@@ -102,9 +99,7 @@ class FeatureSelector:
         self._generate_report(initial_count)
         return candidates
 
-    def _remove_high_missingness(
-        self, X: pd.DataFrame, candidates: list[str]
-    ) -> list[str]:
+    def _remove_high_missingness(self, X: pd.DataFrame, candidates: list[str]) -> list[str]:
         if self.max_missing_pct >= 1.0:
             return []
         removed = []
@@ -117,9 +112,7 @@ class FeatureSelector:
                 removed.append(col)
         return removed
 
-    def _remove_low_variance(
-        self, X: pd.DataFrame, candidates: list[str]
-    ) -> list[str]:
+    def _remove_low_variance(self, X: pd.DataFrame, candidates: list[str]) -> list[str]:
         removed = []
         for col in candidates:
             if col not in X.columns:
@@ -129,9 +122,7 @@ class FeatureSelector:
                 removed.append(col)
         return removed
 
-    def _remove_highly_correlated(
-        self, X: pd.DataFrame, candidates: list[str]
-    ) -> list[str]:
+    def _remove_highly_correlated(self, X: pd.DataFrame, candidates: list[str]) -> list[str]:
         if len(candidates) <= 1:
             return []
         corr = X[candidates].corr().abs()
@@ -153,12 +144,10 @@ class FeatureSelector:
         imp_map = {}
         if "mean_importance" in importance_df.columns:
             imp_map = dict(
-                zip(importance_df["feature"], importance_df["mean_importance"])
+                zip(importance_df["feature"], importance_df["mean_importance"], strict=True)
             )
         elif "importance" in importance_df.columns:
-            imp_map = dict(
-                zip(importance_df["feature"], importance_df["importance"])
-            )
+            imp_map = dict(zip(importance_df["feature"], importance_df["importance"], strict=True))
         removed = []
         for col in candidates:
             imp = imp_map.get(col, 0)
@@ -166,9 +155,7 @@ class FeatureSelector:
                 removed.append(col)
         return removed
 
-    def _apply_shap_boost(
-        self, shap_df: pd.DataFrame, candidates: list[str]
-    ):
+    def _apply_shap_boost(self, shap_df: pd.DataFrame, candidates: list[str]):
         if "feature" not in shap_df.columns or "impact" not in shap_df.columns:
             return
         high_impact = shap_df[shap_df["impact"] == "high"]["feature"].tolist()
@@ -179,8 +166,8 @@ class FeatureSelector:
     def _trim_to_max(
         self,
         candidates: list[str],
-        importance_df: Optional[pd.DataFrame],
-        shap_df: Optional[pd.DataFrame],
+        importance_df: pd.DataFrame | None,
+        shap_df: pd.DataFrame | None,
     ) -> list[str]:
         scores = {}
         for col in candidates:
@@ -194,7 +181,7 @@ class FeatureSelector:
             for _, row in shap_df.iterrows():
                 if row["feature"] in scores:
                     scores[row["feature"]] += row.get("mean_abs_shap", 0)
-        sorted_cols = sorted(scores, key=scores.get, reverse=True)
+        sorted_cols = sorted(scores, key=lambda k: scores.get(k, 0), reverse=True)
         return sorted_cols[: self.max_features]
 
     def _restore_from_must_keep(
@@ -206,7 +193,7 @@ class FeatureSelector:
                 result.append(col)
         return result
 
-    def _save_selection(self, X: pd.DataFrame, y: Optional[pd.Series] = None):
+    def _save_selection(self, X: pd.DataFrame, y: pd.Series | None = None):
         features_dir = Path("features")
         features_dir.mkdir(parents=True, exist_ok=True)
 
@@ -227,9 +214,7 @@ class FeatureSelector:
                 "total_removed": sum(len(v) for v in self.removed_features_.values()),
             }
             json_path = features_dir / "selected_feature_list.json"
-            json_path.write_text(
-                json.dumps(selected_list, indent=2, default=str), encoding="utf-8"
-            )
+            json_path.write_text(json.dumps(selected_list, indent=2, default=str), encoding="utf-8")
 
         if y is not None:
             target_path = features_dir / "target_variable.csv"
@@ -240,14 +225,10 @@ class FeatureSelector:
         removed_count = sum(len(v) for v in self.removed_features_.values())
         report = {
             "initial_features": initial_count,
-            "selected_features": selected_count,
             "total_removed": removed_count,
-            "reduction_pct": round(
-                (1 - selected_count / max(initial_count, 1)) * 100, 2
-            ),
+            "reduction_pct": round((1 - selected_count / max(initial_count, 1)) * 100, 2),
             "removed_by_reason": {
-                k: {"count": len(v), "features": v}
-                for k, v in self.removed_features_.items()
+                k: {"count": len(v), "features": v} for k, v in self.removed_features_.items()
             },
             "thresholds": {
                 "importance": self.importance_threshold,
@@ -260,9 +241,7 @@ class FeatureSelector:
             "selected_features": self.selected_features_,
         }
         path = self.output_dir / "feature_selection_report.json"
-        path.write_text(
-            json.dumps(report, indent=2, default=str), encoding="utf-8"
-        )
+        path.write_text(json.dumps(report, indent=2, default=str), encoding="utf-8")
         logger.info(
             "Feature selection: %d → %d features (%.1f%% reduction)",
             initial_count,

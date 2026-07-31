@@ -1,11 +1,11 @@
+from typing import Any
+
 import numpy as np
 import pandas as pd
-import warnings
-from typing import Optional, Any
 
 
 class PreTrainingChecks:
-    def __init__(self, config: dict = None):
+    def __init__(self, config: dict | None = None):
         self.max_missing_pct = 0.5
         self.min_samples = 10
         self.max_duplicate_pct = 0.8
@@ -20,13 +20,15 @@ class PreTrainingChecks:
             self.max_duplicate_pct = config.get("max_duplicate_pct", self.max_duplicate_pct)
             self.outlier_threshold = config.get("outlier_threshold", self.outlier_threshold)
             self.max_outlier_pct = config.get("max_outlier_pct", self.max_outlier_pct)
-            self.min_feature_variance = config.get("min_feature_variance", self.min_feature_variance)
+            self.min_feature_variance = config.get(
+                "min_feature_variance", self.min_feature_variance
+            )
             self.min_class_count = config.get("min_class_count", self.min_class_count)
 
     def check_all(self, X: pd.DataFrame, y: pd.Series, task: str = "regression") -> dict:
-        checks = {}
-        warnings_list = []
-        errors_list = []
+        checks: dict[str, dict] = {}
+        warnings_list: list[str] = []
+        errors_list: list[str] = []
 
         result = {
             "passed": True,
@@ -104,12 +106,20 @@ class PreTrainingChecks:
                 "detail": f"Columns exceed max missing {self.max_missing_pct:.0%}: {details}",
                 "missing_pct": missing_pct,
             }
-        return {"status": "PASS", "detail": "No columns exceed max missing percentage", "missing_pct": missing_pct}
+        return {
+            "status": "PASS",
+            "detail": "No columns exceed max missing percentage",
+            "missing_pct": missing_pct,
+        }
 
     def _check_duplicate_samples(self, X: pd.DataFrame) -> dict:
         n_total = len(X)
         if n_total == 0:
-            return {"status": "PASS", "detail": "No samples to check duplicates", "duplicate_pct": 0.0}
+            return {
+                "status": "PASS",
+                "detail": "No samples to check duplicates",
+                "duplicate_pct": 0.0,
+            }
         n_duplicates = X.duplicated().sum()
         duplicate_pct = n_duplicates / n_total
         if duplicate_pct > self.max_duplicate_pct:
@@ -118,7 +128,11 @@ class PreTrainingChecks:
                 "detail": f"{n_duplicates}/{n_total} samples are duplicates ({duplicate_pct:.2%})",
                 "duplicate_pct": duplicate_pct,
             }
-        return {"status": "PASS", "detail": f"Duplicate samples: {duplicate_pct:.2%}", "duplicate_pct": duplicate_pct}
+        return {
+            "status": "PASS",
+            "detail": f"Duplicate samples: {duplicate_pct:.2%}",
+            "duplicate_pct": duplicate_pct,
+        }
 
     def _check_feature_variance(self, X: pd.DataFrame) -> dict:
         numeric_cols = X.select_dtypes(include=[np.number]).columns
@@ -135,7 +149,11 @@ class PreTrainingChecks:
                 "detail": f"{len(zero_var_cols)} feature(s) have near-zero variance: {zero_var_cols}",
                 "zero_var_cols": zero_var_cols,
             }
-        return {"status": "PASS", "detail": "All numeric features have sufficient variance", "zero_var_cols": []}
+        return {
+            "status": "PASS",
+            "detail": "All numeric features have sufficient variance",
+            "zero_var_cols": [],
+        }
 
     def _check_outliers(self, X: pd.DataFrame) -> dict:
         numeric_cols = X.select_dtypes(include=[np.number]).columns
@@ -162,7 +180,11 @@ class PreTrainingChecks:
                 "detail": f"Columns exceed max outlier pct {self.max_outlier_pct:.0%}: {details}",
                 "outlier_pct": outlier_pcts,
             }
-        return {"status": "PASS", "detail": "No columns exceed max outlier percentage", "outlier_pct": outlier_pcts}
+        return {
+            "status": "PASS",
+            "detail": "No columns exceed max outlier percentage",
+            "outlier_pct": outlier_pcts,
+        }
 
     def _check_train_test_overlap(self, X_train: pd.DataFrame, X_test: pd.DataFrame) -> dict:
         train_tuples = X_train.astype(str).apply(tuple, axis=1).tolist()
@@ -203,9 +225,7 @@ class PreTrainingChecks:
             raise ValueError(summary)
 
     @staticmethod
-    def check_and_report(
-        X: pd.DataFrame, y: pd.Series, task: str = "regression"
-    ) -> dict:
+    def check_and_report(X: pd.DataFrame, y: pd.Series, task: str = "regression") -> dict:
         checker = PreTrainingChecks()
         result = checker.check_all(X, y, task=task)
 

@@ -39,12 +39,13 @@ class ExtractionResult:
 class Extractor(Protocol):
     """A strategy that extracts UAMS fields from a paper's text."""
 
-    def extract(self, text: str, paper_id: str) -> ExtractionResult:
-        ...
+    def extract(self, text: str, paper_id: str) -> ExtractionResult: ...
 
 
 if __name__ == "__main__":
-    f = ExtractedField(column="Soil_pH", value=6.8, unit_as_reported=None, source_quote="Soil pH was 6.8")
+    f = ExtractedField(
+        column="Soil_pH", value=6.8, unit_as_reported=None, source_quote="Soil pH was 6.8"
+    )
     r = ExtractionResult(paper_id="p1", crop="Wheat", fields=[f], method="test")
     assert r.fields[0].column == "Soil_pH" and r.fields[0].status == "unverified"
     print("base smoke OK ->", r.paper_id, r.fields[0].column)

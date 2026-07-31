@@ -73,7 +73,8 @@ A feature must never encode information unavailable at prediction time. The `is_
 def select_feature_columns(df, target_col, base_exclude=frozenset()):
     numeric_cols = df.select_dtypes(include="number").columns
     return [
-        col for col in numeric_cols
+        col
+        for col in numeric_cols
         if col != target_col
         and col not in NON_FEATURE_COLS
         and col not in base_exclude
@@ -88,8 +89,9 @@ def select_feature_columns(df, target_col, base_exclude=frozenset()):
 The `ModelSelectionAgent` uses `GridSearchCV` for hyperparameter optimisation:
 
 ```python
-search = GridSearchCV(model, param_grid, cv=inner_cv, scoring=scoring,
-                      n_jobs=-1, refit=True, error_score=np.nan)
+search = GridSearchCV(
+    model, param_grid, cv=inner_cv, scoring=scoring, n_jobs=-1, refit=True, error_score=np.nan
+)
 ```
 
 - **Inner CV folds**: 3 (for nested cross-validation)
@@ -151,10 +153,7 @@ The `ExperimentTracker` (`src/ml/experiment_tracker.py`) provides MLflow integra
 ### MLflow Mode (when `mlflow` is installed)
 
 ```python
-tracker = ExperimentTracker(
-    experiment_name="agri_ai_training",
-    tracking_uri="mlruns"
-)
+tracker = ExperimentTracker(experiment_name="agri_ai_training", tracking_uri="mlruns")
 tracker.start_run(run_name="yield_v1")
 tracker.log_params({"model": "XGBoost", "learning_rate": 0.1})
 tracker.log_metrics({"r2": 0.85, "rmse": 120.5})
@@ -266,10 +265,12 @@ Usage:
 ```python
 from src.ml.pre_training_checks import PreTrainingChecks
 
-checker = PreTrainingChecks(config={
-    "max_missing_pct": 0.5,
-    "min_samples": 10,
-})
+checker = PreTrainingChecks(
+    config={
+        "max_missing_pct": 0.5,
+        "min_samples": 10,
+    }
+)
 result = checker.check_all(X, y, task="regression")
 if not result["passed"]:
     checker.raise_if_failed(result)

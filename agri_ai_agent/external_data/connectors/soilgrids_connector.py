@@ -1,9 +1,7 @@
 import hashlib
 import os
 from pathlib import Path
-from typing import Optional
 
-import pandas as pd
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
@@ -26,12 +24,15 @@ class SoilGridsConnector(ExternalDataConnector):
 
     def connect(self) -> bool:
         try:
-            resp = requests.get(f"{self.base_url}/properties/query?lon=0&lat=0&property=clay&depth=0-5cm", timeout=15)
+            resp = requests.get(
+                f"{self.base_url}/properties/query?lon=0&lat=0&property=clay&depth=0-5cm",
+                timeout=15,
+            )
             return resp.status_code < 500
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         properties = [
             {"id": "bdod", "name": "Bulk density", "unit": "kg/dm³"},
             {"id": "cec", "name": "Cation exchange capacity", "unit": "mmol(c)/kg"},
@@ -58,7 +59,7 @@ class SoilGridsConnector(ExternalDataConnector):
             for p in properties
         ]
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         lat = _get_sg_config("latitude", "13.0")
         lon = _get_sg_config("longitude", "77.5")
@@ -87,26 +88,31 @@ class SoilGridsConnector(ExternalDataConnector):
                     for stat_name in ("mean", "uncertainty"):
                         stat_val = vals.get(stat_name)
                         if stat_val is not None:
-                            rows.append({
-                                "Latitude": float(lat),
-                                "Longitude": float(lon),
-                                "Property": prop_name,
-                                "Depth": d_layer.get("label", depth),
-                                "Statistic": stat_name,
-                                "Value": stat_val,
-                                "Unit": unit,
-                            })
+                            rows.append(
+                                {
+                                    "Latitude": float(lat),
+                                    "Longitude": float(lon),
+                                    "Property": prop_name,
+                                    "Depth": d_layer.get("label", depth),
+                                    "Statistic": stat_name,
+                                    "Value": stat_val,
+                                    "Unit": unit,
+                                }
+                            )
             if not rows:
-                rows.append({
-                    "Latitude": float(lat),
-                    "Longitude": float(lon),
-                    "Property": resource_id,
-                    "Depth": depth,
-                    "Statistic": "mean",
-                    "Value": None,
-                    "Unit": "",
-                })
+                rows.append(
+                    {
+                        "Latitude": float(lat),
+                        "Longitude": float(lon),
+                        "Property": resource_id,
+                        "Depth": depth,
+                        "Statistic": "mean",
+                        "Value": None,
+                        "Unit": "",
+                    }
+                )
             import pandas as pd
+
             df = pd.DataFrame(rows)
             df.to_csv(local_path, index=False)
             return local_path

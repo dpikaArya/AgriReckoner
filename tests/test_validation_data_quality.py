@@ -1,5 +1,5 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 import pytest
 
 from src.validation.data_quality import DataQualityValidator
@@ -22,10 +22,12 @@ class TestDataQualityValidator:
         assert "outliers" in result
 
     def test_missing_values_detected(self, validator):
-        df = pd.DataFrame({
-            "x": [1.0, np.nan, 3.0, np.nan],
-            "y": [np.nan, np.nan, np.nan, np.nan],
-        })
+        df = pd.DataFrame(
+            {
+                "x": [1.0, np.nan, 3.0, np.nan],
+                "y": [np.nan, np.nan, np.nan, np.nan],
+            }
+        )
         result = validator.validate(df)
         assert result["missing_values"]["x"]["count"] == 2
         assert result["missing_values"]["y"]["count"] == 4

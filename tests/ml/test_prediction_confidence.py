@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from sklearn.ensemble import RandomForestRegressor
 
-from src.ml.prediction_confidence import PredictionConfidence, RiskLevel
+from src.ml.prediction_confidence import PredictionConfidence
 
 
 @pytest.fixture

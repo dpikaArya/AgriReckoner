@@ -1,17 +1,18 @@
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
-from agri_ai_agent.config.settings import AgriAISettings
 from agri_ai_agent.contracts.messages import AgentContract
 
-
 OBSERVATION_ID_COLS = [
-    "Dataset_ID", "Document_ID", "Paper_ID",
-    "Experiment_ID", "Treatment_ID", "Observation_ID",
+    "Dataset_ID",
+    "Document_ID",
+    "Paper_ID",
+    "Experiment_ID",
+    "Treatment_ID",
+    "Observation_ID",
 ]
 
 
@@ -30,7 +31,9 @@ class FeatureStoreAgent(BaseAgent):
 
         self.log.info(
             "[%s] Stored %d validated observation(s); passing %d to Feature Engineering",
-            self.agent_name, stored_count, len(validated),
+            self.agent_name,
+            stored_count,
+            len(validated),
         )
 
         return validated
@@ -42,16 +45,18 @@ class FeatureStoreAgent(BaseAgent):
                 rejected = len(df) - len(valid)
                 self.log.warning(
                     "[%s] Filtered out %d rejected observation(s)",
-                    self.agent_name, rejected,
+                    self.agent_name,
+                    rejected,
                 )
             return valid
 
         if "_is_valid" in df.columns:
-            valid = df[df["_is_valid"] == True].copy()
+            valid = df[df["_is_valid"]].copy()
             if len(valid) < len(df):
                 self.log.warning(
                     "[%s] Filtered out %d invalid observation(s)",
-                    self.agent_name, len(df) - len(valid),
+                    self.agent_name,
+                    len(df) - len(valid),
                 )
             return valid
 
@@ -73,29 +78,33 @@ class FeatureStoreAgent(BaseAgent):
             )
             for key, group in grouped:
                 if isinstance(key, tuple):
-                    ds_part = str(key[0]) if len(key) > 0 else "unknown"
+                    str(key[0]) if len(key) > 0 else "unknown"
                     exp_part = "_".join(str(k) for k in key)
                 else:
-                    ds_part = str(key)
+                    str(key)
                     exp_part = str(key)
 
                 safe_name = "".join(c if c.isalnum() or c in "-_" else "_" for c in exp_part)
                 path = store_dir / f"observations_{safe_name}.parquet"
                 group.to_parquet(path, index=False)
 
-                manifest_rows.append({
-                    "store_path": str(path),
-                    "observation_count": len(group),
-                    "experiment_key": exp_part,
-                })
+                manifest_rows.append(
+                    {
+                        "store_path": str(path),
+                        "observation_count": len(group),
+                        "experiment_key": exp_part,
+                    }
+                )
         else:
             path = store_dir / "observations.parquet"
             df.to_parquet(path, index=False)
-            manifest_rows.append({
-                "store_path": str(path),
-                "observation_count": len(df),
-                "experiment_key": "all",
-            })
+            manifest_rows.append(
+                {
+                    "store_path": str(path),
+                    "observation_count": len(df),
+                    "experiment_key": "all",
+                }
+            )
 
         if manifest_rows:
             manifest_df = pd.DataFrame(manifest_rows)
@@ -103,7 +112,9 @@ class FeatureStoreAgent(BaseAgent):
 
         return len(df)
 
-    def run(self, df: pd.DataFrame, contract: Optional[AgentContract] = None, **kwargs) -> AgentContract:
+    def run(
+        self, df: pd.DataFrame, contract: AgentContract | None = None, **kwargs
+    ) -> AgentContract:
         self.dataframe = df
         self.contract = contract or AgentContract(agent_name=self.agent_name)
         self.contract.status = "running"
@@ -118,7 +129,9 @@ class FeatureStoreAgent(BaseAgent):
             ).total_seconds()
             self.contract.output_data = self._build_output(result_df, **kwargs)
             self.log.info(
-                "[%s] Completed in %.2fs", self.agent_name, self.contract.execution_time_sec,
+                "[%s] Completed in %.2fs",
+                self.agent_name,
+                self.contract.execution_time_sec,
             )
         except Exception as e:
             self.contract.status = "failed"

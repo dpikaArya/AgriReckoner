@@ -4,9 +4,8 @@ Evaluates unit conversion correctness, missing units, conversion consistency.
 """
 
 import time
-from pathlib import Path
 
-from evaluation.utils import OUTPUT_DIR, write_report, load_dataframe
+from evaluation.utils import OUTPUT_DIR, load_dataframe, write_report
 
 
 def evaluate_unit():
@@ -29,16 +28,21 @@ def evaluate_unit():
             master_df = df
             break
 
-    units_cols = [c for c in (master_df.columns if master_df is not None else [])
-                  if any(u in c.lower() for u in ["_cm", "_mm", "_g", "_kg", "_ha", "_m2",
-                                                    "_ds_m", "_ppm", "spad"])]
+    units_cols = [
+        c
+        for c in (master_df.columns if master_df is not None else [])
+        if any(
+            u in c.lower()
+            for u in ["_cm", "_mm", "_g", "_kg", "_ha", "_m2", "_ds_m", "_ppm", "spad"]
+        )
+    ]
     units_columns_found = len(units_cols)
 
     conversion_accuracy = min(1.0, conversions_applied / 10.0) if conversions_applied < 10 else 1.0
     unsupported_units = max(0, 10 - conversions_applied) if conversions_applied < 10 else 0
 
     report = f"""# Stage 05: Unit Harmonization Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Summary
 - Unit conversions applied: {conversions_applied}

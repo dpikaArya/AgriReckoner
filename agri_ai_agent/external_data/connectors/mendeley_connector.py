@@ -1,6 +1,5 @@
 import hashlib
 from pathlib import Path
-from typing import Optional
 
 import requests
 
@@ -24,7 +23,7 @@ class MendeleyConnector(ExternalDataConnector):
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         params = {"q": query or "agriculture", "limit": 20}
         try:
             resp = requests.get(
@@ -48,7 +47,7 @@ class MendeleyConnector(ExternalDataConnector):
         except requests.RequestException:
             return []
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         local_path = target_dir / f"mendeley_{resource_id}.csv"
         try:

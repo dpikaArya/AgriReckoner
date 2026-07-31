@@ -4,18 +4,20 @@ import pytest
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 
-from src.ml.ensemble.weighted_average import WeightedAverageEnsemble
 from src.ml.ensemble.stacking import StackingEnsemble
+from src.ml.ensemble.weighted_average import WeightedAverageEnsemble
 
 
 @pytest.fixture
 def ensemble_data():
     np.random.seed(42)
-    X = pd.DataFrame({
-        "f1": np.random.randn(100),
-        "f2": np.random.randn(100),
-        "f3": np.random.randn(100),
-    })
+    X = pd.DataFrame(
+        {
+            "f1": np.random.randn(100),
+            "f2": np.random.randn(100),
+            "f3": np.random.randn(100),
+        }
+    )
     y = pd.Series(X["f1"] * 2 + X["f2"] * 0.5 + np.random.randn(100) * 0.2)
     models = {
         "rf": RandomForestRegressor(n_estimators=20, random_state=42),

@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -9,11 +10,13 @@ from src.ml.hyperparameter_optimizer import HyperparameterOptimizer
 @pytest.fixture
 def small_dataset():
     np.random.seed(42)
-    X = pd.DataFrame({
-        "f1": np.random.randn(50),
-        "f2": np.random.randn(50),
-        "f3": np.random.randn(50),
-    })
+    X = pd.DataFrame(
+        {
+            "f1": np.random.randn(50),
+            "f2": np.random.randn(50),
+            "f3": np.random.randn(50),
+        }
+    )
     y = pd.Series(X["f1"] * 2 + X["f2"] + np.random.randn(50) * 0.1)
     return X, y
 
@@ -36,8 +39,11 @@ class TestHyperparameterOptimizer:
     def test_output_dirs_created_with_optuna(self, small_dataset):
         X, y = small_dataset
         try:
-            import optuna
-            optimizer = HyperparameterOptimizer(output_dir="models/optimization", n_trials=1, cv_folds=2)
+            import optuna  # noqa: F401
+
+            optimizer = HyperparameterOptimizer(
+                output_dir="models/optimization", n_trials=1, cv_folds=2
+            )
             optimizer.optimize_xgboost(X, y)
             assert Path("models/optimization/xgboost_best_params.json").exists()
         except ImportError:

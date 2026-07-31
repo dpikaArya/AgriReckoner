@@ -1,17 +1,14 @@
 """Tests for KnowledgeGraph — Phase 13."""
 
-import json
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import pytest
 
 from agri_ai_agent.knowledge_graph.graph import (
-    KnowledgeGraph,
-    VALID_NODE_TYPES,
-    VALID_EDGE_TYPES,
     EDGE_NODE_PAIRS,
+    VALID_EDGE_TYPES,
+    VALID_NODE_TYPES,
+    KnowledgeGraph,
 )
 
 
@@ -22,27 +19,28 @@ def kg():
 
 @pytest.fixture
 def sample_df():
-    return pd.DataFrame({
-        "Source_Paper": ["Paper_A", "Paper_A", "Paper_B"],
-        "Crop": ["Rice", "Rice", "Wheat"],
-        "Fertilizer_Name": ["Urea", "DAP", "NPK"],
-        "Dose": [50.0, 30.0, 40.0],
-        "Application_Interval": [30, 45, 60],
-        "Soil_pH": [6.5, np.nan, 7.0],
-        "Organic_Carbon": [0.8, np.nan, 0.5],
-        "Rainfall": [1200, np.nan, 800],
-        "Temperature_Max": [33, np.nan, 30],
-        "Temperature_Min": [22, np.nan, 18],
-        "Growth_Stage": ["Flowering", "Flowering", "Vegetative"],
-        "Yield_per_Hectare": [4.5, 3.8, 3.2],
-        "Year": [2022, 2022, 2021],
-        "Country": ["India", "India", "USA"],
-        "DOI": ["10.1000/a", "10.1000/a", "10.2000/b"],
-    })
+    return pd.DataFrame(
+        {
+            "Source_Paper": ["Paper_A", "Paper_A", "Paper_B"],
+            "Crop": ["Rice", "Rice", "Wheat"],
+            "Fertilizer_Name": ["Urea", "DAP", "NPK"],
+            "Dose": [50.0, 30.0, 40.0],
+            "Application_Interval": [30, 45, 60],
+            "Soil_pH": [6.5, np.nan, 7.0],
+            "Organic_Carbon": [0.8, np.nan, 0.5],
+            "Rainfall": [1200, np.nan, 800],
+            "Temperature_Max": [33, np.nan, 30],
+            "Temperature_Min": [22, np.nan, 18],
+            "Growth_Stage": ["Flowering", "Flowering", "Vegetative"],
+            "Yield_per_Hectare": [4.5, 3.8, 3.2],
+            "Year": [2022, 2022, 2021],
+            "Country": ["India", "India", "USA"],
+            "DOI": ["10.1000/a", "10.1000/a", "10.2000/b"],
+        }
+    )
 
 
 class TestKnowledgeGraph:
-
     def test_initial_state(self, kg):
         assert kg.node_count == 0
         assert kg.edge_count == 0
@@ -176,7 +174,7 @@ class TestKnowledgeGraph:
         assert s["edge_type_counts"]["TREATS"] == 1
 
     def test_build_from_dataframe(self, kg, sample_df):
-        edges = kg.build_from_dataframe(sample_df)
+        kg.build_from_dataframe(sample_df)
         assert kg.node_count > 0
         assert kg.edge_count > 0
         papers = kg.get_nodes_by_type("Paper")

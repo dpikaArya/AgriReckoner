@@ -1,14 +1,11 @@
 import hashlib
 import os
 from pathlib import Path
-from typing import Optional
 
-import pandas as pd
 import requests
 
 from agri_ai_agent.external_data.connector import ExternalDataConnector
 from agri_ai_agent.external_data.dataset_package import DatasetPackage
-
 
 DEFAULT_PARAMS = {
     "latitude": "29.9136",
@@ -37,15 +34,22 @@ class NASAPowerConnector(ExternalDataConnector):
         try:
             resp = requests.get(
                 f"{self.base_url}/temporal/monthly/point",
-                params={"parameters": "T2M", "latitude": "0", "longitude": "0",
-                         "start": "2020", "end": "2020", "community": "AG", "format": "JSON"},
+                params={
+                    "parameters": "T2M",
+                    "latitude": "0",
+                    "longitude": "0",
+                    "start": "2020",
+                    "end": "2020",
+                    "community": "AG",
+                    "format": "JSON",
+                },
                 timeout=15,
             )
             return resp.status_code == 200
         except requests.RequestException:
             return False
 
-    def discover(self, query: Optional[str] = None) -> list[dict]:
+    def discover(self, query: str | None = None) -> list[dict]:
         return [
             {
                 "id": "monthly",
@@ -67,7 +71,7 @@ class NASAPowerConnector(ExternalDataConnector):
             },
         ]
 
-    def download(self, resource_id: str, target_dir: Path) -> Optional[Path]:
+    def download(self, resource_id: str, target_dir: Path) -> Path | None:
         target_dir.mkdir(parents=True, exist_ok=True)
         temporal = resource_id
 
@@ -104,49 +108,60 @@ class NASAPowerConnector(ExternalDataConnector):
             raw_text = resp.text
 
             import io
-            import re
+
             import pandas as pd
 
-            lines = raw_text.split('\n')
+            lines = raw_text.split("\n")
             data_start = 0
             header_line = None
             for i, line in enumerate(lines):
                 stripped = line.strip()
-                if stripped.startswith('YEAR') or stripped.startswith('PARAMETER'):
+                if stripped.startswith("YEAR") or stripped.startswith("PARAMETER"):
                     data_start = i
                     header_line = stripped
                     break
             if header_line is None:
                 return None
 
-            csv_content = header_line + '\n' + '\n'.join(lines[data_start + 1:])
+            csv_content = header_line + "\n" + "\n".join(lines[data_start + 1 :])
             df = pd.read_csv(io.StringIO(csv_content))
 
-            month_cols = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-                          'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-            id_vars = [c for c in df.columns if c not in month_cols and c != 'ANN']
+            month_cols = [
+                "JAN",
+                "FEB",
+                "MAR",
+                "APR",
+                "MAY",
+                "JUN",
+                "JUL",
+                "AUG",
+                "SEP",
+                "OCT",
+                "NOV",
+                "DEC",
+            ]
+            id_vars = [c for c in df.columns if c not in month_cols and c != "ANN"]
 
-            if all(c in df.columns for c in month_cols) and 'PARAMETER' in df.columns:
+            if all(c in df.columns for c in month_cols) and "PARAMETER" in df.columns:
                 df_long = df.melt(
-                    id_vars=id_vars,
-                    value_vars=month_cols,
-                    var_name='Month',
-                    value_name='Value'
+                    id_vars=id_vars, value_vars=month_cols, var_name="Month", value_name="Value"
                 )
-                df_long.insert(0, 'Latitude', float(lat))
-                df_long.insert(1, 'Longitude', float(lon))
+                df_long.insert(0, "Latitude", float(lat))
+                df_long.insert(1, "Longitude", float(lon))
                 df_long.to_csv(local_path, index=False)
             else:
-                df.insert(0, 'Latitude', float(lat))
-                df.insert(1, 'Longitude', float(lon))
+                df.insert(0, "Latitude", float(lat))
+                df.insert(1, "Longitude", float(lon))
                 # For daily format YEAR,DOY,PARAM1,PARAM2,..., reshape to long
-                if 'DOY' in df.columns and 'YEAR' in df.columns:
-                    param_cols = [c for c in df.columns if c not in ('Latitude', 'Longitude', 'YEAR', 'DOY')]
+                if "DOY" in df.columns and "YEAR" in df.columns:
+                    param_cols = [
+                        c for c in df.columns if c not in ("Latitude", "Longitude", "YEAR", "DOY")
+                    ]
                     df_long = df.melt(
-                        id_vars=['Latitude', 'Longitude', 'YEAR', 'DOY'],
+                        id_vars=["Latitude", "Longitude", "YEAR", "DOY"],
                         value_vars=param_cols,
-                        var_name='PARAMETER',
-                        value_name='Value'
+                        var_name="PARAMETER",
+                        value_name="Value",
                     )
                     df_long.to_csv(local_path, index=False)
                 else:

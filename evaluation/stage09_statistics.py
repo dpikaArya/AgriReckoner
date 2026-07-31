@@ -4,11 +4,11 @@ Computes summary statistics, missing values, correlation matrix, VIF, skewness, 
 """
 
 import time
-from pathlib import Path
 
-from evaluation.utils import OUTPUT_DIR, write_report, load_dataframe, get_master_df
 import numpy as np
 import pandas as pd
+
+from evaluation.utils import OUTPUT_DIR, get_master_df, load_dataframe, write_report
 
 
 def evaluate_statistics():
@@ -24,16 +24,16 @@ def evaluate_statistics():
     numeric_df = master_df.select_dtypes(include=["number"])
     numeric_cols = numeric_df.columns.tolist()
 
-    summary = numeric_df.describe().to_dict() if len(numeric_cols) > 0 else {}
+    numeric_df.describe().to_dict() if len(numeric_cols) > 0 else {}
 
     missing_counts = master_df.isna().sum().to_dict()
     total_cells = n_rows * n_cols
     total_missing = master_df.isna().sum().sum()
     missing_pct = total_missing / total_cells if total_cells > 0 else 0
 
-    missing_by_col = {k: int(v) for k, v in sorted(
-        missing_counts.items(), key=lambda x: x[1], reverse=True
-    )[:20]}
+    missing_by_col = {
+        k: int(v) for k, v in sorted(missing_counts.items(), key=lambda x: x[1], reverse=True)[:20]
+    }
 
     corr_matrix = None
     if len(numeric_cols) > 1:
@@ -45,11 +45,13 @@ def evaluate_statistics():
             for j in range(i + 1, len(corr_matrix.columns)):
                 val = abs(corr_matrix.iloc[i, j])
                 if val > 0.8 and not np.isnan(val):
-                    high_corr_pairs.append({
-                        "var1": corr_matrix.columns[i],
-                        "var2": corr_matrix.columns[j],
-                        "correlation": round(val, 3),
-                    })
+                    high_corr_pairs.append(
+                        {
+                            "var1": corr_matrix.columns[i],
+                            "var2": corr_matrix.columns[j],
+                            "correlation": round(val, 3),
+                        }
+                    )
 
     vif_data = None
     vif_path = OUTPUT_DIR / "VIF_Report.csv"
@@ -72,6 +74,7 @@ def evaluate_statistics():
             kurtosis[col] = round(float(col_data.kurtosis()), 3)
 
             from scipy import stats
+
             _, p_value = stats.shapiro(col_data[:5000] if len(col_data) > 5000 else col_data)
             normality[col] = {
                 "statistic": round(float(p_value), 4),
@@ -83,14 +86,14 @@ def evaluate_statistics():
     non_normal = {k: v for k, v in normality.items() if not v["is_normal"]}
 
     report = f"""# Stage 09: Statistical Diagnostics Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 
 ## Summary
 - Dataset shape: {n_rows} rows × {n_cols} columns
 - Numeric columns: {len(numeric_cols)}
 - Missing values: {total_missing}/{total_cells} ({missing_pct:.1%})
 - High correlation pairs (|r| > 0.8): {len(high_corr_pairs)}
-- High VIF features: {vif_data['high_vif_count'] if vif_data else 'N/A'}
+- High VIF features: {vif_data["high_vif_count"] if vif_data else "N/A"}
 - Highly skewed features: {len(high_skew)}
 - High kurtosis features: {len(high_kurtosis)}
 - Non-normal features: {len(non_normal)}

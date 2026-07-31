@@ -4,7 +4,6 @@ import logging
 import sqlite3
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import pandas as pd
 
@@ -80,7 +79,7 @@ class DatasetRegistry:
     def compare_versions(v1: str, v2: str) -> int:
         parts1 = [p for p in v1.replace("-", ".").split(".") if p.isdigit()]
         parts2 = [p for p in v2.replace("-", ".").split(".") if p.isdigit()]
-        for a, b in zip(parts1, parts2):
+        for a, b in zip(parts1, parts2, strict=False):
             if int(a) < int(b):
                 return -1
             if int(a) > int(b):
@@ -91,22 +90,24 @@ class DatasetRegistry:
             return 1
         return 0
 
-    def register(self, package: DatasetPackage, version: Optional[str] = None,
-                 license: str = "", source_url: str = "") -> tuple[str, bool]:
+    def register(
+        self,
+        package: DatasetPackage,
+        version: str | None = None,
+        license: str = "",
+        source_url: str = "",
+    ) -> tuple[str, bool]:
         version = version or package.version or "1.0.0"
         existing = self.find(package.source, package.resource_id, version)
         if existing is not None:
             return existing["dataset_id"], False
 
         prev = self._latest(package.source, package.resource_id)
-        dataset_id = self.generate_dataset_id(
-            package.source, package.resource_id, version
-        )
+        dataset_id = self.generate_dataset_id(package.source, package.resource_id, version)
         df = package.to_dataframe()
         schema_hash = self.compute_schema_hash(df)
         storage_format = (
-            package.download_path.suffix.lstrip(".")
-            if package.download_path else "unknown"
+            package.download_path.suffix.lstrip(".") if package.download_path else "unknown"
         )
         now = datetime.now().isoformat()
 
@@ -152,8 +153,7 @@ class DatasetRegistry:
                 )
         return dataset_id, True
 
-    def find(self, provider: str, resource_id: str,
-             version: Optional[str] = None) -> Optional[dict]:
+    def find(self, provider: str, resource_id: str, version: str | None = None) -> dict | None:
         with self._conn() as conn:
             if version:
                 row = conn.execute(
@@ -169,7 +169,7 @@ class DatasetRegistry:
                 ).fetchone()
             return self._row_to_dict(row, conn) if row else None
 
-    def _latest(self, provider: str, resource_id: str) -> Optional[dict]:
+    def _latest(self, provider: str, resource_id: str) -> dict | None:
         with self._conn() as conn:
             rows = conn.execute(
                 "SELECT * FROM dataset_registry WHERE provider=? "
@@ -180,7 +180,7 @@ class DatasetRegistry:
                 return None
             return self._row_to_dict(rows[0], conn)
 
-    def get(self, dataset_id: str) -> Optional[dict]:
+    def get(self, dataset_id: str) -> dict | None:
         with self._conn() as conn:
             row = conn.execute(
                 "SELECT * FROM dataset_registry WHERE dataset_id=?",
@@ -188,8 +188,7 @@ class DatasetRegistry:
             ).fetchone()
             return self._row_to_dict(row, conn) if row else None
 
-    def list_datasets(self, provider: Optional[str] = None,
-                      status: Optional[str] = None) -> list[dict]:
+    def list_datasets(self, provider: str | None = None, status: str | None = None) -> list[dict]:
         with self._conn() as conn:
             query = "SELECT * FROM dataset_registry WHERE 1=1"
             params = []
@@ -203,8 +202,7 @@ class DatasetRegistry:
             rows = conn.execute(query, params).fetchall()
             return [self._row_to_dict(r, conn) for r in rows]
 
-    def check_update(self, provider: str, resource_id: str,
-                     current_version: str) -> Optional[str]:
+    def check_update(self, provider: str, resource_id: str, current_version: str) -> str | None:
         with self._conn() as conn:
             rows = conn.execute(
                 "SELECT version FROM dataset_registry WHERE provider=? "
@@ -225,7 +223,7 @@ class DatasetRegistry:
                 (new_version_id, now, dataset_id),
             )
 
-    def rollback(self, dataset_id: str) -> Optional[dict]:
+    def rollback(self, dataset_id: str) -> dict | None:
         current = self.get(dataset_id)
         if current is None:
             return None
@@ -250,23 +248,18 @@ class DatasetRegistry:
         now = datetime.now().isoformat()
         with self._conn() as conn:
             conn.execute(
-                "UPDATE dataset_registry SET last_checked=?, updated_at=? "
-                "WHERE dataset_id=?",
+                "UPDATE dataset_registry SET last_checked=?, updated_at=? WHERE dataset_id=?",
                 (now, now, dataset_id),
             )
 
     def summary(self) -> dict:
         with self._conn() as conn:
-            total = conn.execute(
-                "SELECT COUNT(*) FROM dataset_registry"
-            ).fetchone()[0]
+            total = conn.execute("SELECT COUNT(*) FROM dataset_registry").fetchone()[0]
             by_status = conn.execute(
-                "SELECT status, COUNT(*) FROM dataset_registry "
-                "GROUP BY status"
+                "SELECT status, COUNT(*) FROM dataset_registry GROUP BY status"
             ).fetchall()
             by_provider = conn.execute(
-                "SELECT provider, COUNT(*) FROM dataset_registry "
-                "GROUP BY provider"
+                "SELECT provider, COUNT(*) FROM dataset_registry GROUP BY provider"
             ).fetchall()
             return {
                 "total_datasets": total,
@@ -280,8 +273,8 @@ class DatasetRegistry:
 
     def _row_to_dict(self, row, conn) -> dict:
         if row is None:
-            return None
+            return {}
         if not hasattr(self, "_columns"):
             cur = conn.execute("SELECT * FROM dataset_registry LIMIT 0")
             self._columns = [desc[0] for desc in cur.description]
-        return dict(zip(self._columns, row))
+        return dict(zip(self._columns, row, strict=True))

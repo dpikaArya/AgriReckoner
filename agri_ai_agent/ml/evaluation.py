@@ -18,8 +18,8 @@ from sklearn.model_selection import (
 )
 from sklearn.pipeline import Pipeline
 
-MIN_ROWS_FOR_METRIC = 8    # below this, refuse to report any skill metric
-SMALL_N_THRESHOLD = 30     # below this, use leave-one-out instead of repeated k-fold
+MIN_ROWS_FOR_METRIC = 8  # below this, refuse to report any skill metric
+SMALL_N_THRESHOLD = 30  # below this, use leave-one-out instead of repeated k-fold
 RANDOM_STATE = 42
 
 
@@ -34,10 +34,10 @@ def choose_cv(n_samples: int):
 
 def _point_scores(y_true, y_pred) -> dict:
     residuals = np.asarray(y_true, dtype=float) - np.asarray(y_pred, dtype=float)
-    ss_res = float(np.sum(residuals ** 2))
+    ss_res = float(np.sum(residuals**2))
     ss_tot = float(np.sum((y_true - np.mean(y_true)) ** 2))
     r2 = 1.0 - ss_res / ss_tot if ss_tot > 0 else float("nan")
-    rmse = float(np.sqrt(np.mean(residuals ** 2)))
+    rmse = float(np.sqrt(np.mean(residuals**2)))
     mae = float(np.mean(np.abs(residuals)))
     return {"r2": round(r2, 4), "rmse": round(rmse, 4), "mae": round(mae, 4)}
 
@@ -54,7 +54,9 @@ def evaluate_model(model, X, y) -> dict:
     result = {"n": int(n_samples), "cv_scheme": scheme, "robust": False}
 
     if cv is None:
-        result["note"] = f"insufficient data (n={n_samples} < {MIN_ROWS_FOR_METRIC}); no metric reported"
+        result["note"] = (
+            f"insufficient data (n={n_samples} < {MIN_ROWS_FOR_METRIC}); no metric reported"
+        )
         return result
 
     pipeline = Pipeline([("impute", SimpleImputer(strategy="median")), ("model", clone(model))])
@@ -73,7 +75,8 @@ def evaluate_model(model, X, y) -> dict:
 
     result["robust"] = n_samples >= SMALL_N_THRESHOLD
     result["caveat"] = (
-        "" if result["robust"]
+        ""
+        if result["robust"]
         else f"small-n (n={n_samples}); cross-validated but interpret with care"
     )
     return result
@@ -81,12 +84,19 @@ def evaluate_model(model, X, y) -> dict:
 
 if __name__ == "__main__":
     import numpy as _np
+
     rng = _np.random.default_rng(0)
     X = rng.normal(size=(40, 3))
     y = X[:, 0] * 2 + rng.normal(scale=0.1, size=40)
     from sklearn.linear_model import LinearRegression
+
     good = evaluate_model(LinearRegression(), X, y)
     assert good["robust"] and good["r2"] > 0.9, good
     tiny = evaluate_model(LinearRegression(), X[:5], y[:5])
     assert not tiny["robust"] and "note" in tiny, tiny
-    print("evaluation smoke OK ->", {k: good[k] for k in ("n", "cv_scheme", "r2")}, "| tiny:", tiny["note"])
+    print(
+        "evaluation smoke OK ->",
+        {k: good[k] for k in ("n", "cv_scheme", "r2")},
+        "| tiny:",
+        tiny["note"],
+    )

@@ -1,5 +1,4 @@
 import logging
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -54,9 +53,7 @@ class SoilIndices:
         if ph is None:
             return df
 
-        df["Soil_pH_Suitability_Score"] = (
-            1 - ((df[ph] - 6.5) / 3.5).abs().clip(0, 1)
-        )
+        df["Soil_pH_Suitability_Score"] = 1 - ((df[ph] - 6.5) / 3.5).abs().clip(0, 1)
         self.generated_features_.append("Soil_pH_Suitability_Score")
 
         for crop, (ph_min, ph_max, ph_opt) in [
@@ -67,9 +64,9 @@ class SoilIndices:
             ("Cotton", (5.5, 8.0, 6.5)),
         ]:
             name = f"pH_Suitability_{crop}"
-            df[name] = (
-                1 - ((df[ph] - ph_opt) / max(ph_max - ph_opt, ph_opt - ph_min, 0.1)).abs().clip(0, 1)
-            )
+            df[name] = 1 - (
+                (df[ph] - ph_opt) / max(ph_max - ph_opt, ph_opt - ph_min, 0.1)
+            ).abs().clip(0, 1)
             self.generated_features_.append(name)
 
         return df
@@ -135,9 +132,7 @@ class SoilIndices:
 
         return df
 
-    def _npk_balance(
-        self, n_val, p_val, k_val, ideal: np.ndarray
-    ) -> float:
+    def _npk_balance(self, n_val, p_val, k_val, ideal: np.ndarray) -> float:
         eps = 1e-6
         actual = np.array([n_val, p_val, k_val])
         total = actual.sum()
@@ -150,7 +145,7 @@ class SoilIndices:
     def _ph_score(self, ph: pd.Series) -> pd.Series:
         return (1 - ((ph - 6.5) / 3.5).abs()).clip(0, 1)
 
-    def _find_col(self, df: pd.DataFrame, candidates: list[str]) -> Optional[str]:
+    def _find_col(self, df: pd.DataFrame, candidates: list[str]) -> str | None:
         for c in candidates:
             if c in df.columns:
                 return c

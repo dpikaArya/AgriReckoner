@@ -48,10 +48,19 @@ NUTRIENT_DEFICIENCY_ACTION = {
 }
 
 FERTILIZER_COST_PER_KG = {
-    "Urea": 6.0, "DAP": 28.0, "MOP": 22.0, "SSP": 5.0,
-    "CAN": 12.0, "SOP": 30.0, "10-26-26": 20.0, "12-32-16": 22.0,
-    "15-15-15": 18.0, "20-20-0": 16.0, "Bio NPK": 8.0,
-    "Ammonium Sulphate": 10.0, "Potassium Sulphate": 25.0,
+    "Urea": 6.0,
+    "DAP": 28.0,
+    "MOP": 22.0,
+    "SSP": 5.0,
+    "CAN": 12.0,
+    "SOP": 30.0,
+    "10-26-26": 20.0,
+    "12-32-16": 22.0,
+    "15-15-15": 18.0,
+    "20-20-0": 16.0,
+    "Bio NPK": 8.0,
+    "Ammonium Sulphate": 10.0,
+    "Potassium Sulphate": 25.0,
 }
 
 
@@ -76,8 +85,9 @@ class RecommendationAgent(BaseAgent):
         df = self._generate_summary(df)
 
         n_rec = df["Recommended_Fertilizer"].notna().sum()
-        self.log.info("Recommendations generated for %d/%d rows (top %d alternatives)",
-                      n_rec, len(df), top_n)
+        self.log.info(
+            "Recommendations generated for %d/%d rows (top %d alternatives)", n_rec, len(df), top_n
+        )
 
         report = self._build_report(df, top_n)
         self.save_text_artifact(report, "recommendation_report_v2.md")
@@ -168,12 +178,16 @@ class RecommendationAgent(BaseAgent):
             if pd.notna(df.at[idx, "Recommended_Application_Interval"]):
                 continue
 
-            base = df.at[idx, "Application_Interval"] if "Application_Interval" in df.columns else 10
+            base = (
+                df.at[idx, "Application_Interval"] if "Application_Interval" in df.columns else 10
+            )
             if pd.isna(base):
                 base = 10
 
             rainfall = df.at[idx, "Rainfall"] if "Rainfall" in df.columns else None
-            temp = df.at[idx, "Average_Temperature"] if "Average_Temperature" in df.columns else None
+            temp = (
+                df.at[idx, "Average_Temperature"] if "Average_Temperature" in df.columns else None
+            )
 
             interval = base
             if pd.notna(rainfall) and rainfall > 1000:
@@ -199,7 +213,9 @@ class RecommendationAgent(BaseAgent):
                 continue
 
             predicted = df.at[idx, "Predicted_Yield"] if "Predicted_Yield" in df.columns else None
-            baseline = df.at[idx, "Yield_per_Hectare"] if "Yield_per_Hectare" in df.columns else None
+            baseline = (
+                df.at[idx, "Yield_per_Hectare"] if "Yield_per_Hectare" in df.columns else None
+            )
 
             if pd.notna(predicted) and pd.notna(baseline) and baseline > 0:
                 increase = predicted - baseline
@@ -215,9 +231,17 @@ class RecommendationAgent(BaseAgent):
         self._init_col(df, "Economic_Score", float)
 
         for idx in df.index:
-            fert = df.at[idx, "Recommended_Fertilizer"] if "Recommended_Fertilizer" in df.columns else None
+            fert = (
+                df.at[idx, "Recommended_Fertilizer"]
+                if "Recommended_Fertilizer" in df.columns
+                else None
+            )
             dose = df.at[idx, "Recommended_Dose"] if "Recommended_Dose" in df.columns else None
-            yield_inc = df.at[idx, "Expected_Yield_Increase"] if "Expected_Yield_Increase" in df.columns else None
+            yield_inc = (
+                df.at[idx, "Expected_Yield_Increase"]
+                if "Expected_Yield_Increase" in df.columns
+                else None
+            )
 
             if pd.isna(fert) or pd.isna(dose):
                 continue
@@ -246,7 +270,11 @@ class RecommendationAgent(BaseAgent):
         self._init_col(df, "Environmental_Score", float)
 
         for idx in df.index:
-            fert = str(df.at[idx, "Recommended_Fertilizer"]) if "Recommended_Fertilizer" in df.columns else ""
+            fert = (
+                str(df.at[idx, "Recommended_Fertilizer"])
+                if "Recommended_Fertilizer" in df.columns
+                else ""
+            )
             dose = df.at[idx, "Recommended_Dose"] if "Recommended_Dose" in df.columns else None
 
             organic_ferts = {"Bio NPK", "Jaivik Khad", "Vermicompost", "FYM"}
@@ -310,8 +338,11 @@ class RecommendationAgent(BaseAgent):
                 if col in df.columns and pd.notna(df.at[idx, col]):
                     score += weight
 
-            n_missing = sum(1 for col in ["Soil_pH", "Nitrogen", "Rainfall"]
-                           if col in df.columns and pd.isna(df.at[idx, col]))
+            n_missing = sum(
+                1
+                for col in ["Soil_pH", "Nitrogen", "Rainfall"]
+                if col in df.columns and pd.isna(df.at[idx, col])
+            )
             score -= n_missing * 0.05
 
             df.at[idx, "Confidence_Score"] = round(max(0.1, min(1.0, score)), 3)
@@ -323,7 +354,11 @@ class RecommendationAgent(BaseAgent):
 
         for idx in df.index:
             crop = str(df.at[idx, "Crop"]).strip() if "Crop" in df.columns else ""
-            current = df.at[idx, "Recommended_Fertilizer"] if "Recommended_Fertilizer" in df.columns else None
+            current = (
+                df.at[idx, "Recommended_Fertilizer"]
+                if "Recommended_Fertilizer" in df.columns
+                else None
+            )
             n_status = df.at[idx, "N_Status"] if "N_Status" in df.columns else "medium"
             p_status = df.at[idx, "P_Status"] if "P_Status" in df.columns else "medium"
             k_status = df.at[idx, "K_Status"] if "K_Status" in df.columns else "medium"
@@ -399,12 +434,16 @@ class RecommendationAgent(BaseAgent):
 
             env = df.at[idx, "Environmental_Score"]
             if pd.notna(env):
-                env_label = "Low impact" if env >= 0.7 else "Moderate" if env >= 0.5 else "Higher impact"
+                env_label = (
+                    "Low impact" if env >= 0.7 else "Moderate" if env >= 0.5 else "Higher impact"
+                )
                 parts.append(f"Environmental: {env_label} ({env:.0%}).")
 
             risk = df.at[idx, "Risk_Score"]
             if pd.notna(risk):
-                r_label = "Low risk" if risk <= 0.3 else "Moderate risk" if risk <= 0.6 else "Higher risk"
+                r_label = (
+                    "Low risk" if risk <= 0.3 else "Moderate risk" if risk <= 0.6 else "Higher risk"
+                )
                 parts.append(f"{r_label} ({risk:.0%}).")
 
             df.at[idx, "Recommendation_Summary"] = " ".join(parts)
@@ -414,8 +453,10 @@ class RecommendationAgent(BaseAgent):
     def _describe_conditions(self, df: pd.DataFrame, idx) -> list[str]:
         desc = []
         checks = [
-            ("Nitrogen", "ppm", 50), ("Phosphorus", "ppm", 15),
-            ("Potassium", "ppm", 100), ("Rainfall", "mm", 500),
+            ("Nitrogen", "ppm", 50),
+            ("Phosphorus", "ppm", 15),
+            ("Potassium", "ppm", 100),
+            ("Rainfall", "mm", 500),
         ]
         for col, unit, low_thresh in checks:
             val = df.at[idx, col] if col in df.columns else None
@@ -458,29 +499,35 @@ class RecommendationAgent(BaseAgent):
         if "Confidence_Score" in df.columns:
             conf = df["Confidence_Score"].dropna()
             if len(conf) > 0:
-                lines.extend([
-                    f"\n### Confidence Score Distribution",
-                    f"  - Mean: {conf.mean():.3f}",
-                    f"  - Median: {conf.median():.3f}",
-                    f"  - Min: {conf.min():.3f}",
-                    f"  - Max: {conf.max():.3f}",
-                ])
+                lines.extend(
+                    [
+                        "\n### Confidence Score Distribution",
+                        f"  - Mean: {conf.mean():.3f}",
+                        f"  - Median: {conf.median():.3f}",
+                        f"  - Min: {conf.min():.3f}",
+                        f"  - Max: {conf.max():.3f}",
+                    ]
+                )
 
         if "Economic_Score" in df.columns:
             econ = df["Economic_Score"].dropna()
             if len(econ) > 0:
-                lines.extend([
-                    f"\n### Economic Score",
-                    f"  - Mean: {econ.mean():.3f}",
-                ])
+                lines.extend(
+                    [
+                        "\n### Economic Score",
+                        f"  - Mean: {econ.mean():.3f}",
+                    ]
+                )
 
         if "Environmental_Score" in df.columns:
             env = df["Environmental_Score"].dropna()
             if len(env) > 0:
-                lines.extend([
-                    f"\n### Environmental Score",
-                    f"  - Mean: {env.mean():.3f}",
-                ])
+                lines.extend(
+                    [
+                        "\n### Environmental Score",
+                        f"  - Mean: {env.mean():.3f}",
+                    ]
+                )
 
         if "Risk_Score" in df.columns:
             risk = df["Risk_Score"].dropna()
@@ -488,18 +535,22 @@ class RecommendationAgent(BaseAgent):
                 low = (risk <= 0.3).sum()
                 med = ((risk > 0.3) & (risk <= 0.6)).sum()
                 high = (risk > 0.6).sum()
-                lines.extend([
-                    f"\n### Risk Distribution",
-                    f"  - Low risk (≤30%): {low}",
-                    f"  - Moderate (30-60%): {med}",
-                    f"  - High risk (>60%): {high}",
-                ])
+                lines.extend(
+                    [
+                        "\n### Risk Distribution",
+                        f"  - Low risk (≤30%): {low}",
+                        f"  - Moderate (30-60%): {med}",
+                        f"  - High risk (>60%): {high}",
+                    ]
+                )
 
-        lines.extend([
-            "",
-            "## Sample Recommendations",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Sample Recommendations",
+                "",
+            ]
+        )
         sample = df.head(min(5, len(df)))
         for i, row in sample.iterrows():
             crop = row.get("Crop", "Unknown")
@@ -508,7 +559,7 @@ class RecommendationAgent(BaseAgent):
             conf = row.get("Confidence_Score", "N/A")
             lines.append(f"**Row {i}** ({crop}): {fert} @ {dose} kg/ha (conf={conf})")
 
-        lines.append(f"\n*Report generated by RecommendationAgent v2*")
+        lines.append("\n*Report generated by RecommendationAgent v2*")
         return "\n".join(lines)
 
     def _build_output(self, df: pd.DataFrame, **kwargs) -> dict:

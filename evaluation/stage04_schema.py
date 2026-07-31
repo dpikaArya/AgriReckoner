@@ -7,27 +7,55 @@ Distinguishes core UAMS (A-N) from Data ADES extensions (O-Z).
 import time
 from pathlib import Path
 
-from evaluation.utils import OUTPUT_DIR, write_report, load_dataframe, get_master_df, get_uams_cols
-
+from evaluation.utils import OUTPUT_DIR, get_master_df, get_uams_cols, load_dataframe, write_report
 
 CORE_GROUPS = [
-    "A. Paper Metadata", "B. Crop Information", "C. Experimental Design",
-    "D. Environment", "E. Soil Properties", "F. Fertilizer Information",
-    "G. Crop Growth Parameters", "H. Yield Parameters", "I. Grain Quality",
-    "J. ML Target Variables", "K. Engineered Features", "L. Leakage Labels",
-    "M. Encoded Variables", "N. ML Predictions",
+    "A. Paper Metadata",
+    "B. Crop Information",
+    "C. Experimental Design",
+    "D. Environment",
+    "E. Soil Properties",
+    "F. Fertilizer Information",
+    "G. Crop Growth Parameters",
+    "H. Yield Parameters",
+    "I. Grain Quality",
+    "J. ML Target Variables",
+    "K. Engineered Features",
+    "L. Leakage Labels",
+    "M. Encoded Variables",
+    "N. ML Predictions",
 ]
 
 
 def _get_core_extended_cols():
     try:
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from agri_ai_agent.config.schema import SCHEMA_GROUPS
+
         core = []
         extended = []
         for g, cols in SCHEMA_GROUPS.items():
-            if any(g.startswith(prefix) for prefix in ["A.", "B.", "C.", "D.", "E.", "F.", "G.", "H.", "I.", "J.", "K.", "L.", "M.", "N."]):
+            if any(
+                g.startswith(prefix)
+                for prefix in [
+                    "A.",
+                    "B.",
+                    "C.",
+                    "D.",
+                    "E.",
+                    "F.",
+                    "G.",
+                    "H.",
+                    "I.",
+                    "J.",
+                    "K.",
+                    "L.",
+                    "M.",
+                    "N.",
+                ]
+            ):
                 core.extend(cols)
             else:
                 extended.extend(cols)
@@ -76,11 +104,15 @@ def evaluate_schema():
         dup_cols = master_df.columns[master_df.columns.duplicated()].tolist()
         duplicates_in_cols = list(set(dup_cols))
 
-    mapping_accuracy = len(mapped_vars) / (len(mapped_vars) + len(unmapped_vars)) if (len(mapped_vars) + len(unmapped_vars)) > 0 else 0
+    mapping_accuracy = (
+        len(mapped_vars) / (len(mapped_vars) + len(unmapped_vars))
+        if (len(mapped_vars) + len(unmapped_vars)) > 0
+        else 0
+    )
     duplicate_removal = 1.0 - (len(duplicates_in_cols) / len(actual_cols)) if actual_cols else 1.0
 
     report = f"""# Stage 04: Schema Mapping Report
-Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}
+Generated: {time.strftime("%Y-%m-%d %H:%M:%S")}
 UAMS schema version: 2.0
 UAMS columns: {uams_count} (Core A-N: {len(core_cols)}, Extended O-Z: {len(extended_cols)})
 
@@ -100,8 +132,10 @@ UAMS columns: {uams_count} (Core A-N: {len(core_cols)}, Extended O-Z: {len(exten
 """
     try:
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from agri_ai_agent.config.schema import SCHEMA_GROUPS
+
         for g_name in CORE_GROUPS:
             g_cols = SCHEMA_GROUPS.get(g_name, [])
             present = sum(1 for c in g_cols if c in actual_cols)

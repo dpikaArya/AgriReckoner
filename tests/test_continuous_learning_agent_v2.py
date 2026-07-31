@@ -1,19 +1,17 @@
 """Tests for ContinuousLearningAgent v2 — Phase 12."""
 
 import json
-import shutil
-from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import pytest
 
 from agri_ai_agent.agents.continuous_learning_agent import (
-    ContinuousLearningAgent,
     BEST_MODEL_LABEL,
-    RETRAIN_R2_THRESHOLD,
     DATA_DRIFT_THRESHOLD,
     MIN_SAMPLES_FOR_RETRAIN,
+    RETRAIN_R2_THRESHOLD,
+    ContinuousLearningAgent,
 )
 from agri_ai_agent.contracts.messages import AgentContract
 
@@ -26,34 +24,35 @@ def agent():
 @pytest.fixture
 def sample_df():
     n = MIN_SAMPLES_FOR_RETRAIN + 5
-    return pd.DataFrame({
-        "Crop": ["Rice"] * n,
-        "Variety": ["HYV"] * n,
-        "Soil_pH": np.full(n, 6.5),
-        "Nitrogen": np.full(n, 100.0),
-        "Phosphorus": np.full(n, 25.0),
-        "Potassium": np.full(n, 150.0),
-        "Zinc": np.full(n, 1.5),
-        "Rainfall": np.full(n, 1200.0),
-        "Temperature_Max": np.full(n, 33.0),
-        "Temperature_Min": np.full(n, 22.0),
-        "Organic_Carbon": np.full(n, 0.8),
-        "Growth_Stage": ["Flowering"] * n,
-        "Yield_per_Hectare": np.linspace(3.5, 5.0, n),
-        "Target_Yield": np.linspace(4.0, 5.5, n),
-        "Predicted_Yield": np.linspace(3.8, 5.2, n),
-        "Fertilizer_Name": ["Urea"] * n,
-        "Dose": [50.0] * n,
-        "Application_Interval": [30] * n,
-        "Source_Paper": ["TestPaper"] * n,
-        "DOI": ["10.1000/test"] * n,
-        "Year": [2022] * n,
-        "Country": ["India"] * n,
-    })
+    return pd.DataFrame(
+        {
+            "Crop": ["Rice"] * n,
+            "Variety": ["HYV"] * n,
+            "Soil_pH": np.full(n, 6.5),
+            "Nitrogen": np.full(n, 100.0),
+            "Phosphorus": np.full(n, 25.0),
+            "Potassium": np.full(n, 150.0),
+            "Zinc": np.full(n, 1.5),
+            "Rainfall": np.full(n, 1200.0),
+            "Temperature_Max": np.full(n, 33.0),
+            "Temperature_Min": np.full(n, 22.0),
+            "Organic_Carbon": np.full(n, 0.8),
+            "Growth_Stage": ["Flowering"] * n,
+            "Yield_per_Hectare": np.linspace(3.5, 5.0, n),
+            "Target_Yield": np.linspace(4.0, 5.5, n),
+            "Predicted_Yield": np.linspace(3.8, 5.2, n),
+            "Fertilizer_Name": ["Urea"] * n,
+            "Dose": [50.0] * n,
+            "Application_Interval": [30] * n,
+            "Source_Paper": ["TestPaper"] * n,
+            "DOI": ["10.1000/test"] * n,
+            "Year": [2022] * n,
+            "Country": ["India"] * n,
+        }
+    )
 
 
 class TestContinuousLearningAgent:
-
     def test_agent_name(self, agent):
         assert agent.agent_name == "ContinuousLearningAgent"
 
