@@ -245,11 +245,13 @@ Two measurement issues make the effective total smaller still, and both are trac
 
 - In `Universal_Agricultural_Schema.csv` every measurement column holds only **8 distinct
   values**, the modal one repeated in 38 of 45 rows — one crop's 8 treatment rows are
-  broadcast across the other crops. The effective independent sample is **8**, not 45.
+  broadcast across the other crops. Counting only genuinely distinct measurements, the
+  effective sample is **≈18 observations across 2 crops**, from one site and one season.
 - Splitting folds by row rather than by paper flatters every score. On the treatment-level
   table, the same model moves from **R² = +0.16** (rows split at random) to **R² = −3.36**
-  (leave-one-paper-out) — i.e. worse than predicting the mean once it must generalise to an
-  unseen trial.
+  (leave-one-paper-out) — worse than predicting the mean once it must generalise to an
+  unseen trial. For reference, an out-of-study mean predictor scores **R² = −2.08** there,
+  so the model is currently worse than that baseline too.
 
 Earlier revisions of this section reported R² ≈ 0.99. Those figures were produced by scoring
 models on the rows they were fitted on, with post-harvest outcomes (protein, seed weight,
@@ -280,29 +282,40 @@ read as pipeline output pending agronomic review.
 
 The bottleneck is the number of **independent trials**, not the number of columns.
 
-The external data layer (NASA POWER, SoilGrids, FAOSTAT, ISRIC, …) enriches rows that already
-exist — it adds *columns* such as weather and soil properties. It cannot add *observations*.
-In the current 45-row schema those enrichment columns are in fact constant (`Year`, `Country`,
-`Season`, `Location`, `Rainfall`, `Temperature_*` each hold a single distinct value), so they
-carry no information a model can learn from. Growing the corpus means adding trials.
+The blocker is not the supply of papers. It is that **no code path currently turns one paper
+into more than one row**, so effort spent gathering PDFs does not become training data.
+
+Two distinct mechanisms are often conflated:
+
+- **Enrichment** (NASA POWER, SoilGrids) attaches weather and soil *columns* to rows that
+  already exist. In the current 45-row schema those columns are constant (`Year`, `Country`,
+  `Season`, `Location`, `Rainfall`, `Temperature_*` each hold one distinct value), so they add
+  no information a model can learn from.
+- **Connectors** (HuggingFace, FAOSTAT, …) *can* append rows: `ConnectorManager.merge_packages`
+  takes the master from 45 to 17,445 rows and already runs in `production_run.py`. It is wired
+  but not usable yet — the UAMS mapping is wrong (`Yield` in t/ha maps to `Yield_per_Plot` in g)
+  and `data_enricher` raises on any package carrying a crop column.
 
 **Where new observations come from, in order of yield per unit effort:**
 
-1. **Treatment-level extraction, not paper-level.** `outputs/treatment_level_extraction.csv`
-   already yields 121 rows from 16 papers (~7.5 rows/paper) because it records one row per
-   treatment. The paper-level table records one row per paper. Routing all extraction through
-   the treatment-level path multiplies the corpus by roughly the number of treatments per trial.
-2. **Open-access bulk supply.** `agriai extract --papers <dir>` runs grounded LLM extraction
-   over a PDF directory. EuropePMC's OA subset can supply agronomy trials in bulk, so the
-   supply of source PDFs is not the limiting factor — routing them through extraction is.
-3. **Public agronomy datasets normalised into UAMS.** Field-trial datasets carry many trials
-   with real yields, and the connector layer already exists to fetch them; each needs a UAMS
-   column mapping and a licence check before use.
+1. **Make the PDF route emit rows at all.** `agriai run --papers <dir>` currently produces a
+   0-row frame, so the advertised ingestion path yields nothing. The standalone parser behind
+   `outputs/treatment_level_extraction.csv` already gets 121 rows from 16 papers (~7.5 per
+   paper); routing that into the orchestrator is the single biggest multiplier available.
+2. **Extract per treatment, not per paper.** The LLM extractor emits exactly one row per
+   paper, discarding the 8–24 treatments a trial reports. Until it returns one row per
+   treatment, more papers and more API budget change the corpus size only linearly.
+3. **Read tables.** Treatment rows live in tables, but only flat-text extraction is installed
+   (no `camelot`/`tabula`/OCR), which is why 11 of 16 PDFs produced no yield at all.
+4. **Decide on aggregate datasets.** An already-downloaded 17,400-row India crop-yield table
+   could support a district-level model. It is a *different unit of analysis* from
+   treatment-level trials and must not be pooled with them into one model — that is an
+   owner-level scientific decision, not a mapping task.
 
 **Targets to hit before performance means anything:** ≥ 3 independent papers for any metric at
-all, ≥ 10 for a grouped 5-fold estimate that is labelled robust, and a yield column that
-survives unit checking (see the `t/ha` → `kg/ha` regression in
-`tests/test_yield_unit_extraction.py`).
+all, ≥ 10 for a grouped 5-fold estimate labelled robust, ~30 studies for a stable estimate, a
+yield column that survives unit checking (`tests/test_yield_unit_extraction.py`), and every
+score reported next to the out-of-study mean baseline.
 
 ---
 
