@@ -90,6 +90,69 @@ def test_the_summary_shown_to_the_model_carries_no_full_data():
     assert "61.70" not in text  # a later row, beyond the preview
 
 
+@pytest.mark.parametrize(
+    "label",
+    ["T1", "T2 (120 kg N/ha)", "CK", "N1 (150 kg-hm-2)", "100% RDF", "Control", "FYM + NPK", "N0"],
+)
+def test_treatment_labels_are_kept(label):
+    from scripts.extract_oa_corpus import is_treatment_label
+
+    assert is_treatment_label(label)
+
+
+@pytest.mark.parametrize(
+    "label",
+    [
+        "M",
+        "N",
+        "M x N",
+        "M x N x Y",  # ANOVA factor and interaction terms
+        "Mean",
+        "CD (0.05)",
+        "CV (%)",
+        "SEm",  # summary rows
+        "Treatments",
+        "2021",  # header and year rows
+        "F-Rep (2,12)",
+        "P-Rep",
+        "Contrast 4",
+        "Main effects",
+        "R2",
+        "RMSE",
+        "Root length (cm)",
+        "TKW (g)",
+        "NSM (n. m-2)",  # transposed table: variables as rows
+    ],
+)
+def test_statistics_and_variable_labels_are_rejected(label):
+    """Agronomy tables append an ANOVA block; reading it gives F values shaped like yields."""
+    from scripts.extract_oa_corpus import is_treatment_label
+
+    assert not is_treatment_label(label)
+
+
+def test_a_transposed_table_is_rejected_whole():
+    """If most row labels are variables, the column is not a treatment column."""
+    from scripts.extract_oa_corpus import rows_from
+
+    grid = [
+        ["Root length (cm)", "175.0"],
+        ["TKW (g)", "49.7"],
+        ["NSM (n. m-2)", "176.0"],
+        ["T1", "5.2"],
+    ]
+    choice = {"treatment_column": 0, "yield_column": 1, "yield_unit": "t/ha", "dose_columns": []}
+    assert rows_from(grid, choice) == []
+
+
+def test_a_mostly_clean_table_survives_a_stray_summary_row():
+    from scripts.extract_oa_corpus import rows_from
+
+    grid = [["T1", "5.2"], ["T2", "6.1"], ["T3", "5.8"], ["Mean", "5.7"]]
+    choice = {"treatment_column": 0, "yield_column": 1, "yield_unit": "t/ha", "dose_columns": []}
+    assert [r["treatment"] for r in rows_from(grid, choice)] == ["T1", "T2", "T3"]
+
+
 if __name__ == "__main__":
     import sys
 

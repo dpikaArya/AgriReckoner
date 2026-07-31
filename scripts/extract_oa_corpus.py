@@ -225,12 +225,57 @@ def number_in(text):
     return float(head) if NUMERIC.match(head) else None
 
 
+SUMMARY_LABEL = re.compile(
+    r"^\s*(?:"
+    r"(?:mean|range|cv|sd|se|sem|c\.?d\.?|lsd|total|average|treatments?|source|significance"
+    r"|anova|ns|contrast|interaction|rmse|df|error|residual|block|replication)\b"
+    r"|(?:main|simple)\s+effects?"
+    r"|[fp]\s*[-–]\s*\w"  # F-Rep, P-Rep, F-value
+    r"|[fp]\s*[-–]?\s*value"
+    r"|r\s*[²2]\b|η|χ|σ"  # statistics written as symbols
+    r")",
+    re.I,
+)
+# A row label carrying its own unit is a variable name, not a treatment: the table is
+# transposed, with measured variables down the side and treatments across the top. Reading
+# it as though the rows were treatments produces plausible-looking numbers for the wrong
+# quantity entirely (a root length reported as a grain yield).
+MEASURED_VARIABLE = re.compile(
+    r"\((?:cm|mm|m|g|kg|t|q|%|n\.?\s*m|kg\s*h[lL]|°c|days?|no\.?)\b[^)]*\)?", re.I
+)
+# Below this share of plausible treatment labels the table is not a treatment table at all —
+# most often it is transposed, with measured variables down the side.
+MIN_TREATMENT_SHARE = 0.6
+# Agronomy tables usually append an analysis-of-variance block under the treatment rows:
+# the factor codes (M, N, Y) and their interactions (M x N, M x N x Y). Those rows carry
+# F values, not yields, so reading them produces numbers that are the right shape and
+# entirely wrong.
+FACTOR_TERM = re.compile(r"^\s*[A-Za-z]{1,3}\s*(?:[x×*]\s*[A-Za-z]{1,3}\s*)+$")
+BARE_FACTOR = re.compile(r"^\s*[A-Za-z]\s*$")
+BARE_YEAR = re.compile(r"^\s*(19|20)\d\d\s*$")
+
+
+def is_treatment_label(label):
+    """True when a row label names an experimental treatment rather than a statistic.
+
+    A dose written into the label ("N2 (300 kg/ha)") is a treatment and must survive; a
+    measured variable ("Root length (cm)") is not. They are told apart by whether a number
+    precedes the unit inside the parentheses.
+    """
+    if SUMMARY_LABEL.match(label):
+        return False
+    if FACTOR_TERM.match(label) or BARE_FACTOR.match(label) or BARE_YEAR.match(label):
+        return False
+    match = MEASURED_VARIABLE.search(label)
+    return not (match and not re.search(r"\d\s*[a-zA-Z%]", match.group(0)))
+
+
 def rows_from(grid, choice):
     """Read treatment/yield/dose values out of the chosen columns, by code."""
     treat_col = choice["treatment_column"]
     yield_col = choice["yield_column"]
     dose_cols = [c for c in choice.get("dose_columns") or [] if c >= 0]
-    out = []
+    out, candidates = [], 0
     for row_index, row in enumerate(grid):
         if max(treat_col, yield_col, *(dose_cols or [0])) >= len(row):
             continue
@@ -238,7 +283,8 @@ def rows_from(grid, choice):
         value = number_in(row[yield_col])
         if not label or value is None:
             continue
-        if re.match(r"^\s*(mean|range|cv|sd|se|sem|c\.?d\.?|lsd|total|average)\b", label, re.I):
+        candidates += 1
+        if not is_treatment_label(label):
             continue
         out.append(
             {
@@ -250,6 +296,12 @@ def rows_from(grid, choice):
                 "source_cell": row[yield_col],
             }
         )
+
+    # If most labels down this column are not treatments, the column is not a treatment
+    # column — usually the table is transposed, with variables down the side. Keeping the
+    # minority that happen to look like treatments would mix quantities silently.
+    if candidates and len(out) / candidates < MIN_TREATMENT_SHARE:
+        return []
     return out
 
 
