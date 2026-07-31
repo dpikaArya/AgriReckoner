@@ -17,9 +17,19 @@ from agri_ai_agent.config.schema import (
 
 PREDICTION_COLUMNS = frozenset(SCHEMA_GROUPS.get("N. ML Predictions", []))
 TARGET_COLUMNS = frozenset(SCHEMA_GROUPS.get("J. ML Target Variables", []))
+UPTAKE_COLUMNS = frozenset(SCHEMA_GROUPS.get("X. Nutrient Uptake", []))
 
 # Columns that are outcomes, model outputs, or otherwise unavailable at prediction time.
-OUTCOME_COLUMNS = frozenset(POST_HARVEST_VARIABLES) | PREDICTION_COLUMNS | TARGET_COLUMNS
+# Nutrient uptake is tissue concentration multiplied by harvested biomass, so it is
+# arithmetically a function of yield and can only be known after harvest.
+OUTCOME_COLUMNS = (
+    frozenset(POST_HARVEST_VARIABLES) | PREDICTION_COLUMNS | TARGET_COLUMNS | UPTAKE_COLUMNS
+)
+
+# Quantities defined as an outcome divided or multiplied by an input. They cannot be
+# computed before the outcome exists, whatever the nutrient or resource is named, so they
+# are matched by shape rather than by listing every column the schema happens to contain.
+DERIVED_FROM_OUTCOME_MARKERS = ("uptake", "use_efficiency", "useefficiency")
 
 # Post-harvest outcome families the feature engineer builds interactions/transforms from.
 # Any engineered feature whose name references one of these roots leaks the outcome
@@ -145,6 +155,8 @@ def is_leaky_feature(col: str, target_col: str | None = None) -> bool:
     if col in PREDICTION_COLUMNS or base in PREDICTION_COLUMNS:
         return True
     if _tokens(col) & set(OUTCOME_INTERACTION_ROOTS):
+        return True
+    if any(marker in _compact(col) for marker in DERIVED_FROM_OUTCOME_MARKERS):
         return True
     if _is_outcome_derived(col):
         return True

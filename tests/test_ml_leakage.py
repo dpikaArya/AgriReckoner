@@ -52,6 +52,37 @@ def test_renamed_and_abbreviated_outcome_derivatives_are_leaky():
         assert is_leaky_feature(col, "Yield_per_Hectare"), col
 
 
+def test_nutrient_uptake_is_leaky():
+    """Uptake is tissue concentration x harvested biomass, so it encodes the yield."""
+    for col in ["Nitrogen_Uptake", "Zinc_Uptake", "Molybdenum_Uptake", "Boron_Uptake"]:
+        assert is_leaky_feature(col, "Yield_per_Hectare"), col
+
+
+def test_use_efficiency_is_leaky_however_it_is_qualified():
+    """Regression: Water_Use_Efficiency was caught but System_Water_Use_Efficiency was not."""
+    for col in [
+        "Water_Use_Efficiency",
+        "System_Water_Use_Efficiency",
+        "Nitrogen_Use_Efficiency",
+    ]:
+        assert is_leaky_feature(col, "Yield_per_Hectare"), col
+
+
+def test_every_uptake_column_in_the_schema_is_excluded():
+    """A new nutrient added to the schema must not silently become a predictor."""
+    from agri_ai_agent.config.schema import SCHEMA_GROUPS
+
+    uptake = [c for cols in SCHEMA_GROUPS.values() for c in cols if "uptake" in c.lower()]
+    assert uptake, "expected the schema to declare nutrient uptake columns"
+    assert [c for c in uptake if not is_leaky_feature(c, "Yield_per_Hectare")] == []
+
+
+def test_uptake_rule_does_not_swallow_ordinary_inputs():
+    """The structural rule must stay narrow: soil and management columns are predictors."""
+    for col in ["Nitrogen", "Phosphorus", "Potassium", "Soil_pH", "Rainfall", "Organic_Carbon"]:
+        assert not is_leaky_feature(col, "Yield_per_Hectare"), col
+
+
 def test_strip_engineered():
     assert strip_engineered("Yield_per_Hectare_log") == "Yield_per_Hectare"
     assert strip_engineered("Soil_pH_1") == "Soil_pH"
