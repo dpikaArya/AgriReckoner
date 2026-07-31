@@ -26,6 +26,10 @@ TARGET_COLUMNS = [
     "Target_Potassium",
 ]
 
+# Candidate row-to-source-paper keys, most specific first. Rows sharing one of these
+# come from the same trial and must not be split across evaluation folds.
+GROUP_COLS = ("Paper_ID", "Document_ID", "DOI", "Source_File")
+
 EXCLUDE_COLS = (
     {
         "Paper_ID",
@@ -98,7 +102,7 @@ class TrainingAgent(BaseAgent):
 
         self._check_readiness(df)
 
-        X, y = self._prepare_data(df, target_col)
+        X, y, groups = self._prepare_data(df, target_col)
         if X is None or len(X) < MIN_ROWS_FOR_METRIC:
             n = 0 if X is None else len(X)
             self.log.warning("Insufficient data for honest training (%d samples)", n)
@@ -114,7 +118,7 @@ class TrainingAgent(BaseAgent):
         fitted = {}
         for name, model in self._get_models().items():
             try:
-                metrics = evaluate_model(model, X, y)
+                metrics = evaluate_model(model, X, y, groups=groups)
                 pipeline = self._fit_pipeline(model, X, y)
                 fitted[name] = pipeline
                 model_path = (
@@ -324,10 +328,15 @@ class TrainingAgent(BaseAgent):
         )
 
     def _prepare_data(self, df: pd.DataFrame, target_col: str):
-        """Build a leakage-safe feature matrix; keep rows with gaps (imputed inside CV)."""
+        """Build a leakage-safe feature matrix and its paper groups.
+
+        Rows with gaps are kept (imputation happens inside each CV fold). The returned
+        groups identify the source paper of each row so evaluation can hold out whole
+        trials; it is None when the dataset carries no usable paper identifier.
+        """
         feature_cols = select_feature_columns(df, target_col, base_exclude=EXCLUDE_COLS)
         if len(feature_cols) < 2:
-            return None, None
+            return None, None, None
 
         y = pd.to_numeric(df[target_col], errors="coerce")
         X = df[feature_cols].apply(pd.to_numeric, errors="coerce")
@@ -336,6 +345,7 @@ class TrainingAgent(BaseAgent):
         keep = y.notna()
         X, y = X[keep], y[keep]
         X = X.dropna(axis=1, how="all")
+        groups = self._paper_groups(df, keep)
 
         X, dropped = drop_suspected_leaks(X, y)
         if dropped:
@@ -346,8 +356,28 @@ class TrainingAgent(BaseAgent):
             )
 
         if len(X) < MIN_ROWS_FOR_METRIC or X.shape[1] < 2:
-            return None, None
-        return X, y
+            return None, None, None
+        return X, y, groups
+
+    def _paper_groups(self, df: pd.DataFrame, keep: pd.Series):
+        """Return the source-paper label of each kept row, or None if unavailable."""
+        for col in GROUP_COLS:
+            if col not in df.columns:
+                continue
+            groups = df.loc[keep, col].astype(str).replace({"": pd.NA, "nan": pd.NA})
+            if groups.notna().all() and groups.nunique() > 1:
+                self.log.info(
+                    "Grouping evaluation folds by %s (%d papers over %d rows)",
+                    col,
+                    groups.nunique(),
+                    len(groups),
+                )
+                return groups.to_numpy()
+        self.log.warning(
+            "No usable paper identifier; folds are split by row, so rows from one trial "
+            "may appear in both train and test and scores may be optimistic"
+        )
+        return None
 
     def _save_results(self, results: list[dict], target_col: str):
         results_df = pd.DataFrame(results)
