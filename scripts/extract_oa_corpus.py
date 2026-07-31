@@ -35,6 +35,37 @@ DEFAULT_QUERY = (
 )
 NUMERIC = re.compile(r"^-?\d+(?:\.\d+)?$")
 
+# The model's column choice is checked, not trusted. Reading soil available phosphorus or
+# panicle counts as though they were grain yield was the single largest error class, and it
+# is detectable: a yield column says so in its own header.
+YIELD_WORD = re.compile(r"\b(yield|gy\b|produc(?:tion|tivity)|output)\b", re.I)
+AREA_UNIT = re.compile(r"\b(kg|t|q|mg|g)\s*[./·]?\s*(ha|hm|m\s*[-−]?\s*2|plot|plant|pot)\b", re.I)
+# Tables that describe a model or a relationship rather than an experiment's own results.
+NOT_AN_EXPERIMENT = re.compile(
+    r"\b(correlation|regression|response surface|rmse|r2 |r²|simulat|predicted vs|model "
+    r"(?:evaluation|performance|parameter)|membership|entropy|weight coefficient|sensitivity"
+    r"|analysis of variance|anova|sums? of squares|fitted|calibrat)\w*",
+    re.I,
+)
+
+
+def choice_is_credible(choice, caption, header):
+    """Reject a selection whose own header contradicts it. Returns a reason, or None."""
+    if choice["treatment_column"] < 0 or choice["yield_column"] < 0:
+        return "model reported no usable column"
+    if NOT_AN_EXPERIMENT.search(caption):
+        return f"caption describes an analysis, not an experiment: {caption[:60]}"
+    head = header[0] if header else []
+    if choice["yield_column"] >= len(head):
+        return "yield column is outside the header"
+    cell = head[choice["yield_column"]]
+    blob = f"{cell} {caption}"
+    if not YIELD_WORD.search(cell) and not (YIELD_WORD.search(caption) and AREA_UNIT.search(cell)):
+        return f"chosen column does not name a yield: {cell[:50]!r}"
+    if not AREA_UNIT.search(blob) and not AREA_UNIT.search(choice.get("yield_unit", "")):
+        return f"no area unit for the chosen column: {cell[:50]!r}"
+    return None
+
 SELECT_SCHEMA = {
     "type": "object",
     "additionalProperties": False,
@@ -219,9 +250,15 @@ def ask(messages, schema, api_key, ledger):
 
 
 def number_in(text):
-    """First numeric value in a cell, ignoring dispersion and significance letters."""
-    head = re.split(r"[±±]", str(text))[0].strip()
+    """First numeric value in a cell, ignoring dispersion and significance letters.
+
+    Yields above a thousand are commonly written "1 446" or "1,446". Rejecting those
+    silently dropped the highest-yielding rows — 83 of them in one run, median 9257 — which
+    biased the surviving corpus downward rather than merely shrinking it.
+    """
+    head = re.split(r"[±]", str(text))[0].strip()
     head = re.sub(r"[a-zA-Z\s*]+$", "", head).strip()
+    head = re.sub(r"(?<=\d)[\s,](?=\d{3}\b)", "", head)
     return float(head) if NUMERIC.match(head) else None
 
 
@@ -255,7 +292,21 @@ BARE_FACTOR = re.compile(r"^\s*[A-Za-z]\s*$")
 BARE_YEAR = re.compile(r"^\s*(19|20)\d\d\s*$")
 
 
-def is_treatment_label(label):
+AMBIGUOUS_STAT = re.compile(r"^\s*(sd|se|cv|cd|ns|lsd|sem)\s*$", re.I)
+
+
+def is_treatment_label(label, near_foot=True):
+    """Ambiguous two-letter codes are statistics only in the ANOVA block at the foot.
+
+    ``SD`` was filtered as "standard deviation" in a paper where it meant straw deep
+    incorporation — and it was the highest-yielding treatment in every year.
+    """
+    if AMBIGUOUS_STAT.match(label):
+        return not near_foot
+    return _is_treatment_label(label)
+
+
+def _is_treatment_label(label):
     """True when a row label names an experimental treatment rather than a statistic.
 
     A dose written into the label ("N2 (300 kg/ha)") is a treatment and must survive; a
@@ -270,11 +321,33 @@ def is_treatment_label(label):
     return not (match and not re.search(r"\d\s*[a-zA-Z%]", match.group(0)))
 
 
-def rows_from(grid, choice):
+DOSE_HEADER = re.compile(r"\b(rate|applied|application|dose|dosage|level|added|amount)\b", re.I)
+
+
+def _valid_dose_columns(choice, header):
+    """Keep only dose columns whose header names an applied rate with an area unit.
+
+    Of 82 doses emitted in one run, 5 were right: the rest were costs, grain weights, plot
+    counts, or the yield column itself. A wrong dose is worse than no dose, because it is
+    the variable a recommendation would be built on.
+    """
+    head = header[0] if header else []
+    keep = []
+    for column in choice.get("dose_columns") or []:
+        if not 0 <= column < len(head) or column == choice["yield_column"]:
+            continue
+        cell = head[column]
+        if DOSE_HEADER.search(cell) and AREA_UNIT.search(cell) and not YIELD_WORD.search(cell):
+            keep.append(column)
+    return keep
+
+
+def rows_from(grid, choice, header=None):
     """Read treatment/yield/dose values out of the chosen columns, by code."""
     treat_col = choice["treatment_column"]
     yield_col = choice["yield_column"]
-    dose_cols = [c for c in choice.get("dose_columns") or [] if c >= 0]
+    dose_cols = _valid_dose_columns(choice, header or [])
+    foot_starts = max(0, len(grid) - 3)
     out, candidates = [], 0
     for row_index, row in enumerate(grid):
         if max(treat_col, yield_col, *(dose_cols or [0])) >= len(row):
@@ -284,7 +357,7 @@ def rows_from(grid, choice):
         if not label or value is None:
             continue
         candidates += 1
-        if not is_treatment_label(label):
+        if not is_treatment_label(label, near_foot=row_index >= foot_starts):
             continue
         out.append(
             {
@@ -339,7 +412,12 @@ def process(pmcid, licence, api_key, ledger):
 
     caption, grid = tables[choice["table_index"]]
     record["caption"] = caption[:200]
-    record["rows"] = rows_from(grid, choice)
+    header = grid[:1]
+    rejection = choice_is_credible(choice, caption, header)
+    if rejection:
+        record["reason"] = f"rejected: {rejection}"
+        return record
+    record["rows"] = rows_from(grid[1:], choice, header)
     if not record["rows"]:
         record["reason"] = "chosen table yielded no readable rows"
     return record
