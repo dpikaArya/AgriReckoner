@@ -156,21 +156,17 @@ def train_all_models(df):
     # Identify target and features
     target = "Yield_per_Hectare"
 
-    # Use all numeric columns except identifiers and the target
-    exclude = {
-        "Source_File",
-        "Treatment",
-        "Paper_ID",
-        "Design",
-        "Yield_per_Plot",
-        "Yield_per_Acre",
-        "Biomass_Yield",
-        "Harvest_Index",
-    }
+    # The shared guard, not a hand-written list: it excludes every post-harvest outcome
+    # (protein, seed weight, spike length...) which is measured at harvest alongside
+    # yield and so is unavailable when a recommendation is actually made.
+    from agri_ai_agent.ml.leakage import select_feature_columns
+
+    exclude = {"Source_File", "Treatment", "Paper_ID", "Design"}
+    safe_cols = set(select_feature_columns(df, target, base_exclude=exclude))
 
     feature_cols = []
     for col in df.columns:
-        if col in exclude or col == target:
+        if col not in safe_cols:
             continue
         if df[col].dtype in ["float64", "int64", "float32", "int32"]:
             if df[col].notna().sum() >= 3:  # at least 3 non-null values
@@ -243,11 +239,11 @@ def train_all_models(df):
 
     for name, model in models.items():
         try:
-            # Fit on all data for full-data metrics
+            # Scored on the rows it was fitted on: this measures how well the model
+            # memorises the training set, never how it would do on an unseen trial.
+            # Reported under *_InSample names so it cannot be quoted as skill.
             model.fit(X_full, y_full)
             y_pred_full = model.predict(X_full)
-
-            # Full-data metrics
             mae = mean_absolute_error(y_full, y_pred_full)
             mse = mean_squared_error(y_full, y_pred_full)
             rmse = np.sqrt(mse)
@@ -313,13 +309,13 @@ def train_all_models(df):
                     "Model": name,
                     "N_Samples": n,
                     "N_Features": p,
-                    "MAE": round(mae, 4),
-                    "MSE": round(mse, 4),
-                    "RMSE": round(rmse, 4),
-                    "R2": round(r2, 4),
-                    "Adj_R2": round(adj_r2, 4) if not np.isnan(adj_r2) else "",
+                    "MAE_InSample": round(mae, 4),
+                    "MSE_InSample": round(mse, 4),
+                    "RMSE_InSample": round(rmse, 4),
+                    "R2_InSample": round(r2, 4),
+                    "Adj_R2_InSample": round(adj_r2, 4) if not np.isnan(adj_r2) else "",
                     "MAPE (%)": round(mape, 2) if not np.isnan(mape) else "",
-                    "Median_AE": round(medae, 4),
+                    "Median_AE_InSample": round(medae, 4),
                     "CV_R2_Mean": round(cv_r2_mean, 4) if not np.isnan(cv_r2_mean) else "",
                     "CV_R2_Std": round(cv_r2_std, 4) if not np.isnan(cv_r2_std) else "",
                     "CV_MAE_Mean": round(cv_mae_mean, 4) if not np.isnan(cv_mae_mean) else "",
@@ -329,7 +325,7 @@ def train_all_models(df):
                 }
             )
 
-            log(f"  {name:30s}  R2={r2:.4f}  MAE={mae:.4f}  RMSE={rmse:.4f}")
+            log(f"  {name:30s}  R2(in-sample)={r2:.4f}  MAE={mae:.4f}  RMSE={rmse:.4f}")
 
         except Exception as e:
             log(f"  {name:30s}  FAILED: {e}")
@@ -338,13 +334,13 @@ def train_all_models(df):
                     "Model": name,
                     "N_Samples": len(X_full),
                     "N_Features": len(feature_cols),
-                    "MAE": "",
-                    "MSE": "",
-                    "RMSE": "",
-                    "R2": "",
-                    "Adj_R2": "",
+                    "MAE_InSample": "",
+                    "MSE_InSample": "",
+                    "RMSE_InSample": "",
+                    "R2_InSample": "",
+                    "Adj_R2_InSample": "",
                     "MAPE (%)": "",
-                    "Median_AE": "",
+                    "Median_AE_InSample": "",
                     "CV_R2_Mean": "",
                     "CV_R2_Std": "",
                     "CV_MAE_Mean": "",
