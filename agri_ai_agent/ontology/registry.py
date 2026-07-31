@@ -20,13 +20,15 @@ DEFAULT_REGISTRY_PATH = Path(__file__).resolve().parents[2] / "spec" / "uams_ont
 # Per-prefix local-id syntax. Kept simple and honest: enough to catch typos,
 # not a full ontology validator.
 _LOCALID_PATTERNS = {
-    "AGROVOC": re.compile(r"^c_\d+$"),
+    # AGROVOC issues both legacy numeric ids (c_5192) and newer hex ones (c_7db831f9).
+    "AGROVOC": re.compile(r"^c_(\d+|[0-9a-f]{6,})$"),
     "ENVO": re.compile(r"^\d{8}$"),
     "PO": re.compile(r"^\d{7}$"),
     "CO_320": re.compile(r"^\d{7}$"),
     "FOODON": re.compile(r"^\d{8}$"),
     "UO": re.compile(r"^\d{7}$"),
     "ECO": re.compile(r"^\d{7}$"),
+    "PATO": re.compile(r"^\d{7}$"),
     "QUDT": re.compile(r"^\S+$"),
     "UCUM": re.compile(r"^\S+$"),
 }
@@ -129,11 +131,13 @@ class Registry:
         """
         problems: list[str] = []
         owner: dict[str, str] = {}
+        shared = set(self._data.get("permitted_shared_terms") or {})
         for column, block in self._columns.items():
             for term in block.get("terms") or []:
                 curie = term.get("curie", "")
                 problems.extend(self._check_curie_syntax(column, curie))
-                self._check_collision(column, curie, owner, problems)
+                if curie not in shared:
+                    self._check_collision(column, curie, owner, problems)
         return problems
 
     def _check_curie_syntax(self, column: str, curie: str) -> list[str]:
@@ -163,9 +167,10 @@ if __name__ == "__main__":
     assert len(reg.columns) == 296, len(reg.columns)
     issues = reg.validate()
     assert issues == [], issues
-    assert reg.expand_curie("AGROVOC:c_5188").endswith("agrovoc/c_5188")
+    assert reg.expand_curie("AGROVOC:c_5192").endswith("agrovoc/c_5192")
     assert reg.expand_curie("CO_320:0000005").endswith("CO_320:0000005")
-    assert reg.term_iri("Nitrogen").endswith("c_5188"), reg.term_iri("Nitrogen")
+    # c_5192 is "nitrogen"; c_5188, asserted here previously, is "nitric acid".
+    assert reg.term_iri("Nitrogen").endswith("c_5192"), reg.term_iri("Nitrogen")
     assert reg.term_iri("Paper_ID") is None
     assert reg.canonical_unit("Rainfall") == "mm"
     assert reg.validation_range("Soil_pH") == (3.0, 10.0)

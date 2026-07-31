@@ -60,7 +60,7 @@ def test_every_curie_uses_a_declared_prefix(registry):
 
 def test_expand_curie_resolves_known_prefixes(registry):
     """CURIE expansion matches each ontology's IRI stem."""
-    assert registry.expand_curie("AGROVOC:c_5188") == ("http://aims.fao.org/aos/agrovoc/c_5188")
+    assert registry.expand_curie("AGROVOC:c_5192") == ("http://aims.fao.org/aos/agrovoc/c_5192")
     assert registry.expand_curie("ENVO:00001995") == (
         "http://purl.obolibrary.org/obo/ENVO_00001995"
     )
@@ -77,10 +77,16 @@ def test_expand_curie_raises_on_unknown_prefix(registry):
 
 
 def test_known_columns_resolve_to_expected_ids(registry):
-    """Anchor columns map to their AGROVOC / ENVO identifiers."""
-    assert registry.term_iri("Nitrogen").endswith("agrovoc/c_5188")
-    assert registry.term_iri("Soil_pH").endswith("ENVO_00001995")
-    assert registry.term_iri("Rainfall").endswith("ENVO_01000507")
+    """Anchor columns map to their AGROVOC / ENVO identifiers.
+
+    c_5192 is AGROVOC "nitrogen". This test previously asserted c_5188, which is
+    "nitric acid" — the identifier had been generated rather than resolved.
+    """
+    assert registry.term_iri("Nitrogen").endswith("agrovoc/c_5192")
+    # ENVO:00001995 is "rock"; AGROVOC c_34901 is "soil pH".
+    assert registry.term_iri("Soil_pH").endswith("agrovoc/c_34901")
+    # ENVO:03000127 is "acid rainfall", a different concept.
+    assert registry.term_iri("Rainfall").endswith("agrovoc/c_a060993c")
 
 
 def test_unmapped_columns_have_no_term(registry):
@@ -107,14 +113,14 @@ def test_synonyms_migrated_from_variant_map(registry):
     assert "Nitrogen" not in nitrogen
 
 
-def test_plant_height_records_conflicting_ids(registry):
-    """The CO_320 code-vs-spec disagreement keeps BOTH ids with notes."""
+def test_unresolvable_crop_ontology_terms_are_not_exact_matches(registry):
+    """CO_320 cannot be resolved via cropontology.org or OLS4, so it cannot claim exactMatch."""
     data = load_registry(str(DEFAULT_REGISTRY_PATH))
-    curies = [t["curie"] for t in data["columns"]["Plant_Height_cm"]["terms"]]
-    assert "CO_320:0000005" in curies  # code KB value (preferred)
-    assert "CO_320:0000012" in curies  # spec value (recorded, not preferred)
-    notes = [t.get("note", "") for t in data["columns"]["Plant_Height_cm"]["terms"]]
-    assert any("preferred" in n for n in notes)
+    for column, block in data["columns"].items():
+        for term in block.get("terms") or []:
+            if str(term.get("curie", "")).startswith("CO_320:"):
+                assert term["predicate"] == "skos:closeMatch", (column, term)
+                assert term.get("verified") is False, (column, term)
 
 
 def test_uams_term_mints_namespaced_iri():
@@ -126,3 +132,32 @@ if __name__ == "__main__":
     import sys
 
     sys.exit(pytest.main([__file__, "-q"]))
+
+
+def test_identifiers_are_resolved_not_generated(registry):
+    """Every mapping below was verified against its authority's own label.
+
+    The registry originally asserted skos:exactMatch on generated identifiers: Nitrogen
+    pointed at "nitric acid", Yield_per_Hectare at "Yunnan", Harvest_Index at "Yemen",
+    Ash at "donkeys". Only 18 of 106 mappings were correct. These anchors pin the
+    resolved values so the failure cannot recur silently.
+    """
+    expected = {
+        "Nitrogen": "agrovoc/c_5192",  # nitrogen, not nitric acid (c_5188)
+        "Phosphorus": "agrovoc/c_5804",  # phosphorus
+        "Potassium": "agrovoc/c_6139",  # potassium
+        "Soil_pH": "agrovoc/c_34901",  # soil pH, not ENVO "rock"
+        "Yield_per_Hectare": "agrovoc/c_10176",  # crop yield, not "Yunnan"
+        "Harvest_Index": "agrovoc/c_24854",  # harvest index, not "Yemen"
+    }
+    for column, suffix in expected.items():
+        assert registry.term_iri(column).endswith(suffix), column
+
+
+def test_no_mapping_claims_exact_match_without_verification(registry):
+    """An exactMatch is transitive; it may not be asserted on an unresolvable term."""
+    data = load_registry(str(DEFAULT_REGISTRY_PATH))
+    for column, block in data["columns"].items():
+        for term in block.get("terms") or []:
+            if term.get("verified") is False:
+                assert term["predicate"] != "skos:exactMatch", (column, term)

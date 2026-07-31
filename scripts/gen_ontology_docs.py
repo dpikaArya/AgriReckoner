@@ -109,7 +109,8 @@ def _smoke() -> None:
     """Side-effect-free self-check: render and assert the table is complete."""
     doc = render_markdown(load_registry(str(DEFAULT_REGISTRY_PATH)))
     assert doc.count("\n|") >= 138, "expected >=138 table rows"
-    assert "Soil_pH" in doc and "AGROVOC:c_5188" in doc
+    # c_5192 is AGROVOC "nitrogen"; c_5188, asserted here before, is "nitric acid".
+    assert "Soil_pH" in doc and "AGROVOC:c_5192" in doc
     print("gen_ontology_docs smoke OK", file=sys.stderr)
 
 
