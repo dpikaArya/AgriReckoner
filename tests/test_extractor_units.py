@@ -13,6 +13,32 @@ def test_normalize_unit_forms():
     assert normalize_unit("pH") is None
 
 
+def test_square_hectometre_is_a_hectare():
+    """Found in the wild: a real paper reported yield as 'kg.hm-2', which was rejected.
+
+    A square hectometre is exactly one hectare, so refusing the spelling silently
+    discarded every treatment row in that paper.
+    """
+    assert normalize_unit("kg·hm-2") == "kg/ha"
+    assert normalize_unit("kg hm-2") == "kg/ha"
+    assert normalize_unit("kg/hm2") == "kg/ha"
+    assert normalize_unit("t·hm-2") == "t/ha"
+
+
+def test_exponent_area_units_convert_without_rescaling():
+    value, ok, _ = convert(6000.0, normalize_unit("kg·hm-2"), "kg/ha")
+    assert ok and abs(value - 6000.0) < 1e-6
+    value, ok, _ = convert(6.0, normalize_unit("t·hm-2"), "kg/ha")
+    assert ok and abs(value - 6000.0) < 1e-6
+
+
+def test_area_aliases_do_not_disturb_other_units():
+    assert normalize_unit("g·m-2") == "g/m2"
+    assert normalize_unit("q ha-1") == "q/ha"
+    assert normalize_unit("g/kg") == "g/kg"
+    assert normalize_unit("cm") == "cm"
+
+
 def test_convert_compatible():
     v, ok, _ = convert(4.2, "t/ha", "kg/ha")
     assert ok and abs(v - 4200) < 1e-6

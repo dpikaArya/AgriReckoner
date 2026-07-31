@@ -41,6 +41,11 @@ _TEMPERATURE_TOKENS = {"cel", "f", "k"}
 _NUMERATORS = ("mg", "kg", "cmol", "meq", "ds", "ms", "us", "t", "q", "g", "mm", "cm", "m")
 _DENOMINATORS = ("ha", "100g", "kg", "m2", "m", "cm", "g", "l")
 
+# Area denominators written with an exponent rather than a slash. A square hectometre is
+# exactly one hectare, a spelling common in the Chinese agronomy literature; without this
+# a yield reported as "kg·hm-2" is unrecognised and the observation is silently dropped.
+_AREA_ALIASES = (("hm-2", "ha"), ("hm2", "ha"), ("m-2", "m2"))
+
 
 def _split_ratio(token: str) -> str:
     """Split a concatenated ratio like 'gkg' -> 'g/kg' using a small unit lexicon."""
@@ -62,6 +67,8 @@ def normalize_unit(raw):
         return None
     if unit in _TEMPERATURE or unit.rstrip("s") in _TEMPERATURE:
         return {"f": "f", "fahrenheit": "f", "degf": "f", "k": "k", "kelvin": "k"}.get(unit, "cel")
+    for exponent_form, canonical in _AREA_ALIASES:
+        unit = unit.replace(exponent_form, canonical)
     unit = re.sub(r"(-1|\b1)$", "", unit)  # strip trailing inverse marker (kgha-1 -> kgha)
     unit = unit.replace("-", "/")
     if unit in _UNIT_FACTORS:
