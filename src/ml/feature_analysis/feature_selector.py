@@ -194,7 +194,10 @@ class FeatureSelector:
         return result
 
     def _save_selection(self, X: pd.DataFrame, y: pd.Series | None = None):
-        features_dir = Path("features")
+        # Relative to the configured output directory, not the working directory. Writing to
+        # a bare Path("features") meant a test run from the repository root deposited its
+        # synthetic fixtures beside real pipeline artifacts, indistinguishable from them.
+        features_dir = self.output_dir / "features"
         features_dir.mkdir(parents=True, exist_ok=True)
 
         full_path = features_dir / "full_features.csv"
