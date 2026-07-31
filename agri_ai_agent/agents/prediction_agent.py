@@ -146,7 +146,7 @@ class PredictionAgent(BaseAgent):
 
         self.log.info("Predicting baseline yield from current conditions")
         baseline_preds = self._ensemble_predict(yield_model, X, model_registry)
-        df["Predicted_Yield"] = baseline_preds
+        df["Predicted_Yield"] = self._within_agronomic_range(baseline_preds, "Yield_per_Hectare")
 
         for col, target in [
             ("Expected_Biomass", "Biomass_Yield"),
@@ -154,7 +154,7 @@ class PredictionAgent(BaseAgent):
         ]:
             preds = self._predict_target(target, X, model_registry)
             if preds is not None:
-                df[col] = preds
+                df[col] = self._within_agronomic_range(preds, target)
 
         # Step 2: Build fertilizer option grid
         self.log.info("Generating fertilizer simulation options")
@@ -230,6 +230,49 @@ class PredictionAgent(BaseAgent):
         if not all_preds:
             return None
         return np.mean(all_preds, axis=0)
+
+    def _within_agronomic_range(self, values, column: str):
+        """Blank predictions that fall outside the column's declared range.
+
+        The registry declares an agronomic range per column but nothing enforced it, so a
+        model fitted on almost no data emitted yields around 975,000 kg/ha — a hundred
+        times any real cereal crop — straight into the fertiliser recommendations. An
+        out-of-range prediction is not a cautious estimate, it is a broken one, so it is
+        dropped rather than clamped: clamping would silently present the boundary as though
+        it were a result.
+        """
+        try:
+            low, high = self._registry().validation_range(column)
+        except (KeyError, AttributeError):
+            return values
+
+        array = np.asarray(values, dtype=float)
+        bad = np.zeros(array.shape, dtype=bool)
+        if low is not None:
+            bad |= array < low
+        if high is not None:
+            bad |= array > high
+        if bad.any():
+            self.log.warning(
+                "Dropped %d/%d %s prediction(s) outside the declared range %s-%s: %s",
+                int(bad.sum()),
+                array.size,
+                column,
+                low,
+                high,
+                np.unique(np.round(array[bad], 1))[:5],
+            )
+            array = array.astype(float)
+            array[bad] = np.nan
+        return array
+
+    def _registry(self):
+        """Lazily load the ontology registry; cached on the agent."""
+        if getattr(self, "_registry_cache", None) is None:
+            from agri_ai_agent.ontology.registry import Registry
+
+            self._registry_cache = Registry.load()
+        return self._registry_cache
 
     def _ensemble_predict(
         self, primary_name: str, X: pd.DataFrame, model_registry: list

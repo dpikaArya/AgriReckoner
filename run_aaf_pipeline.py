@@ -1754,20 +1754,31 @@ def phase8_recommendations(df: pd.DataFrame, training_metrics: dict = None) -> p
         else:
             interval = "Every 25-30 days"
 
-        expected_yield = (
-            predicted_yield
-            if predicted_yield
-            else (round(yield_val * 1.15, 2) if yield_val else None)
+        # Only a model prediction can support an expected yield. Inflating the observed
+        # yield by a flat 15% invents both the figure and the gain: it is arithmetic on
+        # the input, not evidence about the fertiliser, and it was previously reported to
+        # users as "High confidence".
+        expected_yield = predicted_yield if predicted_yield else None
+        expected_increase = (
+            round(expected_yield - yield_val, 2)
+            if expected_yield is not None and yield_val
+            else None
         )
-        expected_increase = round(expected_yield * 0.15, 2) if expected_yield else None
 
-        conf_score = 0.75
-        if predicted_yield:
+        # Confidence must fall as evidence thins. The previous ladder started at 0.75 and
+        # only ever lowered it, so a row with no soil data at all kept 0.75 ("High") while
+        # a row with partial data dropped to 0.65 ("Medium") — less data read as more
+        # confident.
+        if predicted_yield and n is not None and p is not None and k is not None:
             conf_score = 0.90
+        elif predicted_yield:
+            conf_score = 0.70
         elif n is not None and p is not None and k is not None and ph is not None:
-            conf_score = 0.85
+            conf_score = 0.45
         elif n is not None or p is not None or k is not None:
-            conf_score = 0.65
+            conf_score = 0.30
+        else:
+            conf_score = 0.15
 
         conf_label = "High" if conf_score >= 0.7 else "Medium" if conf_score >= 0.4 else "Low"
 

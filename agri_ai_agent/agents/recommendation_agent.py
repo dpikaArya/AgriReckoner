@@ -47,6 +47,10 @@ NUTRIENT_DEFICIENCY_ACTION = {
     "high": {"N": None, "P": None, "K": None},
 }
 
+# A return of this many currency units per unit spent scores a full 1.0. Made explicit
+# so the scale is visible rather than buried as a bare divisor.
+ROI_FULL_SCORE = 10.0
+
 FERTILIZER_COST_PER_KG = {
     "Urea": 6.0,
     "DAP": 28.0,
@@ -209,7 +213,12 @@ class RecommendationAgent(BaseAgent):
         self._init_col(df, "Expected_Yield_Increase_Pct", float)
 
         for idx in df.index:
-            if pd.notna(df.at[idx, "Expected_Yield_Increase"]):
+            # The percentage is recomputed whenever it is missing, even if the absolute
+            # increase was supplied upstream: guarding on the absolute value alone left
+            # the percentage blank in every shipped row.
+            has_increase = pd.notna(df.at[idx, "Expected_Yield_Increase"])
+            has_pct = pd.notna(df.at[idx, "Expected_Yield_Increase_Pct"])
+            if has_increase and has_pct:
                 continue
 
             predicted = df.at[idx, "Predicted_Yield"] if "Predicted_Yield" in df.columns else None
@@ -217,13 +226,17 @@ class RecommendationAgent(BaseAgent):
                 df.at[idx, "Yield_per_Hectare"] if "Yield_per_Hectare" in df.columns else None
             )
 
+            # An increase is a comparison. Without a baseline there is nothing to compare
+            # against, and a flat fraction of the prediction — the previous fallback — is an
+            # assumption reported as a result. Leave it missing instead.
             if pd.notna(predicted) and pd.notna(baseline) and baseline > 0:
                 increase = predicted - baseline
                 df.at[idx, "Expected_Yield_Increase"] = round(increase, 2)
                 df.at[idx, "Expected_Yield_Increase_Pct"] = round((increase / baseline) * 100, 1)
-            elif pd.notna(predicted):
-                df.at[idx, "Expected_Yield_Increase"] = round(predicted * 0.1, 2)
-                df.at[idx, "Expected_Yield_Increase_Pct"] = 10.0
+            elif has_increase and pd.notna(baseline) and baseline > 0:
+                df.at[idx, "Expected_Yield_Increase_Pct"] = round(
+                    (df.at[idx, "Expected_Yield_Increase"] / baseline) * 100, 1
+                )
 
         return df
 
@@ -246,8 +259,12 @@ class RecommendationAgent(BaseAgent):
             if pd.isna(fert) or pd.isna(dose):
                 continue
 
+            # Price is per kg and the dose is kg/ha, so the product is already per hectare.
+            # Dividing by 1000 here understated every cost 1000-fold while revenue below
+            # was converted correctly, which inflated ROI by the same factor and pinned the
+            # score at its 1.0 ceiling for every recommendation.
             cost_per_kg = FERTILIZER_COST_PER_KG.get(str(fert), 15.0)
-            total_cost = cost_per_kg * (dose / 1000.0)
+            total_cost = cost_per_kg * dose
 
             revenue_per_ton = 25000
             expected_revenue = 0
@@ -256,13 +273,14 @@ class RecommendationAgent(BaseAgent):
 
             if total_cost > 0 and expected_revenue > 0:
                 roi = expected_revenue / total_cost
-                score = min(1.0, max(0.0, roi / 10.0))
+                score = min(1.0, max(0.0, roi / ROI_FULL_SCORE))
             elif expected_revenue > 0:
                 score = 0.7
             else:
-                score = 0.5
+                # No expected increase means no evidence of a return, not a middling one.
+                score = float("nan")
 
-            df.at[idx, "Economic_Score"] = round(score, 3)
+            df.at[idx, "Economic_Score"] = round(score, 3) if pd.notna(score) else float("nan")
 
         return df
 
