@@ -338,19 +338,30 @@ def main():
 
     ledger = Ledger(args.budget)
     records = []
+    # Written as the run proceeds. A long run that dies near the end otherwise loses every
+    # paper it already paid for, and re-running is both slow and billable.
+    checkpoint = f"{args.out}.partial"
     for index, (pmcid, licence) in enumerate(search(args.papers, args.query), 1):
         if ledger.exhausted():
             print(f"  budget reached after {index - 1} papers", flush=True)
             break
         records.append(process(pmcid, licence, api_key, ledger))
         if index % 10 == 0:
+            _write(checkpoint, {"partial": True, "papers": records})
             print(f"  ...{index} papers, {ledger}", flush=True)
 
     summary = report(records, ledger)
-    with open(args.out, "w", encoding="utf-8") as handle:
-        json.dump({"summary": summary, "papers": records}, handle, indent=2)
+    _write(args.out, {"summary": summary, "papers": records})
     print(f"\n  wrote {args.out}")
     return 0
+
+
+def _write(path, payload):
+    """Write JSON via a temporary file so an interrupted write cannot truncate the result."""
+    tmp = f"{path}.tmp"
+    with open(tmp, "w", encoding="utf-8") as handle:
+        json.dump(payload, handle, indent=2)
+    os.replace(tmp, path)
 
 
 if __name__ == "__main__":
