@@ -199,33 +199,37 @@ def extract_context(lines, full_text):
     return m
 
 
+YIELD_UNIT = r"(kg\s*ha-?1|t\s*ha-?1|kg\s*/\s*ha|t\s*/\s*ha|q\s*/\s*ha|q\s*ha-?1)"
+
+# A yield is only usable if its unit is stated: "2.5" alone could be t/ha, q/ha or a
+# percentage increase, and guessing is a 100-1000x error in the target variable.
+YIELD_PATTERNS = [
+    rf"(?:grain|seed|biological)\s*yield\s*(?:of|was|is|:|=)\s*(\d+\.?\d*)\s*{YIELD_UNIT}",
+    rf"(?:recorded|observed|maximum|highest|average)\s*(?:grain|seed)?\s*yield"
+    rf"\s*(?:of|was|is)?\s*(\d+\.?\d*)\s*{YIELD_UNIT}",
+    rf"yield\s*(?:was|ranged|varied)\s*(?:from)?\s*(\d+\.?\d*)\s*{YIELD_UNIT}",
+    rf"(\d+\.?\d*)\s*{YIELD_UNIT}",
+]
+
+
 def yield_regex_extraction(full_text):
-    """Extract single yield value from text when table parsing fails."""
-    results = {}
-    pats = [
-        (
-            r"(?:grain\s*yield|seed\s*yield|grain\s*yield|biological\s*yield)\s*(?:of|was|is|:|=)\s*(\d+\.?\d*)\s*(?:kg\s*ha-1|t\s*ha-1|kg/ha|t/ha|q/ha)",
-            "Yield_per_Hectare",
-        ),
-        (r"(\d+\.?\d*)\s*(?:kg\s*ha-1|t\s*ha-1)", "Yield_per_Hectare"),
-        (
-            r"(?:recorded|observed|maximum|highest|average)\s*(?:grain\s*yield|seed\s*yield)\s*(?:of|was|is)?\s*(\d+\.?\d*)",
-            "Yield_per_Hectare",
-        ),
-        (
-            r"(?:yield|grain\s*yield)\s*(?:was|ranged|varied)\s*(?:from)?\s*(\d+\.?\d*)",
-            "Yield_per_Hectare",
-        ),
-    ]
-    for pat, var in pats:
-        m = re.search(pat, full_text, re.IGNORECASE)
-        if m:
-            try:
-                results[var] = float(m.group(1))
-                break
-            except Exception:
-                pass
-    return results
+    """Extract a single yield from prose when table parsing fails, converted to kg/ha.
+
+    Every pattern requires an explicit unit, which is captured and converted rather than
+    assumed. A match whose unit cannot be converted is skipped instead of being stored
+    under the wrong unit.
+    """
+    from agri_ai_agent.extractors.units import convert, normalize_unit
+
+    for pat in YIELD_PATTERNS:
+        for m in re.finditer(pat, full_text, re.IGNORECASE):
+            unit = normalize_unit(m.group(2))
+            if unit is None:
+                continue
+            value, ok, _ = convert(float(m.group(1)), unit, "kg/ha")
+            if ok:
+                return {"Yield_per_Hectare": value}
+    return {}
 
 
 def scan_tables(lines, tids, tid_pos_set, ctx):
