@@ -1,14 +1,13 @@
 """Build treatment-level training rows from open-access agronomy papers.
 
-Division of labour, which the pilot established the hard way: rules can parse a table but
-cannot decide which table is the experiment. Ranking by size picks recommendation lookup
-tables; keying on the first column reads the year instead of the treatment. So the model is
-asked only to *choose* — which table, which column is the treatment, which is the yield,
-what unit it is in — and every number is then read out of the XML by code. The model never
-sees a value it could restate, so no reported figure can be an invention.
+The reading logic lives in :mod:`agri_ai_agent.extractors.tables`, so the pipeline's own
+agents and this harvester apply the same audited rules. What belongs here is only what is
+specific to a bulk run over Europe PMC: the search, the model call that *chooses* a table,
+the cost ledger and the report.
 
-Each emitted row carries the table and row it came from and the verbatim source cell, so any
-value can be checked against the paper without rerunning anything.
+The model is asked only to choose — which table, which columns. Every number is read from
+the XML by code, and each row keeps the source cell it came from, so any value can be
+checked against the paper without rerunning anything.
 
 Usage:
     python scripts/extract_oa_corpus.py --papers 100 --out corpus.json
@@ -17,12 +16,19 @@ Usage:
 import argparse
 import json
 import os
-import re
 import sys
 import time
 import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
+
+from agri_ai_agent.extractors.tables import (
+    find_treatment_column,
+    parse_grid,
+    read_rows,
+    selection_problem,
+    valid_dose_columns,
+)
 
 EPMC = "https://www.ebi.ac.uk/europepmc/webservices/rest"
 OPENROUTER = "https://openrouter.ai/api/v1/chat/completions"
@@ -33,38 +39,6 @@ DEFAULT_QUERY = (
     '"grain yield" AND (fertilizer OR fertiliser) AND ("field experiment" OR "field trial") '
     "AND OPEN_ACCESS:Y AND HAS_FT:Y"
 )
-NUMERIC = re.compile(r"^-?\d+(?:\.\d+)?$")
-
-# The model's column choice is checked, not trusted. Reading soil available phosphorus or
-# panicle counts as though they were grain yield was the single largest error class, and it
-# is detectable: a yield column says so in its own header.
-YIELD_WORD = re.compile(r"\b(yield|gy\b|produc(?:tion|tivity)|output)\b", re.I)
-AREA_UNIT = re.compile(r"\b(kg|t|q|mg|g)\s*[./·]?\s*(ha|hm|m\s*[-−]?\s*2|plot|plant|pot)\b", re.I)
-# Tables that describe a model or a relationship rather than an experiment's own results.
-NOT_AN_EXPERIMENT = re.compile(
-    r"\b(correlation|regression|response surface|rmse|r2 |r²|simulat|predicted vs|model "
-    r"(?:evaluation|performance|parameter)|membership|entropy|weight coefficient|sensitivity"
-    r"|analysis of variance|anova|sums? of squares|fitted|calibrat)\w*",
-    re.I,
-)
-
-
-def choice_is_credible(choice, caption, header):
-    """Reject a selection whose own header contradicts it. Returns a reason, or None."""
-    if choice["treatment_column"] < 0 or choice["yield_column"] < 0:
-        return "model reported no usable column"
-    if NOT_AN_EXPERIMENT.search(caption):
-        return f"caption describes an analysis, not an experiment: {caption[:60]}"
-    head = header[0] if header else []
-    if choice["yield_column"] >= len(head):
-        return "yield column is outside the header"
-    cell = head[choice["yield_column"]]
-    blob = f"{cell} {caption}"
-    if not YIELD_WORD.search(cell) and not (YIELD_WORD.search(caption) and AREA_UNIT.search(cell)):
-        return f"chosen column does not name a yield: {cell[:50]!r}"
-    if not AREA_UNIT.search(blob) and not AREA_UNIT.search(choice.get("yield_unit", "")):
-        return f"no area unit for the chosen column: {cell[:50]!r}"
-    return None
 
 SELECT_SCHEMA = {
     "type": "object",
@@ -170,50 +144,6 @@ def search(limit, query):
     return out[:limit]
 
 
-def cell_text(node):
-    text = "".join(node.itertext()).replace("−", "-").replace(" ", " ")
-    return re.sub(r"\s+", " ", text).strip()
-
-
-def parse_table(table_el):
-    """Return (caption, rows) with rowspan/colspan expanded into a rectangular grid."""
-    caption = " ".join(
-        cell_text(node) for tag in ("label", "caption") for node in table_el.findall(f".//{tag}")
-    )
-    grid, pending = [], {}
-    for row in table_el.iter("tr"):
-        out, col = [], 0
-        while col in pending:
-            text, left = pending.pop(col)
-            out.append(text)
-            if left > 1:
-                pending[col] = (text, left - 1)
-            col += 1
-        for cell in row:
-            if cell.tag not in ("td", "th"):
-                continue
-            text = cell_text(cell)
-            for _ in range(int(cell.get("colspan", 1) or 1)):
-                out.append(text)
-                down = int(cell.get("rowspan", 1) or 1)
-                if down > 1:
-                    pending[col] = (text, down - 1)
-                col += 1
-                while col in pending:
-                    held, left = pending.pop(col)
-                    out.append(held)
-                    if left > 1:
-                        pending[col] = (held, left - 1)
-                    col += 1
-        if out:
-            grid.append(out)
-    return caption.strip(), grid
-
-
-def tables_of(root):
-    return [parse_table(t) for t in root.iter("table-wrap")]
-
-
 def summarise(tables, max_rows=4, width=34):
     """Compact view of every table: enough to choose one, too little to read data from."""
     lines = []
@@ -249,136 +179,12 @@ def ask(messages, schema, api_key, ledger):
     return json.loads(body["choices"][0]["message"]["content"])
 
 
-def number_in(text):
-    """First numeric value in a cell, ignoring dispersion and significance letters.
-
-    Yields above a thousand are commonly written "1 446" or "1,446". Rejecting those
-    silently dropped the highest-yielding rows — 83 of them in one run, median 9257 — which
-    biased the surviving corpus downward rather than merely shrinking it.
-    """
-    head = re.split(r"[±]", str(text))[0].strip()
-    head = re.sub(r"[a-zA-Z\s*]+$", "", head).strip()
-    head = re.sub(r"(?<=\d)[\s,](?=\d{3}\b)", "", head)
-    return float(head) if NUMERIC.match(head) else None
-
-
-SUMMARY_LABEL = re.compile(
-    r"^\s*(?:"
-    r"(?:mean|range|cv|sd|se|sem|c\.?d\.?|lsd|total|average|treatments?|source|significance"
-    r"|anova|ns|contrast|interaction|rmse|df|error|residual|block|replication)\b"
-    r"|(?:main|simple)\s+effects?"
-    r"|[fp]\s*[-–]\s*\w"  # F-Rep, P-Rep, F-value
-    r"|[fp]\s*[-–]?\s*value"
-    r"|r\s*[²2]\b|η|χ|σ"  # statistics written as symbols
-    r")",
-    re.I,
-)
-# A row label carrying its own unit is a variable name, not a treatment: the table is
-# transposed, with measured variables down the side and treatments across the top. Reading
-# it as though the rows were treatments produces plausible-looking numbers for the wrong
-# quantity entirely (a root length reported as a grain yield).
-MEASURED_VARIABLE = re.compile(
-    r"\((?:cm|mm|m|g|kg|t|q|%|n\.?\s*m|kg\s*h[lL]|°c|days?|no\.?)\b[^)]*\)?", re.I
-)
-# Below this share of plausible treatment labels the table is not a treatment table at all —
-# most often it is transposed, with measured variables down the side.
-MIN_TREATMENT_SHARE = 0.6
-# Agronomy tables usually append an analysis-of-variance block under the treatment rows:
-# the factor codes (M, N, Y) and their interactions (M x N, M x N x Y). Those rows carry
-# F values, not yields, so reading them produces numbers that are the right shape and
-# entirely wrong.
-FACTOR_TERM = re.compile(r"^\s*[A-Za-z]{1,3}\s*(?:[x×*]\s*[A-Za-z]{1,3}\s*)+$")
-BARE_FACTOR = re.compile(r"^\s*[A-Za-z]\s*$")
-BARE_YEAR = re.compile(r"^\s*(19|20)\d\d\s*$")
-
-
-AMBIGUOUS_STAT = re.compile(r"^\s*(sd|se|cv|cd|ns|lsd|sem)\s*$", re.I)
-
-
-def is_treatment_label(label, near_foot=True):
-    """Ambiguous two-letter codes are statistics only in the ANOVA block at the foot.
-
-    ``SD`` was filtered as "standard deviation" in a paper where it meant straw deep
-    incorporation — and it was the highest-yielding treatment in every year.
-    """
-    if AMBIGUOUS_STAT.match(label):
-        return not near_foot
-    return _is_treatment_label(label)
-
-
-def _is_treatment_label(label):
-    """True when a row label names an experimental treatment rather than a statistic.
-
-    A dose written into the label ("N2 (300 kg/ha)") is a treatment and must survive; a
-    measured variable ("Root length (cm)") is not. They are told apart by whether a number
-    precedes the unit inside the parentheses.
-    """
-    if SUMMARY_LABEL.match(label):
-        return False
-    if FACTOR_TERM.match(label) or BARE_FACTOR.match(label) or BARE_YEAR.match(label):
-        return False
-    match = MEASURED_VARIABLE.search(label)
-    return not (match and not re.search(r"\d\s*[a-zA-Z%]", match.group(0)))
-
-
-DOSE_HEADER = re.compile(r"\b(rate|applied|application|dose|dosage|level|added|amount)\b", re.I)
-
-
-def _valid_dose_columns(choice, header):
-    """Keep only dose columns whose header names an applied rate with an area unit.
-
-    Of 82 doses emitted in one run, 5 were right: the rest were costs, grain weights, plot
-    counts, or the yield column itself. A wrong dose is worse than no dose, because it is
-    the variable a recommendation would be built on.
-    """
-    head = header[0] if header else []
-    keep = []
-    for column in choice.get("dose_columns") or []:
-        if not 0 <= column < len(head) or column == choice["yield_column"]:
-            continue
-        cell = head[column]
-        if DOSE_HEADER.search(cell) and AREA_UNIT.search(cell) and not YIELD_WORD.search(cell):
-            keep.append(column)
-    return keep
-
-
-def rows_from(grid, choice, header=None):
-    """Read treatment/yield/dose values out of the chosen columns, by code."""
-    treat_col = choice["treatment_column"]
-    yield_col = choice["yield_column"]
-    dose_cols = _valid_dose_columns(choice, header or [])
-    foot_starts = max(0, len(grid) - 3)
-    out, candidates = [], 0
-    for row_index, row in enumerate(grid):
-        if max(treat_col, yield_col, *(dose_cols or [0])) >= len(row):
-            continue
-        label = row[treat_col].strip()
-        value = number_in(row[yield_col])
-        if not label or value is None:
-            continue
-        candidates += 1
-        if not is_treatment_label(label, near_foot=row_index >= foot_starts):
-            continue
-        out.append(
-            {
-                "treatment": label,
-                "yield_value": value,
-                "yield_unit": choice.get("yield_unit", ""),
-                "doses": [number_in(row[c]) for c in dose_cols],
-                "row_index": row_index,
-                "source_cell": row[yield_col],
-            }
-        )
-
-    # If most labels down this column are not treatments, the column is not a treatment
-    # column — usually the table is transposed, with variables down the side. Keeping the
-    # minority that happen to look like treatments would mix quantities silently.
-    if candidates and len(out) / candidates < MIN_TREATMENT_SHARE:
-        return []
-    return out
+def tables_of(root):
+    return [parse_grid(t) for t in root.iter("table-wrap")]
 
 
 def process(pmcid, licence, api_key, ledger):
+    """Choose a table with the model, then read it with the shared, audited reader."""
     record = {"pmcid": pmcid, "licence": licence, "rows": [], "reason": ""}
     try:
         root = ET.fromstring(fetch(f"{EPMC}/{pmcid}/fullTextXML"))
@@ -412,12 +218,19 @@ def process(pmcid, licence, api_key, ledger):
 
     caption, grid = tables[choice["table_index"]]
     record["caption"] = caption[:200]
-    header = grid[:1]
-    rejection = choice_is_credible(choice, caption, header)
-    if rejection:
-        record["reason"] = f"rejected: {rejection}"
+    header, body = grid[:1], grid[1:]
+
+    treat_col = choice["treatment_column"]
+    yield_col = choice["yield_column"]
+    problem = selection_problem(treat_col, yield_col, header, caption, choice.get("yield_unit"))
+    if problem:
+        record["reason"] = f"rejected: {problem}"
         return record
-    record["rows"] = rows_from(grid[1:], choice, header)
+    if treat_col >= len(header[0] if header else []):
+        treat_col = find_treatment_column(header, body)
+
+    doses = valid_dose_columns(choice.get("dose_columns"), header, yield_col)
+    record["rows"] = read_rows(body, treat_col, yield_col, doses, choice.get("yield_unit", ""))
     if not record["rows"]:
         record["reason"] = "chosen table yielded no readable rows"
     return record

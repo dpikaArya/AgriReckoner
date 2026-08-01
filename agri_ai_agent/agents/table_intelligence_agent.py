@@ -13,6 +13,12 @@ import pandas as pd
 
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.settings import AgriAISettings
+from agri_ai_agent.extractors.tables import (
+    _foot_block_start,
+    find_treatment_column,
+    is_treatment_label,
+    parse_measurement,
+)
 
 TABLE_TYPE_PATTERNS: dict[str, list[re.Pattern]] = {
     "treatment": [
@@ -141,14 +147,21 @@ class TableIntelligenceAgent(BaseAgent):
         if not headers or not data_rows:
             return []
 
-        treatment_col = self._find_column(headers, ["treatment", "treat", "fertilizer", "dose"])
-        if treatment_col is None:
-            treatment_col = 0
+        # Located, never assumed. Falling back to column 0 reads the year in every table
+        # that reports more than one season, silently replacing the experimental variable.
+        treatment_col = find_treatment_column([headers], data_rows)
 
+        foot_starts = _foot_block_start(data_rows, treatment_col)
         extracted: list[dict] = []
-        for row in data_rows:
+        for row_index, row in enumerate(data_rows):
             if not row or all(v is None or str(v).strip() == "" for v in row):
                 continue
+            if treatment_col < len(row):
+                label = str(row[treatment_col]).strip()
+                # Statistics rows (Mean, CD, CV, the ANOVA factor block) carry F values
+                # shaped exactly like yields; reading them produces plausible nonsense.
+                if label and not is_treatment_label(label, near_foot=row_index >= foot_starts):
+                    continue
 
             record: dict[str, Any] = {
                 "Source_File": table.get("source_file", ""),
@@ -298,15 +311,13 @@ class TableIntelligenceAgent(BaseAgent):
         return None
 
     def _parse_numeric(self, value: str) -> float | None:
-        s = str(value).strip()
-        s = re.sub(r"[†‡*]", "", s)
-        s = re.sub(r"\s*±\s*.*", "", s)
-        s = s.replace(",", "")
-        try:
-            return float(s)
-        except ValueError:
-            match = re.search(r"(\d+\.?\d*)", s)
-            return float(match.group(1)) if match else None
+        """Read a measured value, keeping thousands separators intact.
+
+        The previous implementation stripped commas but not spaces and then fell back to
+        the first digit run, so "1 446" became 1.0 — a wrong number rather than a missing
+        one, and specifically for the high-yield rows where separators appear.
+        """
+        return parse_measurement(value)
 
     def _is_control_treatment(self, treatment) -> bool:
         if not isinstance(treatment, str):
