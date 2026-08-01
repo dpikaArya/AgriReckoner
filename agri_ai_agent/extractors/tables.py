@@ -70,9 +70,17 @@ SUMMARY_LABEL = re.compile(
     r")",
     re.I,
 )
-# Two-letter codes that are a statistic at the foot of a table and a treatment elsewhere:
+# Codes that are a statistic at the foot of a table and can be a treatment elsewhere:
 # "SD" meant straw deep incorporation in one trial, and was its highest-yielding treatment.
-AMBIGUOUS_STAT = re.compile(r"^\s*(sd|se|cv|cd|ns|lsd|sem)\s*$", re.I)
+# LSD, SEm, CD and NS are never treatment names, so they are unconditional (below).
+AMBIGUOUS_STAT = re.compile(r"^\s*(sd|se|cv)\s*$", re.I)
+# Dispersion labels are written with a trailing plus-minus or in parentheses; matching only
+# the bare token let "SEm±" and "SE ±" through as treatments.
+ALWAYS_STAT = re.compile(
+    r"^\s*(?:lsd|sem|cd|ns|s\.?e\.?m|c\.?d)\s*[±+()0-9.\s%]*$"  # never a treatment
+    r"|^\s*(?:sd|se|cv|sem|lsd|cd)\s*[±+]",  # a dispersion label
+    re.I,
+)
 FACTOR_TERM = re.compile(r"^\s*[A-Za-z]{1,3}\s*(?:[x×*]\s*[A-Za-z]{1,3}\s*)+$")
 BARE_FACTOR = re.compile(r"^\s*[A-Za-z]\s*$")
 BARE_YEAR = re.compile(r"^\s*(19|20)\d\d\s*$")
@@ -148,6 +156,8 @@ def is_treatment_label(label, near_foot=False):
     A dose written into the label ("N2 (300 kg/ha)") is a treatment; a measured variable
     ("Root length (cm)") is not. They differ by whether a number precedes the unit.
     """
+    if ALWAYS_STAT.match(label):
+        return False
     if AMBIGUOUS_STAT.match(label):
         return not near_foot
     if SUMMARY_LABEL.match(label):

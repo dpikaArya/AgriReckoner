@@ -236,6 +236,20 @@ def test_the_label_is_used_when_no_dose_column_survives_validation():
     assert [r["doses"] for r in read_rows(body, 0, 1)] == [[150.0], [300.0]]
 
 
+@pytest.mark.parametrize(
+    "label", ["LSD", "SEm±", "SE ±", "SEM ±", "CD", "CD (0.05)", "NS", "S.E.m", "SD ±"]
+)
+def test_dispersion_labels_are_never_treatments(label):
+    """LSD and SEm are never treatment names; a trailing plus-minus settles the rest."""
+    assert not is_treatment_label(label, near_foot=False)
+
+
+@pytest.mark.parametrize("label", ["SD", "SDR", "Seaweed", "CV1"])
+def test_codes_that_merely_start_like_a_statistic_survive(label):
+    """SD was a real treatment (straw deep incorporation) and the highest-yielding one."""
+    assert is_treatment_label(label, near_foot=False)
+
+
 if __name__ == "__main__":
     import sys
 
