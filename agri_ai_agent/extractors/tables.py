@@ -26,7 +26,9 @@ NUMERIC = re.compile(r"^-?\d+(?:\.\d+)?$")
 # A yield column names a yield. "grain" and "harvest" alone are too loose — they also match
 # grain weight and harvest index, which are different quantities on a different scale.
 YIELD_WORD = re.compile(r"\b(yield|gy|produc(?:tion|tivity)|output)\b", re.I)
-AREA_UNIT = re.compile(r"\b(kg|t|q|mg|g)\s*[./·]?\s*(ha|hm|m\s*[-−]?\s*2|plot|plant|pot)\b", re.I)
+AREA_UNIT = re.compile(
+    r"\b(kg|t|q|mg|g)\s*[./·]?\s*(ha|hm\s*-?2?|m\s*[-−]?\s*2|plot|plant|pot)\b", re.I
+)
 DOSE_HEADER = re.compile(r"\b(rate|applied|application|dose|dosage|level|added|amount)\b", re.I)
 # The rate is often written into the treatment label itself — "N2 (300 kg/ha)" — which is the
 # commonest place it appears, and needs no separate column or methods legend to recover.
@@ -45,9 +47,13 @@ def dose_in_label(label):
 NEVER_AN_EXPERIMENT = re.compile(
     r"\b(correlation|regression|response surface|rmse|predicted vs|membership|entropy"
     r"|weight coefficient|analysis of variance|anova|sums? of squares"
-    r"|model\s+(?:evaluation|performance|parameter)|simulat)\w*",
+    r"|model\s+(?:evaluation|performance|parameter)|simulat"
+    # A synthesis of other people's trials reports pooled effects, not this trial's results.
+    r"|meta[-\s]?analy|systematic review|pooled|literature|previous stud|reported (?:in|by))\w*",
     re.I,
 )
+# A column of citations means the rows are other people's results, whatever the caption says.
+CITATION_HEADER = re.compile(r"^\s*(citation|reference|references|source|study|author)s?\s*$", re.I)
 # These only disqualify a caption that does not otherwise announce a yield.
 ANALYSIS_UNLESS_YIELD = re.compile(r"\b(fitted|fitting|calibrat|sensitivity|r²)\w*", re.I)
 
@@ -220,6 +226,8 @@ def selection_problem(treatment_column, yield_column, header, caption, unit=""):
     head = header[0] if header else []
     if yield_column >= len(head):
         return "yield column is outside the header"
+    if any(CITATION_HEADER.match(name) for name in head):
+        return "table cites other studies; the rows are not this trial's results"
     cell = head[yield_column]
     names_yield = YIELD_WORD.search(cell)
     # A caption mentioning yield is not licence to read any column with an area unit: the

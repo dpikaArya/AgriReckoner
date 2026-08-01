@@ -250,6 +250,32 @@ def test_codes_that_merely_start_like_a_statistic_survive(label):
     assert is_treatment_label(label, near_foot=False)
 
 
+@pytest.mark.parametrize(
+    "caption",
+    [
+        "Meta-analysis of biofortification trials",
+        "Pooled RR (95% CI) across 14 studies",
+        "Systematic review of yield responses",
+        "Yields reported in previous studies",
+    ],
+)
+def test_a_synthesis_of_other_trials_is_not_this_trial(caption):
+    """A meta-analysis and a literature review both report other people's results."""
+    assert caption_is_an_analysis(caption)
+
+
+def test_a_citation_column_marks_the_rows_as_someone_elses_results():
+    header = [["Treatment", "Max yield (kg/hm2)", "Citation"]]
+    problem = selection_problem(0, 1, header, "Reported effects of fertilization")
+    assert problem and "cites other studies" in problem
+
+
+def test_square_hectometre_counts_as_an_area_unit():
+    """kg/hm2 is kg/ha; not recognising it rejected real yield columns."""
+    header = [["Treatment", "Maize yield (kg/hm2)"]]
+    assert selection_problem(0, 1, header, "Maize yield by treatment") is None
+
+
 if __name__ == "__main__":
     import sys
 
