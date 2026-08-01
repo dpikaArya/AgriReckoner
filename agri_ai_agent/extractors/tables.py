@@ -28,6 +28,16 @@ NUMERIC = re.compile(r"^-?\d+(?:\.\d+)?$")
 YIELD_WORD = re.compile(r"\b(yield|gy|produc(?:tion|tivity)|output)\b", re.I)
 AREA_UNIT = re.compile(r"\b(kg|t|q|mg|g)\s*[./·]?\s*(ha|hm|m\s*[-−]?\s*2|plot|plant|pot)\b", re.I)
 DOSE_HEADER = re.compile(r"\b(rate|applied|application|dose|dosage|level|added|amount)\b", re.I)
+# The rate is often written into the treatment label itself — "N2 (300 kg/ha)" — which is the
+# commonest place it appears, and needs no separate column or methods legend to recover.
+INLINE_DOSE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:kg|t|q)[\s/·.]*(?:ha|hm)", re.I)
+
+
+def dose_in_label(label):
+    """Fertiliser rate stated inside a treatment label, or None."""
+    match = INLINE_DOSE.search(label or "")
+    return float(match.group(1)) if match else None
+
 
 # Captions whose subject is an analysis rather than an experiment. Split in two because a
 # real results table often *also* reports a fitted curve or a calibration alongside its
@@ -258,6 +268,15 @@ def _foot_block_start(body, treatment_column):
     return run_start if (saw_unambiguous or run_length >= 2) else len(body)
 
 
+def _doses_for(label, row, dose_columns):
+    """Rates from validated dose columns, falling back to the treatment label."""
+    from_columns = [parse_measurement(row[c]) for c in dose_columns if c < len(row)]
+    if any(d is not None for d in from_columns):
+        return from_columns
+    inline = dose_in_label(label)
+    return [inline] if inline is not None else []
+
+
 def read_rows(body, treatment_column, yield_column, dose_columns=(), unit=""):
     """Read treatment rows from a table body, keeping the source cell for each value."""
     foot_starts = _foot_block_start(body, treatment_column)
@@ -277,7 +296,7 @@ def read_rows(body, treatment_column, yield_column, dose_columns=(), unit=""):
                 "treatment": label,
                 "yield_value": value,
                 "yield_unit": unit,
-                "doses": [parse_measurement(row[c]) for c in dose_columns if c < len(row)],
+                "doses": _doses_for(label, row, dose_columns),
                 "row_index": row_index,
                 "source_cell": row[yield_column],
             }

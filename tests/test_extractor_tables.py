@@ -14,6 +14,7 @@ import pytest
 
 from agri_ai_agent.extractors.tables import (
     caption_is_an_analysis,
+    dose_in_label,
     find_treatment_column,
     find_yield_column,
     is_treatment_label,
@@ -205,6 +206,34 @@ def test_a_transposed_table_is_rejected_whole():
 def test_an_out_of_range_column_does_not_raise(table):
     _, _, body = table
     assert read_rows(body, 1, 99) == []
+
+
+@pytest.mark.parametrize(
+    ("label", "expected"),
+    [
+        ("N2 (300 kg·hm-2)", 300.0),
+        ("N1 (150 kg ha-1)", 150.0),
+        ("T5 (2.5 t/ha)", 2.5),
+        ("T1", None),
+        ("CK", None),
+        ("100% RDF", None),
+    ],
+)
+def test_a_rate_written_into_the_treatment_label_is_recovered(label, expected):
+    """The commonest place a dose appears; needs no dose column and no methods legend."""
+    assert dose_in_label(label) == expected
+
+
+def test_a_validated_dose_column_takes_precedence_over_the_label():
+    header = [["Treatment", "N applied (kg ha-1)", "Grain yield (kg ha-1)"]]
+    body = [["N1 (150 kg ha-1)", "160", "5100"]]
+    rows = read_rows(body, 0, 2, valid_dose_columns([1], header, 2))
+    assert rows[0]["doses"] == [160.0]
+
+
+def test_the_label_is_used_when_no_dose_column_survives_validation():
+    body = [["N1 (150 kg ha-1)", "5100"], ["N2 (300 kg ha-1)", "5800"]]
+    assert [r["doses"] for r in read_rows(body, 0, 1)] == [[150.0], [300.0]]
 
 
 if __name__ == "__main__":
