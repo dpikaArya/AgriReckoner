@@ -257,7 +257,7 @@ The schema is the single source of truth for harmonised observations. It evolved
 | Metric | Value |
 |--------|-------|
 | UAMS rows | **332** |
-| UAMS columns | **305** (296 canonical + 8 external) |
+| UAMS columns | **296** (canonical `UAMS_COLUMNS`; enriched frame with 8 external columns preserved in `outputs/Universal_Agricultural_Schema_Enriched.csv`) |
 | Canonical columns matched | **296 / 296** |
 | External enrichment sources healthy | 8 (CGIAR, HuggingFace, ICAR, ISRIC, NASA_POWER, SoilGrids, SAU, Zenodo) |
 | Master seed | `data/master_datasets/master_literature_verified.xlsx` |
@@ -457,7 +457,8 @@ All artifacts land in `outputs/`:
 
 | File | Description |
 |------|-------------|
-| `Universal_Agricultural_Schema.csv` / `.xlsx` | 296-column UAMS v2.0 harmonised dataset |
+| `Universal_Agricultural_Schema.csv` / `.xlsx` | 296-column canonical UAMS v2.0 harmonised dataset |
+| `Universal_Agricultural_Schema_Enriched.csv` / `.xlsx` | Same rows plus external-enrichment columns (296 canonical + 8 external) |
 | `Universal_Agricultural_ML_Master.csv` | ML-ready feature matrix |
 | `features_dataset.csv` | Engineered feature set |
 | `Model_Results_All.csv` | Per-model R² / RMSE / MAE leaderboard |

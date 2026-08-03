@@ -188,17 +188,33 @@ def main():
     log.info("=" * 60)
     log.info("STEP 5: Save Enriched Universal Schema")
     log.info("=" * 60)
+    from agri_ai_agent.external_data.data_enricher import to_canonical_uams
+
     csv_path = settings.OUTPUT_DIR / "Universal_Agricultural_Schema.csv"
     xlsx_path = settings.OUTPUT_DIR / "Universal_Agricultural_Schema.xlsx"
-    enriched_df.to_csv(csv_path, index=False)
-    log.info(
-        "Saved CSV: %s (%d cols, %d rows)", csv_path, len(enriched_df.columns), len(enriched_df)
-    )
+    canonical = to_canonical_uams(enriched_df)
+    canonical.to_csv(csv_path, index=False, lineterminator="\n")
+    log.info("Saved CSV: %s (%d cols, %d rows)", csv_path, len(canonical.columns), len(canonical))
     try:
-        enriched_df.to_excel(xlsx_path, index=False)
+        canonical.to_excel(xlsx_path, index=False)
         log.info("Saved XLSX: %s", xlsx_path)
     except Exception as e:
         log.warning("XLSX save failed: %s", e)
+
+    if len(enriched_df.columns) != len(canonical.columns):
+        enriched_csv = settings.OUTPUT_DIR / "Universal_Agricultural_Schema_Enriched.csv"
+        enriched_xlsx = settings.OUTPUT_DIR / "Universal_Agricultural_Schema_Enriched.xlsx"
+        enriched_df.to_csv(enriched_csv, index=False, lineterminator="\n")
+        log.info(
+            "Enriched frame preserved at %s (%d cols, %d rows)",
+            enriched_csv,
+            len(enriched_df.columns),
+            len(enriched_df),
+        )
+        try:
+            enriched_df.to_excel(enriched_xlsx, index=False)
+        except Exception as e:
+            log.warning("Enriched XLSX save failed: %s", e)
 
     # Summary
     uams_cols_present = [c for c in UAMS_COLUMNS if c in enriched_df.columns]

@@ -2,7 +2,9 @@
   "snapshot": "legacy-monolith-v1",
   "produced_by": "run_aaf_pipeline.py (2004-line procedural monolith)",
   "note": "Validated committed artifacts frozen before refactor. New engine must reproduce these (within tolerance) before the monolith may be deleted.",
-  "git_sha": "e1a33b8899380d51ba341f53ee23f2a379ed1265",
+  "rebaselined": "2026-08-03",
+  "rebaseline_reason": "Two frozen artifacts legitimately changed with the validated 2026-08 literature harvest (commit 40e8826): outputs/Ready_Reckoner.xlsx was replaced by the literature-pipeline Ready Reckoner (5 sheets, 325 verified papers), and outputs/Universal_Agricultural_Schema.csv was restored to the canonical 296-column UAMS (the 9 external-enrichment columns are now preserved separately in Universal_Agricultural_Schema_Enriched.csv). Both artifacts were regenerated deterministically (see docs/CI_FIX_REPORT.md).",
+  "git_sha": "40e8826d38883ebf4d3d75ecd76e42a24dd824ce",
   "files": {
     "outputs/AAIF_Final_Report.html": {
       "sha256": "2000ad6dd8cddf3f63fda8e92184d8608dbf08c983fd736ec1d41e85604a6934",
@@ -129,8 +131,8 @@
       "bytes": 63697
     },
     "outputs/Ready_Reckoner.xlsx": {
-      "sha256": "a627f16d83432a75232d0c1686238c16c359c8ba08d6d7179fe7d0cff00c6609",
-      "bytes": 7350
+      "sha256": "bd2d2c5d1a87e4298bd5294025622d9e9c3943acbc9c409fca32d42d4ac49490",
+      "bytes": 73780
     },
     "outputs/Reproducibility_Report.md": {
       "sha256": "e351058f352fb2d8f2ea52340ed9d76d7527a799aa930fc00350133bfaa10c47",
@@ -161,8 +163,8 @@
       "bytes": 12531
     },
     "outputs/Universal_Agricultural_Schema.csv": {
-      "sha256": "cb1bb519dc9a3fddd135ee3f5e1e8417f348a93fdc32eac8d174cde6cad7a4dd",
-      "bytes": 28683
+      "sha256": "457b26a89fa219754bdde8b33b82cc8db2dda18be49a19caa2b856202bff0795",
+      "bytes": 184064
     },
     "outputs/Unmapped_Columns.csv": {
       "sha256": "385f76869bc8ff505651e8b78b35bc7e4d5ac7990146a5ad4413ba5bc1585c6f",

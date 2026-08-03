@@ -5,9 +5,12 @@ All operational settings live in ``config/*.yaml`` plus ``config/api_keys.env``
 
 * ``load_env_file``   — populate environment variables from a KEY=VALUE file
   (never overwrites a value that is already set).
-* ``load_yaml``       — safe YAML load with an empty-dict fallback.
+* ``load_yaml``       — safe YAML load with an empty-dict fallback (used for
+  optional/auxiliary files and by callers that must never fail).
 * ``load_literature_config`` — read every config file and return one nested
-  dict that ``LiteratureConfig.from_env`` merges into the dataclass.
+  dict that ``LiteratureConfig.from_env`` merges into the dataclass.  Raises
+  :class:`LiteratureConfigError` with an informative message when a required
+  config file is missing or unparsable, instead of silently returning ``{}``.
 
 Every provider value in these files points at the official production API;
 no placeholder endpoints are shipped.
@@ -30,6 +33,14 @@ CONFIG_FILES = (
 )
 
 ENV_FILE = "api_keys.env"
+
+
+class LiteratureConfigError(RuntimeError):
+    """Raised when required externalized literature configuration is unusable.
+
+    Replaces the previous silent ``{}`` fallback so misconfiguration (a missing
+    or unparsable ``config/*.yaml``) surfaces with an actionable message.
+    """
 
 
 def config_root() -> Path:
@@ -83,6 +94,42 @@ def load_yaml(path: str | Path) -> dict:
         return {}
 
 
+def load_required_yaml(path: str | Path, label: str | None = None) -> dict:
+    """Load a YAML config file, raising an informative error when unusable.
+
+    This is the strict counterpart of :func:`load_yaml`: required module
+    configuration must parse, so a missing or malformed file is reported with
+    the offending path and the root cause instead of being swallowed.
+    """
+    try:
+        import yaml
+    except ImportError as exc:  # pragma: no cover - yaml is a runtime dependency
+        raise LiteratureConfigError(
+            "PyYAML is required to load literature configuration but is not installed."
+        ) from exc
+    p = Path(path)
+    name = label or p.name
+    if not p.exists():
+        raise LiteratureConfigError(
+            f"Missing required literature config file: {name!r} (expected at {p}). "
+            f"Point AGRI_CONFIG_DIR at a directory containing all of "
+            f"{', '.join(CONFIG_FILES)}."
+        )
+    try:
+        with p.open("r", encoding="utf-8") as fh:
+            data = yaml.safe_load(fh)
+    except Exception as exc:  # noqa: BLE001 - wrap parse failures with context
+        raise LiteratureConfigError(
+            f"Unparsable literature config file {p} ({exc.__class__.__name__}: {exc})."
+        ) from exc
+    if not isinstance(data, dict):
+        raise LiteratureConfigError(
+            f"Literature config file {p} does not contain a YAML mapping "
+            f"(found {type(data).__name__})."
+        )
+    return data
+
+
 def load_literature_config(root: str | Path | None = None) -> dict:
     """Load every external config file into a single nested dict.
 
@@ -102,14 +149,14 @@ def load_literature_config(root: str | Path | None = None) -> dict:
     base = Path(root).resolve() if root else config_root()
     cfg_root = base if (base / "literature_sources.yaml").exists() else config_root()
 
-    sources = load_yaml(cfg_root / "literature_sources.yaml")
-    limits = load_yaml(cfg_root / "connector_limits.yaml")
-    quality = load_yaml(cfg_root / "quality_thresholds.yaml")
-    schema_map = load_yaml(cfg_root / "schema_mapping.yaml")
-    extraction = load_yaml(cfg_root / "extraction_rules.yaml")
-    training = load_yaml(cfg_root / "training_rules.yaml")
-    scheduler = load_yaml(cfg_root / "scheduler.yaml")
-    dashboard = load_yaml(cfg_root / "dashboard.yaml")
+    sources = load_required_yaml(cfg_root / "literature_sources.yaml")
+    limits = load_required_yaml(cfg_root / "connector_limits.yaml")
+    quality = load_required_yaml(cfg_root / "quality_thresholds.yaml")
+    schema_map = load_required_yaml(cfg_root / "schema_mapping.yaml")
+    extraction = load_required_yaml(cfg_root / "extraction_rules.yaml")
+    training = load_required_yaml(cfg_root / "training_rules.yaml")
+    scheduler = load_required_yaml(cfg_root / "scheduler.yaml")
+    dashboard = load_required_yaml(cfg_root / "dashboard.yaml")
 
     def _merge_sections(data: dict) -> dict:
         """Flatten `{group: {source: {...}}}` into `{source: {...}}`."""

@@ -7,9 +7,12 @@ produce the parquet / csv / xlsx / docx / html deliverables.
 
 from __future__ import annotations
 
+import io
 import json
 import logging
+import re
 import sqlite3
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -19,6 +22,17 @@ import pandas as pd
 from agri_ai_agent.literature.models import LiteratureRecord, SyncResult
 
 logger = logging.getLogger(__name__)
+
+# Fixed timestamps used when writing XLSX so that identical inputs always
+# produce byte-identical files (reproducible builds).  Without this, openpyxl
+# stamps docProps/core.xml and every zip entry with the current wall-clock time.
+_XLSX_CREATOR = "AAIF"
+_XLSX_STAMP = datetime(2000, 1, 1, tzinfo=timezone.utc)
+_XLSX_STAMP_ISO = b"2000-01-01T00:00:00Z"
+_XLSX_ZIP_DATE = (2000, 1, 1, 0, 0, 0)
+_CORE_TS_RE = re.compile(
+    rb"(<dcterms:(?:created|modified)[^>]*>)[^<]*(</dcterms:(?:created|modified)>)"
+)
 
 
 # ---------------------------------------------------------------------- #
@@ -385,11 +399,55 @@ def write_csv(df: pd.DataFrame, path: str | Path) -> Path:
 def write_excel(sheets: dict[str, pd.DataFrame], path: str | Path) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    with pd.ExcelWriter(path, engine="openpyxl") as writer:
+    buf = io.BytesIO()
+    with pd.ExcelWriter(buf, engine="openpyxl") as writer:
         for name, df in sheets.items():
-            (df if df is not None else pd.DataFrame()).to_excel(writer, sheet_name=name[:31], index=False)
+            frame = df if df is not None else pd.DataFrame()
+            frame.to_excel(writer, sheet_name=name[:31], index=False)
+        _set_xlsx_core_properties(writer.book.properties)
+    path.write_bytes(_rewrite_xlsx_deterministic(buf.getvalue()))
     logger.info("Wrote %s (%d sheets)", path, len(sheets))
     return path
+
+
+def _set_xlsx_core_properties(props: Any) -> None:
+    """Pin openpyxl core-properties metadata to a fixed, reproducible value."""
+    try:
+        props.creator = _XLSX_CREATOR
+        props.lastModifiedBy = _XLSX_CREATOR
+        props.created = _XLSX_STAMP
+        props.modified = _XLSX_STAMP
+    except Exception:  # pragma: no cover - property names vary across openpyxl
+        logger.debug("openpyxl core-property pinning unavailable", exc_info=True)
+
+
+def _rewrite_xlsx_deterministic(data: bytes) -> bytes:
+    """Re-pack an XLSX (zip) with fixed member timestamps and a pinned core.xml.
+
+    ``_set_xlsx_core_properties`` pins ``created``, but openpyxl overwrites
+    ``modified`` with the current time on save, so the timestamp text inside
+    ``docProps/core.xml`` is patched too (namespace attributes are preserved).
+    Re-writing the archive then gives every zip member a constant date, making
+    the output byte-reproducible for identical input frames.
+    """
+    out = io.BytesIO()
+    with (
+        zipfile.ZipFile(io.BytesIO(data), "r") as src,
+        zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as dst,
+    ):
+        for info in src.infolist():
+            raw = src.read(info.filename)
+            if info.filename == "docProps/core.xml":
+                raw = _CORE_TS_RE.sub(
+                    rb"\g<1>" + _XLSX_STAMP_ISO + rb"\g<2>",
+                    raw,
+                )
+            new_info = zipfile.ZipInfo(info.filename, _XLSX_ZIP_DATE)
+            new_info.compress_type = zipfile.ZIP_DEFLATED
+            new_info.external_attr = info.external_attr
+            new_info.create_system = info.create_system
+            dst.writestr(new_info, raw)
+    return out.getvalue()
 
 
 # ---------------------------------------------------------------------- #

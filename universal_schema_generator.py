@@ -223,20 +223,53 @@ def _run_enrichment_pipeline(data_dir: Path) -> pd.DataFrame:
 
 
 def save_schema(df: pd.DataFrame, output_path=None):
-    """Save the Universal Schema DataFrame to CSV and XLSX."""
+    """Save the Universal Schema DataFrame to CSV and XLSX.
+
+    The committed artifact is restricted to the canonical :data:`UAMS_COLUMNS`;
+    the full enriched frame (external-data columns included) is preserved in a
+    separate ``*_Enriched`` sidecar so no enrichment data is lost.
+    """
+    from agri_ai_agent.external_data.data_enricher import to_canonical_uams
+
     if output_path is None:
         output_path = OUTPUT_DIR / "Universal_Agricultural_Schema"
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     csv_path = output_path.with_suffix(".csv")
     xlsx_path = output_path.with_suffix(".xlsx")
-    df.to_csv(csv_path, index=False)
-    log.info("Schema saved to %s (%d cols, %d rows)", csv_path, len(df.columns), len(df))
+    canonical = to_canonical_uams(df)
+    canonical.to_csv(csv_path, index=False, lineterminator="\n")
+    log.info(
+        "Schema saved to %s (%d cols, %d rows; canonical UAMS %d)",
+        csv_path,
+        len(canonical.columns),
+        len(canonical),
+        len(canonical.columns),
+    )
     try:
-        df.to_excel(xlsx_path, index=False)
+        canonical.to_excel(xlsx_path, index=False)
         log.info("Schema saved to %s", xlsx_path)
     except Exception as e:
         log.warning("Could not save XLSX: %s", e)
+    if len(df.columns) != len(canonical.columns):
+        enriched_csv = output_path.with_name(
+            output_path.name.replace(
+                "Universal_Agricultural_Schema", "Universal_Agricultural_Schema_Enriched"
+            )
+            + ".csv"
+        )
+        enriched_xlsx = enriched_csv.with_suffix(".xlsx")
+        df.to_csv(enriched_csv, index=False, lineterminator="\n")
+        log.info(
+            "Enriched frame preserved at %s (%d cols, %d rows)",
+            enriched_csv,
+            len(df.columns),
+            len(df),
+        )
+        try:
+            df.to_excel(enriched_xlsx, index=False)
+        except Exception as e:
+            log.warning("Could not save enriched XLSX: %s", e)
     return csv_path, xlsx_path
 
 

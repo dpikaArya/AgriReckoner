@@ -23,9 +23,11 @@ literature:
   arXiv: {enabled: true}
   Zenodo: {enabled: true}
   Figshare: {enabled: true}
-  # disabled per production configuration (not in enabled source list)
+  # declared available (enabled: true) — at runtime the connector still
+  # auto-disables when its required credentials are absent, so a key-less
+  # environment simply skips it (see LiteratureConnector._detect_enabled).
   Mendeley_Data: {enabled: false}
-  Web_of_Science: {enabled: false}
+  Web_of_Science: {enabled: true}
   Scopus: {enabled: false}
   Dimensions: {enabled: false}
 

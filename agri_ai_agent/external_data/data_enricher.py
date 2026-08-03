@@ -28,6 +28,19 @@ def register_external_columns(columns: dict[str, str]) -> list[str]:
     return registered
 
 
+def to_canonical_uams(df: pd.DataFrame) -> pd.DataFrame:
+    """Restrict a frame to the canonical UAMS columns, in ``UAMS_COLUMNS`` order.
+
+    External-enrichment columns (registered via :func:`register_external_columns`)
+    and provenance helpers such as ``_source_file`` are intentionally excluded so
+    the committed ``Universal_Agricultural_Schema.csv`` artifact stays aligned with
+    the authoritative schema definition.  Callers that still need the full enriched
+    frame should persist it separately (see the ``*_Enriched.csv`` sidecar).
+    """
+    columns = [c for c in UAMS_COLUMNS if c in df.columns]
+    return df[columns].copy()
+
+
 def _detect_lat_lon_columns(df: pd.DataFrame) -> tuple[str | None, str | None]:
     lat_col = None
     lon_col = None
