@@ -1,0 +1,102 @@
+# AAIF — Per-connector rate limits, timeouts and retry budgets.
+#
+# Values here override the module defaults (LiteratureConfig.rate_limit_per_minute
+# etc.).  Keys are connector source_names; keep them aligned with
+# config/literature_sources.yaml.
+
+defaults:
+  rate_limit_per_minute: 30
+  timeout_sec: 45
+  retry_max: 3
+  retry_base_delay_sec: 1.5
+
+literature:
+  OpenAlex:
+    rate_limit_per_minute: 10
+    timeout_sec: 60
+  Crossref:
+    rate_limit_per_minute: 50
+  Europe_PMC:
+    rate_limit_per_minute: 20
+  PubMed:
+    rate_limit_per_minute: 5
+    retry_max: 5
+  Semantic_Scholar:
+    rate_limit_per_minute: 10
+    timeout_sec: 60
+  DataCite:
+    rate_limit_per_minute: 20
+  DOAJ:
+    rate_limit_per_minute: 20
+  AGRIS:
+    rate_limit_per_minute: 15
+    timeout_sec: 90
+  arXiv:
+    rate_limit_per_minute: 5
+  Zenodo:
+    rate_limit_per_minute: 20
+  Figshare:
+    rate_limit_per_minute: 20
+  Mendeley_Data:
+    rate_limit_per_minute: 10
+  Web_of_Science:
+    rate_limit_per_minute: 10
+    timeout_sec: 90
+  Scopus:
+    rate_limit_per_minute: 10
+    timeout_sec: 90
+  Dimensions:
+    rate_limit_per_minute: 10
+    timeout_sec: 90
+
+agricultural:
+  FAOSTAT:
+    rate_limit_per_minute: 20
+    timeout_sec: 90
+  NASA_POWER:
+    rate_limit_per_minute: 10
+    timeout_sec: 60
+  SoilGrids:
+    rate_limit_per_minute: 10
+    timeout_sec: 90
+  USDA_NASS:
+    rate_limit_per_minute: 10
+  World_Bank:
+    rate_limit_per_minute: 30
+  CGIAR:
+    rate_limit_per_minute: 20
+  GBIF:
+    rate_limit_per_minute: 10
+    retry_max: 5
+  Copernicus_CDS:
+    rate_limit_per_minute: 5
+    timeout_sec: 120
+  CHIRPS:
+    rate_limit_per_minute: 5
+  ERA5:
+    rate_limit_per_minute: 5
+    timeout_sec: 120
+  AgERA5:
+    rate_limit_per_minute: 5
+    timeout_sec: 120
+  Google_Earth_Engine:
+    rate_limit_per_minute: 5
+    timeout_sec: 120
+  GEOGLAM:
+    rate_limit_per_minute: 10
+  HarvestChoice:
+    rate_limit_per_minute: 15
+  MapSPAM:
+    rate_limit_per_minute: 15
+  MapSPAM_Dataverse:
+    rate_limit_per_minute: 15
+  ICRISAT:
+    rate_limit_per_minute: 10
+  IRRI:
+    rate_limit_per_minute: 10
+  CIMMYT:
+    rate_limit_per_minute: 10
+  IFPRI:
+    rate_limit_per_minute: 10
+  GYGA:
+    rate_limit_per_minute: 10

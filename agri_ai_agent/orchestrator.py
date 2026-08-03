@@ -25,6 +25,7 @@ from agri_ai_agent.agents import (
     FuzzyAgent,
     KnowledgeAgent,
     KnowledgeIntegrationAgent,
+    LiteratureAgent,
     ModelSelectionAgent,
     ObservationGenerationAgent,
     OntologyAgent,
@@ -50,6 +51,11 @@ from agri_ai_agent.utils.logging_utils import get_logger
 # (which look up canonical UAMS columns), and fuzzy runs AFTER prediction (it consumes
 # the model's Yield_Prediction). See the refactor notes for the wiring rationale.
 PIPELINE_STEPS = [
+    (
+        "literature",
+        LiteratureAgent,
+        "Literature Intelligence (Phase 0)",
+    ),
     ("repository_sync", RepositorySyncAgent, "Repository Sync & Change Detection"),
     ("external_data", ExternalDataSourceAgent, "External Data Source Layer"),
     ("dataset_normalization", DatasetNormalizationAgent, "Dataset Normalization"),

@@ -1,0 +1,60 @@
+# AAIF — Training readiness gates and retraining policy (Phases 9-10).
+#
+# The orchestrator re-trains models only when every gate passes; otherwise the
+# cycle is skipped with a diagnostic report and the pipeline continues.
+
+training_rules:
+  readiness_gates:
+    min_observations_per_target: 100
+    min_samples_per_crop: 10
+    min_samples_per_feature: 10
+    max_missing_value_ratio: 0.30
+    duplicate_removal_complete: true
+    feature_stability_required: true
+    schema_validation_required: true
+    min_quality_score: 0.0
+
+  retraining:
+    min_verified_papers: 50
+    min_new_papers: 10
+    auto_retrain: false
+    # retrain_command: "python -m agri_ai_agent.cli run"
+
+  evaluation:
+    metrics:
+      - r2
+      - adjusted_r2
+      - rmse
+      - mae
+      - mape
+      - bias
+    cross_validation_folds: 5
+    nested_cv_folds: 5
+    overfit_threshold_ratio: 1.25
+
+  model_zoo:
+    - mlr
+    - stepwise
+    - polynomial
+    - ridge
+    - lasso
+    - elastic_net
+    - pls
+    - random_forest
+    - extra_trees
+    - xgboost
+    - lightgbm
+    - catboost
+    - svr
+    - gpr
+    - decision_tree
+    - knn
+    - ann
+    - tabnet
+    - automl
+    - bayesian_optimization
+
+  interpretability:
+    - shap
+    - permutation_importance
+    - feature_importance

@@ -12,6 +12,7 @@ from .feature_store_agent import FeatureStoreAgent
 from .fuzzy_logic_agent import FuzzyAgent
 from .knowledge_agent import KnowledgeAgent
 from .knowledge_integration_agent import KnowledgeIntegrationAgent
+from .literature_agent import LiteratureAgent
 from .model_selection_agent import ModelSelectionAgent
 from .observation_generation_agent import ObservationGenerationAgent
 from .ontology_agent import OntologyAgent
@@ -44,6 +45,7 @@ __all__ = [
     "ReadyReckonerAgent",
     "ContinuousLearningAgent",
     "KnowledgeIntegrationAgent",
+    "LiteratureAgent",
     "ExternalDataSourceAgent",
     "DatasetNormalizationAgent",
     "DatasetIngestionBridgeAgent",

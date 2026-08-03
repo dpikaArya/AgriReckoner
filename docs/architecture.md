@@ -2,7 +2,7 @@
 
 ## Overview
 
-The AAIF is a **23-agent sequential pipeline** that converts unstructured agricultural research PDFs into structured, ML-ready datasets and actionable fertilizer recommendations. PHASE -1 (External Data Source Layer) provides a plugin-based external data ingestion system that runs before the main pipeline. Each agent extends `BaseAgent`, communicates via typed `AgentContract` messages, and is orchestrated by a central `Orchestrator` with checkpoint/recovery, retry logic, and provenance logging.
+The AAIF is a **24-agent sequential pipeline** (Phase 0 literature intelligence + 23 core agents) that converts unstructured agricultural research PDFs into structured, ML-ready datasets and actionable fertilizer recommendations. PHASE -1 (External Data Source Layer) provides a plugin-based external data ingestion system that runs before the main pipeline. Each agent extends `BaseAgent`, communicates via typed `AgentContract` messages, and is orchestrated by a central `Orchestrator` with checkpoint/recovery, retry logic, and provenance logging.
 
 ## Agent Pipeline
 

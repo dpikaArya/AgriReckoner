@@ -1,5 +1,6 @@
 from agri_ai_agent.continuous_learning.change_detector import ChangeSet
 
+STAGE_LITERATURE_DISCOVERY = "literature_discovery"
 STAGE_DATASET_REGISTRATION = "dataset_registration"
 STAGE_KNOWLEDGE_GRAPH_UPDATE = "knowledge_graph_update"
 STAGE_AI_EXTRACTION = "ai_extraction"
@@ -11,6 +12,7 @@ STAGE_INCREMENTAL_RETRAINING = "incremental_model_retraining"
 STAGE_READY_RECKONER_UPDATE = "ready_reckoner_update"
 
 ALL_USER_STAGES = [
+    STAGE_LITERATURE_DISCOVERY,
     STAGE_DATASET_REGISTRATION,
     STAGE_KNOWLEDGE_GRAPH_UPDATE,
     STAGE_AI_EXTRACTION,
@@ -23,6 +25,9 @@ ALL_USER_STAGES = [
 ]
 
 PIPELINE_STAGE_MAP = {
+    STAGE_LITERATURE_DISCOVERY: [
+        "literature",
+    ],
     STAGE_DATASET_REGISTRATION: [
         "external_data",
         "dataset_normalization",
@@ -73,6 +78,10 @@ class DependencyGraph:
 
         if not changes.has_changes:
             return affected
+
+        # Literature discovery is the primary change source: keep the corpus
+        # current on every cycle that has any change.
+        affected.append(STAGE_LITERATURE_DISCOVERY)
 
         if changes.has_data_changes:
             affected.extend(

@@ -1,0 +1,39 @@
+# AAIF — Framework health dashboard configuration.
+#
+# Controls which metric cards and sections are rendered by the generated
+# framework_health_dashboard.html.  Values are thresholds used to colour the
+# cards (green/amber/red).
+
+dashboard:
+  title: "AAIF Framework Health Dashboard"
+  refresh_interval_sec: 300
+
+  metric_cards:
+    connectors_enabled: true
+    connectors_auth_status: true
+    api_latency_ms: true
+    rate_limit_status: true
+    papers_discovered: true
+    verified_original_experiments: true
+    pdfs_downloaded: true
+    tables_figures_extracted: true
+    experimental_observations: true
+    schema_completeness_pct: true
+    duplicate_rate_pct: true
+    missing_value_pct: true
+    training_dataset_size: true
+    models_trained: true
+    best_validation_r2: true
+    latest_sync: true
+    pipeline_duration_sec: true
+    cache_utilization_pct: true
+    connector_failures: true
+
+  thresholds:
+    api_latency_ms: {good: 500, warn: 2000}
+    schema_completeness_pct: {good: 90, warn: 70}
+    duplicate_rate_pct: {good: 10, warn: 25}
+    missing_value_pct: {good: 15, warn: 30}
+    best_validation_r2: {good: 0.70, warn: 0.50}
+    cache_utilization_pct: {good: 50, warn: 20}
+    connector_failures: {good: 0, warn: 3}

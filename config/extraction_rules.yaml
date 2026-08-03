@@ -1,0 +1,52 @@
+# AAIF — Literature Intelligence extraction rules (Phase 5).
+#
+# Governs the AI extraction stage: which text sources are read, which
+# observation categories are extracted, and how values are normalized.
+# No extraction is performed for records that do not originate from a
+# legally accessible, original peer-reviewed field experiment.
+
+extraction_rules:
+  text_sources:
+    - body
+    - tables
+    - figures
+    - captions
+    - supplementary_material
+  ocr_scanned_pdfs: true
+
+  required_fields:
+    - crop
+    - yield
+    - treatment
+
+  value_normalization:
+    - units_normalized_to: UAMS
+    - percent_sign_handled
+    - ranges_midpoint
+
+  categories:
+    - crop
+    - variety
+    - experimental_design
+    - replications
+    - treatments
+    - soil
+    - weather
+    - fertilizer
+    - irrigation
+    - plant_growth
+    - yield
+    - economics
+    - statistical_outputs
+    - pest_disease
+    - sowing_date
+    - harvest_date
+    - planting_density
+    - seed_rate
+
+  exclusions:
+    - reviews
+    - editorials
+    - conference_abstracts
+    - simulation_only_studies
+    - patents

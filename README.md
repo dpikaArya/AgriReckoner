@@ -8,7 +8,7 @@
 
 An **agentic pipeline** that converts unstructured agricultural research PDFs into ML-ready datasets, yield-prediction models, and fuzzy-logic fertilizer recommendations — with full per-cell provenance tracking.
 
-**Key capabilities:** 6-reader hybrid PDF extraction, 23-agent pipeline, UAMS v2.0 schema (26 groups, 296 columns), 553-entry variant map, 8 regression model families, 221 Mamdani fuzzy rules, per-cell provenance tracking, external data enrichment (NASA POWER, SoilGrids, ISRIC, CGIAR, FAOSTAT, HuggingFace…), and continuous learning with drift detection.
+**Key capabilities:** 6-reader hybrid PDF extraction, 24-agent pipeline, UAMS v2.0 schema (26 groups, 296 columns), 553-entry variant map, 8 regression model families, 221 Mamdani fuzzy rules, per-cell provenance tracking, external data enrichment (NASA POWER, SoilGrids, ISRIC, CGIAR, FAOSTAT, HuggingFace…), literature intelligence (Phase 0), and continuous learning with drift detection.
 
 ---
 
@@ -80,13 +80,13 @@ Research Papers / Master Datasets / External APIs
    UAMS v2.0  •  Models  •  Ready Reckoner  •  Reports
 ```
 
-The full Mermaid flowchart of the 23-agent pipeline lives in [docs/flowchart.md](docs/flowchart.md); the detailed component reference is in [ARCHITECTURE.md](ARCHITECTURE.md).
+The full Mermaid flowchart of the 24-agent pipeline lives in [docs/flowchart.md](docs/flowchart.md); the detailed component reference is in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ### v3 Enrichment Pipeline
 
 A standalone enrichment pipeline (`run_enrichment.py`) that bypasses the LLM orchestrator for external data joins, delivering a **95% faster** enrichment pass with no LLM cost:
 
-| Metric | v2 (23-agent) | v3 (standalone) | Improvement |
+| Metric | v2 (24-agent) | v3 (standalone) | Improvement |
 |--------|---------------|-----------------|-------------|
 | Pipeline runtime | ~45 min (LLM-bound) | **~2 min** | **95% faster** |
 | External sources | 3 (LLM-limited) | **5+ concurrent** | **+67%** |
@@ -210,6 +210,73 @@ The schema is the single source of truth for harmonised observations. It evolved
 - **10 input membership functions** (soil N/P/K, pH, rainfall, temperature, humidity, …) and **3 output membership functions** (dose action, interval, risk)
 - **Centroid defuzzification** for crisp recommendation doses
 - Fuzzy outputs are fused with ML yield predictions to produce the **Ready Reckoner** — per-crop, per-scenario fertilizer decision tables with confidence, economic, environmental, and risk scores.
+
+---
+
+## Latest Results — Literature Intelligence Harvest (2026-08-03)
+
+### Production Synchronization Run
+
+| Metric | Value |
+|--------|-------|
+| Run ID | `RESUME_20260803` |
+| Total literature papers (canonical) | **844** |
+| Stored papers (`bibliography.db`) | 789 |
+| **Verified papers (PDF + metadata)** | **325** |
+| Duplicates merged | 2 |
+| Failed PDFs | 0 |
+| DOI validation mode | syntax-only (live validation deferred) |
+| Citations / References | 2,912 / 8,466 |
+| Graph artifacts | citation / author / experiment (parquet) |
+
+### Literature Harvest by Source (`state.sqlite` raw_cache = 867)
+
+| Source | Records |
+|--------|---------|
+| Crossref | 206 |
+| OpenAlex | 206 |
+| Zenodo | 201 |
+| Figshare | 197 |
+| Europe PMC | 28 |
+| arXiv | 22 |
+
+### Agricultural Connector Sync (16 enabled sources)
+
+| Source | Records | Status |
+|--------|---------|--------|
+| FAOSTAT (fast ingest, India + key crops) | **963** | ✅ cached |
+| NASA POWER (agroclimatic) | 21 | ✅ healthy |
+| GBIF | 4 | ✅ healthy (100 fetched, 4 parsed) |
+| CGIAR | 3 | ✅ healthy |
+| AgERA5 / ERA5 / CHIRPS / CIMMYT / ICRISAT / IFPRI / IRRI / SoilGrids / GEOGLAM / MapSPAM / HarvestChoice / World_Bank | 0 | ❌ blocked (DNS / API key / dataverse / timeout / cdsapi) |
+
+`outputs/connector_health.csv`, `connector_latency.csv`, `connector_failures.csv` capture the full 37-connector probe + sync result.
+
+### Universal Schema v2.0
+
+| Metric | Value |
+|--------|-------|
+| UAMS rows | **332** |
+| UAMS columns | **305** (296 canonical + 8 external) |
+| Canonical columns matched | **296 / 296** |
+| External enrichment sources healthy | 8 (CGIAR, HuggingFace, ICAR, ISRIC, NASA_POWER, SoilGrids, SAU, Zenodo) |
+| Master seed | `data/master_datasets/master_literature_verified.xlsx` |
+
+### Reports Generated
+
+`schema_validation_report.xlsx`, `schema_completeness.csv`, `coverage_report.xlsx`, `coverage_dashboard.html`, `missing_data_report.xlsx`, `training_readiness_report.xlsx`, `training_blockers.md`, `estimated_additional_papers.xlsx`, `framework_report.html/.docx/.pdf`, and `reports/final_execution_summary.md/.json` (11-item execution summary).
+
+### Training Readiness Gate — FAIL (retraining correctly skipped)
+
+| Gate | Actual | Threshold |
+|------|--------|-----------|
+| min_observations_per_target | 1 | ≥ 100 |
+| min_samples_per_crop | 1 | ≥ 10 |
+| min_samples_per_feature | 0 | ≥ 10 |
+| max_missing_value_ratio | 0.977 | ≤ 0.30 |
+| duplicate_removal_complete | 2 dupes recorded | true |
+
+The pipeline continues without a model cycle; diagnostics are emitted and the gate is re-evaluated after the next harvest expands verified original field-experiment coverage. See `outputs/training_blockers.md`.
 
 ---
 
@@ -357,7 +424,7 @@ mypy src/ --ignore-missing-imports    # clean
 
 ```
 Agricultural-Intelligence-Framework/
-├── agri_ai_agent/            # Core package (23 agents, orchestrator, config, extractors,
+├── agri_ai_agent/            # Core package (24 agents, orchestrator, config, extractors,
 │                             #   external_data connectors, continuous_learning, rules)
 ├── src/                      # Supporting pipeline modules
 │   ├── data_sources/         #   HTTP client, cache, storage, sync, config loader

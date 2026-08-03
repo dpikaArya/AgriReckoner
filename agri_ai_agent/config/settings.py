@@ -47,6 +47,12 @@ class AgriAISettings:
     CHECKPOINT_ENABLED: bool = True
     INCREMENTAL_MODE: bool = False
 
+    # Literature Intelligence Module (Phase 0) — native orchestrator step.
+    INCLUDE_LITERATURE_PHASE: bool = (
+        os.getenv("AGRI_INCLUDE_LITERATURE_PHASE", "1") not in {"0", "false", "False"}
+    )
+    LITERATURE_SKIP_AGRI_ON_RUN: str = os.getenv("AGRI_LIT_SKIP_AGRI_ON_RUN", "0")
+
     def ensure_dirs(self):
         for d in [
             self.OUTPUT_DIR,

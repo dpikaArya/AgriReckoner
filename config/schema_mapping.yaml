@@ -1,0 +1,46 @@
+# AAIF — Universal Agricultural Schema (UAMS) mapping rules.
+#
+# Maps agricultural source variables to canonical UAMS columns and declares
+# the canonical experimental observation categories surfaced during AI
+# extraction.  Loaded by agri_ai_agent.literature.external_config and merged
+# into the pipeline at runtime (AGRI_VARIABLE_TO_UAMS).
+
+schema_mapping:
+  # agricultural variable -> UAMS column
+  variable_to_uams:
+    2m_temperature: Average_Temperature
+    temperature_2m: Average_Temperature
+    mean_temperature: Average_Temperature
+    soil_temperature: Average_Temperature
+    total_precipitation: Rainfall
+    precipitation: Rainfall
+    rainfall: Rainfall
+    solar_radiation: Solar_Radiation
+    wind_speed: Wind_Speed
+    relative_humidity: Humidity
+    soil_moisture: Soil_Moisture
+    evapotranspiration: ET0
+    ndvi: NDVI
+    evi: EVI
+    yield_per_hectare: Yield_per_Hectare
+
+  # canonical observation categories collected during extraction (Phase 5)
+  observation_categories:
+    - crop
+    - variety
+    - experimental_design
+    - replications
+    - treatments
+    - soil
+    - weather
+    - fertilizer
+    - irrigation
+    - plant_growth
+    - yield
+    - economics
+    - statistical_outputs
+    - pest_disease
+    - sowing_date
+    - harvest_date
+    - planting_density
+    - seed_rate

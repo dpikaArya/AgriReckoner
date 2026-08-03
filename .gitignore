@@ -161,6 +161,9 @@ deliverables_*.zip
 # Generated runtime data (not source)
 database/
 
+# Literature harvest runtime data (raw caches, FAOSTAT extracts, DBs) — large
+literature_data/
+
 # Generated output artifacts
 outputs/AAIF_Layer_Efficiency_Report.txt
 outputs/Data_ADES_File_Inventory.csv

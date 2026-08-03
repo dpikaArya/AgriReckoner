@@ -49,6 +49,11 @@ def temp_settings(tmp_path):
     settings.OUTPUT_DIR = tmp_path / "outputs"
     settings.MODELS_DIR = tmp_path / "models"
     settings.OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # The literature phase (Phase 0) performs network sync; these e2e tests
+    # already exercise the network via `external_data`, so literature is
+    # disabled here (it still completes as a no-op, keeping step-count
+    # assertions valid).
+    settings.INCLUDE_LITERATURE_PHASE = False
     return settings
 
 

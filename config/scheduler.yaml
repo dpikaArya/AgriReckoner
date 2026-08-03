@@ -1,0 +1,21 @@
+# AAIF — Continuous-learning scheduler policy.
+#
+# Drives the `agriai learn --scheduled` path and the orchestrator's periodic
+# incremental loop.  If `enabled` is false, the scheduler is inert and runs
+# are manual.
+
+scheduler:
+  enabled: true
+  interval_sec: 86400        # check once per day by default
+  max_runs_per_day: 1
+  run_at: "02:30"            # optional local time-of-day preference
+  timezone: "UTC"
+  on_startup: false          # run one cycle when the process starts
+  retry_on_failure: true
+  retry_after_sec: 3600
+
+  # Literature discovery is the primary change source for the continuous loop.
+  literature:
+    sync_on_cycle: true
+    incremental: true
+    connector_failure_isolation: true

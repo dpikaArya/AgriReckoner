@@ -1,0 +1,492 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [12 0 R 13 0 R 14 0 R 15 0 R 16 0 R 17 0 R 18 0 R] /Count 7 >>
+endobj
+3 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+4 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+5 0 obj
+<< /Length 5871 >>
+stream
+BT /F2 20 Tf 1 0 0 1 46.0 781.89 Tm (AAIF Framework Report - Final Consolidated) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 745.89 Tm (Generated: 2026-08-03T10:26:59.284535+00:00) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 727.89 Tm () Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 708.89 Tm (Executive Summary) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 682.89 Tm (run_id: RESUME_20260803) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 664.89 Tm (completed_at: 2026-08-03 15:56:57) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 646.89 Tm (status: completed_with_errors) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 628.89 Tm (total_papers: 844) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 610.89 Tm (verified_papers: 325) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 592.89 Tm (duplicates_merged: 2) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 574.89 Tm (failed_pdfs: 0) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 556.89 Tm (validated_dois: 0) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 538.89 Tm (agri_records_synced: 991) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 520.89 Tm (uams_rows: 332) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 502.89 Tm (uams_columns: 305) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 484.89 Tm (uams_columns_present: 296) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 466.89 Tm (outputs: 17) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 448.89 Tm (retrain_triggered: False) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 430.89 Tm (gate_verdict: FAIL - retraining skipped) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 412.89 Tm (Agricultural Connector Sync) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 386.89 Tm (source  |  records) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 368.89 Tm (FAOSTAT  |  963) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 353.89 Tm (NASA_POWER  |  21) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 338.89 Tm (GBIF  |  4) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 323.89 Tm (CGIAR  |  3) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 308.89 Tm (TOTAL  |  991) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 293.89 Tm (Connector Health) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 267.89 Tm (connector  |  category  |  enab?  |  probe_st?  |  records_c?  |  records_fetched_?  |  health_status  |  last_syn?  |  notes) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 249.89 Tm (AGRIS  |  literatu?  |  yes  |  403.0  |  0  |  0  |  degraded  |  no  |  403-bot-guard; us?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 234.89 Tm (AgERA5  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  cdsapi-not-instal?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 219.89 Tm (AgMIP  |  agricult?  |  yes  |    |  0  |  0  |  degraded  |  no  |  no-connector-DNS) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 204.89 Tm (CGIAR  |  agricult?  |  yes  |  200.0  |  3  |  3  |  healthy  |  yes  |  ok-hf) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 189.89 Tm (CHIRPS  |  agricult?  |  yes  |  404.0  |  0  |  0  |  degraded  |  no  |  month-not-yet-pub?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 174.89 Tm (CIMMYT  |  agricult?  |  yes  |    |  0  |  0  |  degraded  |  no  |  DNS-fail) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 159.89 Tm (Copernicus_CDS  |  agricult?  |  no  |  401.0  |  0  |  0  |  disabled  |  no  |  credentials-requi?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 144.89 Tm (Crossref  |  literatu?  |  yes  |  200.0  |  206  |  206  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 129.89 Tm (DOAJ  |  literatu?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 114.89 Tm (DataCite  |  literatu?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 99.89 Tm (Dimensions  |  agricult?  |  no  |  200.0  |  0  |  0  |  disabled  |  no  |  api-requires-token) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 84.89 Tm (ERA5  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  cdsapi-not-instal?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 69.89 Tm (Europe_PMC  |  literatu?  |  yes  |  200.0  |  28  |  28  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 54.89 Tm (FAOSTAT  |  agricult?  |  yes  |  200.0  |  963  |  963  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (Figshare  |  literatu?  |  yes  |  200.0  |  197  |  197  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (GBIF  |  agricult?  |  yes  |  200.0  |  4  |  100  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (GEOGLAM  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (GYGA  |  agricult?  |  no  |  403.0  |  0  |  0  |  disabled  |  no  |  bot-guard) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Google_Earth_?  |  agricult?  |  no  |  200.0  |  0  |  0  |  disabled  |  no  |  credentials-requi?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (HarvestChoice  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok-search) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (ICRISAT  |  agricult?  |  yes  |  401.0  |  0  |  0  |  degraded  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (IFPRI  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (IRRI  |  agricult?  |  yes  |    |  0  |  0  |  degraded  |  no  |  DNS-fail) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (MapSPAM  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok-search) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm (MapSPAM_Datav?  |  agricult?  |  no  |  200.0  |  0  |  0  |  disabled  |  no  |  key-required-for-?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 616.89 Tm (Mendeley_Data  |  agricult?  |  no  |  401.0  |  0  |  0  |  disabled  |  no  |  oauth-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 601.89 Tm (NASA_POWER  |  agricult?  |  yes  |  200.0  |  21  |  21  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 586.89 Tm (OpenAlex  |  literatu?  |  yes  |  200.0  |  206  |  206  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 571.89 Tm (PubMed  |  literatu?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 556.89 Tm (Scopus  |  agricult?  |  no  |  401.0  |  0  |  0  |  disabled  |  no  |  api-key-required) Tj ET
+endstream
+endobj
+6 0 obj
+<< /Length 7158 >>
+stream
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (Semantic_Scho?  |  literatu?  |  yes  |  429.0  |  0  |  0  |  degraded  |  no  |  rate-limited) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (SoilGrids  |  agricult?  |  yes  |  504.0  |  0  |  0  |  degraded  |  no  |  timeout) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (USDA_NASS  |  agricult?  |  no  |  401.0  |  0  |  0  |  disabled  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (Web_of_Science  |  agricult?  |  no  |  403.0  |  0  |  0  |  disabled  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (World_Bank  |  agricult?  |  yes  |  200.0  |  0  |  0  |  configured-but?  |  no  |  ok-on-probe-indic?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (Zenodo  |  literatu?  |  yes  |  200.0  |  201  |  201  |  healthy  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (arXiv  |  literatu?  |  yes  |  200.0  |  22  |  22  |  healthy  |  yes  |  ok) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 676.89 Tm (Connector Latency) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 650.89 Tm (connector  |  endpoint  |  http_stat?  |  latency_?  |  ok  |  notes) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 632.89 Tm (OpenAlex  |  https://api.openalex.org/works?per?  |  200  |  890  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 617.89 Tm (Crossref  |  https://api.crossref.org/works?row?  |  200  |  850  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 602.89 Tm (Europe_PMC  |  https://www.ebi.ac.uk/europepmc/we?  |  200  |  720  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 587.89 Tm (PubMed  |  https://eutils.ncbi.nlm.nih.gov/en?  |  200  |  930  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 572.89 Tm (Semantic_Scholar  |  https://api.semanticscholar.org/gr?  |  429  |  950  |  no  |  rate-limited) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 557.89 Tm (DataCite  |  https://api.datacite.org/dois?quer?  |  200  |  980  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 542.89 Tm (DOAJ  |  https://doaj.org/api/search/articl?  |  200  |  1200  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 527.89 Tm (AGRIS  |  https://agris.fao.org/search/en?qu?  |  403  |  1100  |  no  |  403-bot-guard; uses OAI-PMH ins?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 512.89 Tm (arXiv  |  http://export.arxiv.org/api/query??  |  200  |  1340  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 497.89 Tm (Zenodo  |  https://zenodo.org/api/records?q=w?  |  200  |  760  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 482.89 Tm (Figshare  |  https://api.figshare.com/v2/articl?  |  200  |  700  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 467.89 Tm (Dimensions  |  https://app.dimensions.ai/api  |  200  |  400  |  yes  |  api-requires-token) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 452.89 Tm (Scopus  |  https://api.elsevier.com/content/s?  |  401  |  500  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 437.89 Tm (Web_of_Science  |  https://www.webofscience.com/wos/w?  |  403  |  600  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 422.89 Tm (Mendeley_Data  |  https://api.mendeley.com/datasets  |  401  |  400  |  no  |  oauth-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 407.89 Tm (FAOSTAT  |  https://bulks-faostat.fao.org/prod?  |  200  |  1183  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 392.89 Tm (NASA_POWER  |  https://power.larc.nasa.gov/api/te?  |  200  |  620  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 377.89 Tm (SoilGrids  |  https://rest.isric.org/soilgrids/v?  |  504  |  15000  |  no  |  timeout) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 362.89 Tm (World_Bank  |  https://api.worldbank.org/v2/count?  |  200  |  690  |  yes  |  ok-on-probe-indicator) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 347.89 Tm (CGIAR  |  https://huggingface.co/api/datasets  |  200  |  3678  |  yes  |  ok-hf) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 332.89 Tm (ICRISAT  |  https://dataverse.icrisat.org/api/?  |  401  |  700  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 317.89 Tm (IRRI  |  https://dataverse.irri.org/api/sea?  |  error  |  3000  |  no  |  DNS-fail) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 302.89 Tm (CIMMYT  |  https://dataverse.cimmyt.org/api/s?  |  error  |  3000  |  no  |  DNS-fail) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 287.89 Tm (IFPRI  |  https://dataverse.harvard.edu/api/?  |  200  |  900  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 272.89 Tm (AgMIP  |  https://agmip.org  |  error  |  3000  |  no  |  no-connector-DNS) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 257.89 Tm (CHIRPS  |  https://data.chc.ucsb.edu/products?  |  404  |  1400  |  no  |  month-not-yet-published) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 242.89 Tm (ERA5  |  https://cds.climate.copernicus.eu  |  200  |  800  |  yes  |  cdsapi-not-installed) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 227.89 Tm (AgERA5  |  https://cds.climate.copernicus.eu  |  200  |  800  |  yes  |  cdsapi-not-installed) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 212.89 Tm (HarvestChoice  |  https://dataverse.harvard.edu/api/?  |  200  |  900  |  yes  |  ok-search) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 197.89 Tm (MapSPAM  |  https://zenodo.org/api/records?q=m?  |  200  |  760  |  yes  |  ok-search) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 182.89 Tm (MapSPAM_Dataverse  |  https://dataverse.harvard.edu/api/?  |  200  |  900  |  yes  |  key-required-for-download) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 167.89 Tm (GEOGLAM  |  https://app.cropmonitor.org  |  200  |  800  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 152.89 Tm (GYGA  |  https://www.yieldgap.org  |  403  |  700  |  no  |  bot-guard) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 137.89 Tm (GBIF  |  https://api.gbif.org/v1/occurrence?  |  200  |  700  |  yes  |  ok) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 122.89 Tm (USDA_NASS  |  https://quickstats.nass.usda.gov/a?  |  401  |  500  |  no  |  api-key-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 107.89 Tm (Google_Earth_Engi?  |  https://earthengine.googleapis.com  |  200  |  500  |  yes  |  credentials-required) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 92.89 Tm (Copernicus_CDS  |  https://cds.climate.copernicus.eu/?  |  401  |  600  |  no  |  credentials-required) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 77.89 Tm (Connector Failures) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 51.89 Tm (connector  |  failure_type  |  message  |  records_fetched) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (AgERA5  |  sync_error  |  cdsapi not installed  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (CHIRPS  |  sync_error  |  404 month tifs  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (CIMMYT  |  sync_error  |  DNS getaddrinfo failed  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (Copernicus_CDS  |  disabled  |  disabled: missing CDSAPI_URL/CDSAPI_KEY  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Dimensions  |  disabled  |  disabled: missing DIMENSIONS_TOKEN  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (ERA5  |  sync_error  |  cdsapi not installed  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (GEOGLAM  |  sync_error  |  download failed  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (GYGA  |  disabled  |  disabled: missing credentials  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (Google_Earth_Engine  |  disabled  |  disabled: missing GEE credentials + 'ee' package  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (HarvestChoice  |  sync_error  |  download failed \(dataverse key\)  |  0) Tj ET
+endstream
+endobj
+7 0 obj
+<< /Length 7042 >>
+stream
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (IFPRI  |  sync_error  |  download failed \(dataverse key\)  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (IRRI  |  sync_error  |  DNS getaddrinfo failed  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (MapSPAM  |  sync_error  |  zenodo download failed  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (MapSPAM_Dataverse  |  disabled  |  disabled: missing DATAVERSE_API_KEY  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Mendeley_Data  |  disabled  |  disabled: missing MENDELEY_CLIENT_ID  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (Scopus  |  disabled  |  disabled: missing SCOPUS_API_KEY  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (Semantic_Scholar  |  sync_error  |  429 rate limit  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (SoilGrids  |  sync_error  |  download failed/timeout  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (USDA_NASS  |  disabled  |  disabled: missing NASS_API_KEY  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (Web_of_Science  |  disabled  |  disabled: missing WOS_API_KEY  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm (World_Bank  |  sync_error  |  read timeout 90s  |  0) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 616.89 Tm (Verified Papers) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 590.89 Tm (paper_id  |  canonic?  |  title  |  year  |  journal  |  authors  |  cou?  |  crop_te?  |  experim?  |  study_v?  |  quality?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 572.89 Tm (  |  vali?  |  citatio?  |  pdf_loc?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 554.89 Tm (PAPER_4?  |  10.1002?  |  Samplin?  |  197?  |  Biometr?  |  [{'full?  |    |  []  |  ['Rando?  |  []  |  0.7  |  True  |  4.) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 539.89 Tm (0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 524.89 Tm (PAPER_5?  |  10.2919?  |  Charact?  |  201?  |  Journal?  |  []  |    |  ['Rice']  |  ['Rando?  |  ['Culti?  |  0.6  |  True ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 509.89 Tm ( |  0.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 494.89 Tm (PAPER_c?  |  10.2517?  |  Relativ?  |  202?  |  Journal?  |  [{'full?  |    |  []  |  ['Rando?  |  []  |  0.7  |  True  |  4.) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 479.89 Tm (0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 464.89 Tm (PAPER_8?  |  10.1021?  |  Soil fr?  |    |    |  []  |    |  ['Wheat?  |  []  |  []  |  0.35  |  True  |  0.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 449.89 Tm (PAPER_0?  |  10.5194?  |  Long-te?  |  202?  |    |  [{'full?  |    |  ['Wheat?  |  []  |  []  |  0.55  |  True  |  0.0  |  [) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 434.89 Tm (]) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 419.89 Tm (PAPER_c?  |  10.1016?  |  Growth ?  |  201?  |  Agricul?  |  [{'full?  |    |  []  |  []  |  ['Sowin?  |  0.65  |  True  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 404.89 Tm (0.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 389.89 Tm (PAPER_f?  |  10.1111?  |  Respons?  |  200?  |  Soil Us?  |  [{'full?  |    |  []  |  []  |  ['Potas?  |  0.65  |  True  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 374.89 Tm (7.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 359.89 Tm (PAPER_0?  |  10.1111?  |  Grain y?  |  201?  |  Soil Us?  |  [{'full?  |    |  []  |  []  |  ['Yield?  |  0.65  |  True  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 344.89 Tm (3.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 329.89 Tm (PAPER_6?  |  10.1007?  |  Applica?  |  199?  |  Nutrien?  |  [{'full?  |    |  ['Rice']  |  []  |  ['Nitro?  |  0.65  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 314.89 Tm (  |  2.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 299.89 Tm (PAPER_b?  |  10.1007?  |  Yield r?  |  201?  |  Nutrien?  |  [{'full?  |    |  []  |  []  |  ['Phosp?  |  0.65  |  True  |  4) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 284.89 Tm (4.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 269.89 Tm (PAPER_7?  |  10.3246?  |  Technic?  |    |    |  [{'full?  |    |  ['Maize?  |  []  |  ['Nitro?  |  0.45  |  True  |  0.0  | ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 254.89 Tm ( []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 239.89 Tm (PAPER_0?  |  10.1007?  |  Effect ?  |  198?  |  Fertili?  |  [{'full?  |    |  []  |  []  |  ['Phosp?  |  0.65  |  True  |  8) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 224.89 Tm (.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 209.89 Tm (PAPER_9?  |  10.6084?  |  <b>Data?  |  202?  |    |  [{'full?  |    |  ['Wheat?  |  []  |  ['Culti?  |  0.7  |  True  |    | ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 194.89 Tm ( []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 179.89 Tm (PAPER_4?  |  10.3389?  |  Image 1?  |  202?  |    |  [{'full?  |    |  ['Wheat?  |  []  |  ['Nitro?  |  0.7  |  True  |    | ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 164.89 Tm ( []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 149.89 Tm (PAPER_d?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  ['Wheat?  |  []  |  ['Nitro?  |  0.7  |  True  |    | ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 134.89 Tm ( []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 119.89 Tm (PAPER_5?  |  10.6084?  |  Perform?  |  202?  |    |  [{'full?  |    |  ['Rice']  |  []  |  ['Weath?  |  0.8  |  True  |    | ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 104.89 Tm ( [{'url'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 89.89 Tm (PAPER_b?  |  10.1021?  |  Data-Dr?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.8  |  True  |    |  [{'url'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 74.89 Tm (PAPER_7?  |  10.1021?  |  The For?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.8  |  True  |    |  [{'url'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 59.89 Tm (PAPER_8?  |  10.6084?  |  CD4+ T ?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (PAPER_d?  |  10.6084?  |  <b><i>A?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (PAPER_8?  |  10.6084?  |  Researc?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (PAPER_3?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (PAPER_3?  |  10.3389?  |  Image 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.8  |  True  |    |  [{'url'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (PAPER_1?  |  10.3389?  |  Data Sh?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (PAPER_6?  |  10.3389?  |  Supplem?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (PAPER_d?  |  10.3389?  |  Image 2?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (PAPER_d?  |  10.3389?  |  Image 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (PAPER_4?  |  10.3389?  |  Supplem?  |  202?  |    |  [{'full?  |    |  []  |  []  |  ['Nutri?  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (PAPER_d?  |  10.3389?  |  Image 3?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+endstream
+endobj
+8 0 obj
+<< /Length 6283 >>
+stream
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (PAPER_d?  |  10.3389?  |  Image 4?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (PAPER_8?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  ['Culti?  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (PAPER_5?  |  10.3389?  |  Image 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (PAPER_9?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (PAPER_0?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  ['Tomat?  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (PAPER_f?  |  10.3389?  |  Supplem?  |  202?  |    |  [{'full?  |    |  []  |  []  |  ['Potas?  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (PAPER_0?  |  10.3389?  |  Image 1?  |  202?  |    |  [{'full?  |    |  ['Tomat?  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (PAPER_5?  |  10.3389?  |  Data Sh?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (PAPER_d?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (PAPER_1?  |  10.3389?  |  Data Sh?  |  202?  |    |  [{'full?  |    |  ['Chick?  |  []  |  ['Phosp?  |  0.7  |  True  |    | ) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm ( []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 616.89 Tm (PAPER_2?  |  10.3389?  |  Table 1?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 601.89 Tm (PAPER_1?  |  10.3389?  |  Supplem?  |  202?  |    |  [{'full?  |    |  []  |  ['Facto?  |  ['Nutri?  |  0.75  |  True  |    |) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 586.89 Tm (  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 571.89 Tm (PAPER_d?  |  10.6084?  |  A hybri?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.7  |  True  |    |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 556.89 Tm (PAPER_a?  |  10.6084?  |  Assessi?  |  202?  |    |  [{'full?  |    |  ['Rice']  |  []  |  []  |  0.8  |  True  |    |  [{'ur) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 541.89 Tm (l'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 526.89 Tm (PAPER_9?  |  10.6089?  |  Supplem?  |  202?  |    |  [{'full?  |    |  []  |  []  |  ['Weath?  |  0.8  |  True  |    |  [{'ur) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 511.89 Tm (l'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 496.89 Tm (PAPER_a?  |  10.6089?  |  Supplem?  |  202?  |    |  [{'full?  |    |  []  |  []  |  []  |  0.65  |  True  |    |  [{'url'?) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 481.89 Tm (PAPER_d?  |  10.1016?  |  Wheat a?  |  200?  |  Europea?  |  [{'full?  |    |  ['Wheat?  |  []  |  []  |  0.7  |  True  |  42) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 466.89 Tm (8.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 451.89 Tm (PAPER_1?  |  10.1111?  |  Effects?  |  200?  |  Annals ?  |  [{'full?  |    |  ['Wheat?  |  []  |  ['Irrig?  |  0.85  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 436.89 Tm (  |  274.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 421.89 Tm (PAPER_7?  |  10.1038?  |  Rising ?  |  201?  |  Nature ?  |  [{'full?  |    |  ['Wheat?  |  []  |  ['Yield?  |  0.85  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 406.89 Tm (  |  2445.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 391.89 Tm (PAPER_6?  |  10.1080?  |  Relatio?  |  199?  |  Communi?  |  [{'full?  |    |  ['Wheat?  |  []  |  ['Culti?  |  0.85  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 376.89 Tm (  |  78.0  |  []) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 361.89 Tm (PAPER_3?  |  10.1071?  |  Drought?  |  197?  |  Austral?  |  [{'full?  |    |  ['Wheat?  |  []  |  ['Irrig?  |  0.85  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 346.89 Tm (  |  2298.0  |  []) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 331.89 Tm (Universal Schema \(UAMS v2.0\)) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 305.89 Tm (rows: 332) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 287.89 Tm (columns: 305) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 269.89 Tm (uams_canonical: 296) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 251.89 Tm (uams_present: 296) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 233.89 Tm (uams_missing: 0) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 215.89 Tm (completeness_ratio: 1.0) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 197.89 Tm (columns_with_missing: 296) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 179.89 Tm (critical_high_missing: 291) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 161.89 Tm (Schema Completeness) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 135.89 Tm (column  |  present  |  non_null  |  null_count  |  completeness  |  n_unique) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 117.89 Tm (Paper_ID  |  True  |  325  |  7  |  0.9789  |  314) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 102.89 Tm (DOI  |  True  |  309  |  23  |  0.9307  |  309) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 87.89 Tm (Journal  |  True  |  129  |  203  |  0.3886  |  74) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 72.89 Tm (Year  |  True  |  327  |  5  |  0.9849  |  40) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 57.89 Tm (Authors  |  True  |  323  |  9  |  0.9729  |  305) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (Country  |  True  |  5  |  327  |  0.0151  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (Title  |  True  |  325  |  7  |  0.9789  |  320) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (Institution  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (Crop  |  True  |  174  |  158  |  0.5241  |  42) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Scientific_Name  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (Variety  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (Season  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (Growth_Duration_Days  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (Growth_Stage  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (Cover_Crop  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm (Previous_Crop  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 616.89 Tm (Intercrop_Name  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+endstream
+endobj
+9 0 obj
+<< /Length 4915 >>
+stream
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (Design  |  True  |  51  |  281  |  0.1536  |  17) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (Replications  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (Plot_Size  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (Spacing_Row  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Spacing_Plant  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (Sample_Size  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (Location  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (State  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (Site  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (Plot_ID  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm (Block  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 616.89 Tm (Experiment_Objective  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 601.89 Tm (Sowing_Date  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 586.89 Tm (Harvest_Date  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 571.89 Tm (Latitude  |  True  |  1  |  331  |  0.003  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 556.89 Tm (Longitude  |  True  |  1  |  331  |  0.003  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 541.89 Tm (Altitude  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 526.89 Tm (Temperature_Max  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 511.89 Tm (Temperature_Min  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 496.89 Tm (Average_Temperature  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 481.89 Tm (Rainfall  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 466.89 Tm (Humidity  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 451.89 Tm (Solar_Radiation  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 436.89 Tm (Wind_Speed  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 421.89 Tm (ET0  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 406.89 Tm (Climate_Zone  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 391.89 Tm (Soil_pH  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 376.89 Tm (EC  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 361.89 Tm (Organic_Carbon  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 346.89 Tm (Organic_Matter  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 331.89 Tm (Nitrogen  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 316.89 Tm (Phosphorus  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 301.89 Tm (Potassium  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 286.89 Tm (Sulphur  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 271.89 Tm (Iron  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 256.89 Tm (Copper  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 241.89 Tm (Manganese  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 226.89 Tm (Zinc  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 211.89 Tm (Calcium  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 196.89 Tm (Magnesium  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 181.89 Tm (Boron  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 166.89 Tm (Molybdenum  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 151.89 Tm (Sodium  |  True  |  0  |  332  |  0.0  |  0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 136.89 Tm (... 40 more rows omitted) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 118.89 Tm (Coverage Report) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 92.89 Tm (dimension  |  value  |  count) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 74.89 Tm (crop  |  All  |  325) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 59.89 Tm (crop  |  []  |  156) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (crop  |  ['Wheat']  |  33) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (crop  |  ['Rice']  |  25) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (crop  |  ['Maize']  |  25) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (crop  |  ['Tomato']  |  11) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (crop  |  ['Chickpea']  |  9) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (crop  |  ['Cotton']  |  8) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (crop  |  ['Cabbage']  |  6) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (crop  |  ['Potato']  |  5) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (crop  |  ['Wheat', 'Maize']  |  4) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (crop  |  ['Sunflower']  |  4) Tj ET
+endstream
+endobj
+10 0 obj
+<< /Length 5020 >>
+stream
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (crop  |  ['Barley']  |  3) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (crop  |  ['Maize', 'Soybean']  |  3) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (crop  |  ['Soybean']  |  3) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (crop  |  ['Wheat', 'Maize', 'Chickpea']  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (crop  |  ['Maize', 'Sorghum']  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (crop  |  ['Rice', 'Wheat']  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (crop  |  ['Sugarcane']  |  2) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (crop  |  ['Wheat', 'Chickpea']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (crop  |  ['Rice', 'Wheat', 'Maize', 'Soybean']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (crop  |  ['Groundnut']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm (crop  |  ['Canola']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 616.89 Tm (crop  |  ['Rice', 'Wheat', 'Canola']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 601.89 Tm (crop  |  ['Rice', 'Wheat', 'Chickpea', 'Lentil']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 586.89 Tm (crop  |  ['Wheat', 'Maize', 'Soybean']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 571.89 Tm (crop  |  ['Coffee']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 556.89 Tm (crop  |  ['Wheat', 'Maize', 'Soybean', 'Sunflower']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 541.89 Tm (crop  |  ['Wheat', 'Barley']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 526.89 Tm (crop  |  ['Wheat', 'Soybean', 'Sunflower']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 511.89 Tm (crop  |  ['Soybean', 'Cotton']  |  1) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 496.89 Tm (year_range  |  1923-2026  |  323) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 481.89 Tm (country  |  Unknown  |  325) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 466.89 Tm (Missing Data) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 440.89 Tm (column  |  missing_count  |  missing_ratio  |  severity) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 422.89 Tm (Sulphur_Content  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 407.89 Tm (Expected_Plant_Height  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 392.89 Tm (Soil_LOC  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 377.89 Tm (Soil_DOC  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 362.89 Tm (Soil_POC  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 347.89 Tm (Soil_Available_K  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 332.89 Tm (Soil_Ammonium_N  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 317.89 Tm (Soil_Nitrate_N  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 302.89 Tm (Soil_Moisture  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 287.89 Tm (Potential_Evapotranspiration  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 272.89 Tm (Residue_C_Decomposition  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 257.89 Tm (SOC_Mineralization  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 242.89 Tm (Recommendation_Summary  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 227.89 Tm (Confidence_Score  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 212.89 Tm (Expected_Yield_Increase  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 197.89 Tm (Recommended_Application_Interval  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 182.89 Tm (Recommended_Dose  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 167.89 Tm (Soil_MBC  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 152.89 Tm (Soil_MBN  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 137.89 Tm (Soil_Carbon_Walkley_Black  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 122.89 Tm (Soil_Ca_Ammonium_Acetate  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 107.89 Tm (Beta_Glucosidase  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 92.89 Tm (Soil_Cellobiosidase  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 77.89 Tm (Soil_Xylosidase  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 62.89 Tm (Soil_Glucosidase  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 47.89 Tm (Soil_K_Ammonium_Acetate  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (Soil_Mg_Ammonium_Acetate  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (Soil_N_DeSilva2008  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (Soil_Nitrogen_Kjeldahl  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (Soil_N_Parco2020  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Soil_NH4  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (Soil_NO3  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (Soil_Sulphur_Mehlich3  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (Soil_Sulphur_Available  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (Soil_Nitrogen_Alkaline_Permanganate  |  332  |  1.0  |  critical) Tj ET
+endstream
+endobj
+11 0 obj
+<< /Length 4206 >>
+stream
+BT /F1 8 Tf 1 0 0 1 46.0 781.89 Tm (Recommended_Fertilizer  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 766.89 Tm (Expected_Biomass  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 751.89 Tm (Polyphenol_Oxidase  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 736.89 Tm (Predicted_Yield  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 721.89 Tm (Water_Use_Efficiency  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 706.89 Tm (Nitrogen_Use_Efficiency  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 691.89 Tm (Harvest_Index_Calc  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 676.89 Tm (Heat_Units  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 661.89 Tm (Growing_Degree_Days  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 646.89 Tm (Target_Potassium  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 631.89 Tm (Target_Phosphorus  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 616.89 Tm (Target_Nitrogen  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 601.89 Tm (Target_Fertilizer  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 586.89 Tm (Target_Yield  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 571.89 Tm (Oil  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 556.89 Tm (Starch  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 541.89 Tm (Molybdenum_Content  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 526.89 Tm (Chlorine_Content  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 511.89 Tm (Boron_Content  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 496.89 Tm (Rainfall_Anomaly  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 481.89 Tm (Stress_Index  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 466.89 Tm (Disease_Risk_Index  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 451.89 Tm (Feature_Available_Before_Prediction  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 436.89 Tm (Country_Code  |  332  |  1.0  |  critical) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 421.89 Tm (Soil_Texture_Code  |  332  |  1.0  |  critical) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 406.89 Tm (Training Readiness Gate) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 380.89 Tm (gate  |  actual  |  threshold  |  operator  |  pass) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 362.89 Tm (min_observations_per_target  |  1.0  |  100.0  |  gte  |  False) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 347.89 Tm (min_samples_per_crop  |  1.0  |  10.0  |  gte  |  False) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 332.89 Tm (min_samples_per_feature  |  0.0  |  10.0  |  gte  |  False) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 317.89 Tm (max_missing_value_ratio  |  0.9773  |  0.3  |  lte  |  False) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 302.89 Tm (duplicate_removal_complete  |  0.0  |  1.0  |  gte  |  False) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 287.89 Tm (feature_stability_required  |  1.0  |  1.0  |  gte  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 272.89 Tm (schema_validation_required  |  1.0  |  1.0  |  gte  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 257.89 Tm (min_quality_score  |  0.35  |  0.0  |  gte  |  True) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 242.89 Tm (min_verified_papers  |  325.0  |  50.0  |  gte  |  True) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 227.89 Tm (Estimated Additional Papers) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 201.89 Tm (metric  |  value) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 183.89 Tm (verified_papers_current  |  325.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 168.89 Tm (verified_papers_target  |  50.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 153.89 Tm (papers_needed  |  0.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 138.89 Tm (yield_observations_current  |  1.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 123.89 Tm (yield_observations_target  |  100.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 108.89 Tm (observations_needed  |  99.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 93.89 Tm (est_papers_for_obs_gap  |  4.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 78.89 Tm (est_total_additional_papers  |  4.0) Tj ET
+BT /F1 8 Tf 1 0 0 1 46.0 63.89 Tm (est_harvest_hours  |  4.8) Tj ET
+BT /F2 14 Tf 1 0 0 1 46.0 48.89 Tm (Errors) Tj ET
+BT /F1 9 Tf 1 0 0 1 46.0 781.89 Tm (\(none\)) Tj ET
+endstream
+endobj
+12 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 5 0 R >>
+endobj
+13 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 6 0 R >>
+endobj
+14 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 7 0 R >>
+endobj
+15 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 8 0 R >>
+endobj
+16 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 9 0 R >>
+endobj
+17 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 10 0 R >>
+endobj
+18 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.3 841.9] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents 11 0 R >>
+endobj
+xref
+0 19
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000158 00000 n 
+0000000228 00000 n 
+0000000303 00000 n 
+0000006226 00000 n 
+0000013436 00000 n 
+0000020530 00000 n 
+0000026865 00000 n 
+0000031832 00000 n 
+0000036905 00000 n 
+0000041164 00000 n 
+0000041305 00000 n 
+0000041446 00000 n 
+0000041587 00000 n 
+0000041728 00000 n 
+0000041869 00000 n 
+0000042011 00000 n 
+trailer
+<< /Size 19 /Root 1 0 R >>
+startxref
+42153
+%%EOF

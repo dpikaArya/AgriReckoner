@@ -35,8 +35,8 @@ def test_fuzzy_rule_count_is_221():
     assert len(rules["rules"]) == 221
 
 
-def test_default_pipeline_wires_23_agents():
-    assert len(PIPELINE_STEPS) == 23
+def test_default_pipeline_wires_24_agents():
+    assert len(PIPELINE_STEPS) == 24
 
 
 def test_package_version_is_2_0_0():

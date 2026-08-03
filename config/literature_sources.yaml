@@ -1,0 +1,54 @@
+# Literature Intelligence Module — source registry.
+#
+# Every connector name below corresponds to a production connector class in
+# agri_ai_agent.literature.connectors.* (literature) and
+# agri_ai_agent.literature.agri.connectors.* (agricultural).
+#
+# `enabled: false` forces a connector off even when credentials are present.
+# If a connector's `enabled` key is absent, default auto-detection applies
+# (credential-protected connectors auto-disable when credentials are missing).
+#
+# Only official production endpoints are configured. No placeholder URLs.
+
+literature:
+  # open, no-auth connectors
+  OpenAlex: {enabled: true}
+  Crossref: {enabled: true}
+  Europe_PMC: {enabled: true}
+  PubMed: {enabled: true}
+  Semantic_Scholar: {enabled: true}
+  DataCite: {enabled: true}
+  DOAJ: {enabled: true}
+  AGRIS: {enabled: true}
+  arXiv: {enabled: true}
+  Zenodo: {enabled: true}
+  Figshare: {enabled: true}
+  # disabled per production configuration (not in enabled source list)
+  Mendeley_Data: {enabled: false}
+  Web_of_Science: {enabled: false}
+  Scopus: {enabled: false}
+  Dimensions: {enabled: false}
+
+agricultural:
+  FAOSTAT: {enabled: true}
+  NASA_POWER: {enabled: true}
+  SoilGrids: {enabled: true}
+  World_Bank: {enabled: true}
+  CGIAR: {enabled: true}
+  ICRISAT: {enabled: true}
+  IRRI: {enabled: true}
+  CIMMYT: {enabled: true}
+  IFPRI: {enabled: true}
+  GBIF: {enabled: true}
+  CHIRPS: {enabled: true}
+  ERA5: {enabled: true}
+  AgERA5: {enabled: true}
+  HarvestChoice: {enabled: true}
+  MapSPAM: {enabled: true}
+  GEOGLAM: {enabled: true}
+  # disabled per production configuration (not in enabled source list)
+  USDA_NASS: {enabled: false}
+  Copernicus_CDS: {enabled: false}
+  Google_Earth_Engine: {enabled: false}
+  MapSPAM_Dataverse: {enabled: false}
+  GYGA: {enabled: false}

@@ -1,0 +1,27 @@
+# AAIF — Quality thresholds and validation gates.
+#
+# Controls how verified-original status and readiness decisions are computed
+# during the literature pipeline and the training-readiness checkpoint.
+
+quality_thresholds:
+  verified_original:
+    min_quality_score: 0.0
+
+  quality_weights:
+    doi: 0.15
+    title: 0.15
+    year: 0.10
+    journal: 0.10
+    authors: 0.10
+    abstract: 0.15
+    pdf: 0.10
+    references: 0.05
+    design_signal: 0.05
+    verified_doi: 0.05
+
+  doi_validation:
+    live: true
+    source: crossref   # crossref | datacite | none
+
+  deduplication:
+    title_similarity_threshold: 0.95
