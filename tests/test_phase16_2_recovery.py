@@ -812,10 +812,198 @@ class TestDeliverables:
             "ml_readiness",
             "attempts",
             "reports",
+            "deliverables",
         ]
 
     def test_checkpoint_restartable(self):
         from p16_2_common import load_checkpoint
 
         cp = load_checkpoint()
-        assert cp.get("last_step") == "reports"
+        assert cp.get("last_step") == "deliverables"
+
+
+# ---------------------------------------------------------------------------
+# failure categories (spec naming)
+# ---------------------------------------------------------------------------
+
+
+class TestFailureCategories:
+    def test_exact_spec_categories(self):
+        from p16_2_attempts import FAILURE_CATEGORIES
+
+        assert list(FAILURE_CATEGORIES) == [
+            "NO_OPEN_ACCESS_COPY",
+            "PUBLISHER_RESTRICTED",
+            "DOI_INVALID",
+            "DOI_NOT_FOUND",
+            "REPOSITORY_NOT_FOUND",
+            "PDF_NOT_FOUND",
+            "HTTP_ERROR",
+            "RATE_LIMITED",
+            "TIMEOUT",
+            "INVALID_PDF",
+            "CORRUPTED_PDF",
+            "UNRELATED_DOCUMENT",
+            "LOGIN_REQUIRED",
+            "PARSER_FAILURE",
+            "DUPLICATE_ALREADY_RECOVERED",
+            "OTHER",
+        ]
+
+    def test_retry_rules_wellformed(self):
+        from p16_2_attempts import FAILURE_CATEGORIES
+
+        rules = {v[0] for v in FAILURE_CATEGORIES.values()}
+        assert rules <= {"retry_ok", "retry_backoff", "retry_limited", "no_retry"}
+        assert "PUBLISHER_RESTRICTED" in FAILURE_CATEGORIES
+        assert FAILURE_CATEGORIES["INVALID_PDF"][0] == "no_retry"
+        assert FAILURE_CATEGORIES["RATE_LIMITED"][0] == "retry_backoff"
+
+
+# ---------------------------------------------------------------------------
+# consolidated deliverables (spec names, idempotency, backup/rollback)
+# ---------------------------------------------------------------------------
+
+
+class TestSpecDeliverables:
+    def test_workbook_deliverables_present(self):
+        expected = [
+            "recovery_attempts.xlsx",
+            "recovery_success.xlsx",
+            "recovery_failures.xlsx",
+            "pdf_integrity_report.xlsx",
+            "canonical_identity_reconciliation.xlsx",
+            "existing_extraction_reconciliation.xlsx",
+            "new_observations.xlsx",
+            "observation_qc_results.xlsx",
+            "information_gain_after_recovery.xlsx",
+            "affected_meta_analysis.xlsx",
+            "affected_ready_reckoner.xlsx",
+            "rag_incremental_update.xlsx",
+        ]
+        reports = ROOT / "reports" / "phase16_2"
+        if not (reports / "recovery_attempts.xlsx").exists():
+            pytest.skip("pipeline outputs absent")
+        for name in expected:
+            assert (reports / name).exists(), f"missing report {name}"
+
+    def test_parquet_deliverables_present(self):
+        expected = [
+            "recovered_papers.parquet",
+            "recovery_failures.parquet",
+            "canonical_reconciliation.parquet",
+            "new_observations.parquet",
+            "affected_evidence_groups.parquet",
+            "acquisition_state.parquet",
+        ]
+        if not (OUT / "recovered_papers.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        for name in expected:
+            assert (OUT / name).exists(), f"missing output {name}"
+
+    def test_summary_artifacts_present(self):
+        reports = ROOT / "reports" / "phase16_2"
+        if not (reports / "recovery_attempts.xlsx").exists():
+            pytest.skip("pipeline outputs absent")
+        assert (reports / "phase16_2_metrics.json").exists()
+        assert (reports / "Phase16_2_Summary.html").exists()
+
+    def test_metrics_consistent_with_queue(self):
+        import json
+
+        if not (OUT / "recovered_papers.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        m = json.loads((ROOT / "reports" / "phase16_2" / "phase16_2_metrics.json").read_text())
+        q = pd.read_parquet(OUT / "recovery" / "recovery_queue.parquet")
+        assert m["recovery_candidates"] == len(q)
+        assert m["resolution_steps_planned"] >= len(q)
+
+    def test_acquisition_state_all_pending_dry_run(self):
+        if not (OUT / "acquisition_state.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        s = pd.read_parquet(OUT / "acquisition_state.parquet")
+        assert len(s) > 0
+        assert set(s["RecoveryStatus"]) == {"pending"}
+        assert s["PaperID"].is_unique
+
+    def test_dry_run_success_and_failures_empty(self):
+        if not (OUT / "recovered_papers.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        assert len(pd.read_parquet(OUT / "recovered_papers.parquet")) == 0
+        assert len(pd.read_parquet(OUT / "recovery_failures.parquet")) == 0
+
+    def test_attempt_ledger_records_full_schema(self):
+        if not (OUT / "resolution" / "resolution_plan.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        plan = pd.read_parquet(OUT / "resolution" / "resolution_plan.parquet")
+        for col in (
+            "HTTPStatus",
+            "ContentType",
+            "FileSize",
+            "Checksum",
+            "License",
+            "FailureReason",
+            "RetryEligible",
+            "Success",
+        ):
+            assert col in plan.columns
+
+    def test_handoff_written(self):
+        if not (OUT / "recovered_papers.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        import json
+
+        h = json.loads((OUT / "handoff" / "next_cycle_handoff.json").read_text(encoding="utf-8"))
+        assert "next_cycle_candidates" in h
+        assert "recommendations" in h
+        assert h["dry_run"] is True
+
+    def test_idempotent_rerun(self, tmp_path):
+        from p16_2_deliverables import DeliverablesBuilder
+
+        if not (OUT / "recovered_papers.parquet").exists():
+            pytest.skip("pipeline outputs absent")
+        d1 = DeliverablesBuilder(_cfg()).build()
+        d2 = DeliverablesBuilder(_cfg()).build()
+        for key in ("attempts", "success", "failure", "canon", "acquisition_state"):
+            a = d1[key].reset_index(drop=True)
+            b = d2[key].reset_index(drop=True)
+            assert a.equals(b), f"non-idempotent rerun: {key}"
+        assert d1["handoff"].get("next_cycle_candidates") == d2["handoff"].get(
+            "next_cycle_candidates"
+        )
+        assert d1["handoff"].get("recovered_this_cycle") == d2["handoff"].get(
+            "recovered_this_cycle"
+        )
+
+    def test_backup_restore_roundtrip(self, tmp_path):
+        from p16_2_common import backup_artifact, restore_artifact
+
+        src = tmp_path / "curated.parquet"
+        df = pd.DataFrame({"k": [1, 2, 3]})
+        df.to_parquet(src, index=False)
+        bk = backup_artifact(src)
+        assert bk is not None and bk.exists()
+        df2 = pd.DataFrame({"k": [9, 9]})
+        df2.to_parquet(src, index=False)
+        assert pd.read_parquet(src)["k"].tolist() == [9, 9]
+        assert restore_artifact(src, bk) is True
+        assert pd.read_parquet(src)["k"].tolist() == [1, 2, 3]
+
+    def test_backup_missing_returns_none(self, tmp_path):
+        from p16_2_common import backup_artifact
+
+        assert backup_artifact(tmp_path / "nope.parquet") is None
+
+    def test_cross_drive_path_refused(self):
+        from p16_2_run_all import ensure_inside_root
+
+        with pytest.raises(RuntimeError):
+            ensure_inside_root(C.PROJECT_ROOT / "safe", "C:\\Windows\\System32\\evil.txt")
+
+    def test_deterministic_path_prefers_paper_id(self):
+        a = INT.deterministic_pdf_path("10.1000/x", "P-123")
+        b = INT.deterministic_pdf_path("10.1000/y", "P-123")
+        assert a == b  # same paper -> same file, canonical uniqueness
+        c = INT.deterministic_pdf_path("10.1000/x")
+        assert c.name != a.name
