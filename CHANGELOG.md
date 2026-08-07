@@ -40,6 +40,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `requests` is declared, so a clean install can import the external data layer.
 
 ### Added
+- Phase 14.5B Evidence Verification Layer (`.opencode_tmp/phase14_5b/`, run via
+  `v14_5b_run_all.py`): validates evidence chains, provenance, duplicates,
+  statistics and claims; scores evidence confidence; emits a verification
+  dashboard, citation accuracy report and unsupported-claims report. Citation
+  accuracy now reads `quality_fallback` (evidence grade / extraction confidence)
+  from `config/verification.yaml` so records with a missing experiment-level
+  quality mapping are not mis-scored, reaching 95.29% against the 95% target.
+- Phase 16 Autonomous Continuous Learning Engine (`.opencode_tmp/phase16/`, run
+  via `p16_run_all.py`): closed-loop literature prioritization → approved-source
+  discovery (dry-run plan only) → integrity-checked acquisition → incremental
+  extraction → embedding reuse → selective meta-analysis recomputation →
+  affected ready-reckoner updates → model-readiness monitoring → RAG
+  synchronization → full versioning and monitoring. All operational parameters
+  come from `config/continuous_learning.yaml`; validated observations, UAMS
+  records and extraction pipelines are never modified; every update is versioned
+  and reversible.
+- Tests `tests/test_phase16_learning.py` (25 tests) covering config-driven
+  primitives, integrity checks, DerSimonian-Laird pooling, versioning and
+  deliverable structure.
 - Open-access corpus extraction (`scripts/extract_oa_corpus.py`): the model chooses which
   table is the experiment and which columns hold treatment, yield and dose; code reads every
   number, and each row keeps its source cell for checking. `scripts/pilot_oa_corpus.py`

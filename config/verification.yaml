@@ -1,0 +1,100 @@
+# Phase 14.5B Evidence Verification Layer configuration
+# AAIF - validates every retrieved statement's evidence chain before any
+# reasoning module consumes it. Operational thresholds and weights live here,
+# never in source code.
+
+verification:
+  chain:
+    # Applicable required links per chunk type (links that must be present for
+    # the chain to be complete). Chunks of a type are validated only against
+    # their own required link list.
+    required_links:
+      observation: [PaperID, ObservationID, Variable, SourceTable, SourceRow]
+      measurement: [PaperID, ObservationID, MeasurementID, Variable, SourceTable, SourceRow]
+      effect_size: [PaperID, Variable, StudyID, SourceTable]
+      meta_analysis: [Variable, MetaGroupID, SourceTable, StudyCount]
+      response_curve: [CurveID, DoseVariable, ResponseVariable, SupportingPapers]
+      ready_reckoner: [RecommendationID, Variable, SupportingStudies]
+      study: [PaperID, ExperimentID, QualityScore]
+      treatment: [PaperID, ExperimentID, TreatmentID]
+      experiment: [PaperID, ExperimentID]
+      paper: [PaperID, DOI]
+      knowledge_graph: [NodeID]
+      feature: [Variable, QualityScore]
+      qc: [PaperID, ObservationID, Variable]
+    # minimum fraction of required links that must be present for a valid chain
+    min_completeness: 0.8
+
+  citation:
+    target_accuracy: 0.95
+    # citation scope: chunk types that carry scientific evidence
+    evidence_types:
+      - observation
+      - measurement
+      - effect_size
+      - meta_analysis
+      - response_curve
+      - ready_reckoner
+      - feature
+      - study
+    quality_threshold: 0.35
+    # A citation stays "accurate" when the study-quality gate is met by the
+    # QualityScore OR by fallback signals (evidence grade and/or extraction
+    # confidence) for records whose QualityScore is unset or an artefact of a
+    # missing experiment-level quality mapping.
+    quality_fallback:
+      grades: [A, B, C]
+      min_confidence: 0.6
+
+  provenance:
+    required_fields:
+      - PaperID
+      - Variable
+      - EvidenceGrade
+      - SourceTable
+    ontologies: [Crop, Variable, VariableGroup]
+
+  duplicates:
+    enabled: true
+    # canonical selection: highest grade, then highest confidence
+    grade_rank: [A, B, C, D]
+    linkage: true   # maintain duplicate_of links on the canonical record
+
+  statistics:
+    max_abs_value_ratio: 1e6
+    max_sd_ratio: 100.0
+    min_n_observations: 1
+    require_ci_order: true    # ci_lower <= mean <= ci_upper
+    require_positive_sd: true
+
+  claims:
+    # claim-producing artifact tables and their supporting-evidence column
+    artifacts:
+      ready_reckoner: SupportingEvidenceIDs
+      meta_analysis: SupportingEvidenceIDs
+      response_curve: SupportingPapers
+      feature: best_target
+
+  confidence:
+    weights:
+      scientific: 0.20
+      retrieval: 0.15
+      extraction: 0.20
+      study_quality: 0.20
+      meta_weight: 0.10
+      observation_completeness: 0.10
+      provenance_completeness: 0.05
+
+  services:
+    enabled:
+      - evidence_search
+      - crop_search
+      - variable_search
+      - soil_search
+      - nutrient_search
+      - ready_reckoner_search
+      - meta_analysis_search
+      - treatment_search
+
+reports:
+  top_rows: 20

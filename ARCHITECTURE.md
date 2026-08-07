@@ -217,3 +217,35 @@ python universal_schema_generator.py --use-external-data
 4. **REST APIs over GeoTIFF downloads**: SoilGrids switched from WCS GeoTIFF (slow, binary) to `/properties/query` REST API returning tabular CSV — enabling key-based joins instead of raster extraction.
 
 5. **Streaming with cap over full downloads**: HuggingFace connector checks dataset size (<50MB) before downloading, with a 1000-row streaming fallback cap to prevent OOM on large datasets like CropNet (3556 CSV files).
+
+## Evidence Verification & Autonomous Continuous Learning
+
+Two layers sit on top of the curated evidence base (`outputs/phase14/` and `outputs/phase14_5a/`) and close the loop on knowledge growth:
+
+### Phase 14.5B — Evidence Verification Layer (`.opencode_tmp/phase14_5b/`)
+Run via `v14_5b_run_all.py`; all thresholds live in `config/verification.yaml`.
+
+- **Chain validation** — every evidence chunk's PaperID→Experiment→Treatment→Observation→Measurement chain is scored; chains are `valid` / `incomplete` / `inconsistent`.
+- **Provenance verification** — DOI consistency, ontology mapping, quality-score and evidence-grade checks per record.
+- **Duplicate detection** — stable dedupe keys (paper, variable, value, unit, crop) group duplicates; only the highest-grade record is kept canonical, none are deleted.
+- **Statistical validation** — CI order, variance ≥ 0, count ≥ 0, dose plausibility.
+- **Claim verification** — every claim (meta-analysis, response-curve, ready-reckoner, feature, RAG response) is resolved to supporting evidence references; unsupported claims are reported, never hidden.
+- **Evidence confidence** — scientific quality, retrieval, extraction, study quality, meta weight, observation completeness and provenance completeness are blended into a `verified_grade` (A–D).
+- **Citation accuracy** — a citation is accurate when the paper identity is verified, the chain is traceable and the citation-quality gate is met (QualityScore ≥ threshold, or fallback via evidence grade / extraction confidence when a per-experiment quality mapping is absent). Currently 95.29% vs the 95% target.
+
+### Phase 16 — Autonomous Continuous Learning Engine (`.opencode_tmp/phase16/`)
+Run via `p16_run_all.py`; all operational parameters live in `config/continuous_learning.yaml` (dry-run by default).
+
+`prioritization` → `discovery` → `acquisition` → `extraction` → `embedding` → `selective_meta` → `ready_reckoner` → `readiness` → `rag_sync` → `versioning` → `monitoring`.
+
+- **Prioritization** — scores every known paper by information gain, coverage contributions, quality, recency, citations, open access and cost; produces the Phase 15 priority queue and evidence-gap analysis.
+- **Discovery** — approved sources only (OpenAlex, Crossref, Europe PMC, ...); deduplicated against the known-DOI set so nothing is acquired twice. Dry-run produces a plan, never a live API call.
+- **Acquisition** — respects `max_papers_per_cycle` and integrity gates (DOI match, SHA-256 checksum, license, landing page, PDF location).
+- **Incremental extraction / embedding** — only genuinely new papers; reuses the shared Phase 14.5A embedding store (sqlite vector index + `vectors.npy` + manifest).
+- **Selective meta-analysis** — DerSimonian-Laird fixed/random pooling recomputed only for affected (coverage-gap) variables.
+- **Ready reckoner** — only affected recommendations are updated; shifts beyond tolerance are review-flagged.
+- **Readiness** — training-readiness gates re-evaluated each cycle; retraining is never triggered automatically.
+- **RAG sync** — incremental vector-index updates behind a backup; no validated tables are ever modified.
+- **Versioning & monitoring** — append-only changelog, version manifest, learning progress JSON, knowledge-growth workbook and HTML dashboard.
+
+Safety invariants: validated observations, UAMS records and extraction pipelines are never modified; every automated update is versioned, reversible and auditable.

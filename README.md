@@ -138,6 +138,11 @@ Plugin connectors auto-discovered via `pkgutil`: CGIAR, FAOSTAT, NASA POWER, Soi
 ### Continuous Learning
 `ChangeDetector` (drift detection) → `DependencyGraph` (minimal re-execution) → `IncrementalEngine` (change-driven partial retrains) → `VersionHistory` (model/dataset version ledger).
 
+### Evidence Layer & Autonomous Learning Engine
+- **Phase 14.5A Evidence RAG** (`config/rag.yaml`, `.opencode_tmp/phase14_5a/`) — retrieval-augmented generation over the curated evidence base (8,108 chunks, sqlite vector index, sentence-transformers).
+- **Phase 14.5B Evidence Verification** (`config/verification.yaml`, `.opencode_tmp/phase14_5b/`, run via `v14_5b_run_all.py`) — validates evidence chains, provenance, duplicates, statistics and claims; computes evidence confidence and citation accuracy (95.29% vs the 95% target). Reports land in `reports/phase14_5b/`.
+- **Phase 16 Autonomous Continuous Learning** (`config/continuous_learning.yaml`, `.opencode_tmp/phase16/`, run via `p16_run_all.py`) — closed loop: prioritization → approved-source discovery (dry-run) → integrity-checked acquisition → incremental extraction/embedding → selective meta-analysis → ready-reckoner updates → model-readiness monitoring → RAG sync → versioning/monitoring. Validated observations, UAMS records and extraction pipelines are never modified; all updates are versioned and reversible.
+
 **Production run:** `PROD_20260729_134301` — 12 stages in **134.2 s**, 22/22 agents completed, 0 failures, 66 observations.
 
 ---

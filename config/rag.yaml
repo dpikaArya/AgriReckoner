@@ -1,0 +1,98 @@
+# Phase 14.5A Evidence RAG configuration
+# AAIF - Evidence Retrieval Augmented Generation over curated outputs only.
+# No embedding model, vector backend, or retrieval weight is hardcoded in code;
+# everything below is configurable. Editing this file requires no source changes.
+
+embedding:
+  provider: sentence_transformers   # sentence_transformers | deterministic
+  model: sentence-transformers/all-MiniLM-L6-v2
+  version: "1.0.0"
+  max_batch: 128
+  normalize: true
+
+vector:
+  backend: sqlite                   # sqlite | chroma | faiss | qdrant
+  similarity: cosine
+  max_chunks: 20
+
+indexing:
+  incremental: true
+  force: false
+  include_qc_flagged: true          # index QC-CORRECTION_PROPOSED/REVIEW rows as D-grade evidence
+  qc_clean_only: false
+
+chunking:
+  chunk_size: 512
+  chunk_overlap: 64
+  min_text_length: 8
+
+retriever:
+  top_k: 15
+  candidate_pool: 120               # semantic pre-filter pool size before rerank
+  similarity_threshold: 0.25
+  quality_threshold: 0.35           # chunks below this study-quality are down-weighted
+  citation_threshold: 1
+  weights:
+    semantic: 0.55
+    keyword: 0.20
+    ontology: 0.15
+    knowledge_graph: 0.10
+  study_weighting: 0.5              # multiplier blending study quality into hybrid score
+  metadata_filters: []              # e.g. [{field: Variable, op: eq, value: Plant_Height_cm}]
+
+reranker:
+  enabled: true
+  weights:
+    semantic_similarity: 0.20
+    study_quality: 0.15
+    extraction_confidence: 0.10
+    observation_count: 0.10
+    publication_year: 0.05
+    meta_analysis_weight: 0.10
+    evidence_grade: 0.15
+    provenance_completeness: 0.05
+    citation_frequency: 0.05
+    crop_relevance: 0.05
+    treatment_relevance: 0.05
+    variable_importance: 0.05
+  year_reference: 2026
+
+context:
+  max_statements: 20
+  include_effect_sizes: true
+  include_confidence_intervals: true
+  include_response_curves: true
+  include_ready_reckoner: true
+  include_knowledge_graph: true
+
+evaluation:
+  top_k: 5
+  n_queries: 0                       # 0 = use the full golden query set
+  latency_iterations: 3
+
+services:
+  enabled:
+    - evidence_search
+    - crop_search
+    - variety_search
+    - variable_search
+    - soil_search
+    - climate_search
+    - nutrient_search
+    - treatment_search
+    - management_search
+    - location_search
+    - country_search
+    - year_search
+    - experiment_search
+    - paper_search
+    - observation_search
+    - ready_reckoner_search
+    - regression_search
+    - ml_dataset_search
+    - meta_analysis_search
+    - provenance_search
+    - knowledge_graph_search
+
+reports:
+  top_groups: 12
