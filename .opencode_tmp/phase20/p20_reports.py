@@ -4,13 +4,11 @@ Writes summary workbook + dashboard HTML + final execution summary.
 Every report is assembled from outputs/phase20 artifacts already produced by
 the pipeline; nothing here changes any data artifact.
 """
+
 from __future__ import annotations
 
-import json
-import time
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 try:
@@ -40,24 +38,30 @@ def build_summary_workbook(cfg: dict) -> Path:
     ig = _load_json("information_gain_metrics.json", {})
     link = _load_json("external_linkage_metrics.json", {})
 
-    top = pd.DataFrame([{
-        "Decision": decision.get("decision"),
-        "OverallReadinessScore": readiness.get("overall_readiness_score"),
-        "RetrainAllowed": readiness.get("retrain_allowed"),
-        "GatesPassed": gates.get("gates_passed"),
-        "GatesTotal": gates.get("gates_total"),
-        "MatrixObservations": int(readiness.get("per_target", {})
-                                  .get("yield", {}).get("total_observations", 0)),
-        "IndependentStudies": indep.get("independent_studies"),
-        "IndependentLocations": indep.get("independent_locations"),
-        "IndependentPapers": indep.get("independent_papers"),
-        "ObservationsWithLeakageFlags": leak.get("observations_with_flags"),
-        "ExternalLinkageRows": link.get("linked_observations")
-            if isinstance(link, dict) else None,
-        "InputGroups": manifest.get("input_groups"),
-        "MissingInputs": ";".join(manifest.get("missing_inputs", []) or []),
-        "InfoGainScored": ig.get("scored_predictors") if isinstance(ig, dict) else None,
-    }])
+    top = pd.DataFrame(
+        [
+            {
+                "Decision": decision.get("decision"),
+                "OverallReadinessScore": readiness.get("overall_readiness_score"),
+                "RetrainAllowed": readiness.get("retrain_allowed"),
+                "GatesPassed": gates.get("gates_passed"),
+                "GatesTotal": gates.get("gates_total"),
+                "MatrixObservations": int(
+                    readiness.get("per_target", {}).get("yield", {}).get("total_observations", 0)
+                ),
+                "IndependentStudies": indep.get("independent_studies"),
+                "IndependentLocations": indep.get("independent_locations"),
+                "IndependentPapers": indep.get("independent_papers"),
+                "ObservationsWithLeakageFlags": leak.get("observations_with_flags"),
+                "ExternalLinkageRows": link.get("linked_observations")
+                if isinstance(link, dict)
+                else None,
+                "InputGroups": manifest.get("input_groups"),
+                "MissingInputs": ";".join(manifest.get("missing_inputs", []) or []),
+                "InfoGainScored": ig.get("scored_predictors") if isinstance(ig, dict) else None,
+            }
+        ]
+    )
 
     ready_rows = []
     for d, v in readiness.get("per_target", {}).items():
@@ -67,8 +71,7 @@ def build_summary_workbook(cfg: dict) -> Path:
             ready_rows.append(v)
     ready_df = pd.DataFrame(ready_rows) if ready_rows else pd.DataFrame()
 
-    gates_df = pd.DataFrame(gates.get("gates", [])) if gates.get("gates") else \
-        pd.DataFrame()
+    gates_df = pd.DataFrame(gates.get("gates", [])) if gates.get("gates") else pd.DataFrame()
 
     sheets = {
         "Decision": top,
@@ -86,10 +89,7 @@ def build_dashboard_html(cfg: dict) -> Path:
     leak = _load_json("leakage_metrics.json", {})
     gates = _load_json("quality_gates.json", {})
     mr = readiness.get("per_target", {})
-    per = {
-        d: {k: v for k, v in (v or {}).items() if k != "notes"}
-        for d, v in mr.items()
-    }
+    per = {d: {k: v for k, v in (v or {}).items() if k != "notes"} for d, v in mr.items()}
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -112,41 +112,47 @@ def build_dashboard_html(cfg: dict) -> Path:
 <h1>Phase 20 &mdash; Model-Ready Dataset Construction</h1>
 <p>Generated: {C.now_full_iso()}</p>
 <p>Project root: {C.PROJECT_ROOT}</p>
-<p><span class="badge {decision.get('decision')}">{decision.get('decision')}</span>
-&nbsp; Overall readiness score: {readiness.get('overall_readiness_score')}
-&nbsp; Retrain allowed: {readiness.get('retrain_allowed')}</p>
+<p><span class="badge {decision.get("decision")}">{decision.get("decision")}</span>
+&nbsp; Overall readiness score: {readiness.get("overall_readiness_score")}
+&nbsp; Retrain allowed: {readiness.get("retrain_allowed")}</p>
 
 <h2>Quality Gates</h2>
 <table>
 <tr><th>Gate</th><th>Result</th><th>Detail</th></tr>
-{''.join(
-    f"<tr><td>{g.get('gate')}</td><td>{'PASS' if g.get('pass') else 'FAIL'}</td>"
-    f"<td>{g.get('detail')}</td></tr>"
-    for g in (gates.get('gates') or []))}
+{
+        "".join(
+            f"<tr><td>{g.get('gate')}</td><td>{'PASS' if g.get('pass') else 'FAIL'}</td>"
+            f"<td>{g.get('detail')}</td></tr>"
+            for g in (gates.get("gates") or [])
+        )
+    }
 </table>
 
 <h2>Readiness per target</h2>
 <table>
 <tr><th>Domain</th><th>Obs</th><th>Studies</th><th>Locations</th><th>Complete</th>
 <th>p80</th><th>p90</th><th>Crops</th><th>LeakSafe</th><th>EffN</th><th>Gates</th><th>Score</th></tr>
-{''.join(
-    f"<tr><td>{d}</td><td>{v.get('total_observations')}</td>"
-    f"<td>{v.get('independent_studies')}</td><td>{v.get('independent_locations')}</td>"
-    f"<td>{v.get('complete_observations')}</td><td>{v.get('p80_coverage')}</td>"
-    f"<td>{v.get('p90_coverage')}</td><td>{v.get('crop_coverage')}</td>"
-    f"<td>{v.get('leakage_safe_samples')}</td><td>{v.get('effective_sample_size')}</td>"
-    f"<td>{v.get('gates_pass')}</td><td>{v.get('readiness_score')}</td></tr>"
-    for d, v in per.items())}
+{
+        "".join(
+            f"<tr><td>{d}</td><td>{v.get('total_observations')}</td>"
+            f"<td>{v.get('independent_studies')}</td><td>{v.get('independent_locations')}</td>"
+            f"<td>{v.get('complete_observations')}</td><td>{v.get('p80_coverage')}</td>"
+            f"<td>{v.get('p90_coverage')}</td><td>{v.get('crop_coverage')}</td>"
+            f"<td>{v.get('leakage_safe_samples')}</td><td>{v.get('effective_sample_size')}</td>"
+            f"<td>{v.get('gates_pass')}</td><td>{v.get('readiness_score')}</td></tr>"
+            for d, v in per.items()
+        )
+    }
 </table>
 
 <h2>Independence &amp; leakage</h2>
 <table>
 <tr><th>Studies</th><th>Experiments</th><th>Locations</th><th>Papers</th>
 <th>Treatments</th><th>MaxObs/Study</th><th>ObsWithLeakFlags</th></tr>
-<tr><td>{indep.get('independent_studies')}</td><td>{indep.get('independent_experiments')}</td>
-<td>{indep.get('independent_locations')}</td><td>{indep.get('independent_papers')}</td>
-<td>{indep.get('independent_treatments')}</td><td>{indep.get('max_obs_per_study')}</td>
-<td>{leak.get('observations_with_flags')}</td></tr>
+<tr><td>{indep.get("independent_studies")}</td><td>{indep.get("independent_experiments")}</td>
+<td>{indep.get("independent_locations")}</td><td>{indep.get("independent_papers")}</td>
+<td>{indep.get("independent_treatments")}</td><td>{indep.get("max_obs_per_study")}</td>
+<td>{leak.get("observations_with_flags")}</td></tr>
 </table>
 
 <p><em>Phase 20 artifacts are in <code>outputs/phase20</code>; reports in
@@ -176,8 +182,9 @@ def build_execution_summary(cfg: dict) -> dict:
         "external_linkage": _load_json("external_linkage_metrics.json", {}),
         "input_manifest": _load_json("input_manifest.json", {}),
         "protected_checksums_preserved": _load_json("protected_input_checksums_after.json", {}),
-        "reports": [str(p.relative_to(C.PROJECT_ROOT))
-                    for p in sorted(C.REPORTS.glob("*")) if p.is_file()],
+        "reports": [
+            str(p.relative_to(C.PROJECT_ROOT)) for p in sorted(C.REPORTS.glob("*")) if p.is_file()
+        ],
     }
     C.write_json(summary, C.OUT / "final_execution_summary.json")
     return summary
@@ -195,4 +202,5 @@ def run(force: bool = False):
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

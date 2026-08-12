@@ -80,7 +80,9 @@ class SoilGridsConnector(AgriculturalDataConnector):
     # required interface
     # ------------------------------------------------------------------ #
     def search(self, query: str, max_results: int = 20) -> list[DatasetDescriptor]:
-        return [self._descriptor(lat, lon, label) for lat, lon, label in self._points()[:max_results]]
+        return [
+            self._descriptor(lat, lon, label) for lat, lon, label in self._points()[:max_results]
+        ]
 
     def fetch_metadata(self, dataset_id: str) -> DatasetDescriptor | None:
         for lat, lon, label in self._points():
@@ -107,7 +109,9 @@ class SoilGridsConnector(AgriculturalDataConnector):
                     params={"lon": meta["lon"], "lat": meta["lat"], "property": prop},
                 )
                 if isinstance(single, dict):
-                    combined_layers.extend((single.get("properties", {}) or {}).get("layers", []) or [])
+                    combined_layers.extend(
+                        (single.get("properties", {}) or {}).get("layers", []) or []
+                    )
             if combined_layers:
                 payload = {"properties": {"layers": combined_layers}}
         if not isinstance(payload, dict):
@@ -119,7 +123,9 @@ class SoilGridsConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         import json
@@ -131,7 +137,7 @@ class SoilGridsConnector(AgriculturalDataConnector):
 
         # Phase 18: the v2.0 service now returns a "layers" array under
         # properties, e.g. properties.layers[].name / .unit_measure / .depths[].
-        layers = ((payload.get("properties", {}) or {}).get("layers") or [])
+        layers = (payload.get("properties", {}) or {}).get("layers") or []
         records: list[AgriculturalRecord] = []
         if layers:
             for layer in layers:
@@ -143,7 +149,7 @@ class SoilGridsConnector(AgriculturalDataConnector):
                 d_factor = um.get("d_factor", 1)
                 target_units = um.get("target_units") or um.get("mapped_units") or "unitless"
                 mean, depth_label = None, None
-                for depth in (layer.get("depths") or []):
+                for depth in layer.get("depths") or []:
                     vals = depth.get("values") or {}
                     m = vals.get("mean")
                     if m is None:
@@ -168,8 +174,12 @@ class SoilGridsConnector(AgriculturalDataConnector):
                         location_lon=lon,
                         provenance=f"SoilGrids v2.0 property={prop} depth={depth_label}",
                         license="CC BY 4.0",
-                        extra={"property": prop, "depth": depth_label,
-                               "mapped_units": um.get("mapped_units"), "d_factor": d_factor},
+                        extra={
+                            "property": prop,
+                            "depth": depth_label,
+                            "mapped_units": um.get("mapped_units"),
+                            "d_factor": d_factor,
+                        },
                     )
                 )
             return records
@@ -184,7 +194,9 @@ class SoilGridsConnector(AgriculturalDataConnector):
             mean = None
             depth_label = None
             for depth, layer in (data.get("depth") or {}).items():
-                values = [v.get("mean") for v in (layer.get("values") or []) if v.get("mean") is not None]
+                values = [
+                    v.get("mean") for v in (layer.get("values") or []) if v.get("mean") is not None
+                ]
                 if values:
                     mean = sum(values) / len(values)
                     depth_label = depth

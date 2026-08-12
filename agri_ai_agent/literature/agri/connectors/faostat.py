@@ -28,8 +28,14 @@ _CATALOGUE_URL = f"{_BULK_HOST}/datasets_E.json"
 # Phase 18 recovery: catalogue codes/filenames refreshed from
 # https://bulks-faostat.fao.org/production/datasets_E.json (verified 2026-08-11).
 _KNOWN_DATASETS: dict[str, tuple[str, str]] = {
-    "QCL": ("Production - Crops, Livestock and Livestock Products", "Production_Crops_Livestock_E_All_Data_(Normalized).zip"),
-    "RFN": ("Fertilizers - Consumption by Nutrient", "Inputs_FertilizersNutrient_E_All_Data_(Normalized).zip"),
+    "QCL": (
+        "Production - Crops, Livestock and Livestock Products",
+        "Production_Crops_Livestock_E_All_Data_(Normalized).zip",
+    ),
+    "RFN": (
+        "Fertilizers - Consumption by Nutrient",
+        "Inputs_FertilizersNutrient_E_All_Data_(Normalized).zip",
+    ),
     "RP": ("Pesticides - Use", "Inputs_Pesticides_Use_E_All_Data_(Normalized).zip"),
     "RL": ("Land Use Indicators", "Inputs_LandUse_E_All_Data_(Normalized).zip"),
 }
@@ -113,7 +119,8 @@ class FaostatConnector(AgriculturalDataConnector):
         try:
             with zipfile.ZipFile(zip_path) as zf:
                 csv_name = next(
-                    n for n in zf.namelist()
+                    n
+                    for n in zf.namelist()
                     if n.lower().endswith((".csv", ".txt")) and not n.startswith("__MACOSX")
                 )
                 out = target_dir / f"{dataset_id}.csv"
@@ -123,7 +130,9 @@ class FaostatConnector(AgriculturalDataConnector):
         except (zipfile.BadZipFile, StopIteration):
             return None
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         try:

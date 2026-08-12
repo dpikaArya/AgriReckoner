@@ -14,6 +14,7 @@ list, never inventing coordinates:
 Every resolved location records precision, source, confidence, and match
 method. Plot-level precision is never assigned to country-only records.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -25,9 +26,9 @@ except ImportError:
     import p20_common as C
 
 try:
-    from .p20_identity import build_observation_table, add_canonical_identity
+    from .p20_identity import add_canonical_identity, build_observation_table
 except ImportError:
-    from p20_identity import build_observation_table, add_canonical_identity
+    from p20_identity import add_canonical_identity, build_observation_table
 
 
 def _geo(x):
@@ -78,13 +79,16 @@ def build_staging_coords(cfg) -> pd.DataFrame:
         lat, lon = _geo(r.get("Location_Lat")), _geo(r.get("Location_Lon"))
         if pd.isna(lat) or pd.isna(lon):
             continue
-        rows.append({
-            "lat": lat, "lon": lon,
-            "country": C.s(r.get("Country")),
-            "provenance_id": C.s(r.get("Provenance_ID")),
-            "source": C.s(r.get("Source")),
-            "spatial_grade": C.s(r.get("Spatial_Match_Grade")),
-        })
+        rows.append(
+            {
+                "lat": lat,
+                "lon": lon,
+                "country": C.s(r.get("Country")),
+                "provenance_id": C.s(r.get("Provenance_ID")),
+                "source": C.s(r.get("Source")),
+                "spatial_grade": C.s(r.get("Spatial_Match_Grade")),
+            }
+        )
     out = pd.DataFrame(rows).drop_duplicates(subset=["lat", "lon"])
     return out.reset_index(drop=True)
 
@@ -98,11 +102,15 @@ def resolve_location(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     station_r = cfg["spatial"]["station_match_radius_km"]
 
     defaults = {
-        "latitude": np.nan, "longitude": np.nan,
+        "latitude": np.nan,
+        "longitude": np.nan,
         "location_precision": "unknown",
-        "location_source": "", "location_confidence": 0.0,
+        "location_source": "",
+        "location_confidence": 0.0,
         "administrative_level": "",
-        "country": "", "state": "", "district": "",
+        "country": "",
+        "state": "",
+        "district": "",
         "location_match_method": "",
     }
     for k, v in defaults.items():
@@ -148,9 +156,13 @@ def resolve_location(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
                 continue
             out.at[i, "latitude"] = best["lat"]
             out.at[i, "longitude"] = best["lon"]
-            out.at[i, "location_precision"] = "experimental_station" if method == "station_radius_match" else "exact_coordinates"
+            out.at[i, "location_precision"] = (
+                "experimental_station" if method == "station_radius_match" else "exact_coordinates"
+            )
             out.at[i, "location_source"] = "phase18_staged:" + C.s(best["source"])
-            out.at[i, "location_confidence"] = round(max(0.1, 1.0 - best_d / max(station_r, 1e-6)), 3)
+            out.at[i, "location_confidence"] = round(
+                max(0.1, 1.0 - best_d / max(station_r, 1e-6)), 3
+            )
             out.at[i, "country"] = best["country"]
             out.at[i, "administrative_level"] = best["spatial_grade"]
             out.at[i, "location_match_method"] = method
@@ -180,7 +192,8 @@ def resolve_location(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
     # normalize precision rank
     out["location_precision"] = pd.Categorical(
-        out["location_precision"], categories=precision_order, ordered=True)
+        out["location_precision"], categories=precision_order, ordered=True
+    )
     return out
 
 
@@ -189,13 +202,34 @@ def run(force: bool = False):
     obs = build_observation_table_with_identity()
     linked = resolve_location(obs, cfg)
 
-    keep = ["ObservationID_ML", "PaperID", "ExperimentID", "TreatmentID",
-            "ObservationID", "canonical_observation_id", "canonical_study_id",
-            "canonical_experiment_id", "canonical_location_id", "Crop", "Year",
-            "Country", "State", "Site", "Institution", "Location",
-            "latitude", "longitude", "location_precision", "location_source",
-            "location_confidence", "administrative_level", "country", "state",
-            "district", "location_match_method"]
+    keep = [
+        "ObservationID_ML",
+        "PaperID",
+        "ExperimentID",
+        "TreatmentID",
+        "ObservationID",
+        "canonical_observation_id",
+        "canonical_study_id",
+        "canonical_experiment_id",
+        "canonical_location_id",
+        "Crop",
+        "Year",
+        "Country",
+        "State",
+        "Site",
+        "Institution",
+        "Location",
+        "latitude",
+        "longitude",
+        "location_precision",
+        "location_source",
+        "location_confidence",
+        "administrative_level",
+        "country",
+        "state",
+        "district",
+        "location_match_method",
+    ]
     rep = linked[[c for c in keep if c in linked.columns]].copy()
 
     C.to_parquet(rep, C.OUT / "spatial_linkage.parquet")
@@ -211,8 +245,13 @@ def run(force: bool = False):
         "resolved": int(success),
         "resolution_rate": round(rate, 4),
         "precision_counts": {str(k): int(v) for k, v in prec_counts.items()},
-        "exact_or_station": int((linked["location_precision"].isin(
-            ["exact_coordinates", "experimental_station", "study_location"])).sum()),
+        "exact_or_station": int(
+            (
+                linked["location_precision"].isin(
+                    ["exact_coordinates", "experimental_station", "study_location"]
+                )
+            ).sum()
+        ),
         "country_only": int((linked["location_precision"] == "country_only").sum()),
         "unknown": int((linked["location_precision"] == "unknown").sum()),
         "no_coordinates_invented": True,
@@ -231,4 +270,5 @@ def build_observation_table_with_identity():
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

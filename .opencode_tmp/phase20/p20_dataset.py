@@ -6,6 +6,7 @@ STEP 17  per-target model readiness
 
 Nothing here modifies UAMS_v2 or UAMS_v2.1.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -29,7 +30,6 @@ TARGET_DOMAIN_COLUMNS = {
 
 def _has_sklearn():
     try:
-        from sklearn.model_selection import GroupKFold
         return True
     except Exception:
         return False
@@ -39,34 +39,78 @@ def _has_sklearn():
 # STEP 13 - model matrix
 # ---------------------------------------------------------------------------
 
+
 def build_model_matrix(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     out = obs.copy()
     out = out.sort_values("ObservationID_ML").reset_index(drop=True)
 
     base = [
-        "ObservationID_ML", "canonical_observation_id", "canonical_study_id",
-        "canonical_experiment_id", "canonical_location_id",
-        "PaperID", "ExperimentID", "TreatmentID", "ObservationID",
-        "ObservationLevel", "SourceSystem",
+        "ObservationID_ML",
+        "canonical_observation_id",
+        "canonical_study_id",
+        "canonical_experiment_id",
+        "canonical_location_id",
+        "PaperID",
+        "ExperimentID",
+        "TreatmentID",
+        "ObservationID",
+        "ObservationLevel",
+        "SourceSystem",
     ]
     meta = [
-        "Crop", "Crop_Normalized", "Location", "country", "state", "district",
-        "latitude", "longitude", "location_precision", "location_source",
-        "location_confidence", "location_match_method", "year", "season",
-        "season_Normalized", "Season", "start_date", "end_date",
-        "temporal_precision", "temporal_confidence",
+        "Crop",
+        "Crop_Normalized",
+        "Location",
+        "country",
+        "state",
+        "district",
+        "latitude",
+        "longitude",
+        "location_precision",
+        "location_source",
+        "location_confidence",
+        "location_match_method",
+        "year",
+        "season",
+        "season_Normalized",
+        "Season",
+        "start_date",
+        "end_date",
+        "temporal_precision",
+        "temporal_confidence",
     ]
     predictors = [
-        "Rainfall", "Temperature", "Temperature_Max", "Temperature_Min",
-        "Soil_pH", "Organic_Carbon", "Nitrogen", "Phosphorus", "Potassium",
-        "Solar_Radiation", "Soil_Moisture", "Soil_Texture", "Humidity",
-        "Cultivar", "Plant_Population", "Soil_EC", "Irrigation",
-        "Fertilizer_Type", "N_Dose", "P_Dose", "K_Dose", "Days_to_Maturity",
+        "Rainfall",
+        "Temperature",
+        "Temperature_Max",
+        "Temperature_Min",
+        "Soil_pH",
+        "Organic_Carbon",
+        "Nitrogen",
+        "Phosphorus",
+        "Potassium",
+        "Solar_Radiation",
+        "Soil_Moisture",
+        "Soil_Texture",
+        "Humidity",
+        "Cultivar",
+        "Plant_Population",
+        "Soil_EC",
+        "Irrigation",
+        "Fertilizer_Type",
+        "N_Dose",
+        "P_Dose",
+        "K_Dose",
+        "Days_to_Maturity",
     ]
     targets = ["Yield", "Biomass_Yield", "Plant_Height_cm", "Protein"]
     completeness = [
-        "PredictorCount", "AvailablePredictorCount", "MissingPredictorCount",
-        "CompletenessRatio", "QualityGrade", "Target",
+        "PredictorCount",
+        "AvailablePredictorCount",
+        "MissingPredictorCount",
+        "CompletenessRatio",
+        "QualityGrade",
+        "Target",
     ]
     prov = ["Source", "Provenance", "DOI"]
 
@@ -82,8 +126,10 @@ def build_model_matrix(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 # STEP 16 - validation splits
 # ---------------------------------------------------------------------------
 
+
 def study_grouped_split(df, n_splits=5):
     from sklearn.model_selection import GroupKFold
+
     groups = df["canonical_study_id"].values
     kf = GroupKFold(n_splits=min(n_splits, df["canonical_study_id"].nunique()))
     return [(tr.tolist(), te.tolist()) for tr, te in kf.split(df.index, groups=groups)]
@@ -91,15 +137,20 @@ def study_grouped_split(df, n_splits=5):
 
 def location_grouped_split(df, n_splits=5):
     from sklearn.model_selection import GroupKFold
+
     groups = df["canonical_location_id"].values
     kf = GroupKFold(n_splits=min(n_splits, df["canonical_location_id"].nunique()))
     return [(tr.tolist(), te.tolist()) for tr, te in kf.split(df.index, groups=groups)]
 
 
 def leave_one_crop_out(df):
-    return [(df[df["Crop_Normalized"] != c].index.tolist(),
-             df[df["Crop_Normalized"] == c].index.tolist())
-            for c in df["Crop_Normalized"].unique()]
+    return [
+        (
+            df[df["Crop_Normalized"] != c].index.tolist(),
+            df[df["Crop_Normalized"] == c].index.tolist(),
+        )
+        for c in df["Crop_Normalized"].unique()
+    ]
 
 
 def temporal_split(df):
@@ -118,48 +169,96 @@ def build_splits(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     rows = []
     if _has_sklearn() and len(df) >= 5:
         gs = study_grouped_split(df, cfg["splitting"]["n_splits"])
-        rows.append({"Strategy": "Study GroupKFold", "Splits": len(gs),
-                     "Groups": "canonical_study_id",
-                     "MinTrain": min(len(t) for t, _ in gs),
-                     "MinTest": min(len(t) for _, t in gs),
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Study GroupKFold",
+                "Splits": len(gs),
+                "Groups": "canonical_study_id",
+                "MinTrain": min(len(t) for t, _ in gs),
+                "MinTest": min(len(t) for _, t in gs),
+                "SameGroupBothSides": False,
+            }
+        )
         ls = location_grouped_split(df, cfg["splitting"]["n_splits"])
-        rows.append({"Strategy": "Location GroupKFold", "Splits": len(ls),
-                     "Groups": "canonical_location_id",
-                     "MinTrain": min(len(t) for t, _ in ls),
-                     "MinTest": min(len(t) for _, t in ls),
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Location GroupKFold",
+                "Splits": len(ls),
+                "Groups": "canonical_location_id",
+                "MinTrain": min(len(t) for t, _ in ls),
+                "MinTest": min(len(t) for _, t in ls),
+                "SameGroupBothSides": False,
+            }
+        )
     else:
-        rows.append({"Strategy": "Study GroupKFold", "Splits": 0,
-                     "Groups": "canonical_study_id", "MinTrain": 0, "MinTest": 0,
-                     "SameGroupBothSides": False})
-        rows.append({"Strategy": "Location GroupKFold", "Splits": 0,
-                     "Groups": "canonical_location_id", "MinTrain": 0, "MinTest": 0,
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Study GroupKFold",
+                "Splits": 0,
+                "Groups": "canonical_study_id",
+                "MinTrain": 0,
+                "MinTest": 0,
+                "SameGroupBothSides": False,
+            }
+        )
+        rows.append(
+            {
+                "Strategy": "Location GroupKFold",
+                "Splits": 0,
+                "Groups": "canonical_location_id",
+                "MinTrain": 0,
+                "MinTest": 0,
+                "SameGroupBothSides": False,
+            }
+        )
 
     if len(df) and df["Crop_Normalized"].nunique() >= 2:
         lo = leave_one_crop_out(df)
-        rows.append({"Strategy": "Leave One Crop Out", "Splits": len(lo),
-                     "Groups": "Crop_Normalized",
-                     "MinTrain": min(len(t) for t, _ in lo),
-                     "MinTest": min(len(t) for _, t in lo),
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Leave One Crop Out",
+                "Splits": len(lo),
+                "Groups": "Crop_Normalized",
+                "MinTrain": min(len(t) for t, _ in lo),
+                "MinTest": min(len(t) for _, t in lo),
+                "SameGroupBothSides": False,
+            }
+        )
     else:
-        rows.append({"Strategy": "Leave One Crop Out", "Splits": 0,
-                     "Groups": "Crop_Normalized", "MinTrain": 0, "MinTest": 0,
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Leave One Crop Out",
+                "Splits": 0,
+                "Groups": "Crop_Normalized",
+                "MinTrain": 0,
+                "MinTest": 0,
+                "SameGroupBothSides": False,
+            }
+        )
 
     if len(df) and df["year"].notna().nunique() >= cfg["splitting"]["min_temporal_years"]:
         ts = temporal_split(df)
-        rows.append({"Strategy": "Temporal split", "Splits": len(ts),
-                     "Groups": "year",
-                     "MinTrain": len(ts[0][0]) if ts else 0,
-                     "MinTest": len(ts[0][1]) if ts else 0,
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Temporal split",
+                "Splits": len(ts),
+                "Groups": "year",
+                "MinTrain": len(ts[0][0]) if ts else 0,
+                "MinTest": len(ts[0][1]) if ts else 0,
+                "SameGroupBothSides": False,
+            }
+        )
     else:
-        rows.append({"Strategy": "Temporal split", "Splits": 0,
-                     "Groups": "year", "MinTrain": 0, "MinTest": 0,
-                     "SameGroupBothSides": False})
+        rows.append(
+            {
+                "Strategy": "Temporal split",
+                "Splits": 0,
+                "Groups": "year",
+                "MinTrain": 0,
+                "MinTest": 0,
+                "SameGroupBothSides": False,
+            }
+        )
 
     return pd.DataFrame(rows)
 
@@ -168,11 +267,8 @@ def build_splits(df: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 # STEP 17 - model readiness
 # ---------------------------------------------------------------------------
 
-def model_readiness(matrix: pd.DataFrame, cfg: dict) -> tuple[dict, pd.DataFrame]:
-    req = cfg["minimum_requirements"]
-    classes = cfg["readiness_classes"]
-    mr = classes["MODEL_READY_min"]
 
+def model_readiness(matrix: pd.DataFrame, cfg: dict) -> tuple[dict, pd.DataFrame]:
     rows = []
     for domain, cols in TARGET_DOMAIN_COLUMNS.items():
         if not cols:
@@ -185,8 +281,9 @@ def model_readiness(matrix: pd.DataFrame, cfg: dict) -> tuple[dict, pd.DataFrame
     score = 0.0
     weight_sum = 0.0
     for r in rows:
-        w = {"yield": 0.5, "biomass": 0.2, "growth": 0.15, "quality": 0.1,
-             "nutrient": 0.05}.get(r["domain"], 0.1)
+        w = {"yield": 0.5, "biomass": 0.2, "growth": 0.15, "quality": 0.1, "nutrient": 0.05}.get(
+            r["domain"], 0.1
+        )
         score += w * r["readiness_score"]
         weight_sum += w
     overall = round(score / weight_sum, 4) if weight_sum else 0.0
@@ -195,8 +292,7 @@ def model_readiness(matrix: pd.DataFrame, cfg: dict) -> tuple[dict, pd.DataFrame
         "generated_at": C.now_full_iso(),
         "overall_readiness_score": overall,
         "retrain_allowed": bool(all(r["gates_pass"] for r in rows)),
-        "per_target": {r["domain"]: {k: v for k, v in r.items()
-                                     if k != "domain"} for r in rows},
+        "per_target": {r["domain"]: {k: v for k, v in r.items() if k != "domain"} for r in rows},
     }
     return result, ready_df
 
@@ -204,24 +300,43 @@ def model_readiness(matrix: pd.DataFrame, cfg: dict) -> tuple[dict, pd.DataFrame
 def _readiness_row(domain, matrix, cols, cfg, empty=False) -> dict:
     req = cfg["minimum_requirements"]
     mr = cfg["readiness_classes"]["MODEL_READY_min"]
-    nr = cfg["readiness_classes"]["NEAR_READY_min"]
 
     if empty:
-        return {"domain": domain, "total_observations": 0, "independent_studies": 0,
-                "independent_locations": 0, "complete_observations": 0,
-                "p80_coverage": 0, "p90_coverage": 0, "p100_coverage": 0,
-                "crop_coverage": 0, "leakage_safe_samples": 0,
-                "effective_sample_size": 0, "gates_pass": False,
-                "readiness_score": 0.0, "notes": "no target column available"}
+        return {
+            "domain": domain,
+            "total_observations": 0,
+            "independent_studies": 0,
+            "independent_locations": 0,
+            "complete_observations": 0,
+            "p80_coverage": 0,
+            "p90_coverage": 0,
+            "p100_coverage": 0,
+            "crop_coverage": 0,
+            "leakage_safe_samples": 0,
+            "effective_sample_size": 0,
+            "gates_pass": False,
+            "readiness_score": 0.0,
+            "notes": "no target column available",
+        }
 
     cols = [c for c in cols if c in matrix.columns]
     if not cols:
-        return {"domain": domain, "total_observations": 0, "independent_studies": 0,
-                "independent_locations": 0, "complete_observations": 0,
-                "p80_coverage": 0, "p90_coverage": 0, "p100_coverage": 0,
-                "crop_coverage": 0, "leakage_safe_samples": 0,
-                "effective_sample_size": 0, "gates_pass": False,
-                "readiness_score": 0.0, "notes": "target column absent in matrix"}
+        return {
+            "domain": domain,
+            "total_observations": 0,
+            "independent_studies": 0,
+            "independent_locations": 0,
+            "complete_observations": 0,
+            "p80_coverage": 0,
+            "p90_coverage": 0,
+            "p100_coverage": 0,
+            "crop_coverage": 0,
+            "leakage_safe_samples": 0,
+            "effective_sample_size": 0,
+            "gates_pass": False,
+            "readiness_score": 0.0,
+            "notes": "target column absent in matrix",
+        }
 
     m = matrix.copy()
     m["_has_target"] = m[cols].apply(lambda r: r.notna().any(), axis=1)
@@ -230,7 +345,11 @@ def _readiness_row(domain, matrix, cols, cfg, empty=False) -> dict:
     n_studies = int(sub["canonical_study_id"].nunique())
     n_locs = int(sub["canonical_location_id"].nunique())
     n_crops = int(sub["Crop_Normalized"].replace("", np.nan).nunique())
-    comp = sub["CompletenessRatio"] if "CompletenessRatio" in sub.columns else pd.Series(0.0, index=sub.index)
+    comp = (
+        sub["CompletenessRatio"]
+        if "CompletenessRatio" in sub.columns
+        else pd.Series(0.0, index=sub.index)
+    )
     n_complete = int((comp >= 1.0).sum())
     n_80 = int((comp >= mr).sum())
     n_90 = int((comp >= 0.90).sum())
@@ -256,31 +375,42 @@ def _readiness_row(domain, matrix, cols, cfg, empty=False) -> dict:
     )
     # score: mix of volume, diversity, completeness and leakage safety
     score = (
-        0.25 * min(1.0, n / max(req["min_observations"], 1)) +
-        0.20 * min(1.0, n_studies / max(req["min_independent_studies"], 1)) +
-        0.15 * min(1.0, n_locs / max(req["min_independent_locations"], 1)) +
-        0.15 * (comp.mean() if len(comp) else 0.0) +
-        0.10 * min(1.0, n_crops / max(req["min_crops"], 1)) +
-        0.15 * min(1.0, leak_safe / max(n, 1))
+        0.25 * min(1.0, n / max(req["min_observations"], 1))
+        + 0.20 * min(1.0, n_studies / max(req["min_independent_studies"], 1))
+        + 0.15 * min(1.0, n_locs / max(req["min_independent_locations"], 1))
+        + 0.15 * (comp.mean() if len(comp) else 0.0)
+        + 0.10 * min(1.0, n_crops / max(req["min_crops"], 1))
+        + 0.15 * min(1.0, leak_safe / max(n, 1))
     )
     return {
-        "domain": domain, "total_observations": n, "independent_studies": n_studies,
-        "independent_locations": n_locs, "complete_observations": n_complete,
-        "p80_coverage": n_80, "p90_coverage": n_90, "p100_coverage": n_complete,
-        "crop_coverage": n_crops, "study_coverage": n_studies,
-        "location_coverage": n_locs, "leakage_safe_samples": leak_safe,
-        "min_samples_per_crop": int(sub["Crop_Normalized"].replace("", np.nan)
-                                    .value_counts().min()) if n_crops else 0,
-        "effective_sample_size": eff_n, "gates_pass": bool(gates),
+        "domain": domain,
+        "total_observations": n,
+        "independent_studies": n_studies,
+        "independent_locations": n_locs,
+        "complete_observations": n_complete,
+        "p80_coverage": n_80,
+        "p90_coverage": n_90,
+        "p100_coverage": n_complete,
+        "crop_coverage": n_crops,
+        "study_coverage": n_studies,
+        "location_coverage": n_locs,
+        "leakage_safe_samples": leak_safe,
+        "min_samples_per_crop": int(sub["Crop_Normalized"].replace("", np.nan).value_counts().min())
+        if n_crops
+        else 0,
+        "effective_sample_size": eff_n,
+        "gates_pass": bool(gates),
         "readiness_score": round(score, 4),
-        "notes": "MODEL_READY requires >=80% Tier A predictor coverage" if n_80 else
-                 "no observation reaches 80% Tier A coverage",
+        "notes": "MODEL_READY requires >=80% Tier A predictor coverage"
+        if n_80
+        else "no observation reaches 80% Tier A coverage",
     }
 
 
 # ---------------------------------------------------------------------------
 # STEP 19 - ready reckoner impact
 # ---------------------------------------------------------------------------
+
 
 def ready_reckoner_impact(cfg: dict) -> dict:
     """Quantify how much of the dataset is backed by phase14 ready-reckoner
@@ -303,7 +433,11 @@ def run(force: bool = False):
     matrix = build_model_matrix(obs, cfg)
 
     C.to_parquet(matrix, C.OUT / "model_ready_observation_matrix.parquet")
-    C.to_excel(matrix, C.REPORTS / "model_readiness.xlsx", "Matrix", )
+    C.to_excel(
+        matrix,
+        C.REPORTS / "model_readiness.xlsx",
+        "Matrix",
+    )
 
     splits = build_splits(matrix, cfg)
     C.to_parquet(splits, C.OUT / "validation_splits.parquet")
@@ -320,17 +454,19 @@ def run(force: bool = False):
         "matrix_observations": int(len(matrix)),
         "ready_reckoner_impact": rr,
         "splits": splits.to_dict("records"),
-        "readiness": {k: readiness[k] for k in
-                      ("overall_readiness_score", "retrain_allowed")},
+        "readiness": {k: readiness[k] for k in ("overall_readiness_score", "retrain_allowed")},
         "per_target": readiness["per_target"],
     }
     C.write_json(result, C.OUT / "dataset_metrics.json")
     C.mark_done("dataset", result)
-    C.log_msg(f"STEP13/16/17 dataset: matrix {len(matrix)} rows, "
-              f"readiness {readiness['overall_readiness_score']}")
+    C.log_msg(
+        f"STEP13/16/17 dataset: matrix {len(matrix)} rows, "
+        f"readiness {readiness['overall_readiness_score']}"
+    )
     return result
 
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

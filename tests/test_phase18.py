@@ -5,6 +5,7 @@ Integration tests assert the structure of the Phase 18 deliverables and are
 skipped when the pipeline outputs are absent. Nothing here modifies validated
 observations, UAMS, Phase 14/14.5A/16 outputs, or embeddings.
 """
+
 from __future__ import annotations
 
 import json
@@ -39,8 +40,15 @@ class TestProjectRoot:
             assert str(p.resolve()).startswith(str(C.PROJECT_ROOT.resolve()))
 
     def test_stages_listed(self):
-        for stage in ("inventory", "acquisition", "mapping", "fusion",
-                      "promotion", "coverage", "rag_sync"):
+        for stage in (
+            "inventory",
+            "acquisition",
+            "mapping",
+            "fusion",
+            "promotion",
+            "coverage",
+            "rag_sync",
+        ):
             assert stage in C.STAGES
 
 
@@ -53,7 +61,7 @@ class TestEnrichmentHelpers:
     def test_credentials_present_no_values(self):
         report = C.credentials_present(list(C.CREDENTIAL_ENV_VARS)[:3])
         assert isinstance(report, dict)
-        for k, v in report.items():
+        for _k, v in report.items():
             assert isinstance(v, bool)
 
     def test_sha256_file_deterministic(self, tmp_path):
@@ -84,9 +92,7 @@ class TestEnrichmentHelpers:
 
 
 class TestDeliverables:
-    @pytest.mark.skipif(
-        not (OUT / "state_inventory.parquet").exists(), reason="inventory not run"
-    )
+    @pytest.mark.skipif(not (OUT / "state_inventory.parquet").exists(), reason="inventory not run")
     def test_inventory_covers_sources(self):
         df = pd.read_parquet(OUT / "state_inventory.parquet")
         assert "Source" in df.columns
@@ -100,9 +106,7 @@ class TestDeliverables:
         assert "Provenance" in df.columns or "Source" in df.columns
         assert len(df) >= 10
 
-    @pytest.mark.skipif(
-        not (OUT / "mapped_records.parquet").exists(), reason="mapping not run"
-    )
+    @pytest.mark.skipif(not (OUT / "mapped_records.parquet").exists(), reason="mapping not run")
     def test_mapping_has_decision_column(self):
         df = pd.read_parquet(OUT / "mapped_records.parquet")
         assert "Mapping_Decision" in df.columns or "UAMS_Column" in df.columns
@@ -161,17 +165,13 @@ class TestDeliverables:
 
 
 class TestProtectedIntegrity:
-    @pytest.mark.skipif(
-        not (OUT / "promotion_checks.json").exists(), reason="promotion not run"
-    )
+    @pytest.mark.skipif(not (OUT / "promotion_checks.json").exists(), reason="promotion not run")
     def test_promotion_gate_checks_pass(self):
         m = json.loads((OUT / "promotion_checks.json").read_text(encoding="utf-8"))
         assert m["row_count_valid"] is True
         assert m["existing_observations_unchanged"] is True
 
-    @pytest.mark.skipif(
-        not (OUT / "phase18_final_metrics.json").exists(), reason="reports not run"
-    )
+    @pytest.mark.skipif(not (OUT / "phase18_final_metrics.json").exists(), reason="reports not run")
     def test_final_metrics_report(self):
         m = json.loads((OUT / "phase18_final_metrics.json").read_text(encoding="utf-8"))
         assert m["stages_completed"]  # non-empty

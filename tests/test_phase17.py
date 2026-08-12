@@ -6,6 +6,7 @@ assert the structure of the Phase 17 deliverables and are skipped when the
 pipeline outputs are absent. Nothing here modifies validated observations,
 UAMS, Phase 14/14.5A/14.5B/16/16.1 outputs, or embeddings.
 """
+
 from __future__ import annotations
 
 import json
@@ -167,18 +168,14 @@ class TestDeliverables:
         cols, _ = C.load_uams_columns()
         assert df["UAMS_Column"].nunique() == len(cols)
 
-    @pytest.mark.skipif(
-        not (OUT / "ontology_aliases.parquet").exists(), reason="ontology not run"
-    )
+    @pytest.mark.skipif(not (OUT / "ontology_aliases.parquet").exists(), reason="ontology not run")
     def test_ontology_has_canonical_per_column(self):
         df = pd.read_parquet(OUT / "ontology_aliases.parquet")
         cols, _ = C.load_uams_columns()
         canon = df[df["Source"] == "canonical"]["UAMS_Column"].tolist()
         assert set(canon) == set(cols)
 
-    @pytest.mark.skipif(
-        not (OUT / "connector_status.parquet").exists(), reason="audit not run"
-    )
+    @pytest.mark.skipif(not (OUT / "connector_status.parquet").exists(), reason="audit not run")
     def test_audit_has_expected_columns(self):
         df = pd.read_parquet(OUT / "connector_status.parquet")
         for col in ("Source", "Module", "Importable", "Status", "Failure_Category"):
@@ -192,17 +189,13 @@ class TestDeliverables:
         scores = df["Information_Gain_Score"].tolist()
         assert scores == sorted(scores, reverse=True)
 
-    @pytest.mark.skipif(
-        not (OUT / "acquisition_records.parquet").exists(), reason="pilot not run"
-    )
+    @pytest.mark.skipif(not (OUT / "acquisition_records.parquet").exists(), reason="pilot not run")
     def test_acquisition_has_provenance(self):
         df = pd.read_parquet(OUT / "acquisition_records.parquet")
         assert "Provenance" in df.columns
         assert df["Provenance"].notna().all()
 
-    @pytest.mark.skipif(
-        not (OUT / "phase17_final_metrics.json").exists(), reason="reports not run"
-    )
+    @pytest.mark.skipif(not (OUT / "phase17_final_metrics.json").exists(), reason="reports not run")
     def test_final_metrics_report(self):
         m = json.loads((OUT / "phase17_final_metrics.json").read_text(encoding="utf-8"))
         assert m["stages_completed"]  # non-empty

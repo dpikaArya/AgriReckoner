@@ -5,11 +5,9 @@ read-only and preserved. Phase 20 only emits NEW incremental chunk metadata +
 an idempotent sync manifest under outputs/phase20/rag_sync/; it never rebuilds
 or deletes the protected embedding store.
 """
+
 from __future__ import annotations
 
-import json
-
-import numpy as np
 import pandas as pd
 
 try:
@@ -19,7 +17,9 @@ except ImportError:
 
 
 def existing_ids(cfg: dict) -> set:
-    p = C.PROJECT_ROOT / cfg.get("rag", {}).get("store", "outputs/phase14_5a/Embedding_Store/ids.json")
+    p = C.PROJECT_ROOT / cfg.get("rag", {}).get(
+        "store", "outputs/phase14_5a/Embedding_Store/ids.json"
+    )
     ids = C.read_json(p, {})
     if isinstance(ids, dict):
         return set(ids.keys())
@@ -44,18 +44,22 @@ def new_chunks(cfg: dict) -> pd.DataFrame:
             continue
         if "model_ready_observation" not in chunk_types:
             continue
-        text = (f"Phase 20 model-ready observation {oid}: crop "
-                f"{r.get('Crop_Normalized')} year {r.get('year')} location "
-                f"{r.get('canonical_location_id')}; "
-                f"readiness {r.get('QualityGrade')}.")
-        rows.append({
-            "chunk_id": f"obs::{oid}",
-            "chunk_type": "model_ready_observation",
-            "source": "phase20",
-            "text": text,
-            "link_observation": oid,
-            "sha256": C.sha256_bytes(text.encode("utf-8")),
-        })
+        text = (
+            f"Phase 20 model-ready observation {oid}: crop "
+            f"{r.get('Crop_Normalized')} year {r.get('year')} location "
+            f"{r.get('canonical_location_id')}; "
+            f"readiness {r.get('QualityGrade')}."
+        )
+        rows.append(
+            {
+                "chunk_id": f"obs::{oid}",
+                "chunk_type": "model_ready_observation",
+                "source": "phase20",
+                "text": text,
+                "link_observation": oid,
+                "sha256": C.sha256_bytes(text.encode("utf-8")),
+            }
+        )
 
     ig_p = C.OUT / "information_gain_metrics.json"
     if ig_p.exists() and "linkage_metric" in chunk_types:
@@ -66,11 +70,16 @@ def new_chunks(cfg: dict) -> pd.DataFrame:
             if cid in existing:
                 continue
             text = f"Phase 20 information gain for predictor {name}: {val}."
-            rows.append({
-                "chunk_id": cid, "chunk_type": "linkage_metric",
-                "source": "phase20", "text": text, "link_observation": None,
-                "sha256": C.sha256_bytes(text.encode("utf-8")),
-            })
+            rows.append(
+                {
+                    "chunk_id": cid,
+                    "chunk_type": "linkage_metric",
+                    "source": "phase20",
+                    "text": text,
+                    "link_observation": None,
+                    "sha256": C.sha256_bytes(text.encode("utf-8")),
+                }
+            )
 
     mr_p = C.OUT / "model_readiness.json"
     if mr_p.exists() and "phase20_metric" in chunk_types:
@@ -81,13 +90,20 @@ def new_chunks(cfg: dict) -> pd.DataFrame:
             cid = f"metric::readiness::{d}"
             if cid in existing:
                 continue
-            text = (f"Phase 20 model readiness for {d}: score {v.get('readiness_score')}, "
-                    f"observations {v.get('total_observations')}.")
-            rows.append({
-                "chunk_id": cid, "chunk_type": "phase20_metric",
-                "source": "phase20", "text": text, "link_observation": None,
-                "sha256": C.sha256_bytes(text.encode("utf-8")),
-            })
+            text = (
+                f"Phase 20 model readiness for {d}: score {v.get('readiness_score')}, "
+                f"observations {v.get('total_observations')}."
+            )
+            rows.append(
+                {
+                    "chunk_id": cid,
+                    "chunk_type": "phase20_metric",
+                    "source": "phase20",
+                    "text": text,
+                    "link_observation": None,
+                    "sha256": C.sha256_bytes(text.encode("utf-8")),
+                }
+            )
     return pd.DataFrame(rows)
 
 
@@ -109,8 +125,9 @@ def run(force: bool = False):
         "note": "phase14_5a embedding store NOT modified; only manifest emitted",
     }
     C.write_json(manifest, C.RAG_OUT / "rag_sync_manifest.json")
-    C.write_json(chunks.to_dict("records") if len(chunks) else [],
-                 C.RAG_OUT / "rag_sync_chunks.json")
+    C.write_json(
+        chunks.to_dict("records") if len(chunks) else [], C.RAG_OUT / "rag_sync_chunks.json"
+    )
     C.mark_done("rag_sync", manifest)
     C.log_msg(f"STEP20 rag sync: {n_existing} existing, {n_new} new chunks (append-only)")
     return manifest
@@ -118,4 +135,5 @@ def run(force: bool = False):
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

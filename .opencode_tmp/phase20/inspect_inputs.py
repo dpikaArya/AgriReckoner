@@ -1,10 +1,10 @@
 """Phase 20 read-only inspection of key project inputs (no writes outside reports)."""
+
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 import p20_common as C
-
 import pandas as pd
 
 pd.set_option("display.max_columns", None)
@@ -13,11 +13,13 @@ pd.set_option("display.width", 250)
 print("PYTHON:", sys.version)
 print("PROJECT_ROOT:", C.PROJECT_ROOT)
 
+
 def peek(name, df, n=3):
     print("\n" + "=" * 100)
     print(name, "shape:", df.shape)
     print("columns:", list(df.columns))
     print(df.head(n).to_string())
+
 
 def peek_parquet(rel):
     p = C.PROJECT_ROOT / rel
@@ -29,6 +31,7 @@ def peek_parquet(rel):
     print(rel, "shape:", df.shape)
     print("columns:", list(df.columns))
     print(df.head(2).to_string())
+
 
 for rel in [
     "outputs/UAMS_v2.parquet",
@@ -44,6 +47,7 @@ for rel in [
 ]:
     if str(rel).endswith(".json"):
         import json
+
         p = C.PROJECT_ROOT / rel
         if p.exists():
             print("\n==== " + rel + " ====")

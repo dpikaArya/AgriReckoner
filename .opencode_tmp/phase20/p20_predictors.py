@@ -17,6 +17,7 @@ For a yield observation the target column "Yield" is not counted as a
 predictor (it is the target). Tier B/C are never required for basic
 readiness.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -28,11 +29,11 @@ except ImportError:
     import p20_common as C
 
 try:
-    from .p20_identity import build_observation_table, add_canonical_identity
+    from .p20_identity import add_canonical_identity, build_observation_table
     from .p20_spatial import resolve_location
     from .p20_temporal import resolve_temporal
 except ImportError:
-    from p20_identity import build_observation_table, add_canonical_identity
+    from p20_identity import add_canonical_identity, build_observation_table
     from p20_spatial import resolve_location
     from p20_temporal import resolve_temporal
 
@@ -75,9 +76,12 @@ def build_linked_observations(cfg: dict | None = None, use_cache: bool = True) -
         if len(mat):
             keys = [k for k in ("ObservationID_ML", "Crop", "Year") if k in mat.columns]
             mat = mat.drop_duplicates(subset="ObservationID_ML")
-            obs = obs.merge(mat.drop(columns=[k for k in keys if k != "ObservationID_ML"]),
-                            on="ObservationID_ML", how="left",
-                            suffixes=("", "_ext"))
+            obs = obs.merge(
+                mat.drop(columns=[k for k in keys if k != "ObservationID_ML"]),
+                on="ObservationID_ML",
+                how="left",
+                suffixes=("", "_ext"),
+            )
 
     obs = _normalize_variables(obs, cfg)
     obs = _canonicalize_targets(obs)
@@ -89,6 +93,7 @@ def build_linked_observations(cfg: dict | None = None, use_cache: bool = True) -
 # ---------------------------------------------------------------------------
 # variable alignment (STEP 9)
 # ---------------------------------------------------------------------------
+
 
 def _normalize_variables(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     out = obs.copy()
@@ -106,7 +111,8 @@ def _normalize_variables(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
 
     if "Season" in out.columns:
         out["Season_Normalized"] = out["Season"].map(
-            lambda v: C.s(v) if C.s(v).lower() not in ("", "nan", "none") else "")
+            lambda v: C.s(v) if C.s(v).lower() not in ("", "nan", "none") else ""
+        )
     else:
         out["Season_Normalized"] = ""
 
@@ -141,11 +147,13 @@ def _load_crop_aliases(cfg: dict) -> dict:
 
 def _canonicalize_targets(obs: pd.DataFrame) -> pd.DataFrame:
     out = obs.copy()
-    yield_cols = [c for c in ("Yield_per_Hectare", "Yield_per_Plot", "Yield_per_Acre")
-                  if c in out.columns]
+    yield_cols = [
+        c for c in ("Yield_per_Hectare", "Yield_per_Plot", "Yield_per_Acre") if c in out.columns
+    ]
     if yield_cols:
         out["Yield"] = out[yield_cols].apply(
-            lambda r: next((v for v in r if _present(v)), np.nan), axis=1)
+            lambda r: next((v for v in r if _present(v)), np.nan), axis=1
+        )
     elif "Yield" not in out.columns:
         out["Yield"] = np.nan
     else:
@@ -160,6 +168,7 @@ def _canonicalize_targets(obs: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 # predictor completeness (STEP 10)
 # ---------------------------------------------------------------------------
+
 
 def compute_predictor_completeness(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     out = obs.copy()
@@ -212,11 +221,15 @@ def compute_predictor_completeness(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame
     for tier in tiers:
         cols = list(tiers[tier])
         out[f"Tier_{tier}_available"] = out.apply(
-            lambda r: int(sum(1 for c in cols if _present(r.get(c)))), axis=1)
+            lambda r, cols=cols: int(sum(1 for c in cols if _present(r.get(c)))), axis=1
+        )
         out[f"Tier_{tier}_required"] = len(cols)
 
-    has_yield = out["Yield"].apply(_present) if "Yield" in out.columns \
+    has_yield = (
+        out["Yield"].apply(_present)
+        if "Yield" in out.columns
         else pd.Series(False, index=out.index)
+    )
     out["Target"] = np.where(has_yield, "Yield", "")
     return out
 
@@ -235,22 +248,66 @@ def run(force: bool = False):
     cfg = C.load_config()
     obs = build_linked_observations(cfg)
 
-    keep = ["ObservationID_ML", "canonical_observation_id", "canonical_study_id",
-            "canonical_experiment_id", "canonical_location_id", "PaperID",
-            "ExperimentID", "TreatmentID", "ObservationID", "Crop",
-            "Crop_Normalized", "Canonical_Year", "year", "season", "Season",
-            "Location", "country", "latitude", "longitude", "location_precision",
-            "Yield", "Biomass_Yield", "Plant_Height_cm", "Protein", "Rainfall",
-            "Temperature", "Temperature_Max", "Temperature_Min", "Soil_pH",
-            "Nitrogen", "Phosphorus", "Potassium", "Solar_Radiation",
-            "Organic_Carbon", "Soil_Moisture", "Soil_Texture", "Texture",
-            "Humidity", "Cultivar", "Plant_Population", "Soil_EC", "Irrigation",
-            "Fertilizer_Type", "N_Dose", "P_Dose", "K_Dose", "Days_to_Maturity",
-            "PredictorCount", "AvailablePredictorCount", "MissingPredictorCount",
-            "CompletenessRatio", "PredictorCompleteness_TierA",
-            "PredictorCompleteness_TierB", "PredictorCompleteness_TierC",
-            "MissingPredictors", "MissingCriticalPredictors", "QualityGrade",
-            "Target"]
+    keep = [
+        "ObservationID_ML",
+        "canonical_observation_id",
+        "canonical_study_id",
+        "canonical_experiment_id",
+        "canonical_location_id",
+        "PaperID",
+        "ExperimentID",
+        "TreatmentID",
+        "ObservationID",
+        "Crop",
+        "Crop_Normalized",
+        "Canonical_Year",
+        "year",
+        "season",
+        "Season",
+        "Location",
+        "country",
+        "latitude",
+        "longitude",
+        "location_precision",
+        "Yield",
+        "Biomass_Yield",
+        "Plant_Height_cm",
+        "Protein",
+        "Rainfall",
+        "Temperature",
+        "Temperature_Max",
+        "Temperature_Min",
+        "Soil_pH",
+        "Nitrogen",
+        "Phosphorus",
+        "Potassium",
+        "Solar_Radiation",
+        "Organic_Carbon",
+        "Soil_Moisture",
+        "Soil_Texture",
+        "Texture",
+        "Humidity",
+        "Cultivar",
+        "Plant_Population",
+        "Soil_EC",
+        "Irrigation",
+        "Fertilizer_Type",
+        "N_Dose",
+        "P_Dose",
+        "K_Dose",
+        "Days_to_Maturity",
+        "PredictorCount",
+        "AvailablePredictorCount",
+        "MissingPredictorCount",
+        "CompletenessRatio",
+        "PredictorCompleteness_TierA",
+        "PredictorCompleteness_TierB",
+        "PredictorCompleteness_TierC",
+        "MissingPredictors",
+        "MissingCriticalPredictors",
+        "QualityGrade",
+        "Target",
+    ]
     rep = obs[[c for c in keep if c in obs.columns]].copy()
 
     C.to_parquet(rep, C.OUT / "predictor_completeness.parquet")
@@ -275,4 +332,5 @@ def run(force: bool = False):
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

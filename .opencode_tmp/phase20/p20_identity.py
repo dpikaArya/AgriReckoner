@@ -14,6 +14,7 @@ to a review queue.
 
 Protected inputs (UAMS_v2, UAMS_v2.1, ...) are read-only.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -25,12 +26,28 @@ except ImportError:
     import p20_common as C
 
 
-SPURIOUS_COLUMNS = {"100", "86.95652173913044", "Value", "Unit", "Treatment",
-                    "PARAMETER", "Statistic", "Property", "Treatment1"}
+SPURIOUS_COLUMNS = {
+    "100",
+    "86.95652173913044",
+    "Value",
+    "Unit",
+    "Treatment",
+    "PARAMETER",
+    "Statistic",
+    "Property",
+    "Treatment1",
+}
 
 IDENTITY_CARRY = {
-    "SourceRow", "SourceColumn", "SourceSystem", "SourceTable", "Caption",
-    "DOI", "OriginalPaperID", "Provenance_ID", "Dataset_ID",
+    "SourceRow",
+    "SourceColumn",
+    "SourceSystem",
+    "SourceTable",
+    "Caption",
+    "DOI",
+    "OriginalPaperID",
+    "Provenance_ID",
+    "Dataset_ID",
 }
 
 
@@ -67,38 +84,46 @@ def build_observation_table(uams: pd.DataFrame | None = None) -> pd.DataFrame:
 
     if len(lit):
         grp_keys = ["PaperID", "ExperimentID", "TreatmentID"]
-        base = lit.groupby(grp_keys).agg(
-            Crop=("Crop", lambda s: _first(list(s.dropna()))),
-            Year=("Year", lambda s: _first(list(s.dropna()))),
-            Variety=("TreatmentLabel", lambda s: _first(list(s.dropna()))),
-            n_measurement_rows=("MeasurementID", "count"),
-            SourceSystem=("SourceSystem", lambda s: _first(list(s.dropna()))),
-            DOI=("DOI_paper", lambda s: _first(list(s.dropna()))),
-        ).reset_index()
+        base = (
+            lit.groupby(grp_keys)
+            .agg(
+                Crop=("Crop", lambda s: _first(list(s.dropna()))),
+                Year=("Year", lambda s: _first(list(s.dropna()))),
+                Variety=("TreatmentLabel", lambda s: _first(list(s.dropna()))),
+                n_measurement_rows=("MeasurementID", "count"),
+                SourceSystem=("SourceSystem", lambda s: _first(list(s.dropna()))),
+                DOI=("DOI_paper", lambda s: _first(list(s.dropna()))),
+            )
+            .reset_index()
+        )
 
-        num_agg = lit[lit["_num_ok"]].groupby(grp_keys + ["Variable"])["_num"] \
-            .mean().reset_index()
-        num_wide = num_agg.pivot_table(index=grp_keys, columns="Variable",
-                                       values="_num", aggfunc="mean").reset_index()
+        num_agg = lit[lit["_num_ok"]].groupby(grp_keys + ["Variable"])["_num"].mean().reset_index()
+        num_wide = num_agg.pivot_table(
+            index=grp_keys, columns="Variable", values="_num", aggfunc="mean"
+        ).reset_index()
         num_wide.columns = [str(c) for c in num_wide.columns]
 
-        cat_agg = lit[~lit["_num_ok"]].groupby(grp_keys + ["Variable"])[
-            "NormalizedValue"].agg(lambda s: _first(list(s))).reset_index()
-        cat_wide = cat_agg.pivot_table(index=grp_keys, columns="Variable",
-                                       values="NormalizedValue",
-                                       aggfunc=_first).reset_index()
+        cat_agg = (
+            lit[~lit["_num_ok"]]
+            .groupby(grp_keys + ["Variable"])["NormalizedValue"]
+            .agg(lambda s: _first(list(s)))
+            .reset_index()
+        )
+        cat_wide = cat_agg.pivot_table(
+            index=grp_keys, columns="Variable", values="NormalizedValue", aggfunc=_first
+        ).reset_index()
         cat_wide.columns = [str(c) for c in cat_wide.columns]
 
-        protected = {"Crop", "Year", "Variety", "n_measurement_rows", "SourceSystem",
-                     "DOI"}
+        protected = {"Crop", "Year", "Variety", "n_measurement_rows", "SourceSystem", "DOI"}
         for _c in protected:
             if _c in _keep(num_wide.columns) and _c not in grp_keys:
                 num_wide = num_wide.rename(columns={_c: _c + "_var"})
             if _c in _keep(cat_wide.columns) and _c not in grp_keys:
                 cat_wide = cat_wide.rename(columns={_c: _c + "_var"})
 
-        lit_wide = base.merge(num_wide, on=grp_keys, how="left") \
-            .merge(cat_wide, on=grp_keys, how="left")
+        lit_wide = base.merge(num_wide, on=grp_keys, how="left").merge(
+            cat_wide, on=grp_keys, how="left"
+        )
         lit_wide["ObservationLevel"] = "literature"
         wide_parts.append(lit_wide)
 
@@ -106,9 +131,13 @@ def build_observation_table(uams: pd.DataFrame | None = None) -> pd.DataFrame:
         recs = []
         for _, r in ext.iterrows():
             rec = {
-                "PaperID": "", "ExperimentID": "", "TreatmentID": "",
-                "Crop": r.get("Crop"), "Year": r.get("Year"),
-                "Variety": r.get("TreatmentLabel"), "n_measurement_rows": 1,
+                "PaperID": "",
+                "ExperimentID": "",
+                "TreatmentID": "",
+                "Crop": r.get("Crop"),
+                "Year": r.get("Year"),
+                "Variety": r.get("TreatmentLabel"),
+                "n_measurement_rows": 1,
                 "ObservationLevel": "external",
                 "SourceSystem": r.get("SourceSystem"),
                 "ObservationID": r.get("ObservationID"),
@@ -156,14 +185,27 @@ def add_canonical_identity(obs: pd.DataFrame) -> pd.DataFrame:
 
     out["canonical_observation_id"] = [f"OBS-{i:06d}" for i in range(n)]
     out["canonical_study_id"] = out.apply(
-        lambda r: _norm_id(r["PaperID"]) if C.s(r["PaperID"]) else _norm_id("EXT", r["ObservationID"]),
-        axis=1)
+        lambda r: (
+            _norm_id(r["PaperID"]) if C.s(r["PaperID"]) else _norm_id("EXT", r["ObservationID"])
+        ),
+        axis=1,
+    )
     out["canonical_experiment_id"] = out.apply(
-        lambda r: _norm_id(r["PaperID"], r["ExperimentID"]) if C.s(r["PaperID"])
-        else _norm_id("EXT", r["ObservationID"]), axis=1)
+        lambda r: (
+            _norm_id(r["PaperID"], r["ExperimentID"])
+            if C.s(r["PaperID"])
+            else _norm_id("EXT", r["ObservationID"])
+        ),
+        axis=1,
+    )
     out["canonical_location_id"] = out.apply(
-        lambda r: _norm_id(r["PaperID"], r["ExperimentID"], "LOC") if C.s(r["PaperID"])
-        else _norm_id("EXT", r["ObservationID"], "LOC"), axis=1)
+        lambda r: (
+            _norm_id(r["PaperID"], r["ExperimentID"], "LOC")
+            if C.s(r["PaperID"])
+            else _norm_id("EXT", r["ObservationID"], "LOC")
+        ),
+        axis=1,
+    )
 
     out["Canonical_Crop"] = out["Crop"]
     out["Canonical_Year"] = pd.to_numeric(out["Year"], errors="coerce")
@@ -171,16 +213,18 @@ def add_canonical_identity(obs: pd.DataFrame) -> pd.DataFrame:
     out["Canonical_Season"] = out.get("Season", np.nan)
 
     out["Source"] = out["SourceSystem"]
-    out["Provenance"] = np.where(out["ObservationLevel"] == "literature",
-                                 "literature:" + out["PaperID"].astype(str),
-                                 "external:" + out["ObservationID"].astype(str))
+    out["Provenance"] = np.where(
+        out["ObservationLevel"] == "literature",
+        "literature:" + out["PaperID"].astype(str),
+        "external:" + out["ObservationID"].astype(str),
+    )
     return out
 
 
 def _duplicate_fingerprint(r) -> str:
     return C.record_fingerprint(
-        r.get("PaperID"), r.get("ExperimentID"), r.get("TreatmentID"),
-        r.get("Crop"), r.get("Year"))
+        r.get("PaperID"), r.get("ExperimentID"), r.get("TreatmentID"), r.get("Crop"), r.get("Year")
+    )
 
 
 def detect_duplicates(obs: pd.DataFrame) -> pd.DataFrame:
@@ -199,7 +243,6 @@ def detect_duplicates(obs: pd.DataFrame) -> pd.DataFrame:
 
 
 def run(force: bool = False):
-    cfg = C.load_config()
     obs = build_observation_table()
     obs = add_canonical_identity(obs)
     obs = detect_duplicates(obs)
@@ -224,12 +267,15 @@ def run(force: bool = False):
     }
     C.write_json(result, C.OUT / "canonical_identity_metrics.json")
     C.mark_done("identity", result)
-    C.log_msg(f"STEP2 identity: {len(obs)} observations, "
-              f"{result['independent_studies']} studies, "
-              f"{result['duplicate_candidates']} duplicate candidates")
+    C.log_msg(
+        f"STEP2 identity: {len(obs)} observations, "
+        f"{result['independent_studies']} studies, "
+        f"{result['duplicate_candidates']} duplicate candidates"
+    )
     return result
 
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

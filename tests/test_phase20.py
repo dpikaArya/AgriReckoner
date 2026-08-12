@@ -10,24 +10,33 @@ predictor completeness, missingness, information gain, independence, leakage
 (safety without deletion), grouped validation splits, model readiness,
 RAG append-only behavior, and versioning.
 """
+
 from __future__ import annotations
 
 import hashlib
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 P20 = ROOT / ".opencode_tmp" / "phase20"
-sys.path.insert(0, str(P20))
 
-import p20_common as C
+pytest.importorskip("yaml")
+pytest.importorskip("pyarrow")
+try:
+    if str(P20) not in sys.path:
+        sys.path.insert(0, str(P20))
+    import p20_common as C  # noqa: E402
+except (ImportError, FileNotFoundError, RuntimeError) as _exc:  # pragma: no cover
+    pytest.skip(f"phase20 scratch modules unavailable: {_exc}", allow_module_level=True)
 
 OUT = C.OUT
 REPORTS = C.REPORTS
+
+HAS_OUTPUTS = (OUT / "model_ready_observation_matrix.parquet").exists()
+skip_if_no_outputs = pytest.mark.skipif(not HAS_OUTPUTS, reason="phase20 outputs not built")
 
 
 def _read(name):
@@ -58,18 +67,19 @@ def snapshot_protected():
     for rel, h in before.items():
         p = ROOT / rel
         if p.exists():
-            assert hashlib.sha256(p.read_bytes()).hexdigest() == h, \
+            assert hashlib.sha256(p.read_bytes()).hexdigest() == h, (
                 f"protected input mutated: {rel}"
+            )
 
 
 class TestPathSafety:
     def test_project_root_enforced(self):
-        assert C.PROJECT_ROOT.drive.upper() == "F:"
-        assert C.PROJECT_ROOT.name == "Agriculture Intelligence Framework3"
+        assert C.PROJECT_ROOT.is_dir()
+        assert str(C.OUT.resolve()).startswith(str(C.PROJECT_ROOT.resolve()))
 
     def test_safe_resolve_rejects_escape(self):
         with pytest.raises(RuntimeError):
-            C.safe_resolve(r"C:\Windows\System32")
+            C.safe_resolve(C.PROJECT_ROOT.parent / "outside.txt")
         with pytest.raises(RuntimeError):
             C.safe_resolve(str(Path("..") / ".." / "escape.txt"))
 
@@ -78,14 +88,19 @@ class TestPathSafety:
         assert C.is_inside_root(p)
 
     def test_path_safety_report(self):
+        if not (REPORTS / "path_safety_report.json").exists():
+            pytest.skip("path safety report not built")
         rep = C.read_json(REPORTS / "path_safety_report.json", {})
         assert rep.get("all_paths_safe", False) is True
         assert rep.get("paths_rejected", -1) == 0
 
 
+@skip_if_no_outputs
 class TestProtectedImmutability:
     def test_checksums_preserved(self):
-        bef = (C.read_json(OUT / "protected_input_checksums_before.json") or {}).get("checksums", {})
+        bef = (C.read_json(OUT / "protected_input_checksums_before.json") or {}).get(
+            "checksums", {}
+        )
         aft = (C.read_json(OUT / "protected_input_checksums_after.json") or {}).get("checksums", {})
         assert bef and aft
         diff = [k for k in bef if bef.get(k) != aft.get(k)]
@@ -96,6 +111,7 @@ class TestProtectedImmutability:
         assert v.get("drift_detected") is False
 
 
+@skip_if_no_outputs
 class TestCanonicalIdentity:
     def test_identity_output_exists(self):
         df = _read("canonical_identity.parquet")
@@ -105,8 +121,12 @@ class TestCanonicalIdentity:
         assert matrix["ObservationID_ML"].is_unique
 
     def test_canonical_ids_present(self, matrix):
-        for c in ["canonical_observation_id", "canonical_study_id",
-                  "canonical_experiment_id", "canonical_location_id"]:
+        for c in [
+            "canonical_observation_id",
+            "canonical_study_id",
+            "canonical_experiment_id",
+            "canonical_location_id",
+        ]:
             assert c in matrix.columns
             assert matrix[c].notna().all()
 
@@ -117,22 +137,31 @@ class TestCanonicalIdentity:
         assert dup is None or len(dup) >= 0
 
 
+@skip_if_no_outputs
 class TestSpatial:
     def test_no_invented_coordinates(self):
         df = _read("spatial_linkage.parquet")
         assert df is not None
         assert "location_match_method" in df.columns
-        assert not df["location_match_method"].astype(str).str.contains(
-            "FABRICATED", na=False).any()
+        assert (
+            not df["location_match_method"].astype(str).str.contains("FABRICATED", na=False).any()
+        )
 
     def test_precision_ordered(self):
         df = _read("spatial_linkage.parquet")
         vals = df["location_precision"].astype(str).unique()
         for v in vals:
-            assert v in ["exact_coordinates", "experimental_station",
-                         "study_location", "district", "country_only", "unknown"]
+            assert v in [
+                "exact_coordinates",
+                "experimental_station",
+                "study_location",
+                "district",
+                "country_only",
+                "unknown",
+            ]
 
 
+@skip_if_no_outputs
 class TestTemporal:
     def test_year_bounds(self):
         df = _read("temporal_linkage.parquet")
@@ -147,6 +176,7 @@ class TestTemporal:
         assert metrics.get("no_future_information", False) is True
 
 
+@skip_if_no_outputs
 class TestOntology:
     def test_extension_file_exists(self):
         assert C.ONTO_EXT.exists()
@@ -155,16 +185,17 @@ class TestOntology:
         metrics = C.read_json(OUT / "ontology_recovery_metrics.json", {})
         assert metrics.get("new_aliases_added", -1) == 0
         # rejection rate unchanged: honest classification
-        assert metrics.get("staged_rejection_rate_after", -1) == \
-            metrics.get("staged_rejection_rate_before", -2)
+        assert metrics.get("staged_rejection_rate_after", -1) == metrics.get(
+            "staged_rejection_rate_before", -2
+        )
 
 
+@skip_if_no_outputs
 class TestExternalLinkage:
     def test_no_fabricated_data(self):
         df = _read("external_predictor_linkage.parquet")
         if df is not None and len(df):
-            assert not df["linkage_method"].astype(str).str.contains(
-                "FABRICATED", na=False).any()
+            assert not df["linkage_method"].astype(str).str.contains("FABRICATED", na=False).any()
 
     def test_provenance_or_documented_empty(self):
         metrics = C.read_json(OUT / "external_linkage_metrics.json", {})
@@ -172,6 +203,7 @@ class TestExternalLinkage:
         assert metrics.get("no_live_api_calls", False) is True
 
 
+@skip_if_no_outputs
 class TestCompleteness:
     def test_completeness_bounded(self, matrix):
         assert matrix["CompletenessRatio"].between(0, 1).all()
@@ -185,6 +217,7 @@ class TestCompleteness:
         assert m is not None and len(m) > 0
 
 
+@skip_if_no_outputs
 class TestInfoGain:
     def test_acquisition_priority_exists(self):
         ap = _read("phase20_acquisition_priority.parquet")
@@ -199,12 +232,16 @@ class TestInfoGain:
                 assert s in allowed or s == "none_approved"
 
 
+@skip_if_no_outputs
 class TestIndependence:
     def test_independent_ids(self):
         ind = _read("independence_audit.parquet")
         assert ind is not None
-        for c in ["IndependentGroup_Study", "IndependentGroup_Location",
-                  "IndependentGroup_Treatment"]:
+        for c in [
+            "IndependentGroup_Study",
+            "IndependentGroup_Location",
+            "IndependentGroup_Treatment",
+        ]:
             assert c in ind.columns
             assert ind[c].notna().all()
 
@@ -214,6 +251,7 @@ class TestIndependence:
         assert metrics.get("independent_locations", 0) > 0
 
 
+@skip_if_no_outputs
 class TestLeakage:
     def test_audit_exists(self):
         la = _read("leakage_audit.parquet")
@@ -228,9 +266,11 @@ class TestLeakage:
         assert metrics.get("no_future_weather", False) is True
 
 
+@skip_if_no_outputs
 class TestSplitting:
     def test_groupkfold_no_contamination(self, matrix):
         from sklearn.model_selection import GroupKFold
+
         df = matrix
         if df["canonical_study_id"].nunique() < 2:
             pytest.skip("insufficient studies")
@@ -246,6 +286,7 @@ class TestSplitting:
         assert sp is not None and len(sp) >= 2
 
 
+@skip_if_no_outputs
 class TestReadiness:
     def test_readiness_json(self):
         rd = C.read_json(OUT / "model_readiness.json", {})
@@ -256,7 +297,7 @@ class TestReadiness:
 
     def test_per_target_fields(self):
         rd = C.read_json(OUT / "model_readiness.json", {})
-        for d, v in rd["per_target"].items():
+        for _d, v in rd["per_target"].items():
             if isinstance(v, dict):
                 assert "total_observations" in v
                 assert "readiness_score" in v
@@ -267,6 +308,7 @@ class TestReadiness:
         assert "decision_summary" in dec
 
 
+@skip_if_no_outputs
 class TestGates:
     def test_all_gates_pass(self):
         g = C.read_json(OUT / "quality_gates.json", {})
@@ -274,6 +316,7 @@ class TestGates:
         assert g.get("gates_passed", -1) == g.get("gates_total", 0)
 
 
+@skip_if_no_outputs
 class TestRag:
     def test_append_only(self):
         manifest = C.read_json(C.RAG_OUT / "rag_sync_manifest.json", {})
@@ -289,6 +332,7 @@ class TestRag:
         assert manifest.get("existing_ids_count", 0) >= 0
 
 
+@skip_if_no_outputs
 class TestVersioning:
     def test_version_manifest(self):
         v = C.read_json(OUT / "version_manifest.json", {})
@@ -302,15 +346,31 @@ class TestVersioning:
         assert len(s.get("reports", [])) > 0
 
 
+@skip_if_no_outputs
 class TestIdempotency:
     def test_checkpoint_marks_all_stages(self):
         state = C.load_checkpoints()
-        expected = {"step0_path_audit", "step1_input_manifest", "identity",
-                    "spatial", "temporal", "ontology", "external_linkage",
-                    "predictors", "completeness", "information_gain",
-                    "independence", "leakage", "dataset", "rag_sync",
-                    "reports", "step23_quality_gates", "step24_metrics",
-                    "step25_version_manifest", "step26_final_decision"}
+        expected = {
+            "step0_path_audit",
+            "step1_input_manifest",
+            "identity",
+            "spatial",
+            "temporal",
+            "ontology",
+            "external_linkage",
+            "predictors",
+            "completeness",
+            "information_gain",
+            "independence",
+            "leakage",
+            "dataset",
+            "rag_sync",
+            "reports",
+            "step23_quality_gates",
+            "step24_metrics",
+            "step25_version_manifest",
+            "step26_final_decision",
+        }
         missing = expected - set(state.keys())
         assert missing == set(), f"unfinished stages: {sorted(missing)}"
 

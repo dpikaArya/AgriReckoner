@@ -5,6 +5,7 @@ period for every observation using only information that was knowable at
 measurement time (no future information). Precision and confidence are
 recorded per observation.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -16,9 +17,9 @@ except ImportError:
     import p20_common as C
 
 try:
-    from .p20_identity import build_observation_table, add_canonical_identity
+    from .p20_identity import add_canonical_identity, build_observation_table
 except ImportError:
-    from p20_identity import build_observation_table, add_canonical_identity
+    from p20_identity import add_canonical_identity, build_observation_table
 
 
 def _year(v):
@@ -49,10 +50,15 @@ def resolve_temporal(obs: pd.DataFrame, cfg: dict) -> pd.DataFrame:
     out = obs.copy()
     ymin, ymax = cfg["temporal"]["year_range"]
     defaults = {
-        "start_date": "", "end_date": "", "season": "",
-        "year": np.nan, "temporal_precision": "unknown",
-        "temporal_confidence": 0.0, "growing_days": np.nan,
-        "weather_period": "", "sowing_month": np.nan,
+        "start_date": "",
+        "end_date": "",
+        "season": "",
+        "year": np.nan,
+        "temporal_precision": "unknown",
+        "temporal_confidence": 0.0,
+        "growing_days": np.nan,
+        "weather_period": "",
+        "sowing_month": np.nan,
     }
     for k, v in defaults.items():
         if k not in out.columns:
@@ -119,12 +125,29 @@ def run(force: bool = False):
     obs = add_canonical_identity(obs)
     linked = resolve_temporal(obs, cfg)
 
-    keep = ["ObservationID_ML", "PaperID", "ExperimentID", "TreatmentID",
-            "canonical_observation_id", "canonical_study_id",
-            "canonical_experiment_id", "canonical_location_id", "Crop",
-            "Year", "Sowing_Date", "Season", "year", "season",
-            "start_date", "end_date", "growing_days", "sowing_month",
-            "temporal_precision", "temporal_confidence", "weather_period"]
+    keep = [
+        "ObservationID_ML",
+        "PaperID",
+        "ExperimentID",
+        "TreatmentID",
+        "canonical_observation_id",
+        "canonical_study_id",
+        "canonical_experiment_id",
+        "canonical_location_id",
+        "Crop",
+        "Year",
+        "Sowing_Date",
+        "Season",
+        "year",
+        "season",
+        "start_date",
+        "end_date",
+        "growing_days",
+        "sowing_month",
+        "temporal_precision",
+        "temporal_confidence",
+        "weather_period",
+    ]
     rep = linked[[c for c in keep if c in linked.columns]].copy()
 
     C.to_parquet(rep, C.OUT / "temporal_linkage.parquet")
@@ -151,4 +174,5 @@ def run(force: bool = False):
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

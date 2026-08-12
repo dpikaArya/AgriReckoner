@@ -14,11 +14,12 @@ Outputs:
     .opencode_tmp/phase20/phase20_ontology_extensions.yaml
     outputs/phase20/ontology_recovery.parquet
 """
+
 from __future__ import annotations
 
 from datetime import date
+from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import yaml
 
@@ -66,17 +67,27 @@ def classify_record(row: pd.Series) -> dict:
         evidence = f"validation status {status}"
     elif var in ("production_tonnes",):
         classification = "source_schema_mismatch"
-        evidence = ("FAOSTAT 'production_tonnes' is a national production "
-                    "aggregate (t), not a plot/field-level observation; mapping "
-                    "it to Yield_per_Hectare would change semantics and leak "
-                    "national aggregates into plot-level modelling.")
+        evidence = (
+            "FAOSTAT 'production_tonnes' is a national production "
+            "aggregate (t), not a plot/field-level observation; mapping "
+            "it to Yield_per_Hectare would change semantics and leak "
+            "national aggregates into plot-level modelling."
+        )
         confidence = 0.9
     elif var in ("area_harvested",):
         classification = "source_schema_mismatch"
-        evidence = ("FAOSTAT 'area_harvested' is a national harvested area "
-                    "aggregate (ha); it is not an observation-level predictor.")
+        evidence = (
+            "FAOSTAT 'area_harvested' is a national harvested area "
+            "aggregate (ha); it is not an observation-level predictor."
+        )
         confidence = 0.9
-    elif var.startswith("100") or var in ("Value", "PARAMETER", "Property", "Statistic", "Treatment1"):
+    elif var.startswith("100") or var in (
+        "Value",
+        "PARAMETER",
+        "Property",
+        "Statistic",
+        "Treatment1",
+    ):
         classification = "non_agricultural_variable"
         evidence = f"spurious table-scraping variable name '{var}'"
         confidence = 0.8
@@ -135,15 +146,12 @@ def write_extension_yaml(summary: dict, alias_rows: list[dict], reject_rows: lis
             "alias_min_confidence": summary["alias_min_confidence"],
             "aliases": alias_rows,
             "rejected_variable_classification": reject_rows,
-            "recovery_metrics": {
-                k: v for k, v in summary.items() if k != "alias_min_confidence"
-            },
+            "recovery_metrics": {k: v for k, v in summary.items() if k != "alias_min_confidence"},
         }
     }
     p = C.safe_resolve(C.ONTO_EXT)
     p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True),
-                 encoding="utf-8")
+    p.write_text(yaml.safe_dump(doc, sort_keys=False, allow_unicode=True), encoding="utf-8")
     return p
 
 
@@ -160,10 +168,9 @@ def run(force: bool = False):
     rej_df = build_rejection_table(cfg)
     if len(rej_df):
         rej_df["classification"] = pd.Categorical(
-            rej_df["classification"], categories=TAXONOMY + ["invalid_record"],
-            ordered=False)
-    counts = rej_df["classification"].astype(str).value_counts().to_dict() \
-        if len(rej_df) else {}
+            rej_df["classification"], categories=TAXONOMY + ["invalid_record"], ordered=False
+        )
+    counts = rej_df["classification"].astype(str).value_counts().to_dict() if len(rej_df) else {}
 
     # alias candidates: only explicit, evidence-based, non-ambiguous
     alias_rows = []
@@ -182,14 +189,17 @@ def run(force: bool = False):
         "staged_records_rejected_after": rejected,
         "staged_rejection_rate_after": rejected_rate_before,
         "rejection_reduction": 0.0,
-        "note": ("Rejected variables are national aggregates with no honest "
-                 "observation-level alias; rejection rate unchanged, but every "
-                 "rejection is now classified and auditable. No fabricated "
-                 "mapping was introduced."),
+        "note": (
+            "Rejected variables are national aggregates with no honest "
+            "observation-level alias; rejection rate unchanged, but every "
+            "rejection is now classified and auditable. No fabricated "
+            "mapping was introduced."
+        ),
     }
 
-    path = write_extension_yaml(summary, alias_rows, rej_df.to_dict("records")
-                                if len(rej_df) else [])
+    path = write_extension_yaml(
+        summary, alias_rows, rej_df.to_dict("records") if len(rej_df) else []
+    )
 
     C.to_parquet(rej_df, C.OUT / "ontology_recovery.parquet")
     C.to_excel(rej_df, C.REPORTS / "ontology_recovery_report.xlsx", "Rejections")
@@ -200,11 +210,14 @@ def run(force: bool = False):
     result["classification_counts"] = counts
     result["extension_path"] = str(path)
     C.mark_done("ontology", result)
-    C.log_msg(f"STEP5 ontology: classified {result['rejections_classified']} "
-              f"rejections, {result['new_aliases_added']} aliases added")
+    C.log_msg(
+        f"STEP5 ontology: classified {result['rejections_classified']} "
+        f"rejections, {result['new_aliases_added']} aliases added"
+    )
     return result
 
 
 if __name__ == "__main__":
     import sys
+
     run(force="--force" in sys.argv)

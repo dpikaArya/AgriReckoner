@@ -15,6 +15,7 @@ Pipeline order (STEPs 0-26):
 
 Protected inputs are checksummed before and after; any drift is reported.
 """
+
 from __future__ import annotations
 
 import sys
@@ -58,17 +59,27 @@ STAGES = [
 
 def _before_checksums(cfg):
     sums = C.protected_checksums(only_existing=True)
-    C.write_json({"mode": "dry_run" if cfg.get("dry_run") else "production",
-                  "recorded_at": C.now_full_iso(),
-                  "checksums": sums}, C.OUT / "protected_input_checksums_before.json")
+    C.write_json(
+        {
+            "mode": "dry_run" if cfg.get("dry_run") else "production",
+            "recorded_at": C.now_full_iso(),
+            "checksums": sums,
+        },
+        C.OUT / "protected_input_checksums_before.json",
+    )
     return sums
 
 
 def _after_checksums(cfg):
     sums = C.protected_checksums(only_existing=True)
-    C.write_json({"mode": "dry_run" if cfg.get("dry_run") else "production",
-                  "recorded_at": C.now_full_iso(),
-                  "checksums": sums}, C.OUT / "protected_input_checksums_after.json")
+    C.write_json(
+        {
+            "mode": "dry_run" if cfg.get("dry_run") else "production",
+            "recorded_at": C.now_full_iso(),
+            "checksums": sums,
+        },
+        C.OUT / "protected_input_checksums_after.json",
+    )
     return sums
 
 
@@ -104,12 +115,14 @@ def run_pipeline(dry_run: bool):
         t0 = time.time()
         try:
             r = fn(force=False)
-            results[stage] = {"ok": True, "elapsed_s": round(time.time() - t0, 2),
-                              "result": r}
+            results[stage] = {"ok": True, "elapsed_s": round(time.time() - t0, 2), "result": r}
         except Exception as exc:
             C.log_msg(f"FAILED {stage}: {exc}")
-            results[stage] = {"ok": False, "elapsed_s": round(time.time() - t0, 2),
-                              "error": str(exc)}
+            results[stage] = {
+                "ok": False,
+                "elapsed_s": round(time.time() - t0, 2),
+                "error": str(exc),
+            }
             raise
 
     _after_checksums(cfg)

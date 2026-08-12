@@ -7,36 +7,40 @@ Covers immutability, checksums, missingness, independence, duplicate
 protection, leakage safety, completeness, infogain, readiness, splitting,
 RAG incremental behavior, and idempotency.
 """
+
 from __future__ import annotations
 
 import hashlib
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 PH19 = ROOT / ".opencode_tmp" / "phase19"
-sys.path.insert(0, str(PH19))
 
-import p19_common as C
-import p19_data as D
+pytest.importorskip("yaml")
+pytest.importorskip("pyarrow")
+try:
+    if str(PH19) not in sys.path:
+        sys.path.insert(0, str(PH19))
+    import p19_common as C  # noqa: E402
+    import p19_data as D  # noqa: E402
+except (ImportError, FileNotFoundError, RuntimeError) as _exc:  # pragma: no cover
+    pytest.skip(f"phase19 scratch modules unavailable: {_exc}", allow_module_level=True)
 
 SHA_BEFORE = {}
 
 
 @pytest.fixture(scope="module", autouse=True)
 def snapshot_uams():
-    for key, path in [("v2", C.resolve("inputs.uams_v2")),
-                      ("v21", C.resolve("inputs.uams_v2_1"))]:
+    for key, path in [("v2", C.resolve("inputs.uams_v2")), ("v21", C.resolve("inputs.uams_v2_1"))]:
         if path and Path(path).exists():
             h = hashlib.sha256(Path(path).read_bytes()).hexdigest()
             SHA_BEFORE[key] = h
     yield
-    for key, path in [("v2", C.resolve("inputs.uams_v2")),
-                      ("v21", C.resolve("inputs.uams_v2_1"))]:
+    for key, path in [("v2", C.resolve("inputs.uams_v2")), ("v21", C.resolve("inputs.uams_v2_1"))]:
         if path and Path(path).exists():
             h = hashlib.sha256(Path(path).read_bytes()).hexdigest()
             assert SHA_BEFORE[key] == h, f"UAMS input mutated: {path}"
@@ -53,8 +57,12 @@ class TestImmutability:
         assert True  # enforced by snapshot fixture
 
     def test_no_files_under_input_dirs(self, obs):
-        for root in [ROOT / "outputs" / "phase18", ROOT / "outputs" / "phase14",
-                     ROOT / "outputs" / "phase14_5a", ROOT / "outputs" / "phase16"]:
+        for root in [
+            ROOT / "outputs" / "phase18",
+            ROOT / "outputs" / "phase14",
+            ROOT / "outputs" / "phase14_5a",
+            ROOT / "outputs" / "phase16",
+        ]:
             assert root.exists()
 
 
@@ -99,8 +107,9 @@ class TestMissingness:
         assert obs["Predictor_completeness"].between(0, 1).all()
 
     def test_completeness_report_exists(self):
-        assert (C.OUT / "predictor_completeness_report.parquet").exists() or \
-               (C.OUT / "missingness_report.parquet").exists()
+        assert (C.OUT / "predictor_completeness_report.parquet").exists() or (
+            C.OUT / "missingness_report.parquet"
+        ).exists()
 
 
 class TestLeakage:
@@ -108,18 +117,37 @@ class TestLeakage:
         p = C.ML_DATASETS / "yield_ml_dataset.parquet"
         if p.exists():
             df = pd.read_parquet(p)
-            leaky = {"Harvest_Index", "Biomass_Yield", "Yield_per_Plot",
-                     "Economic_Yield", "Marketable_Yield", "Protein",
-                     "Plant_Height_cm", "SPAD", "Tillers", "Leaf_Area_cm2",
-                     "Yield_per_Acre"}
+            leaky = {
+                "Harvest_Index",
+                "Biomass_Yield",
+                "Yield_per_Plot",
+                "Economic_Yield",
+                "Marketable_Yield",
+                "Protein",
+                "Plant_Height_cm",
+                "SPAD",
+                "Tillers",
+                "Leaf_Area_cm2",
+                "Yield_per_Acre",
+            }
             cols = set(df.columns)
             assert cols.isdisjoint(leaky)
 
     def test_no_leaky_predictors_any_domain(self):
-        leaky = {"Harvest_Index", "Biomass_Yield", "Yield_per_Plot",
-                 "Economic_Yield", "Marketable_Yield", "Protein",
-                 "Plant_Height_cm", "SPAD", "Tillers", "Leaf_Area_cm2",
-                 "Yield_per_Acre", "Yield_per_Hectare"}
+        leaky = {
+            "Harvest_Index",
+            "Biomass_Yield",
+            "Yield_per_Plot",
+            "Economic_Yield",
+            "Marketable_Yield",
+            "Protein",
+            "Plant_Height_cm",
+            "SPAD",
+            "Tillers",
+            "Leaf_Area_cm2",
+            "Yield_per_Acre",
+            "Yield_per_Hectare",
+        }
         for domain in ["yield", "biomass", "growth", "quality"]:
             p = C.ML_DATASETS / f"{domain}_ml_dataset.parquet"
             if p.exists():
@@ -156,6 +184,7 @@ class TestSplitting:
         if "StudyIndependentID" not in df.columns or df["StudyIndependentID"].nunique() < 2:
             pytest.skip("insufficient studies")
         from sklearn.model_selection import GroupKFold
+
         groups = df["StudyIndependentID"].values
         kf = GroupKFold(n_splits=min(5, df["StudyIndependentID"].nunique()))
         for tr, te in kf.split(df, groups=groups):
@@ -189,8 +218,12 @@ class TestDatasets:
             p = C.ML_DATASETS / f"{domain}_ml_dataset.parquet"
             if p.exists():
                 df = pd.read_parquet(p)
-                texty = [c for c in df.columns if df[c].dtype == object and
-                         df[c].astype(str).str.contains(r"\S+ \S+ \S+", na=False).any()]
+                texty = [
+                    c
+                    for c in df.columns
+                    if df[c].dtype == object
+                    and df[c].astype(str).str.contains(r"\S+ \S+ \S+", na=False).any()
+                ]
                 assert not texty
 
 
@@ -203,10 +236,7 @@ class TestIdempotency:
             if p.exists():
                 counts1[domain] = len(pd.read_parquet(p))
         # simulated second run is guarded by checkpoints; assert stable
-        import p19_step10_datasets
-        cfg = C.load_config()
-        obs = D.build_full_observation_table()
-        for domain, targets in D.TARGETS_BY_DOMAIN.items():
+        for domain, _targets in D.TARGETS_BY_DOMAIN.items():
             p = C.ML_DATASETS / f"{domain}_ml_dataset.parquet"
             if p.exists():
                 df2 = pd.read_parquet(p)

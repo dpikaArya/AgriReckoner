@@ -1,10 +1,11 @@
 """Analyze yield observations and their spatial/temporal metadata."""
+
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent))
 import p20_common as C
 import pandas as pd
-import numpy as np
 
 pd.set_option("display.max_columns", None)
 pd.set_option("display.width", 300)
@@ -17,8 +18,20 @@ ext = u21[u21["PaperID_s"].eq("")]
 print("literature rows:", len(lit), " external rows:", len(ext))
 
 # variables used as spatial metadata
-meta_vars = ["Latitude", "Longitude", "Location", "Country", "State", "Site", "Institution",
-             "Season", "Sowing_Date", "Month", "Year", "Altitude"]
+meta_vars = [
+    "Latitude",
+    "Longitude",
+    "Location",
+    "Country",
+    "State",
+    "Site",
+    "Institution",
+    "Season",
+    "Sowing_Date",
+    "Month",
+    "Year",
+    "Altitude",
+]
 print("\n== spatial metadata variables in literature rows ==")
 for v in meta_vars:
     sub = lit[lit["Variable"] == v]
@@ -27,8 +40,16 @@ for v in meta_vars:
 # yield in literature rows
 lit_y = lit[lit["Variable"] == "Yield_per_Hectare"]
 print("\n== Literature Yield_per_Hectare rows ==")
-print("  rows:", len(lit_y), " papers:", lit_y["PaperID"].nunique(), " experiments:", lit_y["ExperimentID"].nunique(),
-      " treatments:", lit_y["TreatmentID"].nunique())
+print(
+    "  rows:",
+    len(lit_y),
+    " papers:",
+    lit_y["PaperID"].nunique(),
+    " experiments:",
+    lit_y["ExperimentID"].nunique(),
+    " treatments:",
+    lit_y["TreatmentID"].nunique(),
+)
 print("  years:", sorted(lit_y["Year"].dropna().unique()))
 print("  crops:", lit_y["Crop"].value_counts().head(15).to_dict())
 

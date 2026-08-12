@@ -10,7 +10,10 @@ outside it and never scans other drives.
 
 PROJECT_ROOT is pinned to the confirmed project path (task title):
     F:\\Agentic AI Frameworks\\Agriculture AI Framework\\Agriculture Intelligence Framework3
+On machines where that pinned path is absent (e.g. CI runners), the repository
+root is discovered from this module's location (<root>/.opencode_tmp/phase20/).
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -26,15 +29,33 @@ import numpy as np
 import pandas as pd
 import yaml
 
-PROJECT_ROOT = Path(r"F:\Agentic AI Frameworks\Agriculture AI Framework\Agriculture Intelligence Framework3")
-PROJECT_ROOT = PROJECT_ROOT.resolve()
+PINNED_ROOT = Path(
+    r"F:\Agentic AI Frameworks\Agriculture AI Framework\Agriculture Intelligence Framework3"
+).resolve()
 
-assert PROJECT_ROOT.exists(), f"PROJECT_ROOT missing: {PROJECT_ROOT}"
+
+def _discover_project_root() -> Path:
+    """Locate the repository root from this module's location.
+
+    The repository layout places this module under <root>/.opencode_tmp/phase20/,
+    so walking up to the first ancestor that contains config/phase20.yaml yields
+    the root on any machine (e.g. CI runners without the pinned F: drive).
+    """
+    start = Path(__file__).resolve().parent
+    for candidate in (start, *start.parents):
+        if (candidate / "config" / "phase20.yaml").is_file():
+            return candidate
+    return start.parent.parent
+
+
+PROJECT_ROOT = PINNED_ROOT if PINNED_ROOT.exists() else _discover_project_root()
+
 assert PROJECT_ROOT.is_dir(), f"PROJECT_ROOT not a directory: {PROJECT_ROOT}"
-assert PROJECT_ROOT.drive.upper() == "F:", f"PROJECT_ROOT not on F: drive: {PROJECT_ROOT}"
-assert PROJECT_ROOT.name == "Agriculture Intelligence Framework3", (
-    f"PROJECT_ROOT name mismatch: {PROJECT_ROOT.name}"
-)
+if PROJECT_ROOT == PINNED_ROOT:
+    assert PROJECT_ROOT.drive.upper() == "F:", f"PROJECT_ROOT not on F: drive: {PROJECT_ROOT}"
+    assert PROJECT_ROOT.name == "Agriculture Intelligence Framework3", (
+        f"PROJECT_ROOT name mismatch: {PROJECT_ROOT.name}"
+    )
 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -83,24 +104,58 @@ DEFAULTS: dict = {
     },
     "predictor_tiers": {
         "TIER_A": [
-            "Yield", "Crop", "Location", "Year", "Season", "Rainfall",
-            "Temperature", "Soil_pH", "Nitrogen", "Phosphorus", "Potassium",
+            "Yield",
+            "Crop",
+            "Location",
+            "Year",
+            "Season",
+            "Rainfall",
+            "Temperature",
+            "Soil_pH",
+            "Nitrogen",
+            "Phosphorus",
+            "Potassium",
         ],
         "TIER_B": [
-            "Solar_Radiation", "Organic_Carbon", "Soil_Moisture", "Texture",
-            "Humidity", "Cultivar", "Plant_Population",
+            "Solar_Radiation",
+            "Organic_Carbon",
+            "Soil_Moisture",
+            "Texture",
+            "Humidity",
+            "Cultivar",
+            "Plant_Population",
         ],
         "TIER_C": [
-            "Soil_EC", "Irrigation", "Fertilizer_Type", "N_Dose", "P_Dose",
-            "K_Dose", "Plant_Height_cm", "Days_to_Maturity",
+            "Soil_EC",
+            "Irrigation",
+            "Fertilizer_Type",
+            "N_Dose",
+            "P_Dose",
+            "K_Dose",
+            "Plant_Height_cm",
+            "Days_to_Maturity",
         ],
     },
     "required_predictors": [
-        "Yield", "Crop", "Location", "Year", "Season", "Rainfall",
-        "Temperature", "Soil_pH", "Nitrogen", "Phosphorus", "Potassium",
+        "Yield",
+        "Crop",
+        "Location",
+        "Year",
+        "Season",
+        "Rainfall",
+        "Temperature",
+        "Soil_pH",
+        "Nitrogen",
+        "Phosphorus",
+        "Potassium",
     ],
     "critical_predictors": [
-        "Crop", "Location", "Year", "Season", "Rainfall", "Temperature",
+        "Crop",
+        "Location",
+        "Year",
+        "Season",
+        "Rainfall",
+        "Temperature",
         "Soil_pH",
     ],
     "splitting": {
@@ -151,7 +206,9 @@ DEFAULTS: dict = {
     },
     "rag": {
         "chunk_types_to_add": [
-            "model_ready_observation", "linkage_metric", "phase20_metric",
+            "model_ready_observation",
+            "linkage_metric",
+            "phase20_metric",
         ],
         "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
         "max_chunks": 200,
@@ -183,6 +240,7 @@ def load_config(path: Path | None = None) -> dict:
 # ---------------------------------------------------------------------------
 # path safety
 # ---------------------------------------------------------------------------
+
 
 def safe_resolve(path: Path | str) -> Path:
     """Resolve a path and guarantee it stays inside PROJECT_ROOT.
@@ -231,13 +289,15 @@ def audit_paths(config: dict) -> list[dict]:
 
     report = []
     for r in rows:
-        report.append({
-            "configured_path": str(r["configured"]),
-            "resolved_path": str(r["resolved"]),
-            "inside_project_root": r["ok"],
-            "access_decision": "ALLOW" if r["ok"] else "REJECT",
-            "reason": r["reason"],
-        })
+        report.append(
+            {
+                "configured_path": str(r["configured"]),
+                "resolved_path": str(r["resolved"]),
+                "inside_project_root": r["ok"],
+                "access_decision": "ALLOW" if r["ok"] else "REJECT",
+                "reason": r["reason"],
+            }
+        )
     return report
 
 
@@ -260,6 +320,7 @@ def _record_path(label: str, value: object) -> dict:
 # checkpointing (idempotent, resumable)
 # ---------------------------------------------------------------------------
 
+
 def load_checkpoints() -> dict:
     if CHECKPOINT_FILE.exists():
         try:
@@ -271,8 +332,7 @@ def load_checkpoints() -> dict:
 
 def save_checkpoints(state: dict) -> None:
     CHECKPOINT_FILE.parent.mkdir(parents=True, exist_ok=True)
-    CHECKPOINT_FILE.write_text(
-        json.dumps(state, indent=2, default=str), encoding="utf-8")
+    CHECKPOINT_FILE.write_text(json.dumps(state, indent=2, default=str), encoding="utf-8")
 
 
 def mark_done(stage: str, payload=None) -> dict:
@@ -296,6 +356,7 @@ def require_prior(stage: str) -> None:
 # ---------------------------------------------------------------------------
 # scalar + file helpers
 # ---------------------------------------------------------------------------
+
 
 def fnum(x):
     try:
@@ -453,7 +514,7 @@ def load_input(name: str, cfg: dict | None = None):
     cfg = cfg or load_config()
     key = str(name)
     if key.startswith("inputs."):
-        key = key[len("inputs."):]
+        key = key[len("inputs.") :]
     cur = cfg["inputs"]
     for part in key.split("."):
         if not isinstance(cur, dict) or part not in cur:
