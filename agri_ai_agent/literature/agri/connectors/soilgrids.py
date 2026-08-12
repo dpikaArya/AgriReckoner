@@ -94,9 +94,22 @@ class SoilGridsConnector(AgriculturalDataConnector):
             return None
         meta = descriptor.metadata
         payload = self.http.get_json(
-            "",
+            "/properties/query",
             params={"lon": meta["lon"], "lat": meta["lat"], "property": ",".join(_PROPERTIES)},
         )
+        # The v2.0 service may reject combined property queries (HTTP 500);
+        # fall back to one property per request when that happens.
+        if not isinstance(payload, dict):
+            combined_layers: list = []
+            for prop in _PROPERTIES:
+                single = self.http.get_json(
+                    "/properties/query",
+                    params={"lon": meta["lon"], "lat": meta["lat"], "property": prop},
+                )
+                if isinstance(single, dict):
+                    combined_layers.extend((single.get("properties", {}) or {}).get("layers", []) or [])
+            if combined_layers:
+                payload = {"properties": {"layers": combined_layers}}
         if not isinstance(payload, dict):
             return None
         target_dir.mkdir(parents=True, exist_ok=True)
@@ -115,8 +128,54 @@ class SoilGridsConnector(AgriculturalDataConnector):
         meta = self.fetch_metadata(dataset_id)
         lat = meta.metadata["lat"] if meta else None
         lon = meta.metadata["lon"] if meta else None
-        props = payload.get("properties", {}) or {}
+
+        # Phase 18: the v2.0 service now returns a "layers" array under
+        # properties, e.g. properties.layers[].name / .unit_measure / .depths[].
+        layers = ((payload.get("properties", {}) or {}).get("layers") or [])
         records: list[AgriculturalRecord] = []
+        if layers:
+            for layer in layers:
+                prop = layer.get("name")
+                variable = _PROP_TO_VARIABLE.get(prop)
+                if variable is None:
+                    continue
+                um = layer.get("unit_measure") or {}
+                d_factor = um.get("d_factor", 1)
+                target_units = um.get("target_units") or um.get("mapped_units") or "unitless"
+                mean, depth_label = None, None
+                for depth in (layer.get("depths") or []):
+                    vals = depth.get("values") or {}
+                    m = vals.get("mean")
+                    if m is None:
+                        continue
+                    mean = m
+                    depth_label = depth.get("label") or ""
+                    break
+                if mean is None:
+                    continue
+                try:
+                    scaled = float(mean) / float(d_factor)
+                except (TypeError, ValueError):
+                    continue
+                records.append(
+                    AgriculturalRecord(
+                        source=self.source_name,
+                        dataset_id=f"{dataset_id}::{prop}",
+                        variable=variable,
+                        value=round(scaled, 4),
+                        unit=target_units,
+                        location_lat=lat,
+                        location_lon=lon,
+                        provenance=f"SoilGrids v2.0 property={prop} depth={depth_label}",
+                        license="CC BY 4.0",
+                        extra={"property": prop, "depth": depth_label,
+                               "mapped_units": um.get("mapped_units"), "d_factor": d_factor},
+                    )
+                )
+            return records
+
+        # Legacy response format: properties.<prop>.depth.<depth>.values[].mean
+        props = payload.get("properties", {}) or {}
         for prop, data in props.items():
             variable = _PROP_TO_VARIABLE.get(prop)
             if variable is None:

@@ -99,3 +99,24 @@ This project follows [Semantic Versioning 2.0.0](https://semver.org/):
 2. Include rationale, impacted columns, and migration path
 3. For new columns: specify name, type, units, and ontology mapping
 4. Tag with `schema-change` label
+---
+
+## v2.1 external enrichment (Phase 18, 2026-08-11)
+
+- **Appended** 12361 externally validated observations from production acquisition (FAOSTAT bulk, NASA POWER, SoilGrids, CHIRPS, MapSPAM) into `outputs/UAMS_v2.1.parquet`.
+- UAMS_v2.parquet is unchanged (checksum `ec79c66eb7aab2057db29050edaa51126241e38d06117570ed177e06d7355bd5`); backup at `UAMS_v2.bak_2026-08-11T12-11-48.parquet`.
+- Each promoted row carries provenance_id, source, license, checksum, spatial/temporal match grade, mapping method, and unit status in SoftNotes/Caption.
+---
+
+## v2.1 external enrichment (Phase 18, 2026-08-11)
+
+- **Appended** 0 externally validated observations from production acquisition (FAOSTAT bulk, NASA POWER, SoilGrids, CHIRPS, MapSPAM) into `outputs/UAMS_v2.1.parquet`.
+- UAMS_v2.parquet is unchanged (checksum `ec79c66eb7aab2057db29050edaa51126241e38d06117570ed177e06d7355bd5`); backup at `UAMS_v2.bak_2026-08-11T12-57-35.parquet`.
+- Each promoted row carries provenance_id, source, license, checksum, spatial/temporal match grade, mapping method, and unit status in SoftNotes/Caption.
+---
+
+## v2.1 external enrichment (Phase 18, 2026-08-11)
+
+- **Appended** 12361 externally validated observations from production acquisition (FAOSTAT bulk, NASA POWER, SoilGrids, CHIRPS, MapSPAM) into `outputs/UAMS_v2.1.parquet`.
+- UAMS_v2.parquet is unchanged (checksum `ec79c66eb7aab2057db29050edaa51126241e38d06117570ed177e06d7355bd5`); backup at `UAMS_v2.bak_ec79c66eb7aab2057db29050edaa51126241e38d06117570ed177e06d7355bd5.parquet`.
+- Each promoted row carries provenance_id, source, license, checksum, spatial/temporal match grade, mapping method, and unit status in SoftNotes/Caption.

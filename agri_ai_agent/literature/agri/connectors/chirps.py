@@ -41,8 +41,8 @@ class ChirpsConnector(AgriculturalDataConnector):
         return out
 
     def _descriptor(self, year: str, month: str) -> DatasetDescriptor:
-        filename = f"chirps-v2.0.{year}.{month}.tif"
-        url = f"{_BASE}/global_monthly/tifs/{year}/{filename}"
+        filename = f"chirps-v2.0.{year}.{month}.tif.gz"
+        url = f"{_BASE}/global_monthly/tifs/{filename}"
         return DatasetDescriptor(
             dataset_id=f"{year}-{month}",
             title=f"CHIRPS v2.0 monthly precipitation {year}-{month}",
@@ -50,7 +50,7 @@ class ChirpsConnector(AgriculturalDataConnector):
             description="CHIRPS (Climate Hazards Center) global monthly precipitation (mm).",
             license="CHC data license",
             variable="precipitation",
-            files=[{"url": url, "name": filename, "format": "geotiff"}],
+            files=[{"url": url, "name": filename, "format": "geotiff-gz"}],
             metadata={"year": year, "month": month},
             temporal={"start": f"{year}-{month}", "end": f"{year}-{month}"},
         )

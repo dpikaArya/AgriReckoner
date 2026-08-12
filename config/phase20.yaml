@@ -1,0 +1,205 @@
+# AAIF — Phase 20: Observation Linkage, Predictor Completion, Information
+# Gain Enrichment, and Leakage-Safe Model-Ready Dataset Construction.
+#
+# Phase 20 is a DERIVED data linkage layer. It never modifies UAMS_v2,
+# UAMS_v2.1, validated Phase 12/13/14/16/18/19 artifacts, the extraction
+# pipeline, the literature bibliography, or provenance records. It only
+# produces new derived artifacts under outputs/phase20 and reports/phase20.
+#
+# Every operational threshold is configurable here.
+
+phase20:
+  # ------------------------------------------------------------------
+  # Curated project inputs (must all resolve inside PROJECT_ROOT)
+  # ------------------------------------------------------------------
+  inputs:
+    uams_v2: outputs/UAMS_v2.parquet
+    uams_v2_1: outputs/UAMS_v2.1.parquet
+    phase12:
+      migration_report: outputs/phase12/UAMS_v2_Documentation.pdf
+    phase13:
+      recovered_observations: outputs/phase13/Recovered_Observations.parquet
+      mapped_variable_recovery: outputs/phase13/Mapped_Variable_Recovery.parquet
+    phase14:
+      harmonized_evidence: outputs/phase14/harmonized_evidence.parquet
+      meta_analysis_results: outputs/phase14/meta_analysis_results.parquet
+      effect_size_database: outputs/phase14/effect_size_database.parquet
+      ready_reckoner_knowledge_base: outputs/phase14/ready_reckoner_knowledge_base.parquet
+      feature_validation: outputs/phase14/feature_validation.parquet
+      study_quality_scores: outputs/phase14/study_quality_scores.parquet
+      knowledge_graph: outputs/phase14/knowledge_graph.json
+    phase14_5a:
+      rag_metrics: outputs/phase14_5a/rag_metrics.json
+      chunks: outputs/phase14_5a/Chunk_Metadata/chunks.parquet
+      embed_store_ids: outputs/phase14_5a/Embedding_Store/ids.json
+      embed_store_manifest: outputs/phase14_5a/Embedding_Store/manifest.json
+      vector_index_manifest: outputs/phase14_5a/Vector_Index/vector_index_manifest.json
+    phase14_5b:
+      verification_metrics: outputs/phase14_5b/verification_metrics.json
+    phase16:
+      readiness_metrics: outputs/phase16/readiness/readiness_metrics.json
+      readiness_gates: outputs/phase16/readiness/readiness_gates.parquet
+    phase16_1:
+      evidence_gap_records: outputs/phase16_1/gaps/evidence_gap_records.parquet
+      search_targets: outputs/phase16_1/targets/search_targets.parquet
+      handoff_summary: outputs/phase16_1/handoff/phase16_1_summary.json
+    phase17:
+      ontology_aliases: outputs/phase17/ontology_aliases.parquet
+      resolution_records: outputs/phase17/resolution_records.parquet
+      source_uams_mapping: outputs/phase17/source_uams_mapping.parquet
+    phase18:
+      staging_external: outputs/phase18/staging/external_observations.parquet
+      acquisition_records: outputs/phase18/acquisition_records.parquet
+      acquisition_priority: outputs/phase18/acquisition_priority.parquet
+      validated_records: outputs/phase18/validated_records.parquet
+      mapped_records: outputs/phase18/mapped_records.parquet
+      final_metrics: outputs/phase18/phase18_final_metrics.json
+    phase19:
+      observation_missingness: outputs/phase19/observation_missingness.parquet
+      model_readiness: outputs/phase19/model_readiness.json
+      model_targets: outputs/phase19/model_targets.json
+      predictor_sets: outputs/phase19/predictor_sets.json
+      leakage_audit: outputs/phase19/leakage_audit.parquet
+      feature_information_gain: outputs/phase19/feature_information_gain.parquet
+      independence_audit: outputs/phase19/independence_audit.parquet
+      version_manifest: outputs/phase19/version_manifest.json
+    ready_reckoner: outputs/Ready_Reckoner.xlsx
+    knowledge_graph_global: outputs/Observation_Graph.json
+    provenance_registry: outputs/Provenance_Registry.json
+
+  # ------------------------------------------------------------------
+  # Ontology recovery (STEP 5)
+  # ------------------------------------------------------------------
+  ontology:
+    alias_min_confidence: 0.7
+    max_aliases_per_variable: 100
+    extension_file: .opencode_tmp/phase20/phase20_ontology_extensions.yaml
+
+  # ------------------------------------------------------------------
+  # Spatial linkage (STEP 3) - radii in km for coordinate matching
+  # ------------------------------------------------------------------
+  spatial:
+    exact_match_radius_km: 5.0
+    station_match_radius_km: 50.0
+    district_match_radius_km: 200.0
+    precision_order:
+      - exact_coordinates
+      - experimental_station
+      - study_location
+      - district
+      - country_only
+      - unknown
+
+  # ------------------------------------------------------------------
+  # Temporal linkage (STEP 4)
+  # ------------------------------------------------------------------
+  temporal:
+    year_range: [1970, 2100]
+    default_growing_days: 120
+
+  # ------------------------------------------------------------------
+  # Readiness classes (predictor coverage thresholds)
+  # ------------------------------------------------------------------
+  readiness_classes:
+    MODEL_READY_min: 0.80
+    NEAR_READY_min: 0.60
+    PARTIAL_min: 0.30
+
+  # ------------------------------------------------------------------
+  # Predictor tiers (STEP 10). "Yield" is the target slot for yield
+  # observations; the completeness denominator excludes the target itself.
+  # ------------------------------------------------------------------
+  predictor_tiers:
+    TIER_A: [Yield, Crop, Location, Year, Season, Rainfall, Temperature,
+             Soil_pH, Nitrogen, Phosphorus, Potassium]
+    TIER_B: [Solar_Radiation, Organic_Carbon, Soil_Moisture, Texture,
+             Humidity, Cultivar, Plant_Population]
+    TIER_C: [Soil_EC, Irrigation, Fertilizer_Type, N_Dose, P_Dose, K_Dose,
+             Plant_Height_cm, Days_to_Maturity]
+
+  required_predictors: [Yield, Crop, Location, Year, Season, Rainfall,
+                        Temperature, Soil_pH, Nitrogen, Phosphorus, Potassium]
+  critical_predictors: [Crop, Location, Year, Season, Rainfall, Temperature, Soil_pH]
+
+  # ------------------------------------------------------------------
+  # Information gain (STEP 12)
+  # ------------------------------------------------------------------
+  information_gain:
+    near_ready_boost: 1.0
+    completion_weight: 0.30
+    crop_coverage_weight: 0.15
+    study_diversity_weight: 0.10
+    source_weight: 0.10
+    reliability_weight: 0.10
+    spatial_weight: 0.05
+    temporal_weight: 0.05
+    feasibility_weight: 0.10
+    cost_weight: 0.05
+    priority_classes: [HIGH, MEDIUM, LOW]
+
+  # ------------------------------------------------------------------
+  # Minimum requirements per ML target (STEP 17)
+  # ------------------------------------------------------------------
+  minimum_requirements:
+    min_independent_studies: 5
+    min_independent_locations: 5
+    min_observations: 50
+    min_predictor_completeness: 0.60
+    min_crops: 3
+    min_years: 3
+    min_complete_observations_per_crop: 10
+    status_when_not_met: NOT_READY
+
+  # ------------------------------------------------------------------
+  # Quality gates (STEP 23) - every gate must pass for READY
+  # ------------------------------------------------------------------
+  gates:
+    protected_unchanged: true
+    no_uams_modification: true
+    no_extraction_pipeline_modification: true
+    no_fabricated_external_data: true
+    external_provenance_required: true
+    spatial_confidence_required: true
+    temporal_confidence_required: true
+    derived_predictor_provenance_required: true
+    no_target_leakage: true
+    no_study_leakage: true
+    location_leakage_safe: true
+    ontology_recovery_auditable: true
+    model_readiness_independent: true
+    all_outputs_inside_root: true
+    idempotent: true
+
+  # ------------------------------------------------------------------
+  # Validation splitting (STEP 16)
+  # ------------------------------------------------------------------
+  splitting:
+    primary: study_grouped
+    secondary: location_grouped
+    temporal: temporal_validation
+    min_temporal_years: 6
+    n_splits: 5
+    crop_stratified: true
+
+  # ------------------------------------------------------------------
+  # RAG synchronization (STEP 20) - incremental only
+  # ------------------------------------------------------------------
+  rag:
+    embedding_model: sentence-transformers/all-MiniLM-L6-v2
+    max_chunks: 200
+    chunk_types_to_add: [model_ready_observation, linkage_metric, phase20_metric]
+    vector_index_db: outputs/phase14_5a/Vector_Index/vector_index.sqlite
+    embedding_store_ids: outputs/phase14_5a/Embedding_Store/ids.json
+
+  # ------------------------------------------------------------------
+  # Targets for model readiness (STEP 17)
+  # ------------------------------------------------------------------
+  targets:
+    yield:
+      - Yield
+    biomass:
+      - Biomass_Yield
+    growth:
+      - Plant_Height_cm
+    quality:
+      - Protein

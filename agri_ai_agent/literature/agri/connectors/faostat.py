@@ -17,7 +17,6 @@ import pandas as pd
 from agri_ai_agent.literature.agri.connector import (
     AgriculturalDataConnector,
     DatasetDescriptor,
-    convert_unit,
 )
 from agri_ai_agent.literature.config import ConnectorAuth
 from agri_ai_agent.literature.models import AgriculturalRecord
@@ -26,11 +25,13 @@ _BULK_HOST = "https://bulks-faostat.fao.org/production"
 _CATALOGUE_URL = f"{_BULK_HOST}/datasets_E.json"
 
 # FAOSTAT domain code -> official normalized bulk filename.
+# Phase 18 recovery: catalogue codes/filenames refreshed from
+# https://bulks-faostat.fao.org/production/datasets_E.json (verified 2026-08-11).
 _KNOWN_DATASETS: dict[str, tuple[str, str]] = {
-    "QC": ("Production - Crops, Livestock and Livestock Products", "Production_Crops_Livestock_E_All_Data_(Normalized).zip"),
-    "RF": ("Fertilizers - Consumption by Nutrient", "Fertilizers_E_All_Data_(Normalized).zip"),
-    "RP": ("Pesticides - Use", "PesticidesUse_E_All_Data_(Normalized).zip"),
-    "QL": ("Land Use Indicators", "Land_Use_E_All_Data_(Normalized).zip"),
+    "QCL": ("Production - Crops, Livestock and Livestock Products", "Production_Crops_Livestock_E_All_Data_(Normalized).zip"),
+    "RFN": ("Fertilizers - Consumption by Nutrient", "Inputs_FertilizersNutrient_E_All_Data_(Normalized).zip"),
+    "RP": ("Pesticides - Use", "Inputs_Pesticides_Use_E_All_Data_(Normalized).zip"),
+    "RL": ("Land Use Indicators", "Inputs_LandUse_E_All_Data_(Normalized).zip"),
 }
 
 # FAOSTAT element names we can map to UAMS variables.
@@ -146,8 +147,10 @@ class FaostatConnector(AgriculturalDataConnector):
             unit = str(row.get("Unit", "")).strip() or None
             year = _to_int(row.get("Year"))
             if variable == "yield_per_hectare" and unit:
-                # FAOSTAT yield unit is hg/ha -> kg/ha
-                value = convert_unit(value, unit.lower() if unit.lower() in ("hg/ha",) else None, None)
+                # FAOSTAT yield unit is hg/ha -> kg/ha (1 hg = 0.1 kg).
+                if unit.lower() in ("hg/ha", "100 g/ha"):
+                    value = value * 0.1
+                    unit = "kg/ha"
             records.append(
                 AgriculturalRecord(
                     source=self.source_name,

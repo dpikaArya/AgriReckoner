@@ -1,0 +1,187 @@
+# AAIF — Phase 19: ML Readiness, Feature Completeness, and Leakage-Safe
+# Dataset Construction.
+#
+# Every operational threshold in Phase 19 is configurable here. Phase 19 never
+# modifies UAMS_v2 or UAMS_v2.1; it only produces new versioned artifacts under
+# outputs/phase19 and reports/phase19.
+
+phase19:
+  # ------------------------------------------------------------------
+  # Inputs (curated project outputs only)
+  # ------------------------------------------------------------------
+  inputs:
+    uams_v2: outputs/UAMS_v2.parquet
+    uams_v2_1: outputs/UAMS_v2.1.parquet
+    phase14:
+      harmonized_evidence: outputs/phase14/harmonized_evidence.parquet
+      meta_analysis_results: outputs/phase14/meta_analysis_results.parquet
+      effect_size_database: outputs/phase14/effect_size_database.parquet
+      ready_reckoner_knowledge_base: outputs/phase14/ready_reckoner_knowledge_base.parquet
+      feature_validation: outputs/phase14/feature_validation.parquet
+      study_quality_scores: outputs/phase14/study_quality_scores.parquet
+    phase14_5a:
+      rag_metrics: outputs/phase14_5a/rag_metrics.json
+      chunks: outputs/phase14_5a/Chunk_Metadata/chunks.parquet
+      embed_store: outputs/phase14_5a/Embedding_Store
+      vector_index: outputs/phase14_5a/Vector_Index
+      rag_db: outputs/phase14_5a/Evidence_RAG_Database
+    phase14_5b:
+      verification_metrics: outputs/phase14_5b/verification_metrics.json
+      verified_evidence: outputs/phase14_5b/Verified_Evidence
+    phase16_1:
+      evidence_gap_records: outputs/phase16_1/gaps/evidence_gap_records.parquet
+      search_targets: outputs/phase16_1/targets/search_targets.parquet
+    phase16:
+      readiness_metrics: outputs/phase16/readiness/readiness_metrics.json
+      readiness_gates: outputs/phase16/readiness/readiness_gates.parquet
+    phase18:
+      final_metrics: outputs/phase18/phase18_final_metrics.json
+      ml_readiness_metrics: outputs/phase18/ml/ml_readiness_metrics.json
+      acquisition_records: outputs/phase18/acquisition_records.parquet
+      mapped_records: outputs/phase18/mapped_records.parquet
+      validated_records: outputs/phase18/validated_records.parquet
+      staging_external: outputs/phase18/staging/external_observations.parquet
+      acquisition_priority: outputs/phase18/acquisition_priority.parquet
+      uams_column_state: outputs/phase18/uams_column_state.parquet
+      external_queue: outputs/phase18/continuous_learning/external_data_queue.parquet
+      updated_ready_reckoner: outputs/phase18/ready_reckoner/updated_ready_reckoner.parquet
+    ml_feature_csv: outputs/MachineLearning_Dataset.csv
+
+  # ------------------------------------------------------------------
+  # Readiness class thresholds (observation-level predictor coverage)
+  # ------------------------------------------------------------------
+  readiness_classes:
+    MODEL_READY_min: 0.80        # >= 80% required predictor coverage
+    NEAR_READY_min: 0.60         # 60-79%
+    PARTIAL_min: 0.30            # 30-59%
+    INSUFFICIENT_max: 0.30       # < 30%
+
+  # ------------------------------------------------------------------
+  # Required predictor groups per target
+  # ------------------------------------------------------------------
+  required_predictor_groups:
+    core: ["Crop", "Season", "Location", "Year"]
+    climate: ["Rainfall", "Average_Temperature", "Minimum_Temperature", "Maximum_Temperature"]
+    soil: ["Soil_pH", "Soil_EC", "Organic_Carbon", "Nitrogen", "Phosphorus", "Potassium"]
+    agronomic: ["Plant_Population", "Tillers", "Plant_Height_cm", "Days_to_Maturity"]
+    treatment: ["Fertilizer_Type", "N_Dose", "P_Dose", "K_Dose", "Irrigation"]
+
+  # Weight of each group when computing predictor completeness.
+  group_weights:
+    core: 0.30
+    climate: 0.20
+    soil: 0.20
+    agronomic: 0.15
+    treatment: 0.15
+
+  # ------------------------------------------------------------------
+  # Prediction targets
+  # ------------------------------------------------------------------
+  targets:
+    yield:
+      Yield_per_Hectare:
+        unit: t/ha
+      Yield_per_Plot:
+        unit: kg/plot
+      Yield_per_Acre:
+        unit: t/ac
+    biomass:
+      Biomass_Yield:
+        unit: t/ha
+      Shoot_Biomass_g:
+        unit: g/plant
+    growth:
+      Plant_Height_cm:
+        unit: cm
+      SPAD:
+        unit: unitless
+    quality:
+      Harvest_Index:
+        unit: unitless
+      Protein:
+        unit: g/kg
+
+  # Target columns that are derivatives of yield and must be leakage-audited.
+  target_derived_candidates:
+    - Harvest_Index
+    - Biomass_Yield
+    - Economic_Yield
+    - Marketable_Yield
+    - Yield_per_Plot
+    - Yield_per_Acre
+    - Nitrogen_Use_Efficiency
+    - Yield_per_Plant
+
+  # Variables that are NOT available before prediction time (leakage hard flags).
+  post_harvest_variables:
+    - Protein
+    - Ash
+    - Fat
+    - Carbohydrates
+    - Fiber
+    - Oil
+    - Starch
+
+  # ------------------------------------------------------------------
+  # Independence rules
+  # ------------------------------------------------------------------
+  independence:
+    study: ["PaperID"]
+    location: ["PaperID", "ExperimentID"]
+    temporal: ["PaperID", "ExperimentID", "Year"]
+    observation: ["PaperID", "ExperimentID", "TreatmentID"]
+
+  # ------------------------------------------------------------------
+  # Minimum requirements per ML target (small sample protection)
+  # ------------------------------------------------------------------
+  minimum_requirements:
+    min_independent_studies: 5
+    min_independent_locations: 5
+    min_observations: 50
+    min_predictor_completeness: 0.60
+    min_crops: 3
+    min_years: 3
+    status_when_not_met: NOT_READY
+
+  # ------------------------------------------------------------------
+  # Information gain
+  # ------------------------------------------------------------------
+  information_gain:
+    priority_classes: [HIGH, MEDIUM, LOW]
+    near_ready_boost: 1.0          # variables that convert NEAR_READY->MODEL_READY
+
+  # ------------------------------------------------------------------
+  # Model readiness score weights (sum to 1.0)
+  # ------------------------------------------------------------------
+  readiness_weights:
+    target_completeness: 0.15
+    predictor_completeness: 0.20
+    independent_study_count: 0.15
+    independent_location_count: 0.10
+    temporal_coverage: 0.10
+    crop_coverage: 0.10
+    data_quality: 0.10
+    provenance_completeness: 0.05
+    external_enrichment_quality: 0.05
+    leakage_safety: 0.00            # gated: >=1 passes, else readiness forced low
+
+  # ------------------------------------------------------------------
+  # Splitting strategies
+  # ------------------------------------------------------------------
+  splitting:
+    primary: study_grouped        # GroupKFold by StudyID
+    secondary: location_grouped   # GroupKFold by LocationID
+    temporal: temporal_validation # temporal split when >= min_temporal_years
+    min_temporal_years: 6
+    crop_stratified: true
+
+  # ------------------------------------------------------------------
+  # RAG
+  # ------------------------------------------------------------------
+  rag:
+    embedding_model: sentence-transformers/all-MiniLM-L6-v2
+    citation_accuracy_min: 0.95
+    chunk_types_to_add:
+      - model_ready_observation
+      - feature_diagnostic
+      - phase19_metric

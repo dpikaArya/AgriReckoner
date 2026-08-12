@@ -1,0 +1,227 @@
+# =============================================================================
+# Phase 17 — UAMS variable mapping, unit handling and external source config.
+#
+# This file is the single source of truth for:
+#   * confidence thresholds of the layered variable resolver,
+#   * which resolver levels are enabled,
+#   * contextual validation rules for ambiguous agricultural variables,
+#   * unit conversion behaviour,
+#   * external source endpoints and credential variable names.
+#
+# Credential *values* are NEVER stored here (nor in any source/JSON/parquet).
+# Only the environment-variable *names* that connectors read are listed.
+# =============================================================================
+
+phase17:
+  # ------------------------------------------------------------------
+  # Confidence thresholds (letter grade -> minimum score)
+  # ------------------------------------------------------------------
+  confidence:
+    grade_A_min: 0.95      # exact canonical / strong alias
+    grade_B_min: 0.85      # normalized/unit-aware alias
+    grade_C_min: 0.70      # abbreviation / context match
+    manual_review: 0.70    # below this => MANUAL_REVIEW, never auto-mapped
+
+  # ------------------------------------------------------------------
+  # Layered resolver control
+  # ------------------------------------------------------------------
+  resolver:
+    level_1_exact_canonical: true
+    level_2_normalized_alias: true
+    level_3_unit_aware_alias: true
+    level_4_agronomy_abbreviation: true
+    level_5_scientific_context: true
+    level_6_fuzzy: true
+    level_7_embedding: false       # only when deterministic rules fail
+    level_8_contextual_table: true
+    fuzzy_threshold: 0.85
+    max_candidates: 5
+    prefer_agricultural_variable: true
+
+  # ------------------------------------------------------------------
+  # Contextual disambiguation (header/caption/footnote driven)
+  # ------------------------------------------------------------------
+  context:
+    enable: true
+    require_unit_agreement: true
+    synonyms:
+      - ["nitrogen", "n", "n_uptake", "soil_nitrogen", "plant_nitrogen"]
+    ambiguous_tokens:
+      n: [Nitrogen, Nitrogen_Uptake, Soil_Nitrate_N, Soil_Ammonium_N, Soil_Nitrogen_Kjeldahl]
+      p: [Phosphorus, Phosphorus_Uptake, Phosphorus_Content]
+      k: [Potassium, Potassium_Uptake, Potassium_Content, Soil_Available_K]
+      ph: [Soil_pH, Soil_pH_CaCl2, Soil_pH_KCl]
+      ec: [EC, Soil_Sulphur_Available]
+
+  # ------------------------------------------------------------------
+  # Unit normalisation
+  # ------------------------------------------------------------------
+  units:
+    enabled: true
+    preserve_original: true          # never overwrite measured values
+    record_conversion_provenance: true
+    supported:
+      - kg/ha
+      - kg ha-1
+      - kg hectare-1
+      - t/ha
+      - t ha-1
+      - q/ha
+      - q ha-1
+      - g/m2
+      - g/m^2
+      - g m-2
+      - mg/kg
+      - mg kg-1
+      - ppm
+      - "%"
+      - cm
+      - mm
+      - "°C"
+      - degC
+      - K
+      - dS/m
+      - g/plant
+      - g plant-1
+      - g/kg
+      - g kg-1
+
+  # ------------------------------------------------------------------
+  # External agricultural data sources
+  #
+  # auth.env_vars  -> names of environment variables holding credentials.
+  #                   The VALUES must come from the environment, never here.
+  # ------------------------------------------------------------------
+  sources:
+    AgERA5:
+      official_endpoint: "https://cds.climate.copernicus.eu/api"
+      dataset_catalogue: "https://cds.climate.copernicus.eu/datasets/sis-agrometeorological-indicators"
+      auth:
+        required: true
+        type: cdsapi
+        env_vars: [CDSAPI_URL, CDSAPI_KEY]
+        docs: "https://cds.climate.copernicus.eu/how-to-api"
+      timeout_sec: 60
+    ERA5:
+      official_endpoint: "https://cds.climate.copernicus.eu/api"
+      dataset_catalogue: "https://cds.climate.copernicus.eu/datasets/reanalysis-era5-single-levels"
+      auth:
+        required: true
+        type: cdsapi
+        env_vars: [CDSAPI_URL, CDSAPI_KEY]
+        docs: "https://cds.climate.copernicus.eu/how-to-api"
+      timeout_sec: 60
+    CHIRPS:
+      official_endpoint: "https://data.chc.ucsb.edu/products/CHIRPS-2.0/global_monthly/tifs"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    CIMMYT:
+      official_endpoint: "https://dataverse.cimmyt.org/api"
+      auth:
+        required: true
+        type: dataverse
+        env_vars: [DATAVERSE_API_KEY, AGRI_DATAVERSE_API_KEY]
+        docs: "https://guides.dataverse.org/en/latest/api/auth.html"
+      timeout_sec: 30
+    ICRISAT:
+      official_endpoint: "https://dataverse.icrisat.org/api"
+      auth:
+        required: true
+        type: dataverse
+        env_vars: [DATAVERSE_API_KEY, AGRI_DATAVERSE_API_KEY]
+        docs: "https://guides.dataverse.org/en/latest/api/auth.html"
+      timeout_sec: 30
+    IFPRI:
+      official_endpoint: "https://dataverse.harvard.edu/api"
+      subtree: IFPRI
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    IRRI:
+      official_endpoint: "https://dataverse.irri.org/api"
+      auth:
+        required: true
+        type: dataverse
+        env_vars: [DATAVERSE_API_KEY, AGRI_DATAVERSE_API_KEY]
+        docs: "https://guides.dataverse.org/en/latest/api/auth.html"
+      timeout_sec: 30
+    SoilGrids:
+      official_endpoint: "https://rest.isric.org/soilgrids/v2.0/properties/query"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    GEOGLAM:
+      official_endpoint: "https://earthmap.org/api"
+      auth:
+        required: true
+        type: header_key
+        env_vars: [EARTHMAP_API_KEY, AGRI_GEOGLAM_API_KEY]
+        docs: "https://earthmap.org"
+      timeout_sec: 30
+    MapSPAM:
+      official_endpoint: "https://zenodo.org/api/records"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    HarvestChoice:
+      official_endpoint: "https://dataverse.harvard.edu/api"
+      subtree: HarvestChoice
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    World_Bank:
+      official_endpoint: "https://api.worldbank.org/v2"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    NASA_POWER:
+      official_endpoint: "https://power.larc.nasa.gov/api/temporal/monthly/point"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+    FAOSTAT:
+      official_endpoint: "https://fenixservices.fao.org/faostat/api/v1"
+      bulk_endpoint: "https://fenixservices.fao.org/faostat/static/bulkdownloads"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 90
+    Zenodo:
+      official_endpoint: "https://zenodo.org/api"
+      auth:
+        required: false
+        env_vars: []
+      timeout_sec: 30
+
+  # ------------------------------------------------------------------
+  # Acquisition pilot (STEP 12/13) — small verified samples only
+  # ------------------------------------------------------------------
+  acquisition:
+    enabled: true
+    max_records_per_source: 500
+    max_retries: 2
+    timeout_sec: 30
+    require_license: true
+    require_provenance: true
+    require_checksum: true
+    deduplicate: true
+    output_parquet: "outputs/phase17/acquisition_records.parquet"
+
+  # ------------------------------------------------------------------
+  # Unmapped-column reason codes (STEP 19)
+  # ------------------------------------------------------------------
+  reason_codes:
+    - NO_DATA_AVAILABLE
+    - NO_VALID_ALIAS
+    - SOURCE_UNAVAILABLE
+    - NOT_APPLICABLE
+    - MANUAL_REVIEW
+    - INSUFFICIENT_CONTEXT
