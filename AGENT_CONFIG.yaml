@@ -1,0 +1,51 @@
+# Universal Agentic AI Scientific Operating Policy - machine readable configuration
+# Version 0.1.0
+# This file mirrors the canonical policy in SCIENTIFIC_AGENT_POLICY.md.
+# If this file contradicts the canonical policy, SCIENTIFIC_AGENT_POLICY.md wins.
+
+policy_version: "0.1.0"
+policy_source: "SCIENTIFIC_AGENT_POLICY.md"
+# sha256 of SCIENTIFIC_AGENT_POLICY.md; the integration gate fails if the
+# on-disk policy no longer matches this authoritative digest.
+policy_sha256: "7ee0179fb667afde967fff9958c7eece84097a4855e344bb18a0928c6bb876a9"
+
+scientific_mode: true
+
+provenance:
+  required: true
+  record_tools: true
+  record_decisions: true
+  record_failures: true
+  record_human_interventions: true
+
+verification:
+  required: true
+  schema_checks: true
+  computational_checks: true
+  statistical_checks: true
+  domain_checks: true
+  cross_source_checks: true
+
+uncertainty:
+  required: true
+
+reproducibility:
+  required: true
+
+human_review:
+  required: true
+  required_for:
+    - consequential_scientific_decision
+    - conflicting_evidence
+    - irreversible_data_change
+    - publication_claim
+
+security:
+  least_privilege: true
+  protect_secrets: true
+  protect_sensitive_data: true
+
+compute:
+  resource_estimation: true
+  runaway_protection: true
+  institutional_policy_compliance: true

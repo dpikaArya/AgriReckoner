@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/dpikaArya/Universal-Agentic-AI-Scientific-Operating-Policy-UAASOP-/main/schemas/claim.schema.json",
+  "title": "Scientific Claim Record",
+  "description": "Domain independent record of a scientific claim with its evidence chain. See SCIENTIFIC_AGENT_POLICY.md sections 1.2, 1.8, and 1.9.",
+  "type": "object",
+  "required": [
+    "id",
+    "claim",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this claim record."
+    },
+    "claim": {
+      "type": "string",
+      "description": "The claim being made."
+    },
+    "status": {
+      "type": "string",
+      "description": "Epistemic status of the claim. See SCIENTIFIC_AGENT_POLICY.md section 4.",
+      "enum": [
+        "verified",
+        "observed",
+        "retrieved",
+        "calculated",
+        "estimated",
+        "inferred",
+        "predicted",
+        "assumed",
+        "unknown",
+        "missing",
+        "conflicting"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "description": "References to evidence records supporting this claim.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "References to the underlying sources.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "transformation": {
+      "type": "string",
+      "description": "How the evidence was transformed into this claim."
+    },
+    "validation": {
+      "type": "array",
+      "description": "Validations applied to this claim.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "description": "Confidence in the claim.",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "basis": {
+          "type": "string"
+        }
+      }
+    },
+    "reviewer": {
+      "type": "string",
+      "description": "Human or agent that reviewed the claim."
+    },
+    "reviewed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "consequential": {
+      "type": "boolean",
+      "description": "Whether this claim is consequential and therefore requires human review."
+    },
+    "conflicting_with": {
+      "type": "array",
+      "description": "Identifiers of claims that conflict with this one.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

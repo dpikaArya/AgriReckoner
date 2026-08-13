@@ -25,6 +25,7 @@ An **agentic pipeline** that converts unstructured agricultural research PDFs in
 - [Project Structure](#project-structure)
 - [Output Files](#output-files)
 - [Dependencies](#dependencies)
+- [Scientific Operating Policy](#scientific-operating-policy)
 - [License](#license)
 
 ---
@@ -425,6 +426,19 @@ mypy src/ --ignore-missing-imports    # clean
 
 ---
 
+## Scientific Operating Policy
+
+This project is governed by the **Universal Agentic AI Scientific Operating Policy (UAASOP)** — an IDE independent operating policy for trustworthy, verifiable, provenance aware scientific agentic AI systems.
+
+- `SCIENTIFIC_AGENT_POLICY.md` is the authoritative policy: 20 universal principles (evidence discipline, provenance, auditability, failure preservation, layered verification, uncertainty, reproducibility, human accountability, security, compute and HPC discipline) plus a default `UNDERSTAND → PLAN → INSPECT → EXECUTE → VALIDATE → TRACE → REVIEW → REPORT` workflow.
+- `AGENT_CONFIG.yaml` is the machine readable policy settings.
+- `AGENTS.md` binds this repository to the policy and adds AAIF-specific instructions that extend, but never contradict, the canonical policy.
+- `contracts/` holds the generic machine readable contracts (provenance, evidence, claim, validation); the project's concrete mechanisms are the UAMS spec (`spec/`), the evidence-verification layer (`config/verification.yaml`, `src/validation/`), and provenance tracking (`src/provenance/`).
+
+UAASOP does not guarantee scientific correctness. It establishes behavioral, provenance, verification, reproducibility, security, and accountability requirements; scientific responsibility and final judgment remain with the researchers.
+
+---
+
 ## Project Structure
 
 ```
@@ -447,6 +461,10 @@ Agricultural-Intelligence-Framework/
 ├── docs/                     # Architecture, flowchart, info-flow docs
 ├── scripts/                  # Ontology doc generation, etc.
 ├── config/                   # API keys/config (apis.yaml)
+├── contracts/                # UAASOP machine readable contracts (schemas)
+├── SCIENTIFIC_AGENT_POLICY.md  # UAASOP canonical scientific operating policy
+├── AGENT_CONFIG.yaml         # UAASOP machine readable policy settings
+├── AGENTS.md                 # Policy binding + AAIF-specific agent instructions
 ├── production_run.py         # 12-stage end-to-end orchestrator
 ├── run_enrichment.py         # v3 standalone external-data enrichment
 ├── run_aaf_pipeline.py       # Legacy monolithic runner

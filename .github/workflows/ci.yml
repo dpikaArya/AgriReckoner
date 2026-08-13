@@ -24,6 +24,19 @@ jobs:
         run: ruff check .
         continue-on-error: true
 
+  uaasop-gate:
+    name: UAASOP gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PyYAML
+        run: pip install pyyaml
+      - name: Run UAASOP integration gate
+        run: python scripts/uaasop_gate.py
+
   test:
     name: Tests (py${{ matrix.python-version }})
     runs-on: ubuntu-latest

@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/dpikaArya/Universal-Agentic-AI-Scientific-Operating-Policy-UAASOP-/main/schemas/validation.schema.json",
+  "title": "Scientific Validation Record",
+  "description": "Domain independent record of a validation performed on a scientific output. See SCIENTIFIC_AGENT_POLICY.md sections 1.7 and 1.20.",
+  "type": "object",
+  "required": [
+    "id",
+    "target",
+    "type",
+    "result",
+    "timestamp"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this validation record."
+    },
+    "target": {
+      "type": "string",
+      "description": "Reference to the output, claim, or artifact being validated."
+    },
+    "type": {
+      "type": "string",
+      "description": "Validation layer applied. See SCIENTIFIC_AGENT_POLICY.md section 1.7.",
+      "enum": [
+        "schema",
+        "deterministic",
+        "mathematical",
+        "statistical",
+        "domain",
+        "cross_source",
+        "independent",
+        "human_expert"
+      ]
+    },
+    "result": {
+      "type": "string",
+      "enum": [
+        "passed",
+        "failed",
+        "inconclusive",
+        "not_applicable"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of the validation."
+    },
+    "method": {
+      "type": "string",
+      "description": "Description of how the validation was performed."
+    },
+    "executed_by": {
+      "type": "string",
+      "description": "Agent or human that executed the validation."
+    },
+    "schema_reference": {
+      "type": "string",
+      "description": "Reference to a schema used, when type is schema."
+    },
+    "details": {
+      "type": "string",
+      "description": "Free text details of the validation outcome."
+    },
+    "errors": {
+      "type": "array",
+      "description": "Errors or mismatches found.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "description": "Information supporting reproduction of this validation.",
+      "properties": {
+        "command": {
+          "type": "string"
+        },
+        "environment": {
+          "type": "string"
+        },
+        "seed": {
+          "type": "string"
+        },
+        "parameters": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

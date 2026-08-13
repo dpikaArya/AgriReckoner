@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/dpikaArya/Universal-Agentic-AI-Scientific-Operating-Policy-UAASOP-/main/schemas/evidence.schema.json",
+  "title": "Scientific Evidence Record",
+  "description": "Domain independent record of a piece of evidence. See SCIENTIFIC_AGENT_POLICY.md sections 1.2, 1.5, 1.8, and 1.9.",
+  "type": "object",
+  "required": [
+    "id",
+    "content",
+    "status"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this evidence record."
+    },
+    "content": {
+      "type": "string",
+      "description": "The evidence content or a description of it."
+    },
+    "status": {
+      "type": "string",
+      "description": "Epistemic status of the statement. See SCIENTIFIC_AGENT_POLICY.md section 4.",
+      "enum": [
+        "verified",
+        "observed",
+        "retrieved",
+        "calculated",
+        "estimated",
+        "inferred",
+        "predicted",
+        "assumed",
+        "unknown",
+        "missing",
+        "conflicting"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "description": "Origin of the evidence.",
+      "properties": {
+        "reference": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "dataset",
+            "publication",
+            "documentation",
+            "repository",
+            "measurement",
+            "model_output",
+            "other"
+          ]
+        },
+        "accessed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "transformation": {
+      "type": "object",
+      "description": "How this evidence was derived from the source.",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "method": {
+          "type": "string"
+        },
+        "code_reference": {
+          "type": "string"
+        }
+      }
+    },
+    "confidence": {
+      "type": "object",
+      "description": "Confidence associated with the evidence.",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low"
+          ]
+        },
+        "basis": {
+          "type": "string",
+          "description": "Why this confidence level was assigned."
+        }
+      }
+    },
+    "conflicting_with": {
+      "type": "array",
+      "description": "Identifiers of evidence records that conflict with this one.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recorded_by": {
+      "type": "string",
+      "description": "Agent or human who recorded this evidence."
+    }
+  },
+  "additionalProperties": true
+}

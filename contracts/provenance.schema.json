@@ -1,0 +1,264 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/dpikaArya/Universal-Agentic-AI-Scientific-Operating-Policy-UAASOP-/main/schemas/provenance.schema.json",
+  "title": "Scientific Provenance Record",
+  "description": "Domain independent record of what built upon what during a scientific task. See SCIENTIFIC_AGENT_POLICY.md section 3.",
+  "type": "object",
+  "required": [
+    "id",
+    "task",
+    "created_at",
+    "agent"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for this provenance record."
+    },
+    "task": {
+      "type": "string",
+      "description": "The task being performed."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of record creation."
+    },
+    "agent": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Agent or workflow performing the action."
+        },
+        "model": {
+          "type": "string",
+          "description": "Model used, with version when available."
+        },
+        "model_version": {
+          "type": "string",
+          "description": "Model version when available."
+        }
+      }
+    },
+    "tools": {
+      "type": "array",
+      "description": "Tools, commands, or computations used.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "version": {
+            "type": "string"
+          },
+          "command": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "description": "Inputs used, or references to them.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string",
+            "description": "Path, URI, or identifier of the input."
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "Origins of evidence used.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "dataset",
+              "publication",
+              "documentation",
+              "repository",
+              "measurement",
+              "other"
+            ]
+          }
+        }
+      }
+    },
+    "transformations": {
+      "type": "array",
+      "description": "How inputs became outputs.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "method": {
+            "type": "string"
+          },
+          "code_reference": {
+            "type": "string"
+          },
+          "parameters": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "outputs": {
+      "type": "array",
+      "description": "Produced results or references to them.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "reference": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decisions": {
+      "type": "array",
+      "description": "Decisions made during the task.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "by": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "human"
+            ]
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "description": "Assumptions adopted during the task.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "failures": {
+      "type": "array",
+      "description": "Failed approaches, rejected hypotheses, and validation failures.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string"
+          },
+          "cause": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "retries": {
+      "type": "array",
+      "description": "Retries and their outcomes.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "attempt": {
+            "type": "integer"
+          },
+          "change": {
+            "type": "string"
+          },
+          "outcome": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "validations": {
+      "type": "array",
+      "description": "Validations performed and their results.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "failed",
+              "inconclusive"
+            ]
+          },
+          "details": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "human_interventions": {
+      "type": "array",
+      "description": "Human interventions, approvals, corrections, and overrides.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "approval",
+              "correction",
+              "override",
+              "rejection",
+              "contribution"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "child_of": {
+      "type": "array",
+      "description": "Identifiers of provenance records this record builds upon.",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}
