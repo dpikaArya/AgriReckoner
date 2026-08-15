@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed — numbers shown to users
+- Phosphorus and potassium now mean the element, and an oxide figure is converted instead of
+  being stored as though it were the element. The specification declared the oxide basis
+  (`Phosphorus … (P₂O₅)`) while the ontology asserted the element, and no conversion existed
+  anywhere, so a package-of-practices rate written N:P₂O₅:K₂O entered the phosphorus column
+  2.29x too high. `agri_ai_agent/extractors/nutrients.py` derives each factor from atomic
+  masses (P₂O₅ ×0.4364, K₂O ×0.8302, plus CaO, MgO, SO₃, Na₂O) and every ingest path applies
+  it, whether the oxide is written as a formula (`P2O5`, `P₂O₅`, `P²O⁵`) or in words
+  (`potassium oxide`, `oxide basis`), in the column header or in the unit beside the number.
+  A term naming a form whose basis is genuinely not fixed — `phosphate`, `potash`, `DAP` — is
+  refused rather than assumed, because the basis cannot be recovered once the value is stored;
+  a label that simply says nothing is read on the schema's declared basis. Resolves #20.
 - Recommendations no longer invent an expected yield gain. `run_aaf_pipeline.py` set the
   expected yield to the observed yield times 1.15 and the gain to 15% of that, and reported it
   as high confidence; every row of the shipped `fertilizer_recommendations.csv` came from that

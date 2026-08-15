@@ -42,8 +42,8 @@ Generated from `spec/uams_ontology.yaml` by `scripts/gen_ontology_docs.py`. Do n
 | Organic_Carbon | E. Soil Properties | AGROVOC:c_389fe908 | % | 0.0–10.0 | OC, organic_c, organic_carbon_%, soil organic carbon, total organic carbon |
 | Organic_Matter | E. Soil Properties | AGROVOC:c_5387 | % | — | organic_matter_% |
 | Nitrogen | E. Soil Properties | AGROVOC:c_5192; CO_320:0000020 | kg/ha | 0.0–1000.0 | available nitrogen, available_n, available_n_kg_ha, n, n_kg_ha, nitrogen_kg_ha … |
-| Phosphorus | E. Soil Properties | AGROVOC:c_5804 | kg/ha | 0.0–500.0 | available phosphorus, available_p, available_p_kg_ha, p, p2o5, p2o5_kg_ha … |
-| Potassium | E. Soil Properties | AGROVOC:c_6139 | kg/ha | 0.0–1000.0 | available potassium, available_k, available_k_kg_ha, k, k2o, k2o_kg_ha … |
+| Phosphorus | E. Soil Properties | AGROVOC:c_5804 | kg/ha | 0.0–500.0 | available phosphorus, available_p, available_p_kg_ha, p, p_kg_ha, phosphorous … |
+| Potassium | E. Soil Properties | AGROVOC:c_6139 | kg/ha | 0.0–1000.0 | available potassium, available_k, available_k_kg_ha, k, k_kg_ha, total_k |
 | Sulphur | E. Soil Properties | — | mg/kg | — | s, sulfur, sulphur_ppm |
 | Iron | E. Soil Properties | AGROVOC:c_3950 | mg/kg | — | fe, iron_mgkg, iron_ppm |
 | Copper | E. Soil Properties | AGROVOC:c_1868 | mg/kg | — | copper_ppm, cu, cu_ppm |

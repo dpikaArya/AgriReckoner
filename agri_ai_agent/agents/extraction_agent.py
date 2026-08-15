@@ -14,6 +14,7 @@ import pandas as pd
 from agri_ai_agent.agents.base_agent import BaseAgent
 from agri_ai_agent.config.schema import UAMS_COLUMNS, VARIANT_MAP
 from agri_ai_agent.config.settings import AgriAISettings
+from agri_ai_agent.external_data.column_mapper import to_elemental_basis
 
 # ---------------------------------------------------------------------------
 # CONSTANTS
@@ -833,7 +834,8 @@ class ExtractionAgent(BaseAgent):
                 unmapped.append(col)
                 rename_map[col] = col.strip()
 
-        result_df = df.rename(columns=rename_map, errors="ignore")
+        converted = to_elemental_basis(df, rename_map)
+        result_df = converted.rename(columns=rename_map, errors="ignore")
         result_df = self._resolve_duplicate_columns(result_df)
 
         missing_uams = [col for col in UAMS_COLUMNS if col not in result_df.columns]

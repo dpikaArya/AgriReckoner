@@ -57,7 +57,7 @@ def load_master_datasets(data_dir: Path) -> pd.DataFrame:
 
 def map_columns_to_uams(df: pd.DataFrame) -> pd.DataFrame:
     """Map dataset columns to UAMS canonical names via VARIANT_MAP."""
-    from agri_ai_agent.external_data.column_mapper import map_column
+    from agri_ai_agent.external_data.column_mapper import map_column, to_elemental_basis
 
     uams_rename = {}
     unmapped = []
@@ -68,6 +68,7 @@ def map_columns_to_uams(df: pd.DataFrame) -> pd.DataFrame:
         elif not mapped:
             unmapped.append(col)
     if uams_rename:
+        df = to_elemental_basis(df, uams_rename)
         df = df.rename(columns=uams_rename)
         log.info("Mapped %d columns to UAMS names", len(uams_rename))
     if unmapped:
