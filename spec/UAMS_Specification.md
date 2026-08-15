@@ -84,6 +84,16 @@ Geospatial coordinates and weather variables.
 
 Pre-sowing or pre-planting soil physico-chemical analysis.
 
+**Nutrient basis.** Nutrients are stored as the **element**, never as the oxide:
+`Phosphorus` is P, `Potassium` is K, and the same holds for `Calcium`, `Magnesium`,
+`Sulphur` and `Sodium`. Sources report both bases and they differ by a fixed factor, so an
+oxide figure is converted on ingest (P₂O₅ ×0.4364, K₂O ×0.8302, CaO ×0.7147, MgO ×0.6030,
+SO₃ ×0.4005, Na₂O ×0.7419), whether the oxide is named by formula, in words, or in the unit
+beside the number. A term naming a form whose basis is genuinely not fixed — `phosphate`,
+`potash`, a fertiliser product name — is **refused rather than assumed**, because the basis
+cannot be recovered once the number is stored. A label that simply says nothing about basis
+is read on this declared basis. Nitrogen has no oxide convention and is always N.
+
 | # | Column | Type | Units | Required | Description |
 |---|--------|------|-------|----------|-------------|
 | 30 | `Soil_pH` | float | — | No | Soil pH (1:2.5 soil:water suspension) |
@@ -91,8 +101,8 @@ Pre-sowing or pre-planting soil physico-chemical analysis.
 | 32 | `Organic_Carbon` | float | % | No | Soil organic carbon |
 | 33 | `Organic_Matter` | float | % | No | Soil organic matter |
 | 34 | `Nitrogen` | float | kg/ha | No | Available nitrogen |
-| 35 | `Phosphorus` | float | kg/ha | No | Available phosphorus (P₂O₅) |
-| 36 | `Potassium` | float | kg/ha | No | Available potassium (K₂O) |
+| 35 | `Phosphorus` | float | kg/ha | No | Available phosphorus, elemental P (a P₂O₅ figure is converted on ingest, ×0.4364) |
+| 36 | `Potassium` | float | kg/ha | No | Available potassium, elemental K (a K₂O figure is converted on ingest, ×0.8302) |
 | 37 | `Sulphur` | float | ppm | No | Available sulphur |
 | 38 | `Iron` | float | ppm | No | DTPA-extractable iron |
 | 39 | `Copper` | float | ppm | No | DTPA-extractable copper |
