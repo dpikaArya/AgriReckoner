@@ -1,0 +1,3055 @@
+version: 2.0.0
+namespace: https://w3id.org/uams#
+provenance:
+  agrovoc_release: unversioned/TODO
+  envo_release: unversioned/TODO
+  po_release: unversioned/TODO
+  co_version: CO_320 unversioned/TODO
+  generated_note: Terms migrated from agri_ai_agent/agents/extraction_agent.py (ONTOLOGY_KNOWLEDGE_BASE,
+    authoritative) and spec/Ontology_Registry.md. CURIEs normalised to PREFIX:localid. Release versions
+    unknown — TODO.
+  validation: CURIEs resolved against AGROVOC SPARQL and OLS4 by scripts/validate_ontology.py. Identifiers
+    whose authority label did not exactly match the column were re-derived by label search or removed
+    (scripts/repair_ontology.py); the previous identifiers had been generated, not resolved.
+prefixes:
+  AGROVOC: http://aims.fao.org/aos/agrovoc/
+  ENVO: http://purl.obolibrary.org/obo/ENVO_
+  PO: http://purl.obolibrary.org/obo/PO_
+  CO_320: 'https://cropontology.org/rdf/CO_320:'
+  FOODON: http://purl.obolibrary.org/obo/FOODON_
+  UO: http://purl.obolibrary.org/obo/UO_
+  QUDT: http://qudt.org/vocab/unit/
+  UCUM: https://ucum.org/
+  ECO: http://purl.obolibrary.org/obo/ECO_
+  PATO: http://purl.obolibrary.org/obo/PATO_
+columns:
+  Paper_ID:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  DOI:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Journal:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Year:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Authors:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Country:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Crop:
+    group: B. Crop Information
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000000
+      label: Crop
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: null
+    synonyms:
+    - crop species
+    - crop type
+    - cultivated plant
+    validation:
+      min: null
+      max: null
+  Scientific_Name:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Variety:
+    group: B. Crop Information
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000001
+      label: Variety
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: null
+    synonyms:
+    - cultivar
+    - variety name
+    - variety type
+    validation:
+      min: null
+      max: null
+  Season:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - cropping_season
+    - growing_season
+    - kharif
+    - planting_date
+    - rabi
+    - seasonal
+    - sowing_date
+    - zaid
+    validation:
+      min: null
+      max: null
+  Growth_Duration_Days:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: d
+    synonyms:
+    - crop_duration
+    - days_to_harvest
+    - days_to_maturity
+    - growth_duration
+    - harvest_das
+    - harvest_date
+    - harvest_days
+    - harvest_stage
+    - maturity_days
+    validation:
+      min: null
+      max: null
+  Growth_Stage:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - phenological_stage
+    validation:
+      min: null
+      max: null
+  Design:
+    group: C. Experimental Design
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_2208
+      label: design
+    unit_ucum: null
+    synonyms:
+    - exp_design
+    - experimental_design
+    validation:
+      min: null
+      max: null
+  Replications:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - no_of_replications
+    - rep
+    - repititions
+    - replicate
+    - replicates
+    validation:
+      min: null
+      max: null
+  Plot_Size:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: m2
+    synonyms:
+    - plot_area
+    - plot_area_m2
+    - plot_dimension
+    - plot_size_m2
+    validation:
+      min: null
+      max: null
+  Spacing_Row:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - inter_row
+    - row_spacing
+    - row_spacing_cm
+    - row_to_row
+    validation:
+      min: null
+      max: null
+  Spacing_Plant:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - intra_row
+    - plant_spacing
+    - plant_spacing_cm
+    - plant_to_plant
+    validation:
+      min: null
+      max: null
+  Sample_Size:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Location:
+    group: C. Experimental Design
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_330988
+      label: location
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  State:
+    group: C. Experimental Design
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_330998
+      label: state
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Site:
+    group: C. Experimental Design
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_331000
+      label: site
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Latitude:
+    group: D. Environment
+    terms: []
+    unit_ucum: deg
+    synonyms:
+    - lat
+    validation:
+      min: null
+      max: null
+  Longitude:
+    group: D. Environment
+    terms: []
+    unit_ucum: deg
+    synonyms:
+    - lon
+    - long
+    validation:
+      min: null
+      max: null
+  Altitude:
+    group: D. Environment
+    terms: []
+    unit_ucum: m
+    synonyms:
+    - elevation
+    validation:
+      min: null
+      max: null
+  Temperature_Max:
+    group: D. Environment
+    terms: []
+    unit_ucum: Cel
+    synonyms:
+    - daily maximum temperature
+    - max temp
+    - max_temperature
+    - maximum temperature
+    - temp_max
+    - tmax
+    - tmax_c
+    validation:
+      min: -20.0
+      max: 55.0
+  Temperature_Min:
+    group: D. Environment
+    terms: []
+    unit_ucum: Cel
+    synonyms:
+    - daily minimum temperature
+    - min temp
+    - min_temperature
+    - minimum temperature
+    - temp_min
+    - tmin
+    - tmin_c
+    validation:
+      min: -30.0
+      max: 40.0
+  Average_Temperature:
+    group: D. Environment
+    terms: []
+    unit_ucum: Cel
+    synonyms:
+    - avg_temp
+    - temp
+    - temperature
+    validation:
+      min: null
+      max: null
+  Rainfall:
+    group: D. Environment
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_a060993c
+      label: rainfall
+    unit_ucum: mm
+    synonyms:
+    - precipitation
+    - precipitation amount
+    - rain
+    - rainfall amount
+    - rainfall_mm
+    validation:
+      min: 0.0
+      max: 10000.0
+  Humidity:
+    group: D. Environment
+    terms:
+    - predicate: skos:exactMatch
+      curie: PATO:0015009
+      label: humidity
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_3689
+      label: humidity
+    unit_ucum: '%'
+    synonyms:
+    - air humidity
+    - atmospheric humidity
+    - relative_humidity
+    validation:
+      min: 0.0
+      max: 100.0
+  Soil_pH:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_34901
+      label: soil pH
+    unit_ucum: null
+    synonyms:
+    - pH value
+    - ph
+    - soil acidity
+    - soil reaction
+    validation:
+      min: 3.0
+      max: 10.0
+  EC:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: dS/m
+    synonyms:
+    - ec_ds_m
+    - electrical_conductivity
+    - salinity
+    - soil EC
+    validation:
+      min: 0.0
+      max: 10.0
+  Organic_Carbon:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_389fe908
+      label: soil organic carbon
+    unit_ucum: '%'
+    synonyms:
+    - OC
+    - organic_c
+    - organic_carbon_%
+    - soil organic carbon
+    - total organic carbon
+    validation:
+      min: 0.0
+      max: 10.0
+  Organic_Matter:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_5387
+      label: organic matter
+    unit_ucum: '%'
+    synonyms:
+    - organic_matter_%
+    validation:
+      min: null
+      max: null
+  Nitrogen:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_5192
+      label: nitrogen
+    - predicate: skos:closeMatch
+      curie: CO_320:0000020
+      label: Nitrogen
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: kg/ha
+    synonyms:
+    - available nitrogen
+    - available_n
+    - available_n_kg_ha
+    - n
+    - n_kg_ha
+    - nitrogen_kg_ha
+    - soil nitrogen
+    - total nitrogen
+    - total_n
+    validation:
+      min: 0.0
+      max: 1000.0
+  Phosphorus:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_5804
+      label: phosphorus
+    unit_ucum: kg/ha
+    basis: elemental
+    synonyms:
+    - available phosphorus
+    - available_p
+    - available_p_kg_ha
+    - p
+    - p_kg_ha
+    - phosphorous
+    - total_p
+    # Reported on the oxide basis. Multiplied by 0.4364 on ingest, never stored as-is.
+    oxide_synonyms:
+    - p2o5
+    - p2o5_kg_ha
+    # The term does not say which basis it is. Refused on ingest rather than assumed.
+    ambiguous_synonyms:
+    - phosphate
+    validation:
+      min: 0.0
+      max: 500.0
+  Potassium:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_6139
+      label: potassium
+    unit_ucum: kg/ha
+    basis: elemental
+    synonyms:
+    - available potassium
+    - available_k
+    - available_k_kg_ha
+    - k
+    - k_kg_ha
+    - total_k
+    # Reported on the oxide basis. Multiplied by 0.8302 on ingest, never stored as-is.
+    oxide_synonyms:
+    - k2o
+    - k2o_kg_ha
+    # The term does not say which basis it is. Refused on ingest rather than assumed.
+    ambiguous_synonyms:
+    - potash
+    validation:
+      min: 0.0
+      max: 1000.0
+  Sulphur:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: mg/kg
+    basis: elemental
+    # An SO3 figure is multiplied by 0.4005 on ingest, never stored as-is.
+    synonyms:
+    - s
+    - sulfur
+    - sulphur_ppm
+    validation:
+      min: null
+      max: null
+  Iron:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_3950
+      label: iron
+    unit_ucum: mg/kg
+    synonyms:
+    - fe
+    - iron_mgkg
+    - iron_ppm
+    validation:
+      min: null
+      max: null
+  Copper:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_1868
+      label: copper
+    unit_ucum: mg/kg
+    synonyms:
+    - copper_ppm
+    - cu
+    - cu_ppm
+    validation:
+      min: null
+      max: null
+  Manganese:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_4570
+      label: manganese
+    unit_ucum: mg/kg
+    synonyms:
+    - mn
+    - mn_ppm
+    validation:
+      min: null
+      max: null
+  Zinc:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_8517
+      label: zinc
+    unit_ucum: mg/kg
+    synonyms:
+    - zn
+    - zn_ppm
+    validation:
+      min: null
+      max: null
+  Calcium:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_1196
+      label: calcium
+    unit_ucum: mg/kg
+    basis: elemental
+    # An CaO figure is multiplied by 0.7147 on ingest, never stored as-is.
+    synonyms:
+    - ca
+    validation:
+      min: null
+      max: null
+  Magnesium:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_4517
+      label: magnesium
+    unit_ucum: mg/kg
+    basis: elemental
+    # An MgO figure is multiplied by 0.6030 on ingest, never stored as-is.
+    synonyms:
+    - mg
+    validation:
+      min: null
+      max: null
+  Boron:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_1018
+      label: boron
+    unit_ucum: mg/kg
+    synonyms:
+    - b
+    validation:
+      min: null
+      max: null
+  Molybdenum:
+    group: E. Soil Properties
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_4901
+      label: molybdenum
+    unit_ucum: mg/kg
+    synonyms:
+    - mo
+    validation:
+      min: null
+      max: null
+  Treatment:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - treatments
+    validation:
+      min: null
+      max: null
+  Fertilizer_Name:
+    group: F. Fertilizer Information
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_2867
+      label: fertilizers
+    unit_ucum: null
+    synonyms:
+    - amendment
+    - fertiliser
+    - fertilizer
+    validation:
+      min: null
+      max: null
+  Organic_Fertilizer:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - compost
+    - farmyard_manure
+    - fym
+    - organic_amendments
+    - vermicompost
+    validation:
+      min: null
+      max: null
+  Biofertilizer:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - biofertilizers
+    - inoculation
+    validation:
+      min: null
+      max: null
+  Dose:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - dose_kg_acre
+    - dose_kg_ha
+    - fertilizer_dose
+    - k_dose
+    - n_dose
+    - p_dose
+    validation:
+      min: null
+      max: null
+  Application_Method:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Application_Interval:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Shoot_Length_cm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - shoot_length
+    - shoot_length_at_harvest
+    - shootheight
+    validation:
+      min: null
+      max: null
+  Root_Length_cm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - root_length
+    - root_length_at_harvest
+    validation:
+      min: null
+      max: null
+  Plant_Height_cm:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000005
+      label: Plant height
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+      verified: false
+    - predicate: skos:closeMatch
+      curie: CO_320:0000012
+      label: Plant height
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+      verified: false
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_61f3cae5
+      label: plant height
+    unit_ucum: cm
+    synonyms:
+    - final_plant_height
+    - height
+    - plant_height
+    - plant_height_at_harvest
+    - shoot length
+    validation:
+      min: 0.0
+      max: 500.0
+  Shoot_Biomass_g:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - shoot_biomass
+    validation:
+      min: null
+      max: null
+  Root_Biomass_g:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - root_biomass
+    validation:
+      min: null
+      max: null
+  Leaf_Area_cm2:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000028
+      label: Leaf area
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: cm2
+    synonyms:
+    - lai
+    - leaf_area
+    - leaf_area_index
+    validation:
+      min: null
+      max: null
+  Leaf_Number:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000027
+      label: Leaf number
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: null
+    synonyms:
+    - leaves_plant
+    - no_leaves
+    - number_of_leaves
+    validation:
+      min: null
+      max: null
+  Tillers:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000032
+      label: Tiller number
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: null
+    synonyms:
+    - no_tillers
+    - number_of_tillers
+    - tiller_number
+    validation:
+      min: null
+      max: null
+  Root_Diameter_mm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: mm
+    synonyms:
+    - root_diameter
+    validation:
+      min: null
+      max: null
+  SPAD:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000035
+      label: SPAD chlorophyll
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: null
+    synonyms:
+    - SPAD value
+    - chlorophyll
+    - chlorophyll_content
+    - chlorophyll_content_spad
+    - chlorophyll_spad
+    - leaf greenness
+    validation:
+      min: 0.0
+      max: 80.0
+  Moisture_Content:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_4886
+      label: moisture content
+    unit_ucum: '%'
+    synonyms:
+    - moisture
+    validation:
+      min: null
+      max: null
+  Dry_Matter:
+    group: G. Crop Growth Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_331318
+      label: dry matter
+    unit_ucum: '%'
+    synonyms:
+    - dry_matter_%
+    - dry_matter_pct
+    validation:
+      min: null
+      max: null
+  Stem_Diameter_mm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: mm
+    synonyms:
+    - stem_diameter
+    validation:
+      min: null
+      max: null
+  Branches:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - branches_per_plant
+    - branches_plant
+    - number_of_branches
+    validation:
+      min: null
+      max: null
+  Nodes:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - number_of_nodes
+    validation:
+      min: null
+      max: null
+  Flowers:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - flowers_per_plant
+    - flowers_plant
+    - number_of_flowers
+    validation:
+      min: null
+      max: null
+  Plant_Height_30_cm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: 'Temporal (30-day) variant of Plant_Height_cm; no distinct ontology term. TODO: model as a phenotyping
+      time point.'
+  Plant_Height_60_cm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: Temporal (60-day) variant of Plant_Height_cm; no distinct ontology term. TODO.
+  Plant_Height_90_cm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: Temporal (90-day) variant of Plant_Height_cm; no distinct ontology term. TODO.
+  Leaf_Area_30_cm2:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm2
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: Temporal (30-day) variant of Leaf_Area_cm2; no distinct ontology term. TODO.
+  Leaf_Area_60_cm2:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm2
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: Temporal (60-day) variant of Leaf_Area_cm2; no distinct ontology term. TODO.
+  Leaf_Area_90_cm2:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm2
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: Temporal (90-day) variant of Leaf_Area_cm2; no distinct ontology term. TODO.
+  Yield_per_Plot:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_10176
+      label: crop yield
+    unit_ucum: g
+    synonyms:
+    - economic_yield
+    - fresh_weight
+    - fresh_weight_g
+    - grain_yield
+    - seed_yield
+    - yield
+    - yield_per_plot_g
+    - yield_plot
+    validation:
+      min: null
+      max: null
+  Yield_per_Acre:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_10176
+      label: crop yield
+    unit_ucum: kg/[acr_us]
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Yield_per_Hectare:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_10176
+      label: crop yield
+    unit_ucum: kg/ha
+    synonyms:
+    - crop yield
+    - grain yield
+    - yield ha
+    - yield_per_ha
+    validation:
+      min: 0.0
+      max: 50000.0
+  Fruit_Number:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - fruits_plant
+    validation:
+      min: 0.0
+      max: 10000.0
+  Fruit_Weight:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_7db831f9
+      label: fruit weight
+    unit_ucum: g
+    synonyms:
+    - fruit_weight_g
+    validation:
+      min: 0.0
+      max: 5000.0
+  Fruit_Diameter_mm:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000037
+      label: Fruit diameter
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: mm
+    synonyms:
+    - fruit_diameter
+    validation:
+      min: null
+      max: null
+  Spike_Length:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - panicle_length
+    - spike_length_cm
+    validation:
+      min: null
+      max: null
+  Seeds_per_Spike:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:closeMatch
+      curie: CO_320:0000042
+      label: Seeds per spike
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: null
+    synonyms:
+    - grains_per_spike
+    - seeds_spike
+    validation:
+      min: null
+      max: null
+  100_Seed_Weight:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_36510
+      label: seed weight
+    - predicate: skos:closeMatch
+      curie: CO_320:0000040
+      label: 100-seed weight
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: g
+    synonyms:
+    - 1000_grain_weight
+    - hundred_seed_weight
+    - test_weight
+    - test_weight_g
+    - thousand_grain_weight
+    - weight_100_seeds_g
+    validation:
+      min: 0.0
+      max: 500.0
+  Root_Weight:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - root_weight_g
+    validation:
+      min: null
+      max: null
+  Pod_Weight:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - pod_weight_g
+    validation:
+      min: null
+      max: null
+  Harvest_Index:
+    group: H. Yield Parameters
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_24854
+      label: harvest index
+    unit_ucum: null
+    synonyms:
+    - HI
+    validation:
+      min: 0.0
+      max: 1.5
+  Biomass_Yield:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - biological_yield
+    - straw_yield
+    - total_biomass
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_8489, but that CURIE already identifies Shoot_Biomass_g;
+      dropped to avoid a cross-column collision.
+  Protein:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_6251
+      label: protein content
+    - predicate: skos:closeMatch
+      curie: CO_320:0000045
+      label: Protein content
+      verified: false
+      note: CO_320 is not resolvable via cropontology.org or OLS4; unverified
+    unit_ucum: '%'
+    synonyms:
+    - crude protein
+    - grain protein
+    - protein_%
+    - protein_content
+    validation:
+      min: 0.0
+      max: 60.0
+  Ash:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_665
+      label: ash content
+    unit_ucum: '%'
+    synonyms:
+    - ash_%
+    - ash_pct
+    validation:
+      min: null
+      max: null
+  Gluten:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_3294
+      label: gluten
+    unit_ucum: '%'
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Fiber:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - crude_fiber
+    validation:
+      min: null
+      max: null
+  Carbohydrates:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_1300
+      label: carbohydrates
+    unit_ucum: '%'
+    synonyms:
+    - carbs
+    validation:
+      min: null
+      max: null
+  Fat:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - crude_fat
+    - oil
+    validation:
+      min: null
+      max: null
+  Nitrogen_Content:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_5193
+      label: nitrogen content
+    unit_ucum: '%'
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Phosphorus_Content:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_5804
+      label: phosphorus
+    unit_ucum: '%'
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Potassium_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: '%'
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Iron_Content:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_3950
+      label: iron
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Copper_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_1863, but that CURIE already identifies Copper; dropped
+      (collision).
+  Zinc_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_8515, but that CURIE already identifies Zinc; dropped
+      (collision).
+  Manganese_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_4572, but that CURIE already identifies Manganese;
+      dropped (collision).
+  Sulphur_Content:
+    group: I. Grain Quality
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_7514
+      label: sulfur
+    unit_ucum: '%'
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Target_Yield:
+    group: J. ML Target Variables
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_8496 (= Yield_per_Hectare); an ML target, not a distinct
+      concept — dropped (collision).
+  Target_Fertilizer:
+    group: J. ML Target Variables
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_2363 (= Dose); ML target, dropped (collision).
+  Target_Nitrogen:
+    group: J. ML Target Variables
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_5188 (= Nitrogen); ML target, dropped (collision).
+  Target_Phosphorus:
+    group: J. ML Target Variables
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_5801 (= Phosphorus); ML target, dropped (collision).
+  Target_Potassium:
+    group: J. ML Target Variables
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+    note: spec/Ontology_Registry.md maps AGROVOC:c_6139 (= Potassium); ML target, dropped (collision).
+  Growing_Degree_Days:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: Cel.d
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Heat_Units:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: Cel.d
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Harvest_Index_Calc:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Nitrogen_Use_Efficiency:
+    group: K. Engineered Features
+    terms:
+    - predicate: skos:exactMatch
+      curie: AGROVOC:c_1e66facd
+      label: nutrient use efficiency
+    unit_ucum: kg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Water_Use_Efficiency:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: kg/m3
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Rainfall_Anomaly:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: mm
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Stress_Index:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Disease_Risk_Index:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Yield_per_Plant:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: g
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Yield_per_Plot_Calc:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: g
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Yield_per_Hectare_Calc:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Temp_x_Rainfall:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  N_x_P:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Temp_squared:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Rainfall_7d_MA:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: mm
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Temp_7d_MA:
+    group: K. Engineered Features
+    terms: []
+    unit_ucum: Cel
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Feature_Available_Before_Prediction:
+    group: L. Leakage Labels
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Crop_Code:
+    group: M. Encoded Variables
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Season_Code:
+    group: M. Encoded Variables
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Variety_Code:
+    group: M. Encoded Variables
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Fertilizer_Code:
+    group: M. Encoded Variables
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Soil_Texture_Code:
+    group: M. Encoded Variables
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Country_Code:
+    group: M. Encoded Variables
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Predicted_Yield:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Expected_Biomass:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Expected_Plant_Height:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: cm
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Recommended_Fertilizer:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Recommended_Dose:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: kg/ha
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Recommended_Application_Interval:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: d
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Expected_Yield_Increase:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: '%'
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Confidence_Score:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - confidence
+    validation:
+      min: null
+      max: null
+  Recommendation_Summary:
+    group: N. ML Predictions
+    terms: []
+    unit_ucum: null
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Title:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - title_of_article
+    validation:
+      min: null
+      max: null
+  Institution:
+    group: A. Paper Metadata
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - institution
+    validation:
+      min: null
+      max: null
+  Cover_Crop:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - cover_crop
+    - cover crop
+    validation:
+      min: null
+      max: null
+  Previous_Crop:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - previous_crop_name
+    validation:
+      min: null
+      max: null
+  Intercrop_Name:
+    group: B. Crop Information
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - intercrop_name
+    validation:
+      min: null
+      max: null
+  Plot_ID:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - plot_id
+    validation:
+      min: null
+      max: null
+  Block:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - block
+    validation:
+      min: null
+      max: null
+  Experiment_Objective:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - experimental_objective_description
+    validation:
+      min: null
+      max: null
+  Sowing_Date:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - sowing_date
+    validation:
+      min: null
+      max: null
+  Harvest_Date:
+    group: C. Experimental Design
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - harvest_date
+    validation:
+      min: null
+      max: null
+  Solar_Radiation:
+    group: D. Environment
+    terms: []
+    unit_ucum: W/m2
+    synonyms:
+    - solar_radiation
+    validation:
+      min: null
+      max: null
+  Wind_Speed:
+    group: D. Environment
+    terms: []
+    unit_ucum: m/s
+    synonyms:
+    - wind_speed
+    validation:
+      min: null
+      max: null
+  ET0:
+    group: D. Environment
+    terms: []
+    unit_ucum: mm/d
+    synonyms:
+    - potential_evapotranspiration
+    validation:
+      min: null
+      max: null
+  Climate_Zone:
+    group: D. Environment
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - climate_zone
+    validation:
+      min: null
+      max: null
+  Sodium:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: mg/kg
+    basis: elemental
+    # An Na2O figure is multiplied by 0.7419 on ingest, never stored as-is.
+    synonyms:
+    - sodium
+    - soil_sodium
+    - soil_na_mg_kg
+    validation:
+      min: null
+      max: null
+  Chlorine:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - chlorine
+    - soil_cl_mg_kg
+    validation:
+      min: null
+      max: null
+  CEC:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: cmol+/kg
+    synonyms:
+    - soil_cec_cmol_kg
+    validation:
+      min: null
+      max: null
+  Soil_Bulk_Density:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: Mg/m3
+    synonyms:
+    - soil_bulk_density_mg_cm3
+    validation:
+      min: 0.5
+      max: 2.0
+  Soil_Clay_Pct:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - soil_clay_%
+    validation:
+      min: 0
+      max: 100
+  Soil_Silt_Pct:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - soil_silt_%
+    validation:
+      min: 0
+      max: 100
+  Soil_Sand_Pct:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - soil_sand_%
+    validation:
+      min: 0
+      max: 100
+  Soil_Texture:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - soil_texture_name
+    validation:
+      min: null
+      max: null
+  Soil_Class:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - soil_class
+    validation:
+      min: null
+      max: null
+  Soil_Depth_cm:
+    group: E. Soil Properties
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - soil_depth_cm
+    validation:
+      min: 0
+      max: null
+  Fertilizer_Calcium:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - fertiliser_ca_kg_ca_ha
+    validation:
+      min: null
+      max: null
+  Fertilizer_Magnesium:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - fertiliser_mg_kg_mg_ha
+    validation:
+      min: null
+      max: null
+  Fertilizer_Boron:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - fertiliser_b_kg_b_ha
+    validation:
+      min: null
+      max: null
+  Fertilizer_Chlorine:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - fertiliser_cl_kg_cl_ha
+    validation:
+      min: null
+      max: null
+  Fertilizer_Molybdenum:
+    group: F. Fertilizer Information
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - fertiliser_mo_kg_mo_ha
+    validation:
+      min: null
+      max: null
+  Plant_Height_120_cm:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm
+    synonyms:
+    - ph120
+    - plant_height_120_cm
+    validation:
+      min: null
+      max: null
+  Leaf_Area_120_cm2:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: cm2
+    synonyms:
+    - la120
+    - leaf_area_120_cm2
+    validation:
+      min: null
+      max: null
+  Branches_60:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - branches_60
+    validation:
+      min: null
+      max: null
+  Branches_90:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - branches_90
+    validation:
+      min: null
+      max: null
+  Flowers_60:
+    group: G. Crop Growth Parameters
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - flowers_60
+    validation:
+      min: null
+      max: null
+  FruitWeight_90_g:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - fruitweight_90_g
+    validation:
+      min: null
+      max: null
+  FruitWeight_120_g:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - fruitweight_120_g
+    validation:
+      min: null
+      max: null
+  FruitDiameter_90_mm:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: mm
+    synonyms:
+    - fruitdiameter_90_mm
+    validation:
+      min: null
+      max: null
+  FruitDiameter_120_mm:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: mm
+    synonyms:
+    - fruitdiameter_120_mm
+    validation:
+      min: null
+      max: null
+  YieldPlot_90_g:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - yieldplot_90_g
+    validation:
+      min: null
+      max: null
+  YieldPlot_120_g:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g
+    synonyms:
+    - yieldplot_120_g
+    validation:
+      min: null
+      max: null
+  Yield_13pct_Moisture:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - yield_13%_moisture
+    validation:
+      min: null
+      max: null
+  Marketable_Yield:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - marketable_yield
+    validation:
+      min: null
+      max: null
+  Biological_Yield:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - biological_yield
+    validation:
+      min: null
+      max: null
+  Stover_Yield:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - stover_yield
+    validation:
+      min: null
+      max: null
+  Seed_Yield:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - seed_yield
+    validation:
+      min: null
+      max: null
+  Pods_Number:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - pods_number
+    validation:
+      min: null
+      max: null
+  Seeds_per_Pod:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - seeds_per_pod
+    validation:
+      min: null
+      max: null
+  Weed_Biomass:
+    group: H. Yield Parameters
+    terms: []
+    unit_ucum: g/m2
+    synonyms:
+    - weed_biomass
+    validation:
+      min: null
+      max: null
+  Calcium_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - calcium_content
+    validation:
+      min: null
+      max: null
+  Magnesium_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - magnesium_content
+    validation:
+      min: null
+      max: null
+  Boron_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - boron_content
+    validation:
+      min: null
+      max: null
+  Chlorine_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - chlorine_content
+    validation:
+      min: null
+      max: null
+  Molybdenum_Content:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - molybdenum_content
+    validation:
+      min: null
+      max: null
+  Starch:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - starch
+    validation:
+      min: null
+      max: null
+  Oil:
+    group: I. Grain Quality
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - oil
+    validation:
+      min: null
+      max: null
+  SOC_Mineralization:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg/d
+    synonyms:
+    - soc_mineralization
+    - basal soc mineralization
+    validation:
+      min: null
+      max: null
+  Residue_C_Decomposition:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg/d
+    synonyms:
+    - residue/root c decomposition
+    - residue_c_decomposition
+    validation:
+      min: null
+      max: null
+  Potential_Evapotranspiration:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mm
+    synonyms:
+    - pe
+    validation:
+      min: null
+      max: null
+  Soil_Moisture:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - soil_moisture_%_whc
+    - soil_moisture_%
+    validation:
+      min: 0
+      max: 100
+  Soil_Nitrate_N:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - water_extractable_nitrate
+    - wec_no3_n_mg_n_kg
+    validation:
+      min: null
+      max: null
+  Soil_Ammonium_N:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - water_extractable_nh4
+    - wec_nh4_mg_n_kg
+    validation:
+      min: null
+      max: null
+  Soil_Available_K:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Soil_POC:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: g/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Soil_DOC:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Soil_LOC:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms: []
+    validation:
+      min: null
+      max: null
+  Soil_MBC:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_mbc_mg_c_kg
+    validation:
+      min: null
+      max: null
+  Soil_MBN:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_mbn_mg_n_kg
+    validation:
+      min: null
+      max: null
+  Soil_Carbon_Walkley_Black:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - soil_carbon_(walkley-black)_%
+    validation:
+      min: null
+      max: null
+  Soil_Nitrogen_Kjeldahl:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: g/kg
+    synonyms:
+    - soil_nc_kjeldahl_g_n_kg
+    validation:
+      min: null
+      max: null
+  Soil_Nitrogen_Alkaline_Permanganate:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - soil_n_alkaline_permanganate_kg_n_ha
+    validation:
+      min: null
+      max: null
+  Soil_Sulphur_Available:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_s_(cacl2)_mg_s_kg
+    validation:
+      min: null
+      max: null
+  Soil_Sulphur_Mehlich3:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_s_(mehlich-3)_mg_s_kg
+    validation:
+      min: null
+      max: null
+  Soil_NO3:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_nitrate
+    validation:
+      min: null
+      max: null
+  Soil_NH4:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_nh4
+    validation:
+      min: null
+      max: null
+  Soil_N_Parco2020:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - soil_n_(parco2020)_kg_n_ha
+    validation:
+      min: null
+      max: null
+  Soil_N_DeSilva2008:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - soil_n_(de silva 2008)_kg_n_ha
+    validation:
+      min: null
+      max: null
+  Soil_Ca_Ammonium_Acetate:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_ca_(ammonium_acetate)_mg_ca_kg
+    validation:
+      min: null
+      max: null
+  Soil_Mg_Ammonium_Acetate:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_mg_(ammonium_acetate)_mg_k_kg
+    validation:
+      min: null
+      max: null
+  Soil_K_Ammonium_Acetate:
+    group: O. Soil Biological Properties
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - soil_k_(ammonium_acetate)_mg_k_kg
+    validation:
+      min: null
+      max: null
+  Soil_Glucosidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - glucosidase
+    validation:
+      min: null
+      max: null
+  Soil_Xylosidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - xylosidase
+    validation:
+      min: null
+      max: null
+  Soil_Cellobiosidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - cellobiosidase
+    validation:
+      min: null
+      max: null
+  Beta_Glucosidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - beta_glucosidase
+    validation:
+      min: null
+      max: null
+  Peroxidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - peroxidase
+    validation:
+      min: null
+      max: null
+  Polyphenol_Oxidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - polyphenol_oxidase
+    - ppo
+    validation:
+      min: null
+      max: null
+  N_Acetyl_Glucosaminidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - n-acetyl-glucosaminidase
+    - nag
+    validation:
+      min: null
+      max: null
+  Leucine_Aminopeptidase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - leucine_aminopeptidase
+    - lap
+    validation:
+      min: null
+      max: null
+  Phosphatase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - phosphatase
+    - acid_phosphatase
+    - alkaline_phosphatase
+    validation:
+      min: null
+      max: null
+  Catalase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mL/g/h
+    synonyms:
+    - catalase
+    validation:
+      min: null
+      max: null
+  Urease:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - urease
+    validation:
+      min: null
+      max: null
+  Dehydrogenase:
+    group: P. Soil Enzyme Activity
+    terms: []
+    unit_ucum: mg/kg/d
+    synonyms:
+    - dehydrogenase
+    validation:
+      min: null
+      max: null
+  Bacterial_Diversity_Chao1:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - bacterial_chao1
+    validation:
+      min: null
+      max: null
+  Bacterial_Diversity_Shannon:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - bacterial_shannon
+    validation:
+      min: null
+      max: null
+  Fungal_Diversity_Chao1:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - fungal_chao1
+    validation:
+      min: null
+      max: null
+  Fungal_Diversity_Shannon:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - fungal_shannon
+    validation:
+      min: null
+      max: null
+  Total_PLFAs:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: nmol/g
+    synonyms:
+    - total_plfas
+    validation:
+      min: null
+      max: null
+  Gram_Positive_PLFAs:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: nmol/g
+    synonyms:
+    - gram_positive_plfas
+    validation:
+      min: null
+      max: null
+  Gram_Negative_PLFAs:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: nmol/g
+    synonyms:
+    - gram_negative_plfas
+    validation:
+      min: null
+      max: null
+  Fungal_PLFAs:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: nmol/g
+    synonyms:
+    - fungal_plfas
+    validation:
+      min: null
+      max: null
+  Bacterial_PLFAs:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: nmol/g
+    synonyms:
+    - bacterial_plfas
+    validation:
+      min: null
+      max: null
+  Actinomycetes_PLFAs:
+    group: Q. Soil Microbial Community
+    terms: []
+    unit_ucum: nmol/g
+    synonyms:
+    - actinomycetes_plfas
+    validation:
+      min: null
+      max: null
+  NDVI:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - ndvi
+    - ndvi_green
+    validation:
+      min: -1
+      max: 1
+  EVI:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - evi
+    - enhanced_vegetation_index
+    validation:
+      min: -1
+      max: 1
+  SAVI:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - savi
+    - soil_adjusted_vegetation_index
+    validation:
+      min: -1
+      max: 1
+  NDWI:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - ndwi
+    validation:
+      min: -1
+      max: 1
+  NDRE:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - ndre
+    validation:
+      min: -1
+      max: 1
+  Canopy_Temperature:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: degC
+    synonyms:
+    - canopy_temperature
+    - canopy_temp
+    validation:
+      min: null
+      max: null
+  CIG:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - cig
+    - chlorophyll_index_green
+    validation:
+      min: null
+      max: null
+  CIRE:
+    group: R. Remote Sensing Indices
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - cire
+    - chlorophyll_index_red_edge
+    validation:
+      min: null
+      max: null
+  Calcium_Mehlich3:
+    group: S. Soil Exchangeable Cations
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - calcium_mehlich3
+    - soil_ca_mehlich-3_mg_ca_kg
+    validation:
+      min: null
+      max: null
+  Calcium_Saturation:
+    group: S. Soil Exchangeable Cations
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - calcium_saturation_%
+    validation:
+      min: 0
+      max: 100
+  Magnesium_Saturation:
+    group: S. Soil Exchangeable Cations
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - magnesium_saturation_%
+    validation:
+      min: 0
+      max: 100
+  Sodium_Saturation:
+    group: S. Soil Exchangeable Cations
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - sodium_saturation_%
+    validation:
+      min: 0
+      max: 100
+  Potassium_Saturation:
+    group: S. Soil Exchangeable Cations
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - potassium_saturation_%
+    validation:
+      min: 0
+      max: 100
+  Hydrogen_Saturation:
+    group: S. Soil Exchangeable Cations
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - hydrogen_saturation_%
+    validation:
+      min: 0
+      max: 100
+  Water_Extractable_Nitrate:
+    group: T. Water Extractable Organic
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - wec_n_mg_n_kg
+    - wec_no3_n_mg_n_kg
+    validation:
+      min: null
+      max: null
+  Water_Extractable_Organic_Carbon:
+    group: T. Water Extractable Organic
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - wec_oc_mg_c_kg
+    - wec_oc_mg_oc_kg
+    validation:
+      min: null
+      max: null
+  Water_Extractable_Organic_Nitrogen:
+    group: T. Water Extractable Organic
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - wec_on_mg_n_kg
+    - wec_on_mg_on_kg
+    validation:
+      min: null
+      max: null
+  Water_Extractable_NH4:
+    group: T. Water Extractable Organic
+    terms: []
+    unit_ucum: mg/kg
+    synonyms:
+    - wec_nh4_mg_n_kg
+    - wec_nh4_n_mg_n_kg
+    validation:
+      min: null
+      max: null
+  Water_Extractable_CN_Ratio:
+    group: T. Water Extractable Organic
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - wec_cn_ratio
+    validation:
+      min: null
+      max: null
+  Aggregate_Stability:
+    group: U. Soil Physical Properties
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - aggregate_stability
+    validation:
+      min: null
+      max: null
+  Soil_Respiration:
+    group: U. Soil Physical Properties
+    terms: []
+    unit_ucum: mg/kg/h
+    synonyms:
+    - soil_respiration
+    validation:
+      min: null
+      max: null
+  Infiltration_Rate:
+    group: U. Soil Physical Properties
+    terms: []
+    unit_ucum: mm/h
+    synonyms:
+    - infiltration_rate
+    validation:
+      min: null
+      max: null
+  Nematode_Maturity_Index:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - mi
+    validation:
+      min: null
+      max: null
+  Nematode_Plant_Parasitic_Index:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - ppi
+    validation:
+      min: null
+      max: null
+  Nematode_Channel_Index:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - ci
+    validation:
+      min: null
+      max: null
+  Nematode_Basal_Index:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - bi
+    validation:
+      min: null
+      max: null
+  Nematode_Enrichment_Index:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - ei
+    validation:
+      min: null
+      max: null
+  Nematode_Structure_Index:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - si
+    validation:
+      min: null
+      max: null
+  Nematode_Total_Biomass_mg:
+    group: V. Nematode Ecology
+    terms: []
+    unit_ucum: mg
+    synonyms:
+    - nematode_total_biomass_mg
+    validation:
+      min: null
+      max: null
+  Total_Cost:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: USD/ha
+    synonyms:
+    - total_cost
+    validation:
+      min: null
+      max: null
+  Total_Return:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: USD/ha
+    synonyms:
+    - total_return
+    validation:
+      min: null
+      max: null
+  Net_Profit:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: USD/ha
+    synonyms:
+    - net_profit
+    validation:
+      min: null
+      max: null
+  Benefit_Cost_Ratio:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: 1
+    synonyms:
+    - system benefit cost ratio
+    - bc_ratio
+    validation:
+      min: null
+      max: null
+  System_Benefit_USD_ha:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: USD/ha
+    synonyms:
+    - system benefit (usd/ha)
+    validation:
+      min: null
+      max: null
+  Off_Season_Contribution_Pct:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: '%'
+    synonyms:
+    - off-season contribution to system benefit (%)
+    validation:
+      min: null
+      max: null
+  System_Water_Use_Efficiency:
+    group: W. Economic Parameters
+    terms: []
+    unit_ucum: kg/m3/ha
+    synonyms:
+    - system water use efficiency (kg/m3/ha)
+    validation:
+      min: null
+      max: null
+  Phosphorus_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - p_uptake
+    - phosphorus_uptake
+    - p_uptake_kg_ha
+    validation:
+      min: null
+      max: null
+  Nitrogen_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - n_uptake
+    - nitrogen_uptake
+    - n_uptake_kg_ha
+    validation:
+      min: null
+      max: null
+  Potassium_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - k_uptake
+    - potassium_uptake
+    - k_uptake_kg_ha
+    validation:
+      min: null
+      max: null
+  Sulphur_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - s_uptake
+    - sulphur_uptake
+    validation:
+      min: null
+      max: null
+  Calcium_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - ca_uptake
+    - calcium_uptake
+    validation:
+      min: null
+      max: null
+  Magnesium_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - mg_uptake
+    - magnesium_uptake
+    validation:
+      min: null
+      max: null
+  Boron_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - b_uptake
+    - boron_uptake
+    validation:
+      min: null
+      max: null
+  Chlorine_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - cl_uptake
+    - chlorine_uptake
+    validation:
+      min: null
+      max: null
+  Copper_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - cu_uptake
+    - copper_uptake
+    validation:
+      min: null
+      max: null
+  Iron_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - fe_uptake
+    - iron_uptake
+    validation:
+      min: null
+      max: null
+  Manganese_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - mn_uptake
+    - manganese_uptake
+    validation:
+      min: null
+      max: null
+  Molybdenum_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - mo_uptake
+    - molybdenum_uptake
+    validation:
+      min: null
+      max: null
+  Zinc_Uptake:
+    group: X. Nutrient Uptake
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - zn_uptake
+    - zinc_uptake
+    validation:
+      min: null
+      max: null
+  Irrigation_Method:
+    group: Y. Irrigation & Management
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - irrigation
+    - irrigation_method_name
+    validation:
+      min: null
+      max: null
+  Irrigation_mm:
+    group: Y. Irrigation & Management
+    terms: []
+    unit_ucum: mm
+    synonyms:
+    - actual_irrigation_mm
+    - water_amount_mm
+    validation:
+      min: null
+      max: null
+  Sowing_Density:
+    group: Y. Irrigation & Management
+    terms: []
+    unit_ucum: seeds/m2
+    synonyms:
+    - sow_density_seeds_m2
+    validation:
+      min: null
+      max: null
+  Harvest_Density:
+    group: Y. Irrigation & Management
+    terms: []
+    unit_ucum: plants/m2
+    synonyms:
+    - harvest_density_plants_m2
+    validation:
+      min: null
+      max: null
+  Cultivation_Method:
+    group: Y. Irrigation & Management
+    terms: []
+    unit_ucum: null
+    synonyms:
+    - cultivation_method_name
+    validation:
+      min: null
+      max: null
+  N_Fixation:
+    group: Y. Irrigation & Management
+    terms: []
+    unit_ucum: kg/ha
+    synonyms:
+    - n_fixation_kg_n_ha
+    validation:
+      min: null
+      max: null
+  Soil_pH_CaCl2:
+    group: Z. Soil pH Variants
+    terms: []
+    unit_ucum: '1'
+    synonyms:
+    - soil_ph_cacl2
+    - soil_ph_cacl2_number
+    validation:
+      min: 0
+      max: 14
+  Soil_pH_KCl:
+    group: Z. Soil pH Variants
+    terms: []
+    unit_ucum: '1'
+    synonyms:
+    - soil_ph_kcl
+    - soil_ph_kcl_number
+    validation:
+      min: 0
+      max: 14
+permitted_shared_terms:
+  AGROVOC:c_10176: one concept recorded by several columns (unit or matrix differs, carried by unit_ucum
+    rather than by the term)
+  AGROVOC:c_3950: one concept recorded by several columns (unit or matrix differs, carried by unit_ucum
+    rather than by the term)
+  AGROVOC:c_5804: one concept recorded by several columns (unit or matrix differs, carried by unit_ucum
+    rather than by the term)

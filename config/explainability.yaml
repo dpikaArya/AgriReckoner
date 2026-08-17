@@ -1,0 +1,44 @@
+# Explainability Agent Configuration
+# AAIF v2.0
+
+enabled: true
+
+# Features to explain
+top_n_features: 10
+
+# Output settings
+output_dir: agri_ai_agent/outputs/reports/explainability
+save_individual_reports: true
+save_summary: true
+save_feature_importance_csv: true
+
+# Explanation components
+include:
+  model_used: true
+  prediction_confidence: true
+  feature_importance: true
+  top_variables: true
+  fuzzy_rules: true
+  evidence_papers: true
+  supporting_treatments: true
+  supporting_crops: true
+  soil_conditions: true
+  climate_conditions: true
+  data_quality_score: true
+  extraction_confidence: true
+  recommendation_reason: true
+  alternatives: true
+  uncertainty: true
+
+# Confidence thresholds
+confidence_thresholds:
+  high: 0.80
+  medium: 0.50
+  low: 0.00
+
+# Dashboard options
+dashboard:
+  show_crop_distribution: true
+  show_confidence_histogram: true
+  show_uncertainty_chart: true
+  show_data_quality_chart: true

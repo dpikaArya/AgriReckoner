@@ -1,0 +1,32 @@
+# Auto-detect text files and normalize line endings
+* text=auto
+
+# Source code
+*.py text diff=python eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.md text eol=lf
+*.rst text eol=lf
+*.cfg text eol=lf
+*.ini text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+*.csv text eol=lf
+
+# Binary / generated artifacts (committed as regular blobs)
+*.pkl -text
+*.joblib -text
+*.xlsx -text
+*.docx -text
+*.html -text
+*.zip -text
+*.db -text
+*.sqlite -text
+*.parquet -text
+*.feather -text
+*.h5 -text
+*.onnx -text
+*.pt -text

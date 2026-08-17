@@ -1,0 +1,79 @@
+# Validation configuration
+schema:
+  strict_mode: false
+  allow_extra_columns: true
+
+missing_values:
+  max_threshold_pct: 0.5
+  warn_threshold_pct: 0.2
+
+duplicates:
+  max_threshold_pct: 0.1
+  subset_columns:
+    - "Paper_ID"
+    - "Treatment_ID"
+    - "Observation_ID"
+
+outliers:
+  method: "iqr"
+  iqr_multiplier: 1.5
+  zscore_threshold: 3.0
+  max_outlier_pct: 0.1
+
+agricultural_ranges:
+  temperature:
+    min: -50
+    max: 60
+    unit: "°C"
+  rainfall:
+    min: 0
+    max: 10000
+    unit: "mm/year"
+  humidity:
+    min: 0
+    max: 100
+    unit: "%"
+  soil_ph:
+    min: 0
+    max: 14
+    unit: "pH"
+  organic_carbon:
+    min: 0
+    max: 100
+    unit: "%"
+  nitrogen:
+    min: 0
+    max: 1000
+    unit: "kg/ha"
+  phosphorus:
+    min: 0
+    max: 1000
+    unit: "kg/ha"
+  potassium:
+    min: 0
+    max: 1000
+    unit: "kg/ha"
+  crop_yield:
+    min: 0
+    max: 100
+    unit: "t/ha"
+  latitude:
+    min: -90
+    max: 90
+    unit: "degrees"
+  longitude:
+    min: -180
+    max: 180
+    unit: "degrees"
+
+provenance:
+  require_checksum: true
+  require_metadata: true
+  require_manifest: true
+  lineage_stages:
+    - "api_source"
+    - "raw_dataset"
+    - "clean_dataset"
+    - "feature_dataset"
+    - "training_dataset"
+    - "model"

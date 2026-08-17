@@ -1,0 +1,119 @@
+# Model training configuration
+training:
+  random_seed: 42
+  test_size: 0.2
+  cv_folds: 5
+  n_jobs: -1
+  early_stopping_rounds: 10
+  max_training_time_sec: 3600
+
+models:
+  linear_regression:
+    enabled: true
+  
+  ridge:
+    enabled: true
+    alpha: [0.1, 1.0, 10.0]
+  
+  lasso:
+    enabled: true
+    alpha: [0.001, 0.01, 0.1]
+  
+  random_forest:
+    enabled: true
+    n_estimators: [100, 200, 500]
+    max_depth: [3, 5, 10, None]
+    min_samples_split: [2, 5, 10]
+  
+  gradient_boosting:
+    enabled: true
+    n_estimators: [50, 100, 200]
+    max_depth: [2, 3, 5]
+    learning_rate: [0.01, 0.05, 0.1]
+  
+  xgboost:
+    enabled: true
+    n_estimators: [50, 100, 200]
+    max_depth: [3, 5, 7]
+    learning_rate: [0.01, 0.05, 0.1]
+    subsample: [0.8, 1.0]
+  
+  svr:
+    enabled: false
+    kernel: ["rbf", "linear"]
+    C: [0.1, 1.0, 10.0]
+    epsilon: [0.01, 0.1]
+
+metrics:
+  regression:
+    - rmse
+    - mae
+    - r2
+    - mape
+  classification:
+    - accuracy
+    - precision
+    - recall
+    - f1
+    - roc_auc
+
+feature_selection:
+  max_missing_pct: 0.7
+  importance_threshold: 0.001
+  correlation_threshold: 0.95
+  variance_threshold: 1e-12
+  max_features: 200
+  min_features: 80
+  n_top_features: 150
+
+importance_methods:
+  random_forest: true
+  xgboost: true
+  lightgbm: true
+  catboost: false
+  shap: true
+
+feature_engineering:
+  enabled: true
+  validate_with_cv: true
+  min_cv_improvement: 0.001
+  remove_if_no_improvement: true
+
+optimization:
+  n_trials: 200
+  timeout_seconds: 600
+  min_acceptable_r2: 0.89
+
+ensemble:
+  enabled: true
+  methods:
+    - weighted_average
+    - stacking
+  auto_weight: true
+
+data_quality:
+  scoring_enabled: true
+  high_quality_threshold: 0.8
+  medium_quality_threshold: 0.5
+  prioritize_high_quality: true
+
+validation:
+  cv_folds: 10
+  spatial_folds: 3
+  temporal_folds: 3
+  leakage_check: true
+  stop_on_leakage: true
+  use_loocv: true
+  loocv_models:
+    - ridge
+    - lasso
+    - random_forest
+    - gradient_boosting
+
+thresholds:
+  min_r2: 0.0
+  max_rmse: 100.0
+  max_mape: 50.0
+  min_samples: 10
+  max_missing_pct: 0.5
+  corr_leak_threshold: 0.999

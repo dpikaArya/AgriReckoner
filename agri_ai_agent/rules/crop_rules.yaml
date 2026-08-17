@@ -1,0 +1,165 @@
+metadata:
+  version: "1.0"
+  description: "Crop-specific agronomic parameters and nutrient guidelines"
+  source: "ICAR / State Agriculture University recommendations"
+
+crops:
+  Rice:
+    type: kharif
+    duration_days: 120-150
+    npk_ratio:
+      N: 120
+      P: 60
+      K: 60
+    zinc: true
+    zinc_sulfate_kg_per_ha: 25
+    critical_stages:
+      - tillering
+      - panicle_initiation
+      - flowering
+    soil_ph_range: [5.5, 7.0]
+    spacing_cm: [20, 15]
+    water_requirement: high
+    organic_carbon_min: 0.5
+
+  Wheat:
+    type: rabi
+    duration_days: 110-140
+    npk_ratio:
+      N: 150
+      P: 75
+      K: 60
+    zinc: true
+    zinc_sulfate_kg_per_ha: 20
+    critical_stages:
+      - crown_root_initiation
+      - tillering
+      - booting
+    soil_ph_range: [6.0, 7.5]
+    spacing_cm: [22.5, 5]
+    water_requirement: medium
+    organic_carbon_min: 0.4
+
+  Maize:
+    type: kharif
+    duration_days: 90-120
+    npk_ratio:
+      N: 200
+      P: 80
+      K: 80
+    zinc: true
+    zinc_sulfate_kg_per_ha: 30
+    critical_stages:
+      - V6
+      - V12
+      - tasseling
+      - silking
+    soil_ph_range: [5.5, 7.5]
+    spacing_cm: [60, 25]
+    water_requirement: medium
+    organic_carbon_min: 0.5
+
+  Sugarcane:
+    type: cash
+    duration_days: 300-365
+    npk_ratio:
+      N: 250
+      P: 80
+      K: 120
+    zinc: false
+    critical_stages:
+      - tillering
+      - grand_growth
+      - maturation
+    soil_ph_range: [6.0, 7.5]
+    spacing_cm: [90, 60]
+    water_requirement: high
+    organic_carbon_min: 0.6
+
+  Groundnut:
+    type: kharif
+    duration_days: 100-130
+    npk_ratio:
+      N: 25
+      P: 60
+      K: 50
+    zinc: true
+    zinc_sulfate_kg_per_ha: 15
+    critical_stages:
+      - flowering
+      - peg_formation
+      - pod_development
+    soil_ph_range: [5.5, 7.0]
+    spacing_cm: [30, 10]
+    water_requirement: low
+    organic_carbon_min: 0.4
+
+  Cotton:
+    type: kharif
+    duration_days: 150-180
+    npk_ratio:
+      N: 120
+      P: 60
+      K: 60
+    zinc: true
+    zinc_sulfate_kg_per_ha: 20
+    critical_stages:
+      - squaring
+      - flowering
+      - boll_development
+    soil_ph_range: [6.0, 8.0]
+    spacing_cm: [90, 60]
+    water_requirement: low
+    organic_carbon_min: 0.5
+
+  Pulses:
+    type: rabi
+    duration_days: 90-120
+    npk_ratio:
+      N: 25
+      P: 50
+      K: 30
+    zinc: true
+    zinc_sulfate_kg_per_ha: 15
+    critical_stages:
+      - flowering
+      - pod_filling
+    soil_ph_range: [6.0, 7.5]
+    spacing_cm: [30, 10]
+    water_requirement: low
+    organic_carbon_min: 0.3
+
+  Vegetables:
+    type: mixed
+    duration_days: 60-120
+    npk_ratio:
+      N: 100
+      P: 60
+      K: 80
+    zinc: true
+    zinc_sulfate_kg_per_ha: 15
+    critical_stages:
+      - transplanting
+      - flowering
+      - fruiting
+    soil_ph_range: [6.0, 7.0]
+    spacing_cm: [45, 30]
+    water_requirement: high
+    organic_carbon_min: 0.5
+
+  Sorghum:
+    type: kharif
+    duration_days: 90-120
+    npk_ratio:
+      N: 80
+      P: 40
+      K: 40
+    zinc: false
+    critical_stages:
+      - tillering
+      - flag_leaf
+      - heading
+    soil_ph_range: [5.5, 8.0]
+    spacing_cm: [45, 15]
+    water_requirement: low
+    organic_carbon_min: 0.3

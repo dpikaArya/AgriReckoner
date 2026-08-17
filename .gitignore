@@ -1,0 +1,198 @@
+# ===========================
+# Python
+# ===========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+dist/
+build/
+eggs/
+*.whl
+
+# ===========================
+# Virtual Environments
+# ===========================
+.venv/
+venv/
+env/
+ENV/
+
+# ===========================
+# Testing / Coverage
+# ===========================
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# ===========================
+# Type Checking / Linting
+# ===========================
+.mypy_cache/
+.ruff_cache/
+.pytype/
+
+# ===========================
+# IDE / Editor
+# ===========================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# ===========================
+# OS Files
+# ===========================
+.DS_Store
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# ===========================
+# Source PDFs (too large for git)
+# ===========================
+Data ADES/*.pdf
+
+# ===========================
+# Source Data Directory (large, not needed in repo)
+# ===========================
+data/
+
+# ===========================
+# Large Binary Data
+# ===========================
+*.parquet
+*.feather
+*.duckdb
+
+# ===========================
+# Master Dataset Excel files (large)
+# ===========================
+*_Master_Dataset.xlsx
+*_Master dataset.xlsx
+data/master_datasets/
+
+# ===========================
+# Large Excel files (schema copies)
+# ===========================
+*_Master_Learning_Schema*.xlsx
+*_Agricultural_Schema.xlsx
+outputs/Universal_Agricultural_Machine_Learning_Schema_v1.xlsx
+outputs/Universal_Agricultural_Schema.xlsx
+outputs/hybrid/Universal_Agricultural_Schema.xlsx
+Data ADES/*.xlsx
+
+# ===========================
+# Generated outputs at runtime
+# ===========================
+agri_ai_agent/outputs/
+outputs/*.sqlite
+
+# ===========================
+# Logs & Temp
+# ===========================
+logs/
+*.log
+tmp/
+temp/
+.cache/
+
+# ===========================
+# Jupyter
+# ===========================
+.ipynb_checkpoints/
+
+# ===========================
+# Model cache / Downloads
+# ===========================
+model_cache/
+ollama/
+sentence_transformers/
+
+# ===========================
+# Old Package (superseded by agri_ai_agent/)
+# ===========================
+ades/
+ades.egg-info/
+
+# ===========================
+# Redundant Extraction Module
+# ===========================
+aaif/
+
+# ===========================
+# Databases (runtime data, not source)
+# ===========================
+*.sqlite
+agri_ai_agent/memory/*.db
+
+# ===========================
+# Secrets
+# ===========================
+.env
+.env.*
+*.key
+*.pem
+credentials.*
+token.*
+secrets.*
+REFACTOR_NOTES.md
+
+# runtime artifacts (committed outputs/ is the frozen baseline)
+agri_ai_agent/outputs/
+agri_ai_agent/models/
+agri_ai_agent/memory/
+agri_ai_agent/logs/
+.checkpoints/
+
+# Production pipeline artifacts
+reports/
+/external_data/
+deliverables_*.zip
+
+# Generated runtime data (not source)
+database/
+
+# Generated output artifacts
+outputs/AAIF_Layer_Efficiency_Report.txt
+outputs/Data_ADES_File_Inventory.csv
+outputs/Model_Results_All.csv
+outputs/Pipeline_Manifest.json
+outputs/Ready_Reckoner_Table*.csv
+outputs/Ready_Reckoner_Updated.xlsx
+outputs/benchmark_history.json
+
+# Generated feature sets (test output)
+features/
+
+# Auto-generated ensemble files (test artifacts)
+models/ensemble_weights.json
+models/stacking_ensemble_info.json
+models/*_optimization_history.json
+models/*_best_params.json
+models/optimization/
+models/*.pkl
+models/*.joblib
+
+# Generated output data files (pipeline artifacts, not source)
+outputs/*.csv
+outputs/**/*.csv
+outputs/*.xlsx
+outputs/**/*.xlsx
+outputs/*.json
+outputs/**/*.json
+outputs/*.docx
+outputs/**/*.docx
+outputs/*.html
+outputs/**/*.html
+
+# Evaluation benchmark artifacts
+evaluation/reports/*.csv

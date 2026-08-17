@@ -1,0 +1,15 @@
+name: agri-ai
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python>=3.10
+  - pandas
+  - numpy
+  - scikit-learn
+  - scipy
+  - pyarrow
+  - pip
+  - pip:
+    - -r requirements-lock.txt
+    - -r requirements-dev.txt

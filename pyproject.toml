@@ -1,0 +1,80 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "agri-ai-agent"
+version = "2.0.0"
+description = "Agricultural Intelligence Framework (AAIF) — agentic pipeline turning agronomic literature into ML-ready UAMS datasets, yield models, and fuzzy fertilizer recommendations"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "openpyxl>=3.1",
+    "scikit-learn>=1.3",
+    "scipy>=1.10",
+    "pyarrow>=10.0",
+    "chardet>=5.0",
+    "duckdb>=0.8.0",
+    "PyPDF2>=3.0",
+    "pdfplumber>=0.9",
+    "pdfminer.six>=20221101",
+    "xgboost>=2.0",
+    "joblib>=1.3",
+    "PyYAML>=6.0",
+    "networkx>=3.0",
+    "datasets>=2.14",
+    "huggingface-hub>=0.20",
+    "requests>=2.31",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+llm = ["openai>=1.40"]
+ml = [
+    "optuna>=4.0",
+    "lightgbm>=4.0",
+    "shap>=0.45",
+]
+ml-full = [
+    "optuna>=4.0",
+    "lightgbm>=4.0",
+    "shap>=0.45",
+    "catboost>=1.2",
+    "python-docx>=1.1",
+]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "ruff>=0.6",
+    "mypy>=1.10",
+    "pip-audit>=2.7",
+]
+
+[project.scripts]
+agriai = "agri_ai_agent.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["agri_ai_agent*", "src*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+ignore = ["E501"]
+
+[tool.mypy]
+ignore_missing_imports = true
+python_version = "3.12"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"
+markers = ["live: requires live external services/network"]
+
+[tool.coverage.run]
+source = ["agri_ai_agent", "src"]

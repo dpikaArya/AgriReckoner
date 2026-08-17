@@ -1,0 +1,505 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.1.1, pluggy-1.6.0 -- C:\Users\Dr.Manisha ji\AppData\Local\Python\pythoncore-3.14-64\python.exe
+cachedir: .pytest_cache
+rootdir: E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework
+configfile: pyproject.toml
+plugins: anyio-4.12.1, cov-7.1.0
+collecting ... collected 351 items
+
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_agent_name PASSED [  0%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_run_returns_contract PASSED [  0%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_extraction_metrics_computed PASSED [  0%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_training_metrics_computed PASSED [  1%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_training_r2_positive PASSED [  1%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_recommendation_metrics_computed PASSED [  1%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_reckoner_metrics_computed PASSED [  1%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_overall_score_computed PASSED [  2%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_agent_scores_computed PASSED [  2%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_comparison_computed PASSED [  2%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_history_created PASSED [  3%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_history_append PASSED [  3%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_benchmark_report_csv PASSED [  3%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_benchmark_report_html PASSED [  3%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_benchmark_dashboard_json PASSED [  4%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_with_pipeline_results PASSED [  4%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_with_reference_df PASSED [  4%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_empty_dataframe PASSED [  5%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_missing_yield_columns PASSED [  5%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_no_recommendation_columns PASSED [  5%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_metric_constants PASSED [  5%]
+tests/test_benchmark_agent.py::TestBenchmarkAgent::test_artifacts_collected PASSED [  6%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_agent_name PASSED [  6%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_run_returns_contract PASSED [  6%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_explanations_generated PASSED [  7%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_individual_json_reports PASSED [  7%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_summary_json PASSED [  7%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_feature_importance_csv PASSED [  7%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_explainability_dashboard PASSED [  8%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_explanation_structure PASSED [  8%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_prediction_fields PASSED [  8%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_feature_importance_top_10 PASSED [  9%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_fuzzy_rules_extracted PASSED [  9%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_evidence_papers PASSED [  9%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_soil_conditions PASSED [  9%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_climate_conditions PASSED [ 10%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_data_quality_score PASSED [ 10%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_recommendation_reason PASSED [ 10%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_alternatives_parsed PASSED [ 11%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_uncertainty_computed PASSED [ 11%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_avg_confidence PASSED [ 11%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_empty_dataframe PASSED [ 11%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_with_pipeline_results PASSED [ 12%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_missing_fields_detected PASSED [ 12%]
+tests/test_explainability_agent.py::TestExplainabilityAgent::test_artifacts_collected PASSED [ 12%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_agent_name PASSED [ 13%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_process_empty_stage_results PASSED [ 13%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_process_single_reader PASSED [ 13%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_fuse_multiple_readers_highest_confidence PASSED [ 13%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_provenance_preserved PASSED [ 14%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_unit_normalization_yield_per_hectare PASSED [ 14%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_deduplication_keeps_richest PASSED [ 14%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_crop_consistency_correction PASSED [ 15%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_fallback_metadata PASSED [ 15%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_run_method_returns_contract PASSED [ 15%]
+tests/test_evidence_fusion_agent.py::TestEvidenceFusionAgent::test_fusion_report_structure PASSED [ 15%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_agent_name PASSED  [ 16%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_process_empty_dataframe PASSED [ 16%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_column_exact_match PASSED [ 16%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_column_synonym PASSED [ 17%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_column_case_insensitive PASSED [ 17%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_column_with_spaces PASSED [ 17%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_column_with_units PASSED [ 17%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_column_unknown PASSED [ 18%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_process_renames_columns PASSED [ 18%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_process_preserves_data PASSED [ 18%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_process_handles_duplicate_columns PASSED [ 19%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_value_valid PASSED [ 19%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_value_with_symbols PASSED [ 19%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_value_invalid PASSED [ 19%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_resolve_value_with_commas PASSED [ 20%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_get_canonical_columns PASSED [ 20%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_get_synonyms PASSED [ 20%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_add_synonym PASSED [ 21%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_add_synonym_no_duplicates PASSED [ 21%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_run_method_returns_contract PASSED [ 21%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_process_mixed_known_unknown_columns PASSED [ 21%]
+tests/test_ontology_agent.py::TestOntologyAgent::test_normalize_name PASSED [ 22%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_agent_name PASSED [ 22%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_process_empty_dataframe PASSED [ 22%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_classify_yield_table PASSED [ 23%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_classify_growth_table PASSED [ 23%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_classify_soil_table PASSED [ 23%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_classify_treatment_table PASSED [ 23%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_parse_mean_sd PASSED [ 24%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_parse_mean_lsd PASSED [ 24%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_parse_mean_cd PASSED [ 24%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_parse_mean_cv PASSED [ 25%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_parse_plain_number PASSED [ 25%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_parse_invalid_value PASSED [ 25%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_extract_from_structured_table PASSED [ 25%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_extract_with_statistics PASSED [ 26%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_identify_control_treatment PASSED [ 26%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_extract_dose_from_treatment PASSED [ 26%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_process_raw_text PASSED [ 27%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_process_dataframe_passthrough PASSED [ 27%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_run_method_returns_contract PASSED [ 27%]
+tests/test_table_intelligence_agent.py::TestTableIntelligenceAgent::test_extraction_report_structure PASSED [ 27%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_agent_name PASSED [ 28%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_process_empty_dataframe PASSED [ 28%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_yield_plot_to_hectare PASSED [ 28%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_yield_acre_to_hectare PASSED [ 29%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_organic_matter_from_carbon PASSED [ 29%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_organic_carbon_from_matter PASSED [ 29%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_biomass_from_shoot_root PASSED [ 29%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_gdd_calculation PASSED [ 30%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_nue_calculation PASSED [ 30%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_nx_p_interaction PASSED [ 30%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_does_not_overwrite_existing PASSED [ 31%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_skips_rows_with_missing_sources PASSED [ 31%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_population_report_structure PASSED [ 31%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_run_method_returns_contract PASSED [ 31%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_custom_min_confidence PASSED [ 32%]
+tests/test_schema_population_agent.py::TestSchemaPopulationAgent::test_multiple_derivation_paths PASSED [ 32%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_agent_name PASSED [ 32%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_biological_range_check PASSED [ 33%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_biological_range_ok PASSED [ 33%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_biological_soil_ph PASSED [ 33%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_biological_soil_ph_violation PASSED [ 33%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_biological_harvest_index PASSED [ 34%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_agronomic_temperature_consistency PASSED [ 34%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_agronomic_temperature_ok PASSED [ 34%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_agronomic_yield_biomass_ratio PASSED [ 35%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_mad_outlier_detection PASSED [ 35%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_mad_no_outliers PASSED [ 35%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_full_quality_checks_include_new_fields PASSED [ 35%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_quality_checks_empty_dataframe PASSED [ 36%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_process_returns_dataframe PASSED [ 36%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_range_constraint_check PASSED [ 36%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_biological_rules_defined PASSED [ 37%]
+tests/test_validation_agent_v2.py::TestValidationAgentV2::test_agronomic_rules_defined PASSED [ 37%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_agent_name PASSED [ 37%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features PASSED [ 37%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_process_minimal_dataframe PASSED [ 38%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_preserves_original_columns PASSED [ 38%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_interaction_features_created PASSED [ 38%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_log_features_created PASSED [ 39%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_ratio_features_created PASSED [ 39%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_polynomial_features_created PASSED [ 39%]
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_ratio_features_created_v2 PASSED [ 39%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_agent_name PASSED [ 40%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_model_pool_small_sample PASSED [ 40%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_model_pool_medium_sample PASSED [ 40%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_model_pool_large_sample PASSED [ 41%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_model_pool_classification PASSED [ 41%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_process_small_dataframe PASSED [ 41%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_process_large_dataframe PASSED [ 41%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_no_target_returns_input PASSED [ 42%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_optimized_vs_default PASSED [ 42%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_cv_folds_adapts_to_sample_size PASSED [ 42%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_custom_scoring PASSED [ 43%]
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_very_small_dataset_returns_input PASSED [ 43%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_agent_name PASSED [ 43%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_process_returns_dataframe PASSED [ 43%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_crop_yield_range_columns_added PASSED [ 44%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_rice_yield_ranges PASSED [ 44%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_unknown_crop_gets_no_range PASSED [ 44%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_soil_defaults_fill_missing PASSED [ 45%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_climate_defaults_fill_missing PASSED [ 45%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_yield_range_fill PASSED [ 45%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_existing_values_not_overwritten PASSED [ 45%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_lookup_crop PASSED [ 46%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_lookup_soil PASSED [ 46%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_lookup_climate PASSED [ 46%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_empty_dataframe PASSED [ 47%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_no_crop_column PASSED [ 47%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_no_missing_values PASSED [ 47%]
+tests/test_knowledge_integration_agent.py::TestKnowledgeIntegrationAgent::test_multiple_unknown_crops PASSED [ 47%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_agent_name PASSED [ 48%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_process_returns_dataframe PASSED [ 48%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_all_columns_added PASSED [ 48%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_fertilizer_recommendation_logic PASSED [ 49%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_dose_adjusted_for_n_status PASSED [ 49%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_yield_increase_computed PASSED [ 49%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_confidence_score_range PASSED [ 49%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_economic_score_computed PASSED [ 50%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_environmental_score_computed PASSED [ 50%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_risk_score_computed PASSED [ 50%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_top_alternatives_is_json PASSED [ 50%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_top_n_alternatives PASSED [ 51%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_recommendation_summary_not_empty PASSED [ 51%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_existing_values_preserved PASSED [ 51%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_minimal_input PASSED [ 52%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_empty_dataframe PASSED [ 52%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_crop_preference_lookup PASSED [ 52%]
+tests/test_recommendation_agent_v2.py::TestRecommendationAgentV2::test_fertilizer_cost_lookup PASSED [ 52%]
+tests/test_fuzzy_expanded.py::TestFuzzyRulesExpanded::test_rules_file_exists PASSED [ 53%]
+tests/test_fuzzy_expanded.py::TestFuzzyRulesExpanded::test_rules_count_above_200 PASSED [ 53%]
+tests/test_fuzzy_expanded.py::TestFuzzyRulesExpanded::test_rules_metadata_version PASSED [ 53%]
+tests/test_fuzzy_expanded.py::TestFuzzyRulesExpanded::test_rules_have_correct_structure PASSED [ 54%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_agent_name PASSED [ 54%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_process_returns_dataframe PASSED [ 54%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_fuzzy_output_columns PASSED [ 54%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_fuzzy_summary_populated PASSED [ 55%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_fuzzy_risk_labels PASSED [ 55%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_fuzzy_confidence_labels PASSED [ 55%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_n_action_labels PASSED [ 56%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_different_inputs_different_outputs PASSED [ 56%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_membership_functions PASSED [ 56%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_triangle_mf PASSED [ 56%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_shouldered_mf PASSED [ 57%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_minimal_input PASSED [ 57%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_empty_dataframe PASSED [ 57%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_dose_modified_by_fuzzy PASSED [ 58%]
+tests/test_fuzzy_expanded.py::TestFuzzyAgentExpanded::test_interval_modified_by_fuzzy PASSED [ 58%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_agent_name PASSED [ 58%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_process_returns_dataframe PASSED [ 58%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_csv_export PASSED [ 59%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_json_export PASSED [ 59%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_markdown_export PASSED [ 59%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_html_export PASSED [ 60%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_dashboard_export PASSED [ 60%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_report_export PASSED [ 60%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_summary_stats_export PASSED [ 60%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_reckoner_data_filters_columns PASSED [ 61%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_minimal_dataframe PASSED [ 61%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_empty_dataframe PASSED [ 61%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_existing_values_preserved PASSED [ 62%]
+tests/test_ready_reckoner_v2.py::TestReadyReckonerAgentV2::test_recommendation_cols_define_output PASSED [ 62%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_agent_name PASSED [ 62%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_process_returns_dataframe PASSED [ 62%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_process_empty_dataframe PASSED [ 63%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_constants_defined PASSED [ 63%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_should_retrain_below_min_samples PASSED [ 63%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_should_retrain_no_history PASSED [ 64%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_should_retrain_with_history_no_growth PASSED [ 64%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_should_retrain_with_growth PASSED [ 64%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_merge_new_data PASSED [ 64%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_merge_new_data_empty_df PASSED [ 65%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_validate_and_transform_adds_schema_cols PASSED [ 65%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_validate_and_transform_numeric_coercion PASSED [ 65%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_remove_duplicates PASSED [ 66%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_remove_duplicates_no_dups PASSED [ 66%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_load_training_results_empty PASSED [ 66%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_load_training_results_with_data PASSED [ 66%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_deploy_if_improved_no_existing PASSED [ 67%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_deploy_if_improved_with_existing_worse PASSED [ 67%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_deploy_if_improved_with_existing_better PASSED [ 67%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_load_current_best_metrics_none PASSED [ 68%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_load_current_best_metrics_valid PASSED [ 68%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_log_model_version PASSED [ 68%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_save_cycle_report PASSED [ 68%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_save_cycle_report_with_drift PASSED [ 69%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_log_performance_history PASSED [ 69%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_load_performance_history_empty PASSED [ 69%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_load_performance_history_multiple PASSED [ 70%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_log_drift PASSED [ 70%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_log_drift_empty PASSED [ 70%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_build_output PASSED [ 70%]
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_retrain_and_evaluate_no_target PASSED [ 71%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_initial_state PASSED [ 71%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_add_node PASSED  [ 71%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_add_node_invalid_type PASSED [ 72%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_add_edge PASSED  [ 72%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_add_edge_invalid_type PASSED [ 72%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_add_edge_wrong_source_type PASSED [ 72%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_add_edge_wrong_target_type PASSED [ 73%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_get_node_nonexistent PASSED [ 73%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_get_nodes_by_type PASSED [ 73%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_get_edges_by_type PASSED [ 74%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_get_neighbors PASSED [ 74%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_get_neighbors_nonexistent PASSED [ 74%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_shortest_path_found PASSED [ 74%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_shortest_path_not_found PASSED [ 75%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_centrality_degree PASSED [ 75%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_centrality_betweenness PASSED [ 75%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_centrality_invalid_method PASSED [ 76%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_summary_empty PASSED [ 76%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_summary_populated PASSED [ 76%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_build_from_dataframe PASSED [ 76%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_build_from_dataframe_has_soil_climate PASSED [ 77%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_build_from_dataframe_has_treatments PASSED [ 77%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_build_from_dataframe_has_management PASSED [ 77%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_build_from_dataframe_has_observations_yields PASSED [ 78%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_to_dict PASSED   [ 78%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_to_json_and_back PASSED [ 78%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_save_and_load_json PASSED [ 78%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_page_rank PASSED [ 79%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_node_degrees PASSED [ 79%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_empty_dataframe PASSED [ 79%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_valid_node_types_count PASSED [ 80%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_valid_edge_types_count PASSED [ 80%]
+tests/test_knowledge_graph.py::TestKnowledgeGraph::test_edge_node_pairs_count PASSED [ 80%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_agent_name PASSED [ 80%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_process_returns_dataframe PASSED [ 81%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_provenance_columns_added PASSED [ 81%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_source_paper_applied PASSED [ 81%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_doi_applied PASSED [ 82%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_extraction_method_applied PASSED [ 82%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_default_method_is_master_dataset PASSED [ 82%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_page_number_applied PASSED [ 82%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_table_id_applied PASSED [ 83%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_derived_columns_tagged PASSED [ 83%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_missing_values_get_missing_fields_tag PASSED [ 83%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_non_missing_retains_confidence PASSED [ 84%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_original_columns_preserved PASSED [ 84%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_timestamp_format PASSED [ 84%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_coverage_pct PASSED [ 84%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_total_values PASSED [ 85%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_report_structure PASSED [ 85%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_validate_provenance_valid PASSED [ 85%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_validate_provenance_missing_column PASSED [ 86%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_validate_provenance_unknown_source PASSED [ 86%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_provenance_summary_by_paper PASSED [ 86%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_multiple_extractions PASSED [ 86%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_manual_method PASSED [ 87%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_computed_method PASSED [ 87%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_extraction_methods_count PASSED [ 87%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_empty_dataframe PASSED [ 88%]
+tests/test_provenance_agent.py::TestProvenanceAgent::test_no_original_columns PASSED [ 88%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_initial_state PASSED [ 88%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_extraction_accuracy_full PASSED [ 88%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_extraction_accuracy_with_reference PASSED [ 89%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_schema_mapping_accuracy PASSED [ 89%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_schema_mapping_accuracy_all_mapped PASSED [ 89%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_missing_data_rate PASSED [ 90%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_missing_data_rate_no_missing PASSED [ 90%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_missing_data_rate_all_missing PASSED [ 90%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_validation_pass_rate PASSED [ 90%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_validation_pass_rate_with_issues PASSED [ 91%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_feature_coverage PASSED [ 91%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_feature_coverage_no_new PASSED [ 91%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_recommendation_confidence PASSED [ 92%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_recommendation_confidence_no_column PASSED [ 92%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_reckoner_completeness PASSED [ 92%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_pipeline_success_rate PASSED [ 92%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_pipeline_success_rate_all_success PASSED [ 93%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_compute_all PASSED [ 93%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_generate_html PASSED [ 93%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_save_dashboard PASSED [ 94%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_save_metrics_json PASSED [ 94%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_summary_text PASSED [ 94%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_overall_score PASSED [ 94%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_empty_dataframe PASSED [ 95%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_metric_names_count PASSED [ 95%]
+tests/test_evaluation_dashboard.py::TestEvaluationDashboard::test_details_populated PASSED [ 95%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_targets_defined PASSED [ 96%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_validate_perfect PASSED [ 96%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_validate_failing PASSED [ 96%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_get_failures_empty PASSED [ 96%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_get_failures_nonempty PASSED [ 97%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_get_passed PASSED [ 97%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_get_passed_partial PASSED [ 97%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_summary_text PASSED [ 98%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_summary_text_with_failures PASSED [ 98%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_save_report PASSED [ 98%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_missing_rate_direction PASSED [ 98%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_missing_rate_too_high PASSED [ 99%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_empty_metrics PASSED [ 99%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_partial_metrics PASSED [ 99%]
+tests/test_performance_targets.py::TestPerformanceTargets::test_threshold_values PASSED [100%]
+
+============================== warnings summary ===============================
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:575: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Shoot_Root_Ratio"] = sb / rb.replace(0, np.nan)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:578: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Root_Shoot_Ratio"] = rb / sb.replace(0, np.nan)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:581: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Root_pct"] = rb / total.replace(0, np.nan)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:589: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["N_x_P_x_pH"] = n * p * ph
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:595: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["FruitWeight_log"] = np.log1p(fw.clip(lower=0))
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:598: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["FruitWeight_squared"] = fw ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:604: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["SeedWeight_log"] = np.log1p(sw.clip(lower=0))
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:610: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["HI_squared"] = hi ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:613: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["HI_log"] = np.log1p(hi.clip(lower=0))
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:619: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Rainfall_100_bin"] = (rainfall / 100).round() * 100
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:634: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["N_squared"] = n ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:637: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["N_category"] = pd.cut(n, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:643: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["P_squared"] = p ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:646: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["P_category"] = pd.cut(p, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:652: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["K_squared"] = k ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:655: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["K_category"] = pd.cut(k, bins=5, labels=[0, 1, 2, 3, 4]).astype(float)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:661: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Height_squared"] = ph ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:667: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["SPAD_squared"] = spad ** 2
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:676: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["NPK_x_pH"] = (n + p + k) * ph
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:683: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["N_Rainfall_ratio"] = n / rainfall.replace(0, np.nan)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:690: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Yield_per_Height"] = yh / ph.replace(0, np.nan)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:697: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Biomass_x_N"] = bm * n
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:700: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Biomass_N_ratio"] = bm / n.replace(0, np.nan)
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:707: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Biomass_x_pH"] = bm * ph
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:714: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["SPAD_x_N"] = spad * n
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:721: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["LA_x_N"] = la * n
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:728: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Height_x_P"] = ph * p
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:735: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Height_x_K"] = ph * k
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:743: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Yield_pH_N_interaction"] = yh * ph * n
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:750: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Height_x_SPAD"] = ph * spad
+
+tests/test_feature_agent_v2.py::TestFeatureAgentV2::test_generates_150_plus_features
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\feature_agent.py:783: PerformanceWarning: DataFrame is highly fragmented.  This is usually the result of calling `frame.insert` many times, which has poor performance.  Consider joining all columns at once using pd.concat(axis=1) instead. To get a de-fragmented frame, use `newframe = frame.copy()`
+    df["Feature_Available_Before_Prediction"] = leak_df["Availability"].map(
+
+tests/test_feature_agent_v2.py: 3 warnings
+tests/test_continuous_learning_agent_v2.py: 85 warnings
+  C:\Users\Dr.Manisha ji\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\scipy\stats\_axis_nan_policy.py:592: UserWarning: scipy.stats.shapiro: Input data has range zero. The results may not be accurate.
+    res = hypotest_fun_out(*samples, **kwds)
+
+tests/test_model_selection_agent.py: 48 warnings
+  C:\Users\Dr.Manisha ji\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\sklearn\metrics\_regression.py:1288: UndefinedMetricWarning: R^2 score is not well-defined with less than two samples.
+    warnings.warn(msg, UndefinedMetricWarning)
+
+tests/test_model_selection_agent.py::TestModelSelectionAgent::test_process_large_dataframe
+  C:\Users\Dr.Manisha ji\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\sklearn\neural_network\_multilayer_perceptron.py:785: ConvergenceWarning: Stochastic Optimizer: Maximum iterations (500) reached and the optimization hasn't converged yet.
+    warnings.warn(
+
+tests/test_continuous_learning_agent_v2.py::TestContinuousLearningAgent::test_process_returns_dataframe
+  E:\Agriculture\Ready_Reckoner Table\RET\ReadyReckonerTableAI-Framework\agri_ai_agent\agents\training_agent.py:172: Pandas4Warning: For backward compatibility, 'str' dtypes are included by select_dtypes when 'object' dtype is specified. This behavior is deprecated and will be removed in a future version. Explicitly pass 'str' to `include` to select them, or to `exclude` to remove them and silence this warning.
+  See https://pandas.pydata.org/docs/user_guide/migration-3-strings.html#string-migration-select-dtypes for details on how to write code that works with pandas 2 and 3.
+    cat_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================ 351 passed, 169 warnings in 99.01s (0:01:39) =================

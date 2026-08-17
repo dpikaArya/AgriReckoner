@@ -1,0 +1,6819 @@
+metadata:
+  version: '3.0'
+  description: Expanded fuzzy expert rules (200+) for agronomist-style recommendations
+  inference: Mamdani + symbolic rule evaluation
+  defuzzification: centroid
+  total_rules: 221
+variables:
+  input:
+  - Nitrogen
+  - Phosphorus
+  - Potassium
+  - Zinc
+  - Soil_pH
+  - Rainfall
+  - Temperature_Max
+  - Organic_Carbon
+  - Growth_Stage
+  - Yield_Prediction
+  output_numeric:
+  - Nitrogen_Adjustment
+  - Potash_Adjustment
+  - Irrigation_Adjustment
+  - Dose_Adjustment
+  output_symbolic:
+  - N_Action
+  - P_Action
+  - K_Action
+  - Zinc_Action
+  - Risk
+  - Confidence
+rules:
+- name: LowN_Soil_pH_acidic
+  description: Nitrogen low + Soil_pH=acidic
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Soil_pH_neutral
+  description: Nitrogen low + Soil_pH=neutral
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Soil_pH_alkaline
+  description: Nitrogen low + Soil_pH=alkaline
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Rainfall_low
+  description: Nitrogen low + Rainfall=low
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: LowN_Rainfall_medium
+  description: Nitrogen low + Rainfall=medium
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Rainfall_high
+  description: Nitrogen low + Rainfall=high
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Organic_Carbon_low
+  description: Nitrogen low + Organic_Carbon=low
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Organic_Carbon
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Organic_Carbon_medium
+  description: Nitrogen low + Organic_Carbon=medium
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Organic_Carbon
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Organic_Carbon_high
+  description: Nitrogen low + Organic_Carbon=high
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Organic_Carbon
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Temperature_Max_cool
+  description: Nitrogen low + Temperature_Max=cool
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Temperature_Max_moderate
+  description: Nitrogen low + Temperature_Max=moderate
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowN_Temperature_Max_hot
+  description: Nitrogen low + Temperature_Max=hot
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: LowP_Soil_pH_acidic
+  description: Phosphorus low + Soil_pH=acidic
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: LowP_Soil_pH_neutral
+  description: Phosphorus low + Soil_pH=neutral
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Soil_pH_alkaline
+  description: Phosphorus low + Soil_pH=alkaline
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: apply_soil
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_foliar_spray
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: LowP_Rainfall_low
+  description: Phosphorus low + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Rainfall_medium
+  description: Phosphorus low + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Rainfall_high
+  description: Phosphorus low + Rainfall=high
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Organic_Carbon_low
+  description: Phosphorus low + Organic_Carbon=low
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Organic_Carbon
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Organic_Carbon_medium
+  description: Phosphorus low + Organic_Carbon=medium
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Organic_Carbon
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Organic_Carbon_high
+  description: Phosphorus low + Organic_Carbon=high
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Organic_Carbon
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Temperature_Max_cool
+  description: Phosphorus low + Temperature_Max=cool
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Temperature_Max_moderate
+  description: Phosphorus low + Temperature_Max=moderate
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowP_Temperature_Max_hot
+  description: Phosphorus low + Temperature_Max=hot
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Soil_pH_acidic
+  description: Potassium low + Soil_pH=acidic
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Soil_pH_neutral
+  description: Potassium low + Soil_pH=neutral
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Soil_pH_alkaline
+  description: Potassium low + Soil_pH=alkaline
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Rainfall_low
+  description: Potassium low + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: LowK_Rainfall_medium
+  description: Potassium low + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Rainfall_high
+  description: Potassium low + Rainfall=high
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Organic_Carbon_low
+  description: Potassium low + Organic_Carbon=low
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Organic_Carbon
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Organic_Carbon_medium
+  description: Potassium low + Organic_Carbon=medium
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Organic_Carbon
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Organic_Carbon_high
+  description: Potassium low + Organic_Carbon=high
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Organic_Carbon
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Temperature_Max_cool
+  description: Potassium low + Temperature_Max=cool
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Temperature_Max_moderate
+  description: Potassium low + Temperature_Max=moderate
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: LowK_Temperature_Max_hot
+  description: Potassium low + Temperature_Max=hot
+  priority: 9
+  antecedents:
+  - var: Potassium
+    set: low
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: Nlow_Plow_Rainfall_low
+  description: N=low P=low + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Plow_Rainfall_medium
+  description: N=low P=low + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Plow_Soil_pH_acidic
+  description: N=low P=low + Soil_pH=acidic
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Plow_Soil_pH_neutral
+  description: N=low P=low + Soil_pH=neutral
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Rainfall_low
+  description: N=low P=medium + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Rainfall_medium
+  description: N=low P=medium + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Soil_pH_acidic
+  description: N=low P=medium + Soil_pH=acidic
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Soil_pH_neutral
+  description: N=low P=medium + Soil_pH=neutral
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Rainfall_low
+  description: N=medium P=low + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Rainfall_medium
+  description: N=medium P=low + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Soil_pH_acidic
+  description: N=medium P=low + Soil_pH=acidic
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Soil_pH_neutral
+  description: N=medium P=low + Soil_pH=neutral
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Klow_Rainfall_low
+  description: N=low K=low + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Klow_Rainfall_medium
+  description: N=low K=low + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Kmedium_Rainfall_low
+  description: N=low K=medium + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Potassium
+    set: medium
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Kmedium_Rainfall_medium
+  description: N=low K=medium + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Potassium
+    set: medium
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Klow_Rainfall_low
+  description: N=medium K=low + Rainfall=low
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Klow_Rainfall_medium
+  description: N=medium K=low + Rainfall=medium
+  priority: 9
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Potassium
+    set: low
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Plow_Klow_combo
+  description: P=low K=low combo
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Plow_Kmedium_combo
+  description: P=low K=medium combo
+  priority: 9
+  antecedents:
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Cool_Dry
+  description: 'Cool+dry: protect seedlings'
+  priority: 7
+  antecedents:
+  - var: Temperature_Max
+    set: cool
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Cool_Wet
+  description: 'Cool+wet: reduce irrigation'
+  priority: 7
+  antecedents:
+  - var: Temperature_Max
+    set: cool
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Moderate_LowRain
+  description: Moderate temp + low rain
+  priority: 6
+  antecedents:
+  - var: Temperature_Max
+    set: moderate
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Moderate_MediumRain
+  description: 'Moderate temp + medium rain: ideal'
+  priority: 5
+  antecedents:
+  - var: Temperature_Max
+    set: moderate
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Moderate_HighRain
+  description: Moderate temp + high rain
+  priority: 6
+  antecedents:
+  - var: Temperature_Max
+    set: moderate
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Hot_Dry
+  description: 'Hot+dry: stress mitigation'
+  priority: 9
+  antecedents:
+  - var: Temperature_Max
+    set: hot
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Hot_Wet
+  description: 'Hot+wet: disease risk'
+  priority: 8
+  antecedents:
+  - var: Temperature_Max
+    set: hot
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_acidic_Nlow
+  description: pH=acidic + N=low
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_acidic_Nmedium
+  description: pH=acidic + N=medium
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_acidic_Nhigh
+  description: pH=acidic + N=high
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_neutral_Nlow
+  description: pH=neutral + N=low
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_neutral_Nmedium
+  description: pH=neutral + N=medium
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_neutral_Nhigh
+  description: pH=neutral + N=high
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_alkaline_Nlow
+  description: pH=alkaline + N=low
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_foliar_spray
+    amount: 0
+    unit: ''
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: pH_alkaline_Nmedium
+  description: pH=alkaline + N=medium
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_alkaline_Nhigh
+  description: pH=alkaline + N=high
+  priority: 8
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: nutrient
+    nutrient: Zinc
+    action: monitor
+    amount: 0
+    unit: ''
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: OC_low_Nlow
+  description: OC=low + N=low
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: low
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 30
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: low
+- name: OC_low_Nmedium
+  description: OC=low + N=medium
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: low
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: OC_low_Nhigh
+  description: OC=low + N=high
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: low
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: OC_medium_Nlow
+  description: OC=medium + N=low
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: medium
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: OC_medium_Nmedium
+  description: OC=medium + N=medium
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: medium
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: OC_medium_Nhigh
+  description: OC=medium + N=high
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: medium
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: OC_high_Nlow
+  description: OC=high + N=low
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: high
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: OC_high_Nmedium
+  description: OC=high + N=medium
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: high
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: OC_high_Nhigh
+  description: OC=high + N=high
+  priority: 7
+  antecedents:
+  - var: Organic_Carbon
+    set: high
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Zinc_low_pH_acidic
+  description: Zinc=low + pH=acidic
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_soil
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Zinc_low_pH_neutral
+  description: Zinc=low + pH=neutral
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: low
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_soil
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Zinc_low_pH_alkaline
+  description: Zinc=low + pH=alkaline
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: low
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_foliar_spray
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: high
+- name: Zinc_medium_pH_acidic
+  description: Zinc=medium + pH=acidic
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: medium
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Zinc_medium_pH_neutral
+  description: Zinc=medium + pH=neutral
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: medium
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Zinc_medium_pH_alkaline
+  description: Zinc=medium + pH=alkaline
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: medium
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Zinc_high_pH_acidic
+  description: Zinc=high + pH=acidic
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: high
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: monitor
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Zinc_high_pH_neutral
+  description: Zinc=high + pH=neutral
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: high
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: monitor
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Zinc_high_pH_alkaline
+  description: Zinc=high + pH=alkaline
+  priority: 8
+  antecedents:
+  - var: Zinc
+    set: high
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: monitor
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_seedling_Nlow
+  description: Stage=seedling + N=low
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_seedling_Nmedium
+  description: Stage=seedling + N=medium
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_seedling_Nhigh
+  description: Stage=seedling + N=high
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_vegetative_Nlow
+  description: Stage=vegetative + N=low
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_vegetative_Nmedium
+  description: Stage=vegetative + N=medium
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_vegetative_Nhigh
+  description: Stage=vegetative + N=high
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_flowering_Nlow
+  description: Stage=flowering + N=low
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Stage_flowering_Nmedium
+  description: Stage=flowering + N=medium
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_flowering_Nhigh
+  description: Stage=flowering + N=high
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_maturity_Nlow
+  description: Stage=maturity + N=low
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_maturity_Nmedium
+  description: Stage=maturity + N=medium
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_maturity_Nhigh
+  description: Stage=maturity + N=high
+  priority: 7
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_low_Nlow
+  description: Yield=low + N=low
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: low
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 30
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: low
+- name: Yield_low_Nmedium
+  description: Yield=low + N=medium
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: low
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_low_Nhigh
+  description: Yield=low + N=high
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: low
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: review
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Yield_medium_Nlow
+  description: Yield=medium + N=low
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: medium
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_medium_Nmedium
+  description: Yield=medium + N=medium
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: medium
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_medium_Nhigh
+  description: Yield=medium + N=high
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: medium
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_high_Nlow
+  description: Yield=high + N=low
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: high
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_high_Nmedium
+  description: Yield=high + N=medium
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: high
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Yield_high_Nhigh
+  description: Yield=high + N=high
+  priority: 7
+  antecedents:
+  - var: Yield_Prediction
+    set: high
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Nlow_Plow_Klow_tri
+  description: N=low P=low K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Plow_Kmedium_tri
+  description: N=low P=low K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Plow_Khigh_tri
+  description: N=low P=low K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Klow_tri
+  description: N=low P=medium K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Kmedium_tri
+  description: N=low P=medium K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nlow_Pmedium_Khigh_tri
+  description: N=low P=medium K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nlow_Phigh_Klow_tri
+  description: N=low P=high K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nlow_Phigh_Kmedium_tri
+  description: N=low P=high K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nlow_Phigh_Khigh_tri
+  description: N=low P=high K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Klow_tri
+  description: N=medium P=low K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Kmedium_tri
+  description: N=medium P=low K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nmedium_Plow_Khigh_tri
+  description: N=medium P=low K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nmedium_Pmedium_Klow_tri
+  description: N=medium P=medium K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nmedium_Pmedium_Kmedium_tri
+  description: N=medium P=medium K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Nmedium_Pmedium_Khigh_tri
+  description: N=medium P=medium K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Nmedium_Phigh_Klow_tri
+  description: N=medium P=high K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nmedium_Phigh_Kmedium_tri
+  description: N=medium P=high K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Nmedium_Phigh_Khigh_tri
+  description: N=medium P=high K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Nhigh_Plow_Klow_tri
+  description: N=high P=low K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Nhigh_Plow_Kmedium_tri
+  description: N=high P=low K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nhigh_Plow_Khigh_tri
+  description: N=high P=low K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nhigh_Pmedium_Klow_tri
+  description: N=high P=medium K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nhigh_Pmedium_Kmedium_tri
+  description: N=high P=medium K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Nhigh_Pmedium_Khigh_tri
+  description: N=high P=medium K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Nhigh_Phigh_Klow_tri
+  description: N=high P=high K=low 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Nhigh_Phigh_Kmedium_tri
+  description: N=high P=high K=medium 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Nhigh_Phigh_Khigh_tri
+  description: N=high P=high K=high 3-factor
+  priority: 6
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rlow_Tcool
+  description: pH=acidic Rain=low Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rlow_Tmoderate
+  description: pH=acidic Rain=low Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rlow_Thot
+  description: pH=acidic Rain=low Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rmedium_Tcool
+  description: pH=acidic Rain=medium Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_acidic_Rmedium_Tmoderate
+  description: pH=acidic Rain=medium Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_acidic_Rmedium_Thot
+  description: pH=acidic Rain=medium Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rhigh_Tcool
+  description: pH=acidic Rain=high Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rhigh_Tmoderate
+  description: pH=acidic Rain=high Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_acidic_Rhigh_Thot
+  description: pH=acidic Rain=high Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rlow_Tcool
+  description: pH=neutral Rain=low Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rlow_Tmoderate
+  description: pH=neutral Rain=low Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rlow_Thot
+  description: pH=neutral Rain=low Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rmedium_Tcool
+  description: pH=neutral Rain=medium Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_neutral_Rmedium_Tmoderate
+  description: pH=neutral Rain=medium Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_neutral_Rmedium_Thot
+  description: pH=neutral Rain=medium Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rhigh_Tcool
+  description: pH=neutral Rain=high Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rhigh_Tmoderate
+  description: pH=neutral Rain=high Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_neutral_Rhigh_Thot
+  description: pH=neutral Rain=high Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rlow_Tcool
+  description: pH=alkaline Rain=low Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rlow_Tmoderate
+  description: pH=alkaline Rain=low Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rlow_Thot
+  description: pH=alkaline Rain=low Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: low
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rmedium_Tcool
+  description: pH=alkaline Rain=medium Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_alkaline_Rmedium_Tmoderate
+  description: pH=alkaline Rain=medium Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: pH_alkaline_Rmedium_Thot
+  description: pH=alkaline Rain=medium Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: medium
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rhigh_Tcool
+  description: pH=alkaline Rain=high Temp=cool
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rhigh_Tmoderate
+  description: pH=alkaline Rain=high Temp=moderate
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: pH_alkaline_Rhigh_Thot
+  description: pH=alkaline Rain=high Temp=hot
+  priority: 6
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  - var: Rainfall
+    set: high
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_N_low
+  description: N=low alone
+  priority: 5
+  antecedents:
+  - var: Nitrogen
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_N_medium
+  description: N=medium alone
+  priority: 5
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_N_high
+  description: N=high alone
+  priority: 5
+  antecedents:
+  - var: Nitrogen
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_P_low
+  description: P=low alone
+  priority: 5
+  antecedents:
+  - var: Phosphorus
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_P_medium
+  description: P=medium alone
+  priority: 5
+  antecedents:
+  - var: Phosphorus
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_P_high
+  description: P=high alone
+  priority: 5
+  antecedents:
+  - var: Phosphorus
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_K_low
+  description: K=low alone
+  priority: 5
+  antecedents:
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_K_medium
+  description: K=medium alone
+  priority: 5
+  antecedents:
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_K_high
+  description: K=high alone
+  priority: 5
+  antecedents:
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_pH_acidic
+  description: pH=acidic alone
+  priority: 5
+  antecedents:
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_pH_neutral
+  description: pH=neutral alone
+  priority: 5
+  antecedents:
+  - var: Soil_pH
+    set: neutral
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_pH_alkaline
+  description: pH=alkaline alone
+  priority: 5
+  antecedents:
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_Rain_low
+  description: Rain=low alone
+  priority: 5
+  antecedents:
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: Single_Rain_medium
+  description: Rain=medium alone
+  priority: 5
+  antecedents:
+  - var: Rainfall
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Rain_high
+  description: Rain=high alone
+  priority: 5
+  antecedents:
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: Single_Temp_cool
+  description: Temp=cool alone
+  priority: 5
+  antecedents:
+  - var: Temperature_Max
+    set: cool
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_Temp_moderate
+  description: Temp=moderate alone
+  priority: 5
+  antecedents:
+  - var: Temperature_Max
+    set: moderate
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Temp_hot
+  description: Temp=hot alone
+  priority: 5
+  antecedents:
+  - var: Temperature_Max
+    set: hot
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Single_Zinc_low
+  description: Zinc=low alone
+  priority: 5
+  antecedents:
+  - var: Zinc
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_foliar_spray
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_Zinc_medium
+  description: Zinc=medium alone
+  priority: 5
+  antecedents:
+  - var: Zinc
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Zinc_high
+  description: Zinc=high alone
+  priority: 5
+  antecedents:
+  - var: Zinc
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: monitor
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_OC_low
+  description: OC=low alone
+  priority: 5
+  antecedents:
+  - var: Organic_Carbon
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Single_OC_medium
+  description: OC=medium alone
+  priority: 5
+  antecedents:
+  - var: Organic_Carbon
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_OC_high
+  description: OC=high alone
+  priority: 5
+  antecedents:
+  - var: Organic_Carbon
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Stage_seedling
+  description: Stage=seedling alone
+  priority: 5
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Stage_vegetative
+  description: Stage=vegetative alone
+  priority: 5
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Stage_flowering
+  description: Stage=flowering alone
+  priority: 5
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Stage_maturity
+  description: Stage=maturity alone
+  priority: 5
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Single_Yield_low
+  description: Yield=low alone
+  priority: 5
+  antecedents:
+  - var: Yield_Prediction
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Single_Yield_medium
+  description: Yield=medium alone
+  priority: 5
+  antecedents:
+  - var: Yield_Prediction
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Single_Yield_high
+  description: Yield=high alone
+  priority: 5
+  antecedents:
+  - var: Yield_Prediction
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: Stage_seedling_Plow
+  description: Stage=seedling + P=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Phosphorus
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_seedling_Phigh
+  description: Stage=seedling + P=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Phosphorus
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_vegetative_Plow
+  description: Stage=vegetative + P=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Phosphorus
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_vegetative_Phigh
+  description: Stage=vegetative + P=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Phosphorus
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_flowering_Plow
+  description: Stage=flowering + P=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Phosphorus
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_flowering_Phigh
+  description: Stage=flowering + P=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Phosphorus
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_maturity_Plow
+  description: Stage=maturity + P=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Phosphorus
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_maturity_Phigh
+  description: Stage=maturity + P=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Phosphorus
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_seedling_Klow
+  description: Stage=seedling + K=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_seedling_Khigh
+  description: Stage=seedling + K=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: seedling
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_vegetative_Klow
+  description: Stage=vegetative + K=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_vegetative_Khigh
+  description: Stage=vegetative + K=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: vegetative
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_flowering_Klow
+  description: Stage=flowering + K=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_flowering_Khigh
+  description: Stage=flowering + K=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: flowering
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: Stage_maturity_Klow
+  description: Stage=maturity + K=low
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 20
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Stage_maturity_Khigh
+  description: Stage=maturity + K=high
+  priority: 6
+  antecedents:
+  - var: Growth_Stage
+    set: maturity
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 10
+    unit: '%'
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: medium
+- name: OC_low_pH_acidic
+  description: OC=low + pH=acidic
+  priority: 6
+  antecedents:
+  - var: Organic_Carbon
+    set: low
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: OC_low_pH_alkaline
+  description: OC=low + pH=alkaline
+  priority: 6
+  antecedents:
+  - var: Organic_Carbon
+    set: low
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: OC_high_pH_acidic
+  description: OC=high + pH=acidic
+  priority: 6
+  antecedents:
+  - var: Organic_Carbon
+    set: high
+  - var: Soil_pH
+    set: acidic
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: OC_high_pH_alkaline
+  description: OC=high + pH=alkaline
+  priority: 6
+  antecedents:
+  - var: Organic_Carbon
+    set: high
+  - var: Soil_pH
+    set: alkaline
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: Zinc_low_Rain_low
+  description: Zinc low + Rain=low
+  priority: 6
+  antecedents:
+  - var: Zinc
+    set: low
+  - var: Rainfall
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_foliar_spray
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: medium
+- name: Zinc_low_Rain_high
+  description: Zinc low + Rain=high
+  priority: 6
+  antecedents:
+  - var: Zinc
+    set: low
+  - var: Rainfall
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Zinc
+    action: apply_foliar_spray
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: medium
+- name: All_Optimal_NP_Kmedium
+  description: All N,P medium, K medium
+  priority: 3
+  antecedents:
+  - var: Nitrogen
+    set: medium
+  - var: Phosphorus
+    set: medium
+  - var: Potassium
+    set: medium
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Phosphorus
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: nutrient
+    nutrient: Potassium
+    action: maintain
+    amount: 0
+    unit: ''
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: medium
+  - type: adjustment
+    var: Potash_Adjustment
+    set: medium
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: medium
+  - type: risk
+    level: low
+  - type: confidence
+    level: high
+- name: All_High_NPK
+  description: 'All N,P,K high: reduce all'
+  priority: 4
+  antecedents:
+  - var: Nitrogen
+    set: high
+  - var: Phosphorus
+    set: high
+  - var: Potassium
+    set: high
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: reduce
+    amount: 20
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: reduce
+    amount: 15
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: low
+  - type: adjustment
+    var: Potash_Adjustment
+    set: low
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: low
+  - type: risk
+    level: medium
+  - type: confidence
+    level: high
+- name: All_Low_NPK
+  description: 'All N,P,K low: emergency boost'
+  priority: 10
+  antecedents:
+  - var: Nitrogen
+    set: low
+  - var: Phosphorus
+    set: low
+  - var: Potassium
+    set: low
+  consequents:
+  - type: nutrient
+    nutrient: Nitrogen
+    action: increase
+    amount: 30
+    unit: '%'
+  - type: nutrient
+    nutrient: Phosphorus
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: nutrient
+    nutrient: Potassium
+    action: increase
+    amount: 25
+    unit: '%'
+  - type: adjustment
+    var: Nitrogen_Adjustment
+    set: high
+  - type: adjustment
+    var: Potash_Adjustment
+    set: high
+  - type: adjustment
+    var: Irrigation_Adjustment
+    set: medium
+  - type: adjustment
+    var: Dose_Adjustment
+    set: high
+  - type: risk
+    level: high
+  - type: confidence
+    level: low
