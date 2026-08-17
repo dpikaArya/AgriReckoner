@@ -1,0 +1,4 @@
+Feature,Importance,Target
+Plant_Height_90_cm,0.4949,Plant_Height_cm
+Plant_Height_30_cm,0.4676,Plant_Height_cm
+Soil_pH,0.0374,Plant_Height_cm

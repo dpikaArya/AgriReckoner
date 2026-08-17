@@ -1,0 +1,447 @@
+﻿Column,Data_Type,Unique_Values,Missing_Count,Missing_Pct,Sample_Values
+Paper_ID,str,45,0,0.0,"['Paper002', 'PAPER/50624db1', 'PAPER/25d2522c', 'PAPER/524e7c84', 'PAPER/65af36a2']"
+DOI,object,0,66,100.0,[]
+Journal,object,0,66,100.0,[]
+Year,object,0,66,100.0,[]
+Authors,object,0,66,100.0,[]
+Country,str,1,50,75.76,['India']
+Title,object,0,66,100.0,[]
+Institution,object,0,66,100.0,[]
+Crop,str,5,0,0.0,"['Bell pepper', 'Black Wheat', 'Carrot', 'Gram', 'Spinach']"
+Scientific_Name,object,0,66,100.0,[]
+Variety,str,3,42,63.64,"['Namdhari', 'Lalbadshah', 'Green Vatika']"
+Season,str,1,50,75.76,['Sep2022-May2023']
+Growth_Duration_Days,str,1,58,87.88,['120 DAS']
+Growth_Stage,object,0,66,100.0,[]
+Cover_Crop,object,0,66,100.0,[]
+Previous_Crop,object,0,66,100.0,[]
+Intercrop_Name,object,0,66,100.0,[]
+Design,str,1,50,75.76,['RCBD']
+Replications,float64,1,42,63.64,[3.0]
+Plot_Size,float64,1,50,75.76,[8.0]
+Spacing_Row,float64,1,58,87.88,[50.0]
+Spacing_Plant,float64,1,58,87.88,[5.0]
+Sample_Size,object,0,66,100.0,[]
+Location,str,1,50,75.76,['Haridwar']
+State,str,1,50,75.76,['Uttarakhand']
+Location_1,object,0,66,100.0,[]
+Plot_ID,object,0,66,100.0,[]
+Block,object,0,66,100.0,[]
+Experiment_Objective,object,0,66,100.0,[]
+Sowing_Date,object,0,66,100.0,[]
+Harvest_Date,object,0,66,100.0,[]
+Latitude,float64,1,50,75.76,[29.9136]
+Longitude,float64,1,50,75.76,[77.9975]
+Altitude,object,0,66,100.0,[]
+Temperature_Max,float64,2,0,0.0,"[27.0, 32.0]"
+Temperature_Min,float64,2,0,0.0,"[7.0, 21.0]"
+Average_Temperature,float64,1,0,0.0,[26.5]
+Rainfall,float64,2,0,0.0,"[16.5, 1000.0]"
+Humidity,float64,2,0,0.0,"[65.0, 60.0]"
+Solar_Radiation,object,0,66,100.0,[]
+Wind_Speed,object,0,66,100.0,[]
+ET0,object,0,66,100.0,[]
+Climate_Zone,object,0,66,100.0,[]
+Soil_pH,float64,7,0,0.0,"[6.75, 7.2, 7.0, 6.8, 6.6]"
+EC,float64,0,66,100.0,[]
+Organic_Carbon,float64,5,0,0.0,"[1.0, 0.25, 0.3, 0.55, 0.35]"
+Organic_Matter,float64,10,44,66.67,"[3.58, 3.27, 3.08, 2.99, 1.9]"
+Nitrogen,float64,7,0,0.0,"[150.0, 370.0, 410.0, 390.0, 360.0]"
+Phosphorus,float64,7,0,0.0,"[23.5, 5.0, 22.0, 23.0, 10.0]"
+Potassium,float64,1,0,0.0,[200.0]
+Sulphur,float64,10,44,66.67,"[1.14, 1.9, 2.22, 1.33, 1.88]"
+Iron,float64,10,44,66.67,"[23.7, 24.29, 24.78, 24.9, 22.22]"
+Copper,float64,9,44,66.67,"[0.64, 1.06, 0.91, 0.93, 0.79]"
+Manganese,float64,10,44,66.67,"[1.88, 1.7, 2.41, 3.01, 2.51]"
+Zinc,float64,7,44,66.67,"[1.33, 1.18, 1.07, 1.0, 1.17]"
+Calcium,object,0,66,100.0,[]
+Magnesium,object,0,66,100.0,[]
+Boron,object,0,66,100.0,[]
+Molybdenum,object,0,66,100.0,[]
+Sodium,object,0,66,100.0,[]
+Chlorine,object,0,66,100.0,[]
+CEC,object,0,66,100.0,[]
+Soil_Bulk_Density,object,0,66,100.0,[]
+Soil_Clay_Pct,object,0,66,100.0,[]
+Soil_Silt_Pct,object,0,66,100.0,[]
+Soil_Sand_Pct,object,0,66,100.0,[]
+Soil_Texture,object,0,66,100.0,[]
+Soil_Class,object,0,66,100.0,[]
+Soil_Depth_cm,object,0,66,100.0,[]
+Treatment,str,21,0,0.0,"['T0', 'T1', 'T2', 'T3', 'T4']"
+Fertilizer_Name,str,8,50,75.76,"['Control', 'Jaivik Prom', 'Pori Potash', 'Dharti ka Chaukidar', 'Jaivik Poshak']"
+Organic_Fertilizer,object,0,66,100.0,[]
+Biofertilizer,object,0,66,100.0,[]
+Dose,float64,5,48,72.73,"[0.0, 100.0, 10.0, 7.0, 80.0]"
+Application_Method,object,0,66,100.0,[]
+Application_Interval,object,0,66,100.0,[]
+Fertilizer_Calcium,object,0,66,100.0,[]
+Fertilizer_Magnesium,object,0,66,100.0,[]
+Fertilizer_Boron,object,0,66,100.0,[]
+Fertilizer_Chlorine,object,0,66,100.0,[]
+Fertilizer_Molybdenum,object,0,66,100.0,[]
+Shoot_Length_cm,float64,16,38,57.58,"[72.444, 77.444, 81.556, 78.0, 77.0]"
+Root_Length_cm,float64,14,38,57.58,"[12.556, 13.333, 13.778, 14.222, 14.333]"
+Plant_Height_cm,float64,3,63,95.45,"[17.03, 21.67, 24.21]"
+Shoot_Biomass_g,float64,16,38,57.58,"[6.274, 9.544, 10.292, 11.713, 10.388]"
+Root_Biomass_g,float64,16,38,57.58,"[1.071, 1.349, 1.209, 1.792, 1.539]"
+Leaf_Area_cm2,float64,19,35,53.03,"[41.38, 47.823, 49.747, 53.533, 54.62]"
+Leaf_Number,float64,7,58,87.88,"[4.556, 6.0, 5.889, 5.556, 4.778]"
+Tillers,float64,7,46,69.7,"[3.778, 4.0, 4.333, 5.333, 4.556]"
+Root_Diameter_mm,float64,8,58,87.88,"[24.787, 28.754, 27.334, 25.318, 26.469]"
+SPAD,float64,8,46,69.7,"[45.889, 47.778, 52.489, 49.911, 52.878]"
+Moisture_Content,object,0,66,100.0,[]
+Dry_Matter,float64,5,60,90.91,"[7.0, 14.0, 13.0, 12.0, 11.0]"
+Stem_Diameter_mm,object,0,66,100.0,[]
+Branches,float64,7,58,87.88,"[5.0, 5.467, 5.4, 5.2, 5.067]"
+Nodes,object,0,66,100.0,[]
+Flowers,float64,7,58,87.88,"[13.867, 13.467, 12.267, 15.333, 18.583]"
+Plant_Height_30_cm,float64,8,58,87.88,"[10.6, 14.8, 12.0, 11.4, 13.733]"
+Plant_Height_60_cm,float64,8,58,87.88,"[21.133, 24.533, 23.2, 23.667, 24.067]"
+Plant_Height_90_cm,float64,8,58,87.88,"[29.267, 37.2, 31.8, 32.8, 38.8]"
+Plant_Height_120_cm,float64,8,58,87.88,"[36.0, 43.933, 38.8, 37.533, 45.733]"
+Leaf_Area_30_cm2,float64,8,58,87.88,"[12.61, 19.241, 14.253, 17.99, 17.125]"
+Leaf_Area_60_cm2,float64,8,58,87.88,"[23.212, 35.863, 36.04, 29.447, 32.58]"
+Leaf_Area_90_cm2,float64,8,58,87.88,"[31.55, 39.317, 40.833, 40.973, 38.633]"
+Leaf_Area_120_cm2,float64,8,58,87.88,"[36.943, 52.94, 53.303, 44.097, 38.579]"
+Branches_60,object,0,66,100.0,[]
+Branches_90,object,0,66,100.0,[]
+Flowers_60,object,0,66,100.0,[]
+Yield_per_Plot,float64,8,58,87.88,"[724.96, 960.173, 999.423, 1359.49, 1723.027]"
+Yield_per_Acre,float64,8,58,87.88,"[366726.45320000005, 485710.7133475, 505565.6202225, 687708.2126750001, 871606.1306525001]"
+Yield_per_Hectare,float64,8,58,87.88,"[906200.0, 1200216.25, 1249278.75, 1699362.5, 2153783.75]"
+Fruit_Number,object,0,66,100.0,[]
+Fruit_Weight,float64,8,58,87.88,"[36.514, 63.152, 63.456, 55.54, 50.042]"
+Fruit_Diameter_mm,float64,8,58,87.88,"[2.0856, 2.445, 2.459, 2.381, 2.058]"
+Spike_Length,float64,10,46,69.7,"[7.433, 8.533, 8.467, 8.556, 8.989]"
+Seeds_per_Spike,float64,9,46,69.7,"[40.889, 51.444, 46.667, 49.778, 51.667]"
+100_Seed_Weight,float64,10,46,69.7,"[4.03, 4.81, 4.32, 4.54, 4.24]"
+Root_Biomass_g_1,object,0,66,100.0,[]
+Pod_Weight,object,0,66,100.0,[]
+Harvest_Index,object,0,66,100.0,[]
+Biomass_Yield,float64,16,38,57.58,"[7.345, 10.893, 11.501, 13.504999999999999, 11.927]"
+FruitWeight_90_g,object,0,66,100.0,[]
+FruitWeight_120_g,object,0,66,100.0,[]
+FruitDiameter_90_mm,object,0,66,100.0,[]
+FruitDiameter_120_mm,object,0,66,100.0,[]
+YieldPlot_90_g,object,0,66,100.0,[]
+YieldPlot_120_g,object,0,66,100.0,[]
+Yield_13pct_Moisture,object,0,66,100.0,[]
+Marketable_Yield,object,0,66,100.0,[]
+Biological_Yield,object,0,66,100.0,[]
+Stover_Yield,object,0,66,100.0,[]
+Seed_Yield,object,0,66,100.0,[]
+Pods_Number,object,0,66,100.0,[]
+Seeds_per_Pod,object,0,66,100.0,[]
+Weed_Biomass,object,0,66,100.0,[]
+Protein,object,0,66,100.0,[]
+Ash,float64,6,58,87.88,"[1.31, 2.2, 2.5, 2.6, 2.8]"
+Gluten,object,0,66,100.0,[]
+Fiber,object,0,66,100.0,[]
+Carbohydrates,object,0,66,100.0,[]
+Fat,object,0,66,100.0,[]
+Nitrogen_Content,object,0,66,100.0,[]
+Phosphorus_Content,object,0,66,100.0,[]
+Potassium_Content,object,0,66,100.0,[]
+Iron_1,object,0,66,100.0,[]
+Copper_1,object,0,66,100.0,[]
+Zinc_1,object,0,66,100.0,[]
+Manganese_1,object,0,66,100.0,[]
+Sulphur_1,object,0,66,100.0,[]
+Calcium_1,object,0,66,100.0,[]
+Magnesium_1,object,0,66,100.0,[]
+Boron_1,object,0,66,100.0,[]
+Chlorine_Content,object,0,66,100.0,[]
+Molybdenum_Content,object,0,66,100.0,[]
+Starch,object,0,66,100.0,[]
+Oil,object,0,66,100.0,[]
+Target_Yield,object,0,66,100.0,[]
+Target_Fertilizer,object,0,66,100.0,[]
+Target_Nitrogen,object,0,66,100.0,[]
+Target_Phosphorus,object,0,66,100.0,[]
+Target_Potassium,object,0,66,100.0,[]
+Growing_Degree_Days,object,0,66,100.0,[]
+Heat_Units,object,0,66,100.0,[]
+Harvest_Index_Calc,object,0,66,100.0,[]
+Nitrogen_Use_Efficiency,object,0,66,100.0,[]
+Water_Use_Efficiency,object,0,66,100.0,[]
+Rainfall_Anomaly,object,0,66,100.0,[]
+Stress_Index,object,0,66,100.0,[]
+Disease_Risk_Index,object,0,66,100.0,[]
+Yield_per_Plant,float64,8,58,87.88,"[5799.68, 7681.384, 7995.384, 10875.92, 13784.216]"
+Yield_per_Plot_Calc,object,0,66,100.0,[]
+Yield_per_Hectare_Calc,object,0,66,100.0,[]
+Temp_x_Rainfall,object,0,66,100.0,[]
+N_x_P,float64,8,58,87.88,"[1850.0, 9020.0, 8970.0, 1950.0, 3600.0]"
+Temp_squared,object,0,66,100.0,[]
+Rainfall_7d_MA,object,0,66,100.0,[]
+Temp_7d_MA,object,0,66,100.0,[]
+Feature_Available_Before_Prediction,object,0,66,100.0,[]
+Crop_Code,object,0,66,100.0,[]
+Season_Code,object,0,66,100.0,[]
+Variety_Code,object,0,66,100.0,[]
+Fertilizer_Code,object,0,66,100.0,[]
+Soil_Texture_Code,object,0,66,100.0,[]
+Country_Code,object,0,66,100.0,[]
+Predicted_Yield,object,0,66,100.0,[]
+Expected_Biomass,object,0,66,100.0,[]
+Expected_Plant_Height,object,0,66,100.0,[]
+Recommended_Fertilizer,object,0,66,100.0,[]
+Recommended_Dose,object,0,66,100.0,[]
+Recommended_Application_Interval,object,0,66,100.0,[]
+Expected_Yield_Increase,object,0,66,100.0,[]
+Confidence_Score,object,0,66,100.0,[]
+Recommendation_Summary,object,0,66,100.0,[]
+SOC_Mineralization,object,0,66,100.0,[]
+Residue_C_Decomposition,object,0,66,100.0,[]
+Potential_Evapotranspiration,object,0,66,100.0,[]
+Soil_Moisture,object,0,66,100.0,[]
+Soil_Nitrate_N,object,0,66,100.0,[]
+Soil_Ammonium_N,object,0,66,100.0,[]
+Soil_Available_K,object,0,66,100.0,[]
+Soil_POC,object,0,66,100.0,[]
+Soil_DOC,object,0,66,100.0,[]
+Soil_LOC,object,0,66,100.0,[]
+Soil_MBC,object,0,66,100.0,[]
+Soil_MBN,object,0,66,100.0,[]
+Soil_Carbon_Walkley_Black,object,0,66,100.0,[]
+Soil_Nitrogen_Kjeldahl,object,0,66,100.0,[]
+Soil_Nitrogen_Alkaline_Permanganate,object,0,66,100.0,[]
+Soil_Sulphur_Available,object,0,66,100.0,[]
+Soil_Sulphur_Mehlich3,object,0,66,100.0,[]
+Soil_NO3,object,0,66,100.0,[]
+Soil_NH4,object,0,66,100.0,[]
+Soil_N_Parco2020,object,0,66,100.0,[]
+Soil_N_DeSilva2008,object,0,66,100.0,[]
+Soil_Ca_Ammonium_Acetate,object,0,66,100.0,[]
+Soil_Mg_Ammonium_Acetate,object,0,66,100.0,[]
+Soil_K_Ammonium_Acetate,object,0,66,100.0,[]
+Soil_Glucosidase,object,0,66,100.0,[]
+Soil_Xylosidase,object,0,66,100.0,[]
+Soil_Cellobiosidase,object,0,66,100.0,[]
+Beta_Glucosidase,object,0,66,100.0,[]
+Peroxidase,object,0,66,100.0,[]
+Polyphenol_Oxidase,object,0,66,100.0,[]
+N_Acetyl_Glucosaminidase,object,0,66,100.0,[]
+Leucine_Aminopeptidase,object,0,66,100.0,[]
+Phosphatase,object,0,66,100.0,[]
+Catalase,object,0,66,100.0,[]
+Urease,object,0,66,100.0,[]
+Dehydrogenase,object,0,66,100.0,[]
+Bacterial_Diversity_Chao1,object,0,66,100.0,[]
+Bacterial_Diversity_Shannon,object,0,66,100.0,[]
+Fungal_Diversity_Chao1,object,0,66,100.0,[]
+Fungal_Diversity_Shannon,object,0,66,100.0,[]
+Total_PLFAs,object,0,66,100.0,[]
+Gram_Positive_PLFAs,object,0,66,100.0,[]
+Gram_Negative_PLFAs,object,0,66,100.0,[]
+Fungal_PLFAs,object,0,66,100.0,[]
+Bacterial_PLFAs,object,0,66,100.0,[]
+Actinomycetes_PLFAs,object,0,66,100.0,[]
+NDVI,object,0,66,100.0,[]
+EVI,object,0,66,100.0,[]
+SAVI,object,0,66,100.0,[]
+NDWI,object,0,66,100.0,[]
+NDRE,object,0,66,100.0,[]
+Canopy_Temperature,object,0,66,100.0,[]
+CIG,object,0,66,100.0,[]
+CIRE,object,0,66,100.0,[]
+Calcium_Mehlich3,object,0,66,100.0,[]
+Calcium_Saturation,object,0,66,100.0,[]
+Magnesium_Saturation,object,0,66,100.0,[]
+Sodium_Saturation,object,0,66,100.0,[]
+Potassium_Saturation,object,0,66,100.0,[]
+Hydrogen_Saturation,object,0,66,100.0,[]
+Water_Extractable_Nitrate,object,0,66,100.0,[]
+Water_Extractable_Organic_Carbon,object,0,66,100.0,[]
+Water_Extractable_Organic_Nitrogen,object,0,66,100.0,[]
+Water_Extractable_NH4,object,0,66,100.0,[]
+Water_Extractable_CN_Ratio,object,0,66,100.0,[]
+Aggregate_Stability,object,0,66,100.0,[]
+Soil_Respiration,object,0,66,100.0,[]
+Infiltration_Rate,object,0,66,100.0,[]
+Nematode_Maturity_Index,object,0,66,100.0,[]
+Nematode_Plant_Parasitic_Index,object,0,66,100.0,[]
+Nematode_Channel_Index,object,0,66,100.0,[]
+Nematode_Basal_Index,object,0,66,100.0,[]
+Nematode_Enrichment_Index,object,0,66,100.0,[]
+Nematode_Structure_Index,object,0,66,100.0,[]
+Nematode_Total_Biomass_mg,object,0,66,100.0,[]
+Total_Cost,object,0,66,100.0,[]
+Total_Return,object,0,66,100.0,[]
+Net_Profit,object,0,66,100.0,[]
+Benefit_Cost_Ratio,object,0,66,100.0,[]
+System_Benefit_USD_ha,object,0,66,100.0,[]
+Off_Season_Contribution_Pct,object,0,66,100.0,[]
+System_Water_Use_Efficiency,object,0,66,100.0,[]
+Phosphorus_Uptake,object,0,66,100.0,[]
+Nitrogen_Uptake,object,0,66,100.0,[]
+Potassium_Uptake,object,0,66,100.0,[]
+Sulphur_Uptake,object,0,66,100.0,[]
+Calcium_Uptake,object,0,66,100.0,[]
+Magnesium_Uptake,object,0,66,100.0,[]
+Boron_Uptake,object,0,66,100.0,[]
+Chlorine_Uptake,object,0,66,100.0,[]
+Copper_Uptake,object,0,66,100.0,[]
+Iron_Uptake,object,0,66,100.0,[]
+Manganese_Uptake,object,0,66,100.0,[]
+Molybdenum_Uptake,object,0,66,100.0,[]
+Zinc_Uptake,object,0,66,100.0,[]
+Irrigation_Method,object,0,66,100.0,[]
+Irrigation_mm,object,0,66,100.0,[]
+Sowing_Density,object,0,66,100.0,[]
+Harvest_Density,object,0,66,100.0,[]
+Cultivation_Method,object,0,66,100.0,[]
+N_Fixation,object,0,66,100.0,[]
+Soil_pH_CaCl2,object,0,66,100.0,[]
+Soil_pH_KCl,object,0,66,100.0,[]
+_source_file,str,5,0,0.0,"['BellPepper_Master_Dataset.xlsx', 'BlackWheat_Master_Dataset.xlsx', 'Carrot_Master_Dataset.xlsx', 'Gram_Master_Dataset.xlsx', 'Spinach_Master dataset.xlsx']"
+dataset_id,str,1,0,0.0,['addbe466e94a42d6']
+provider,str,1,0,0.0,['pipeline_input']
+document_type,str,1,0,0.0,['tabular']
+normalized_at,str,1,0,0.0,['2026-07-29T13:43:29.000042']
+_extraction_method,str,1,0,0.0,['dataframe_passthrough']
+Source_File,object,0,66,100.0,[]
+Table_Type,object,0,66,100.0,[]
+Is_Control,object,0,66,100.0,[]
+Dose_Value,object,0,66,100.0,[]
+Dose_Unit,object,0,66,100.0,[]
+Dose_Per,object,0,66,100.0,[]
+Crop_Yield_Min,float64,2,50,75.76,"[8.0, 5.0]"
+Crop_Yield_Max,float64,2,50,75.76,"[35.0, 20.0]"
+Crop_Opt_Temp_Min,float64,2,50,75.76,"[15.0, 10.0]"
+Crop_Opt_Temp_Max,float64,1,50,75.76,[22.0]
+Crop_Opt_Rain_Min,float64,1,50,75.76,[400.0]
+Crop_Opt_Rain_Max,float64,1,50,75.76,[600.0]
+Crop_Yield_Unit,str,2,0,0.0,"['', 't/ha']"
+Yield_Lower_Bound,float64,2,50,75.76,"[8.0, 5.0]"
+Yield_Upper_Bound,float64,2,50,75.76,"[35.0, 20.0]"
+Optimal_pH_Min,float64,1,0,0.0,[5.5]
+Optimal_pH_Max,float64,1,0,0.0,[7.0]
+N_Status,str,1,0,0.0,['high']
+P_Status,str,2,0,0.0,"['medium', 'low']"
+K_Status,str,1,0,0.0,['medium']
+Fertilizer_NPK,str,3,0,0.0,"['0-0-0', '0-0-15', '3-2-2']"
+Fertilizer_Type,str,2,0,0.0,"['unknown', 'organic']"
+Dataset_ID,str,45,0,0.0,"['Paper002', 'PAPER/50624db1', 'PAPER/25d2522c', 'PAPER/524e7c84', 'PAPER/65af36a2']"
+Document_ID,str,45,0,0.0,"['Paper002/doc/0', 'PAPER/50624db1/doc/0', 'PAPER/25d2522c/doc/0', 'PAPER/524e7c84/doc/0', 'PAPER/65af36a2/doc/0']"
+Experiment_ID,str,45,0,0.0,"['Paper002/exp/Haridwar_Uttarakhand_Sep2022-May2023_RCBD_Bell pepper', 'PAPER/50624db1/exp/Black Wheat', 'PAPER/25d2522c/exp/Black Wheat', 'PAPER/524e7c84/exp/Black Wheat', 'PAPER/65af36a2/exp/Black Wheat']"
+Treatment_ID,str,66,0,0.0,"['Paper002/exp/Haridwar_Uttarakhand_Sep2022-May2023_RCBD_Bell pepper/trt/T0_Control_0.0_Namdhari', 'Paper002/exp/Haridwar_Uttarakhand_Sep2022-May2023_RCBD_Bell pepper/trt/T1_Jaivik Prom_100.0_Namdhari', 'Paper002/exp/Haridwar_Uttarakhand_Sep2022-May2023_RCBD_Bell pepper/trt/T2_Pori Potash_100.0_Namdhari', 'Paper002/exp/Haridwar_Uttarakhand_Sep2022-May2023_RCBD_Bell pepper/trt/T3_Dharti ka Chaukidar_10.0_Namdhari', 'Paper002/exp/Haridwar_Uttarakhand_Sep2022-May2023_RCBD_Bell pepper/trt/T4_Jaivik Poshak_7.0_Namdhari']"
+Observation_ID,str,66,0,0.0,"['OBS/e74596964e73', 'OBS/2523fc2b2569', 'OBS/dbd41118923d', 'OBS/cb144ef6cfdd', 'OBS/d185016c58f9']"
+_replicates,int64,2,0,0.0,"[2, 1]"
+Temp_Range,float64,2,0,0.0,"[20.0, 11.0]"
+Temp_CV,float64,2,0,0.0,"[1.1764705882352942, 0.41509433962264153]"
+Temp_Above_10,float64,2,0,0.0,"[7.0, 16.5]"
+Temp_Above_15,float64,2,0,0.0,"[2.0, 11.5]"
+Temp_Above_20,float64,2,0,0.0,"[0.0, 6.5]"
+Temp_Above_25,float64,2,0,0.0,"[0.0, 1.5]"
+Temp_Above_30,float64,1,0,0.0,[0.0]
+Temp_Above_35,float64,1,0,0.0,[0.0]
+Rainfall_log,float64,2,0,0.0,"[2.8622008809294686, 6.90875477931522]"
+Rainfall_sqrt,float64,2,0,0.0,"[4.06201920231798, 31.622776601683793]"
+Rainfall_squared,float64,2,0,0.0,"[272.25, 1000000.0]"
+Rainfall_Bin,float64,2,0,0.0,"[0.0, 2.0]"
+Rainfall_100_bin,float64,2,0,0.0,"[0.0, 1000.0]"
+N_log,float64,7,0,0.0,"[5.017279836814924, 5.916202062607435, 6.018593214496234, 5.968707559985366, 5.8888779583328805]"
+N_sqrt,float64,7,0,0.0,"[12.24744871391589, 19.235384061671343, 20.248456731316587, 19.748417658131498, 18.973665961010276]"
+N_squared,float64,7,0,0.0,"[22500.0, 136900.0, 168100.0, 152100.0, 129600.0]"
+N_category,float64,2,0,0.0,"[0.0, 4.0]"
+P_log,float64,7,0,0.0,"[3.1986731175506815, 1.791759469228055, 3.1354942159291497, 3.1780538303479458, 2.3978952727983707]"
+P_squared,float64,7,0,0.0,"[552.25, 25.0, 484.0, 529.0, 100.0]"
+P_category,float64,3,0,0.0,"[4.0, 0.0, 1.0]"
+K_log,float64,1,0,0.0,[5.303304908059076]
+K_squared,float64,1,0,0.0,[40000.0]
+K_category,float64,1,0,0.0,[2.0]
+NPK_sum,float64,9,0,0.0,"[373.5, 575.0, 632.0, 613.0, 595.0]"
+NPK_ratio_N,float64,9,0,0.0,"[0.40160642570281124, 0.6434782608695652, 0.6487341772151899, 0.636215334420881, 0.6554621848739496]"
+NPK_ratio_P,float64,9,0,0.0,"[0.06291834002677377, 0.008695652173913044, 0.03481012658227848, 0.037520391517128875, 0.008403361344537815]"
+NPK_ratio_K,float64,9,0,0.0,"[0.535475234270415, 0.34782608695652173, 0.31645569620253167, 0.3262642740619902, 0.33613445378151263]"
+N_x_K,float64,7,0,0.0,"[30000.0, 74000.0, 82000.0, 78000.0, 72000.0]"
+P_x_K,float64,7,0,0.0,"[4700.0, 1000.0, 4400.0, 4600.0, 2000.0]"
+N_plus_P,float64,9,0,0.0,"[173.5, 375.0, 432.0, 413.0, 395.0]"
+N_plus_K,float64,7,0,0.0,"[350.0, 570.0, 610.0, 590.0, 560.0]"
+P_plus_K,float64,7,0,0.0,"[223.5, 205.0, 222.0, 223.0, 210.0]"
+Soil_pH_squared,float64,7,0,0.0,"[45.5625, 51.84, 49.0, 46.239999999999995, 43.559999999999995]"
+Soil_pH_neutral,float64,6,0,0.0,"[0.25, 0.20000000000000018, 0.0, 0.40000000000000036, 0.7999999999999998]"
+Soil_pH_acidic,int64,2,0,0.0,"[0, 1]"
+Soil_pH_alkaline,int64,1,0,0.0,[0]
+OC_log,float64,5,0,0.0,"[0.6931471805599453, 0.22314355131420976, 0.262364264467491, 0.4382549309311553, 0.3001045924503381]"
+OC_squared,float64,5,0,0.0,"[1.0, 0.0625, 0.09, 0.30250000000000005, 0.12249999999999998]"
+C_N_ratio,float64,9,0,0.0,"[0.006666666666666667, 0.0006756756756756757, 0.0007317073170731707, 0.0014102564102564104, 0.0007692307692307692]"
+N_P_ratio,float64,9,0,0.0,"[6.382978723404255, 74.0, 18.636363636363637, 16.956521739130434, 78.0]"
+P_K_ratio,float64,7,0,0.0,"[0.1175, 0.025, 0.11, 0.115, 0.05]"
+Biomass_log,float64,16,38,57.58,"[2.1216625571137984, 2.475949991745108, 2.525808641108426, 2.6744934175733674, 2.5593181473018105]"
+Biomass_sqrt,float64,16,38,57.58,"[2.7101660465735304, 3.3004545141540733, 3.3913124303136684, 3.6749149650025914, 3.453548899320813]"
+Biomass_squared,float64,16,38,57.58,"[53.949025, 118.65744900000001, 132.273001, 182.38502499999998, 142.25332899999998]"
+Humidity_squared,float64,2,0,0.0,"[4225.0, 3600.0]"
+Humidity_log,float64,2,0,0.0,"[4.189654742026425, 4.110873864173311]"
+Height_log,float64,3,63,95.45,"[2.8920370372152258, 3.1210424645194377, 3.2272407411998283]"
+Height_sqrt,float64,3,63,95.45,"[4.12674205639267, 4.655104724922953, 4.920365840057018]"
+Height_squared,float64,3,63,95.45,"[290.02090000000004, 469.5889000000001, 586.1241]"
+SPAD_log,float64,8,46,69.7,"[3.8477831063652315, 3.88727939153723, 3.9794760252852104, 3.930079010227717, 3.9867222313283466]"
+SPAD_squared,float64,8,46,69.7,"[2105.800321, 2282.737284, 2755.095121, 2491.1079210000003, 2796.082884]"
+SPAD_category,float64,2,46,69.7,"[2.0, 3.0]"
+Height_x_LeafArea,float64,3,63,95.45,"[1007.6651, 3744.5760000000005, 3648.4469999999997]"
+Height_x_ShootBiomass,float64,0,66,100.0,[]
+Temperature_Max_7d_MA,float64,8,0,0.0,"[27.0, 27.714285714285715, 28.428571428571427, 29.142857142857142, 29.857142857142858]"
+Temperature_Min_7d_MA,float64,8,0,0.0,"[7.0, 9.0, 11.0, 13.0, 15.0]"
+Average_Temperature_7d_MA,float64,1,0,0.0,[26.5]
+Temp_x_N,float64,7,0,0.0,"[3975.0, 9805.0, 10865.0, 10335.0, 9540.0]"
+Rainfall_x_N,float64,8,0,0.0,"[2475.0, 150000.0, 370000.0, 410000.0, 390000.0]"
+Rainfall_x_P,float64,8,0,0.0,"[387.75, 23500.0, 5000.0, 22000.0, 23000.0]"
+Rainfall_x_K,float64,2,0,0.0,"[3300.0, 200000.0]"
+OC_x_pH,float64,9,0,0.0,"[6.75, 1.8, 2.1, 3.74, 1.9799999999999998]"
+EC_x_pH,float64,0,66,100.0,[]
+Plant_Height_cm_log,float64,3,63,95.45,"[2.8920370372152258, 3.1210424645194377, 3.2272407411998283]"
+Shoot_Biomass_g_log,float64,16,38,57.58,"[1.9843063465647972, 2.3555569777601515, 2.424094510391243, 2.5426250919679854, 2.4325601694157912]"
+Root_Biomass_g_log,float64,16,38,57.58,"[0.7280315824134471, 0.8539897056767757, 0.7925399244379802, 1.026758184900126, 0.9317703027225414]"
+Leaf_Area_cm2_log,float64,19,35,53.03,"[3.746676552840153, 3.888201513302144, 3.926852502874144, 3.9988060230124183, 4.018542848805819]"
+Fruit_Weight_log,float64,8,58,87.88,"[3.6247141966381498, 4.161255267504727, 4.165982820474895, 4.034948352265444, 3.932648823221802]"
+100_Seed_Weight_log,float64,10,46,69.7,"[1.6154199841116479, 1.7595805708638197, 1.6714733033535532, 1.7119945007591924, 1.6563214983329508]"
+EC_log,float64,0,66,100.0,[]
+EC_squared,float64,0,66,100.0,[]
+EC_category,float64,0,66,100.0,[]
+Rainfall_x_pH,float64,8,0,0.0,"[111.375, 6750.0, 7200.0, 7000.0, 6800.0]"
+Rainfall_x_OC,float64,6,0,0.0,"[16.5, 1000.0, 250.0, 300.0, 550.0]"
+N_x_pH,float64,9,0,0.0,"[1012.5, 2664.0, 2870.0, 2652.0, 2574.0]"
+P_x_pH,float64,9,0,0.0,"[158.625, 36.0, 154.0, 156.4, 33.0]"
+K_x_pH,float64,7,0,0.0,"[1350.0, 1440.0, 1400.0, 1360.0, 1320.0]"
+Height_x_N,float64,3,63,95.45,"[6301.1, 8451.300000000001, 9684.0]"
+Height_x_Rainfall,float64,3,63,95.45,"[17030.0, 21670.0, 24210.0]"
+Height_x_pH,float64,3,63,95.45,"[122.61600000000001, 143.022, 150.102]"
+Tmax_x_N,float64,8,0,0.0,"[4050.0, 4800.0, 11840.0, 13120.0, 12480.0]"
+Tmax_x_Rainfall,float64,2,0,0.0,"[445.5, 32000.0]"
+Tmin_x_Rainfall,float64,2,0,0.0,"[115.5, 21000.0]"
+Humidity_x_Rainfall,float64,2,0,0.0,"[1072.5, 60000.0]"
+Humidity_x_N,float64,8,0,0.0,"[9750.0, 9000.0, 22200.0, 24600.0, 23400.0]"
+EC_x_OC,float64,0,66,100.0,[]
+N_x_OC,float64,9,0,0.0,"[150.0, 92.5, 123.0, 214.50000000000003, 117.0]"
+P_x_OC,float64,9,0,0.0,"[23.5, 1.25, 6.6, 12.65, 1.5]"
+K_x_OC,float64,5,0,0.0,"[200.0, 50.0, 60.0, 110.00000000000001, 70.0]"
+LA_log,float64,19,35,53.03,"[3.746676552840153, 3.888201513302144, 3.926852502874144, 3.9988060230124183, 4.018542848805819]"
+LA_squared,float64,19,35,53.03,"[1712.3044000000002, 2287.039329, 2474.764009, 2865.7820890000003, 2983.3443999999995]"
+ShootBiomass_log,float64,16,38,57.58,"[1.9843063465647972, 2.3555569777601515, 2.424094510391243, 2.5426250919679854, 2.4325601694157912]"
+RootBiomass_log,float64,16,38,57.58,"[0.7280315824134471, 0.8539897056767757, 0.7925399244379802, 1.026758184900126, 0.9317703027225414]"
+Shoot_Root_Ratio,float64,16,38,57.58,"[5.858076563958917, 7.0748702742772425, 8.512820512820513, 6.536272321428571, 6.749837556855101]"
+Root_Shoot_Ratio,float64,16,38,57.58,"[0.17070449474019764, 0.14134534786253142, 0.11746987951807229, 0.15299240160505423, 0.14815171351559492]"
+Root_pct,float64,16,38,57.58,"[0.14581347855684137, 0.12384099880657302, 0.1051212938005391, 0.13269159570529435, 0.12903496268969564]"
+N_x_P_x_pH,float64,9,0,0.0,"[23793.75, 13320.0, 63140.0, 60996.0, 12870.0]"
+FruitWeight_log,float64,8,58,87.88,"[3.6247141966381498, 4.161255267504727, 4.165982820474895, 4.034948352265444, 3.932648823221802]"
+FruitWeight_sqrt,float64,8,58,87.88,"[6.042681523959375, 7.9468232646762695, 7.965927441296462, 7.4525163535546834, 7.074037036940081]"
+FruitWeight_squared,float64,8,58,87.88,"[1333.2721960000001, 3988.175104, 4026.6639360000004, 3084.6916, 2504.2017640000004]"
+SeedWeight_log,float64,10,46,69.7,"[1.6154199841116479, 1.7595805708638197, 1.6714733033535532, 1.7119945007591924, 1.6563214983329508]"
+SeedWeight_squared,float64,10,46,69.7,"[16.240900000000003, 23.136099999999995, 18.6624, 20.6116, 17.977600000000002]"
+HI_squared,float64,0,66,100.0,[]
+HI_log,float64,0,66,100.0,[]
+Tavg_squared,float64,1,0,0.0,[702.25]
+Tavg_log,float64,1,0,0.0,[3.3141860046725258]
+NPK_x_pH,float64,9,0,0.0,"[2521.125, 4140.0, 4424.0, 4168.4, 3927.0]"
+N_Rainfall_ratio,float64,8,0,0.0,"[9.090909090909092, 0.15, 0.37, 0.41, 0.39]"
+Biomass_x_N,float64,16,38,57.58,"[1101.75, 1633.95, 1725.1499999999999, 2025.7499999999998, 1789.05]"
+Biomass_N_ratio,float64,16,38,57.58,"[0.048966666666666665, 0.07262, 0.07667333333333333, 0.09003333333333333, 0.07951333333333332]"
+Biomass_x_pH,float64,16,38,57.58,"[49.57875, 73.52775, 77.63175, 91.15875, 80.50725]"
+SPAD_x_N,float64,8,46,69.7,"[6883.35, 7166.7, 7873.349999999999, 7486.650000000001, 7931.7]"
+LA_x_N,float64,19,35,53.03,"[6207.0, 7173.45, 7462.05, 8029.95, 8193.0]"
+Height_x_P,float64,3,63,95.45,"[85.15, 108.35000000000001, 242.10000000000002]"
+Height_x_K,float64,3,63,95.45,"[3406.0, 4334.0, 4842.0]"
+Height_x_SPAD,float64,0,66,100.0,[]

@@ -1,0 +1,49 @@
+{
+  "pipeline": "ADES v1.0",
+  "agent_version": "1.0.0",
+  "generated_at": "2026-07-07T22:01:32.072658",
+  "provenance_records": [
+    {
+      "paper": "pipeline_input",
+      "doi": "",
+      "variable": "tmax_c",
+      "value": "",
+      "unit": "",
+      "page": 0,
+      "table": "",
+      "row": "",
+      "column": "",
+      "figure": "",
+      "caption": "Column from pipeline input dataset",
+      "extraction_timestamp": "2026-07-07T22:01:32.072121",
+      "agent_version": "1.0.0",
+      "extraction_method": "dataset_import",
+      "confidence": "high",
+      "validation": "ACCEPTED",
+      "source_text": "",
+      "char_start": 0,
+      "char_end": 0
+    },
+    {
+      "paper": "pipeline_input",
+      "doi": "",
+      "variable": "rainfall_mm",
+      "value": "",
+      "unit": "",
+      "page": 0,
+      "table": "",
+      "row": "",
+      "column": "",
+      "figure": "",
+      "caption": "Column from pipeline input dataset",
+      "extraction_timestamp": "2026-07-07T22:01:32.072144",
+      "agent_version": "1.0.0",
+      "extraction_method": "dataset_import",
+      "confidence": "high",
+      "validation": "ACCEPTED",
+      "source_text": "",
+      "char_start": 0,
+      "char_end": 0
+    }
+  ]
+}

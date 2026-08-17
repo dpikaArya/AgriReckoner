@@ -1,0 +1,99 @@
+{
+  "pipeline_id": "AAIF_20260720_165322",
+  "pipeline_version": "2.0.0",
+  "status": "completed",
+  "started_at": "2026-07-20 16:45:11",
+  "completed_at": "2026-07-20 16:53:46",
+  "completed_agents": [
+    "ingestion", "extraction", "validation", "feature_engineering",
+    "training", "fuzzy", "recommendation", "ready_reckoner",
+    "continuous_learning", "documentation", "export", "schema_mapping"
+  ],
+  "failed_agents": [],
+  "results": {
+    "ingestion": {
+      "status": "success",
+      "execution_time_sec": 511.0,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/ingestion_report.csv", "outputs/ingestion_report.xlsx"]
+    },
+    "extraction": {
+      "status": "success",
+      "execution_time_sec": 0.5,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/Universal_Agricultural_Schema.csv"]
+    },
+    "validation": {
+      "status": "success",
+      "execution_time_sec": 0.1,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/validation_report.xlsx", "outputs/Validated_Extractions.json"]
+    },
+    "feature_engineering": {
+      "status": "success",
+      "execution_time_sec": 0.1,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/features_dataset.csv"]
+    },
+    "training": {
+      "status": "success",
+      "execution_time_sec": 22.0,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/model_metrics.xlsx", "models/best_model_Yield_per_Plot.pkl", "models/best_model_Plant_Height_cm.pkl", "models/best_model_SPAD.pkl", "models/best_model_Shoot_Biomass_g.pkl"]
+    },
+    "fuzzy": {
+      "status": "success",
+      "execution_time_sec": 1.0,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["fuzzy_logic/fertilizer_rules.yaml", "fuzzy_logic/fuzzy_report.md"]
+    },
+    "recommendation": {
+      "status": "success",
+      "execution_time_sec": 0.1,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/recommendations/fertilizer_recommendations.xlsx"]
+    },
+    "ready_reckoner": {
+      "status": "success",
+      "execution_time_sec": 1.0,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/Ready_Reckoner.xlsx", "outputs/Ready_Reckoner.html"]
+    },
+    "continuous_learning": {
+      "status": "success",
+      "execution_time_sec": 0.1,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["database/paper_registry.sqlite"]
+    },
+    "documentation": {
+      "status": "success",
+      "execution_time_sec": 0.5,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    },
+    "export": {
+      "status": "success",
+      "execution_time_sec": 0.5,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": ["outputs/Universal_Agricultural_ML_Master.csv"]
+    },
+    "schema_mapping": {
+      "status": "success",
+      "execution_time_sec": 0.1,
+      "retry_count": 0,
+      "errors": [],
+      "artifacts": []
+    }
+  }
+}

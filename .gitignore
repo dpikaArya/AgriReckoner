@@ -179,20 +179,11 @@ models/stacking_ensemble_info.json
 models/*_optimization_history.json
 models/*_best_params.json
 models/optimization/
-models/*.pkl
-models/*.joblib
 
-# Generated output data files (pipeline artifacts, not source)
-outputs/*.csv
-outputs/**/*.csv
-outputs/*.xlsx
-outputs/**/*.xlsx
-outputs/*.json
-outputs/**/*.json
-outputs/*.docx
-outputs/**/*.docx
-outputs/*.html
-outputs/**/*.html
+# NOTE: outputs/*.csv, *.xlsx, *.json, *.docx, *.html, and models/*.pkl, *.joblib
+# were previously blanket-ignored here, but the frozen baseline (baseline/legacy_monolith_v1.sha256.json)
+# requires these artifacts to be committed.  Do NOT re-add blanket ignore patterns
+# for outputs/ or models/ — use per-file rules above instead.
 
 # Evaluation benchmark artifacts
 evaluation/reports/*.csv

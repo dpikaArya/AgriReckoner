@@ -1,0 +1,4 @@
+﻿Variable,N,Mean,Median,Variance,Std_Dev,Min,Max,Skewness,Kurtosis,Missing_Count,Missing_Pct,Normality_Stat,Normality_p,Q1,Q3,IQR
+Temperature_Max,1,30.0,30.0,,,30.0,30.0,0.0,0.0,0,0.0,0.0,1.0,30.0,30.0,0.0
+Rainfall,1,100.0,100.0,,,100.0,100.0,0.0,0.0,0,0.0,0.0,1.0,100.0,100.0,0.0
+Temperature_Max_7d_MA,1,30.0,30.0,,,30.0,30.0,0.0,0.0,0,0.0,0.0,1.0,30.0,30.0,0.0
