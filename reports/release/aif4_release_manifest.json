@@ -1,0 +1,4190 @@
+{
+  "repository": "https://github.com/Adpika/Agricultural-Intelligence-Framework",
+  "branch": "branch-8",
+  "commit_sha": "ae44a4ce5dee4399ddccd9e17afee77b4faace95",
+  "release_version": "AIF4",
+  "generation_timestamp": "2026-08-18T11:45:15Z",
+  "total_tracked_files": 522,
+  "protected_artifacts": 115,
+  "test_status": "1174 passed, 2 skipped, 3 deselected",
+  "ruff_status": "All checks passed",
+  "protected_artifact_status": "No protected outputs/models/baseline/contracts files modified",
+  "file_checksums": [
+    {
+      "relative_path": ".env.example",
+      "file_size": 1460,
+      "sha256": "f396287971ca63b2105e2391def460ff0d9d28fde04f634613b8849f8bd8b248",
+      "file_type": ".example",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".gitattributes",
+      "file_size": 593,
+      "sha256": "1c800f0698816b09b5c4f621ab103d8f517f2d6fa7ed7ff2b80d369a05a5e1b1",
+      "file_type": "",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".github/workflows/ci.yml",
+      "file_size": 2191,
+      "sha256": "79fdce6f8ad6a2ae14103b1b2e8c1c6705665939a3f2c1c62591fd723a9f5a98",
+      "file_type": ".yml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".github/workflows/quality_check.yml",
+      "file_size": 1153,
+      "sha256": "c65f084643ee74a5470afcf3690c9f861324f9853158413f01ee14c19860fbaf",
+      "file_type": ".yml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".gitignore",
+      "file_size": 3976,
+      "sha256": "d909b7a6559e1747e26e1a6edc12631278e4861373f29dd72cc89a0bae3f3897",
+      "file_type": "",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/analyze_data.py",
+      "file_size": 2328,
+      "sha256": "d54471069ebe21e2d17b2e7bc0becc8ef5f1c8a29096d5ae57557079c6ff4ddf",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/analyze_ext.py",
+      "file_size": 2393,
+      "sha256": "44701a16ddf538ef80424d32f54033b24c3276288bca153b90fe23b05586f2d2",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/analyze_onto.py",
+      "file_size": 1368,
+      "sha256": "063eb6767cf44fccad13e9b2e4ebf915665a410fc29f01f092d49af30d589b2c",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/analyze_yield.py",
+      "file_size": 2549,
+      "sha256": "6d00b30f986ab18dc2b6678d8500bb6b803dc4c3a7cc62a75ac5981b0000ac89",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/inspect_inputs.py",
+      "file_size": 1627,
+      "sha256": "b759c15f2c08949bfe054d097dbc6c257ff48be0eeb8c0191ee4078906bb3fc4",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_common.py",
+      "file_size": 16509,
+      "sha256": "ea7f69f9258447396b0af5c301a22e006ca7e60fb8ba459d6807be5137d38686",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_completeness.py",
+      "file_size": 4704,
+      "sha256": "e4ba01ae405134780b7b98be846a086893c46ea2ee63217fe8e74818d7cfcdd7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_dataset.py",
+      "file_size": 14958,
+      "sha256": "34fbcfebd60f564ae19c323d2ca28cd517a8d1fe285309b211d95ab791319288",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_external_linkage.py",
+      "file_size": 7965,
+      "sha256": "dec4a664cb80bc3009bbed2031a4ca3245ef1aff2ebf07401b6813998f86621b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_identity.py",
+      "file_size": 9437,
+      "sha256": "89de2474a3f23e23b1af087beec2219b8c199a2b878f2cee5805bbd20a957a50",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_independence.py",
+      "file_size": 4080,
+      "sha256": "e8d393d01a01ab9b6300e9b764045948d7cf7c63287819438f5d2040f3ac8e6d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_information_gain.py",
+      "file_size": 8111,
+      "sha256": "651e383b6520e6de963b8a140b386a204a5f83f43082a233b47866029a445477",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_leakage.py",
+      "file_size": 8192,
+      "sha256": "794d4fbe43df241abab255d6a5f07d23e43e57a91dc9c9c9f499d377b689117f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_ontology.py",
+      "file_size": 7847,
+      "sha256": "d939de11156e77b18e11c60d787a09c7b72c2337a40322a6ccb5893f2d2a49a5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_predictors.py",
+      "file_size": 11078,
+      "sha256": "c6d1e760e15315aecdf4c68e0f9e883c9b076ecbd3aca4b035e8c3570dff2ad2",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_rag.py",
+      "file_size": 4889,
+      "sha256": "7c025ba35b643580b0ba8ad44182197d123205242f4da3a6a8b48bf14f6b24b8",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_reports.py",
+      "file_size": 8063,
+      "sha256": "c96212e386215eca9f9956e1ff86e421d4000e7e5558f4ffbfc07dd2aa5c5439",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_run_all.py",
+      "file_size": 5773,
+      "sha256": "dbe23bddd3cb4b19fa61ab314e0fc1b5d0bd89ca732f101f396d2fd808ebc943",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_spatial.py",
+      "file_size": 9459,
+      "sha256": "46e106e90ba4992ce28ea8cd76946c385263657bbd36443991932c4f19752b15",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_temporal.py",
+      "file_size": 5631,
+      "sha256": "3f61192455b54a612427180257433f3c1f1f9b09935c34a5935932076e51bbb6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".opencode_tmp/phase20/p20_validation.py",
+      "file_size": 18079,
+      "sha256": "4fbecc59eae251edc73b2e5165b432ab483430e5e415e0d2b124cc9d7c735219",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": ".pre-commit-config.yaml",
+      "file_size": 152,
+      "sha256": "708463b62553169ada9e87b914c22f38158876b221fbbd26934fb446b4ddbafe",
+      "file_type": ".yaml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "AGENTS.md",
+      "file_size": 6014,
+      "sha256": "b1d950a6fbac8068fee1c9e8cc25a8d13e4edc6f4e5acd6da006ee7a4c342285",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "AGENT_CONFIG.yaml",
+      "file_size": 1290,
+      "sha256": "acd8b12d90a4145fc099b1b6755cf821e944af7dc761dcaff898221b48377d98",
+      "file_type": ".yaml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "ARCHITECTURE.md",
+      "file_size": 15076,
+      "sha256": "ddaf40d3a498754cdd9cc38aa8e67ac7aa879b8be3fcbfdee35d6f37bf197e5b",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "CHANGELOG.md",
+      "file_size": 6893,
+      "sha256": "fd4d50c7eeb817142723c2afae7b47fbac554ef22e3d856c5eff7a8777c95ff4",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "DATA_PIPELINE.md",
+      "file_size": 10316,
+      "sha256": "064992b0e6c9ce40eb0e6686809b5fcb5b7755fe5fbd023132d2c408c6c0da2c",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "LICENSE",
+      "file_size": 11558,
+      "sha256": "1eb85fc97224598dad1852b5d6483bbcf0aa8608790dcc657a5a2a761ae9c8c6",
+      "file_type": "",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "MODEL_TRAINING.md",
+      "file_size": 11295,
+      "sha256": "cfef9621d0ce576c9c332742bb952dad24cee7651b688b63b32bd35d13619fe8",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "Makefile",
+      "file_size": 212,
+      "sha256": "54ddfb108b1c7f0e09bd2674eea4ebae7617f5c6e4c89a625733de35127b39c7",
+      "file_type": "",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "README.md",
+      "file_size": 28136,
+      "sha256": "79d6ac133a79947428fd2e03524360fa6723e858e8405c072ce1261f4e6985b9",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "SCIENTIFIC_AGENT_POLICY.md",
+      "file_size": 10723,
+      "sha256": "7ee0179fb667afde967fff9958c7eece84097a4855e344bb18a0928c6bb876a9",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "TEST_RESULTS.txt",
+      "file_size": 54835,
+      "sha256": "bae5f2af996c30ee7b5db27f4ca0fac9c591017c1279d2ecb61812256d9426c8",
+      "file_type": ".txt",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/__init__.py",
+      "file_size": 568,
+      "sha256": "d9931ad234768010b761629c13ec1c33f05c7f68e64b047bc09d3f517ca9c9a3",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/__main__.py",
+      "file_size": 133,
+      "sha256": "1859808e680f7e5cab5258180f16176859cd91d303fe34039671019908c8a917",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/__init__.py",
+      "file_size": 2061,
+      "sha256": "43e31dc0f45886bffee9813a460bf5150bdc160305417357358dcd7dd8f8d4a0",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/base_agent.py",
+      "file_size": 5228,
+      "sha256": "aab39083deea5e397626dfba468c88a5f04ebea92d767f46c8131829ef55f3f3",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/benchmark_agent.py",
+      "file_size": 17370,
+      "sha256": "d3771cb15227ff6960330790d2d056d6d6a8f69393a8e8bbba379a70988ec849",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/continuous_learning_agent.py",
+      "file_size": 22740,
+      "sha256": "c2d238f14894affc71e050273bbd4228959c4191cd09858e51f8f7cf23b80be0",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/dataset_ingestion_bridge_agent.py",
+      "file_size": 5103,
+      "sha256": "d0cb3cfb64c461013393b44258ae0bccfb4326ed48edf465923b970487f7f8a7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/dataset_normalization_agent.py",
+      "file_size": 10462,
+      "sha256": "8e9bb633b4a65d387d36a80b1788f339cb96286deda90724b07b3af87844ab1f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/evidence_fusion_agent.py",
+      "file_size": 13825,
+      "sha256": "69a3046a58e9b54cb574462df344efec245fa4d55a3b9ebf8444b366d6419901",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/explainability_agent.py",
+      "file_size": 17366,
+      "sha256": "187f9bd7e6a7cd790bafad25d73ceaf4d09f29d483bb57683718fd83d4abfd14",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/external_data_source_agent.py",
+      "file_size": 7630,
+      "sha256": "99f90edd107bec790717228a2e8bcb4125f5b083207e0def2a4a24198cc560ed",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/extraction_agent.py",
+      "file_size": 30533,
+      "sha256": "9f01ef71ec52d2decac4c71d1bbc8886fe38361701c60cb169919d43d7d55c0f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/feature_agent.py",
+      "file_size": 24682,
+      "sha256": "258b14e16b7b9454a64967ff1cd6d9ce33c1b24507a52075e4d8bad50f11b7d5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/feature_store_agent.py",
+      "file_size": 4962,
+      "sha256": "4a1af68c9623e52d6a734ca90fef97a538e504f32fa5a0eb493af137be8cf9f9",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/fuzzy_logic_agent.py",
+      "file_size": 13621,
+      "sha256": "2893177dcf8f08dfd8dc4767ae869c26b32b78c631a8fd2f504e5cb26482946a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/knowledge_agent.py",
+      "file_size": 6029,
+      "sha256": "391f599a14e493e46b727706d7da03b36f1e635a7956683ca4e3eb675231d97c",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/knowledge_integration_agent.py",
+      "file_size": 17669,
+      "sha256": "a2abca5393cf9162e16f26ecc4687b052261d280dc4ee0199bffc56f683507de",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/literature_agent.py",
+      "file_size": 5130,
+      "sha256": "8e9b2fd84461a508bebd36944c6f265b1ef9462d8942fefe000f333c87371645",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/llm_extraction_agent.py",
+      "file_size": 5159,
+      "sha256": "fb51187786bc7d6dc64945970fc5bae4e0a757010317378fd42604ec36a4ae0c",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/model_selection_agent.py",
+      "file_size": 27325,
+      "sha256": "6ef31a25bf432ae86ba01ef1399567e6732548d6665530800be3c926240e8208",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/observation_generation_agent.py",
+      "file_size": 7782,
+      "sha256": "d7477c3abf3837e2778b7e5d1c6ec7eda07764883e02844f80290918d896db44",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/ontology_agent.py",
+      "file_size": 19791,
+      "sha256": "5775433cffdeddf4f8419c2cdecb1b82532c83bc8759aa3f57f8411d1127b81e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/prediction_agent.py",
+      "file_size": 32192,
+      "sha256": "b4508827583c75180d042d961678d21004f93a36661c3e6755a02bdd5cdcb0f4",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/provenance_agent.py",
+      "file_size": 7196,
+      "sha256": "042a33638845d6c7caf43202920a36e09e874d32b35e98c0e23989da22152ebe",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/ready_reckoner_agent.py",
+      "file_size": 16966,
+      "sha256": "e32f550c353f2bd80340f691001118288952f42345a49ec53cabff748fe5b4f7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/recommendation_agent.py",
+      "file_size": 22419,
+      "sha256": "af7771e97a6d29595f73804549eca5c7b3ca772bfa2dfd6f544598f2fdd97c8a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/repository_sync_agent.py",
+      "file_size": 4067,
+      "sha256": "e0ddea2fe06c4fd637ffc0adf942c104731ec5385316b2591f79830e36dc79e7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/schema_population_agent.py",
+      "file_size": 7374,
+      "sha256": "419d5436df14a06d15fb598b9c27e4f4543492dad5303c7e8cc3dc194807b09a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/table_intelligence_agent.py",
+      "file_size": 14288,
+      "sha256": "b1a5e27df9f5ebb868de0acf8fab6ce9ef51fe468e089d55ba51cbeba3856ca6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/training_agent.py",
+      "file_size": 19454,
+      "sha256": "c618ecf778c77a46d27179321c241d16795ad21581afb5a4e0a1e5311ce6772e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/agents/validation_agent.py",
+      "file_size": 28532,
+      "sha256": "9c1159fe78044635f6cf571c8f5bbd38a004419fc879a1922bbae12b26566e52",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/cli.py",
+      "file_size": 7484,
+      "sha256": "589b150710ab3952e39bf92bbfcdc8c1262c395fb7368ca1d351e7a2e6edef7c",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/config/__init__.py",
+      "file_size": 229,
+      "sha256": "77e4df1c671cccd4825842f36503965f70164c3b7b699a3b9f4a616538908e14",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/config/schema.py",
+      "file_size": 51366,
+      "sha256": "1d0385263bc408ce890fcb92f0df8ead8150a137e5d2381d08435b28a9f28d27",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/config/settings.py",
+      "file_size": 2551,
+      "sha256": "67329315b668cf2351ea2bb31d0b64eb1894ee492ff640218e40a1d6dd834697",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/__init__.py",
+      "file_size": 806,
+      "sha256": "b866c5240ab98d775216d2b5ada2f8970222eee63a2251f17b097a768d1ef7b5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/change_detector.py",
+      "file_size": 4086,
+      "sha256": "e3a5e8f906f123fc0bb89806f1205a08ad2fe000077a7971f64a2606def42300",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/dependency_graph.py",
+      "file_size": 3561,
+      "sha256": "c1630d1465e7e0a5651a758dd513298b618b7fde66539d60fff8d1f6ca57f069",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/incremental_engine.py",
+      "file_size": 4645,
+      "sha256": "760149a998a83266b7dcff0e02c26b1b450652a9e8e16a5f1c6d21a2f91693be",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/reports.py",
+      "file_size": 3730,
+      "sha256": "9335804c4f0ba612a7a405d51c1a2e01fab2216814b39b574adeca55e28bd095",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/repository_registry.py",
+      "file_size": 3770,
+      "sha256": "f703109fff5b256c4f39b81691a92865080fc8a7422dad199565244506cfe8b8",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/scheduler.py",
+      "file_size": 3036,
+      "sha256": "51db07c32d1881e10b4f9053cb189699cf57cdc96c49b5ead378e59f95be66ff",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/continuous_learning/version_history.py",
+      "file_size": 5924,
+      "sha256": "72d3f3a9b728c19f46b47e6d5f8806246e0772fe1b15615a93ab3b1eb0f2827d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/contracts/__init__.py",
+      "file_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/contracts/messages.py",
+      "file_size": 6516,
+      "sha256": "a2b2d776bfee395b4e58340bac3e2e804e45b6f3a7cbd2b25bee96db6fa1d159",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/dashboard/__init__.py",
+      "file_size": 13411,
+      "sha256": "452de6743083ec84f7774edb52baec5384be2cfffc2a6b7ee4cb18b008b0b992",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/evaluation/__init__.py",
+      "file_size": 4229,
+      "sha256": "24e5c96d8497225f10d8abd3fbec455e27b74e815ce7e4dc6e892e24e7dfcfc7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/__init__.py",
+      "file_size": 1212,
+      "sha256": "a8d1c4ac422e4510f3a569b3922e8a1e5849f2cffd41e3e9f5c3c1720abed6be",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/column_mapper.py",
+      "file_size": 7706,
+      "sha256": "c6b7dd1632cf38234307a3ebd20073de5a50f1cd6d75b4734a86cfa78305fe88",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connector.py",
+      "file_size": 2675,
+      "sha256": "2c2ae2fd502c6f607f6ec1451e00b214c054f864a49368bd061d9a866e4eb274",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connector_manager.py",
+      "file_size": 18403,
+      "sha256": "a39230b31d1c36feb452331f7c4c7d10a5e193fc99236a0590f328751ec10d37",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/__init__.py",
+      "file_size": 796,
+      "sha256": "e5db5efce74c7daebf3016d245db155d1bc1326baf57fefc02c162be5b88e25e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/cgiar_connector.py",
+      "file_size": 3363,
+      "sha256": "c0e49ad2c373f038166a6aeeb9b6a4292d7ceb1a9036cf56dbd1492cbb51de2b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/faostat_connector.py",
+      "file_size": 3404,
+      "sha256": "692c7543aa44959927c233e0247e4c810095e6b9fea30de89bc6ba6d4ecd9cb3",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/huggingface_connector.py",
+      "file_size": 6536,
+      "sha256": "94ecc100c4e5cf101cd919ce7e40b9a4dc3e1892d31f3d1468f5e02c6363d3f9",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/icar_connector.py",
+      "file_size": 3173,
+      "sha256": "f1da1b0e518b01eb2673663111d4331fe636c16638de3a184c7197003e29a08f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/isric_connector.py",
+      "file_size": 2745,
+      "sha256": "7977109f56b9bcb3ac575279170c654f9d34cd0d3ee9f1cf1e414a583fe2febb",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/kaggle_connector.py",
+      "file_size": 3946,
+      "sha256": "98f1ac706b9b52a6aa0233fdd4241a2728c9de5a1666f2864f43ae7b378ac0f7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/mendeley_connector.py",
+      "file_size": 3247,
+      "sha256": "150cea672bcdd3012f96f47aa176b90cc206ced3a36c48da50f6a9b838b16a69",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/nasa_power_connector.py",
+      "file_size": 6773,
+      "sha256": "a6d4f5680674ec6eff5dfb8c3835dfc074a2d17ad0f39f5c13f1ec16b655a2f8",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/sau_connector.py",
+      "file_size": 5113,
+      "sha256": "14bee8ffc4258f06845c984a6921f2aba016659006d481fce56bb44652cd3b2d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/soilgrids_connector.py",
+      "file_size": 5577,
+      "sha256": "88ba360456a9b06f44d852be54a720f185d96f904d933009686af0068b684f80",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/connectors/zenodo_connector.py",
+      "file_size": 3269,
+      "sha256": "be7265b0feaa0a1ce66b270865fe145cbeb8acbf5e5e08a834868b0d346f5698",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/data_enricher.py",
+      "file_size": 9282,
+      "sha256": "db17ed1d3ac3b409ddcb33dd29af130576595ad3bebbf794dc41dc8f7272e547",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/dataset_package.py",
+      "file_size": 5881,
+      "sha256": "d0071466399cddc251592564015837e013f433e4b186ed795b9f863dc5a9a42e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/download_strategy.py",
+      "file_size": 3021,
+      "sha256": "d29eaafdca0383b1c657544d34e04bb17695ce5671bd1e00a2bbce4b5bccec82",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/registry.py",
+      "file_size": 2354,
+      "sha256": "52cdb14290aa6a858a4a232db441e4233b5033c9806c36bbe24ad532c1bb8a09",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/external_data/registry_db.py",
+      "file_size": 11099,
+      "sha256": "875d9a385e42275de88c2dcc7c691860b2a45b5eb571424c21aae63c71d7d44a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/__init__.py",
+      "file_size": 648,
+      "sha256": "b04fe69b6276cd74d512565a97e25bbb50547baf398402fd98a3bef074133cd3",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/base.py",
+      "file_size": 1611,
+      "sha256": "e1e07da1824c6cd62fc322c92e06e37b556c7659c16e5b61fedc1a58f353d8a9",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/fields.py",
+      "file_size": 1638,
+      "sha256": "54d403714315bb6f7406341eb6bf1d054dc1c0b6e235e610db631a01d293d961",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/grounding.py",
+      "file_size": 4009,
+      "sha256": "48d58d74984227bde37619f5605462c3cabc2f8f63bd476676d52e5107e2be0f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/llm_extractor.py",
+      "file_size": 7453,
+      "sha256": "863b958cf9a628d009b3e88df784d442372b537973d5bc89050a29c3fb9e2022",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/pdf_reader.py",
+      "file_size": 1213,
+      "sha256": "e3b7d3235e44c9fdf9ec5e10b7b3631093a18896328bd0b3f816074f70dcb3cf",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/tables.py",
+      "file_size": 15858,
+      "sha256": "e53eeb5d7b86d40c9891eb8bb03c7c8bafbccf97eb1410feda91a10c99f8fb47",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/extractors/units.py",
+      "file_size": 5474,
+      "sha256": "ae2ac2a2b29c2e75263d7381a724a8a6bad3ae7be11f7b93839049344bd67fab",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/knowledge_graph/__init__.py",
+      "file_size": 281,
+      "sha256": "d1b01ca0172d4a49773fef37a555a5b2211d1a969b519d07b322dab7d8152a7e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/knowledge_graph/graph.py",
+      "file_size": 12641,
+      "sha256": "cd68498abb5242565e60ad3ffd985d23aa898fa15845dcc14baf7ca3927157bf",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/knowledge_graph/provenance.py",
+      "file_size": 4445,
+      "sha256": "f0e4ef50b237c9e6ba0bb80665078cd1b015228635656d9e5d1f74fd39c77317",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/__init__.py",
+      "file_size": 356,
+      "sha256": "8b5cfc885b906c27771fc9f2ee95b8414b9f0189d0e497f5e434a6c282ec2957",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/cds.py",
+      "file_size": 9669,
+      "sha256": "e659bda90d96e2de074d069d7d35f91884746ff9c2798a6824584e3ec2b5fda5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connector.py",
+      "file_size": 9361,
+      "sha256": "606ea606b1122840ee0430ed8fcdec1b2a0e22641ed690b24243c3a97769d680",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/__init__.py",
+      "file_size": 1631,
+      "sha256": "87ce6acbe0f9723a40c91854243b9a3d12e00d0b75575a9e749cf6fecfa2573d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/cds_agri.py",
+      "file_size": 643,
+      "sha256": "ececee46c7efac1d13e6f54869352413886dad2cc7af27a482daa4a760ef67b7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/cgiar_hf.py",
+      "file_size": 3772,
+      "sha256": "864d35a486503da8b1586ab83832af91b6b2194a2d3f2b68c50de361c2edd45d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/chirps.py",
+      "file_size": 4748,
+      "sha256": "907541d20efcd6e561cb43bc1f13075108a994cca4dcac732a9afba65a8c2b37",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/dataverse_agri.py",
+      "file_size": 2241,
+      "sha256": "a8ea8c6d30aaa0fa3223a893a6ec697a0f40193f214691b1b38db7f05ccfbb93",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/faostat.py",
+      "file_size": 7688,
+      "sha256": "40718ae4dbe8e7a5fce58cc849f4a213b3d789671c336148f64082bfcd1bd4a2",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/gbif.py",
+      "file_size": 4059,
+      "sha256": "15f7530012bd61cde2a09260abb82efa0402f3679bb38744b262011b603cc1a5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/gee.py",
+      "file_size": 4860,
+      "sha256": "6f4889568de870dcfba267385f2dcb4916a44c1857fa60e29612b6fc01be9a15",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/geoglam.py",
+      "file_size": 4651,
+      "sha256": "44f8d84bafc8420903385c48e35c004d96103f7af7d81d008ffc01add303144d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/gyga.py",
+      "file_size": 6199,
+      "sha256": "a0bfddc967531b129223b86c2ff05c5d2fb0ddbb6f5360ee7edb7c4c596ddaac",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/mapspam.py",
+      "file_size": 5295,
+      "sha256": "63a39f0b46f3a5f5daad32162cc7867c628a1e4a03b5932a7cae5f48b289cc51",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/nass.py",
+      "file_size": 5560,
+      "sha256": "a21f112b1bb31c81bf3c8102f1bc39a152caf5acb559c123d31dcbe39879e60e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/power.py",
+      "file_size": 6874,
+      "sha256": "2304185d1413bdded93d84b2d4951d18d5f0616586d45074a19fc107897004a2",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/soilgrids.py",
+      "file_size": 8650,
+      "sha256": "8bb25582b0112281b06f615cabc9c7dfb2885708d8cfdea815f9c80705a649f6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/connectors/worldbank.py",
+      "file_size": 5565,
+      "sha256": "dcff4d6e239c37ecf42feb1a79cf4ff87a13bc5c72a7aa8d88d22f516a10ab9a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/dataverse.py",
+      "file_size": 5862,
+      "sha256": "b4bd1e0227f0b56918b33a59d33c431f99e799f32f435e531dd50a07f0856db7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/manager.py",
+      "file_size": 3908,
+      "sha256": "41ce19b46efc818dd928132854c7ab5df5df0df7622ebd5e7f55be472ed0d27b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/agri/sources.py",
+      "file_size": 1720,
+      "sha256": "4fba66faf7209c7df9f1d2f01264ced02c95fdec290c9c12a5dd2f981d8aa187",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/classify.py",
+      "file_size": 6329,
+      "sha256": "3ff88ccd89fde46b78df4ab0ffa4149aa649d323878cdeb95ec49c20c1521072",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/config.py",
+      "file_size": 10210,
+      "sha256": "8becca51c31da14fe15424c6c8099bf87bc0cbf2a6b41b61c94206a2ab0db5f8",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connector.py",
+      "file_size": 10946,
+      "sha256": "b8228cf69b1ebfc1412e2897e83fa21137a9275dc92f9a263070dffe2565f382",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/__init__.py",
+      "file_size": 1715,
+      "sha256": "b86d79a6a32f74e44c002c5f16534a1d8bba5585e316b4a2e71758874bca7160",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/agris.py",
+      "file_size": 9201,
+      "sha256": "3a8642d949903f44430bb1bce265f227a1ce4058064187df7097c30dbe2526ee",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/arxiv.py",
+      "file_size": 4681,
+      "sha256": "6d45a0987eea2a5da9452734be1b565560cf53d59c40cb6dbfbf8566af151263",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/crossref.py",
+      "file_size": 7017,
+      "sha256": "6603f854e621e3b0564ccb4bd24ee9238fb4db9256cda9fa6c09703697c9529a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/datacite.py",
+      "file_size": 6010,
+      "sha256": "03860ec641b01689aea737f9fcc879a76260f4c3027a18cc81c0bfbadd1e9409",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/dimensions.py",
+      "file_size": 4319,
+      "sha256": "db0832720f1a910c880bf05c06677c94eee150700211a4f0f1a302f265ad7a2a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/doaj.py",
+      "file_size": 4597,
+      "sha256": "9bec59b19eeb4618209e1cf7fa7ff411579eada0bfeb6e25ce5fb16bb76dd87d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/europepmc.py",
+      "file_size": 6212,
+      "sha256": "233b4685cc60a0539ee5044ee8bbae14ea9d3f1222ce53b3341ca50c8bc10b40",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/figshare.py",
+      "file_size": 5020,
+      "sha256": "c1f300da505f122f596e3300c50dfe510fc176f33d70d268842b7646fd632d93",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/mendeley.py",
+      "file_size": 7135,
+      "sha256": "214db150a71c7eb9626dc1f7290b9716780f2aa5d3f2dc11f5d173f63b382af5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/openalex.py",
+      "file_size": 7280,
+      "sha256": "aa78b7c45b1617f3195258b96437a1ce929318d8d0b6fba6981592a345dbc4fa",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/pubmed.py",
+      "file_size": 8706,
+      "sha256": "2d415e4addf871944c36161e7aa436126617b0dd313c2af3fe4c4772c3ff6097",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/scopus.py",
+      "file_size": 5496,
+      "sha256": "f28d46023ba8ba64c0d75c44c03d706335cde8b599382dd3b466be391b525cb1",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/semanticscholar.py",
+      "file_size": 5421,
+      "sha256": "d5c04153ad3c75efd7eba6dc0c59619367640a1ca14b5058f91dfef0538b3fe6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/wos.py",
+      "file_size": 4064,
+      "sha256": "40c85c7ff5b40adae5ec600d4178a04ad8b9140a50e1404ee4e7b661fd472b5f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/connectors/zenodo.py",
+      "file_size": 5478,
+      "sha256": "1f7cbf87fff2e5d96e8ecc15898f87f3e99b8cbf2d151469d921ddc1a19e8a5c",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/dashboard.py",
+      "file_size": 17405,
+      "sha256": "0524855465efb9bda5cb379cd913138b89634355eca6ab7a27ee1f585edd5f10",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/dedupe.py",
+      "file_size": 9861,
+      "sha256": "e706f228300958c9c4a60d4885a0bf709f306489ab7c73a7afa2efc474690bdd",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/external_config.py",
+      "file_size": 7322,
+      "sha256": "fe4fd4e03ed6f71406377dab0d53afead61c870a3e2b8318402bdb36b78469fc",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/graphs.py",
+      "file_size": 3972,
+      "sha256": "72565a70d3688662c8d050592ddd89e975e0f0fce5cadbde87e61a0338559b06",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/http.py",
+      "file_size": 5697,
+      "sha256": "3d2b3eba1ea17589617a171e969f35f2173fa6439fbd2b8b163bb77e4181d1ba",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/models.py",
+      "file_size": 10306,
+      "sha256": "bdef1c26f7b05fa840c4b3b0d2cd9f396af04433e79419f882cdc648d0f69f11",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/pipeline.py",
+      "file_size": 34393,
+      "sha256": "ab745535050c404080af57a2f8a39f83ac0ecca9e8a9ed6e96fb5b643c854498",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/query.py",
+      "file_size": 5137,
+      "sha256": "e74fc771c690968443122f38807b980aec3e113a6c0eebea96ba295cc3a45786",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/registry.py",
+      "file_size": 1526,
+      "sha256": "6f49e6e29e954d7b93fbcf3c5cc1efc0ee9d36302f55c1a4572af87e1674f942",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/state.py",
+      "file_size": 7683,
+      "sha256": "39933055c679a41112a8cd51817b073f579f0ac6b3ac6ad19f36280cc4d8286b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/literature/storage.py",
+      "file_size": 30928,
+      "sha256": "d79ab403c9d160d423ce422db18354e9f6db2d41928201d33498c3461ee2629b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/ml/__init__.py",
+      "file_size": 79,
+      "sha256": "20697c42e16ceb445361b6a5f36d6c00416e4dd8e668ae8a07d42b24d32ba9f3",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/ml/evaluation.py",
+      "file_size": 7534,
+      "sha256": "104f5183a0568ffb45d59edccca6db8fce6a9f9597a608f470c11a30b7518921",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/ml/leakage.py",
+      "file_size": 8759,
+      "sha256": "e48f2ce2c63dc3b5e01d25fd491405a080e3a1c693810d850124bf729d9dbccc",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/ontology/__init__.py",
+      "file_size": 523,
+      "sha256": "dc3a7a1813e6333824a051fae340e06faf88d1d9a538aea03e95a5c9d95abb76",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/ontology/namespace.py",
+      "file_size": 1833,
+      "sha256": "5a53a20a4f2c7f57239c1e6c414a1489b46ff56d054b555516909788b8c398bd",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/ontology/registry.py",
+      "file_size": 7225,
+      "sha256": "ee9cc3fd44fc4ef32692a3ce3be8431313bebebc4516250496b1741a21c83cd1",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/orchestrator.py",
+      "file_size": 15158,
+      "sha256": "26059e7267762cb4aa0e6e546802ea378260c07173ecb822ad398912df64edb6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/prompts/extraction_system.txt",
+      "file_size": 1046,
+      "sha256": "85936ca23d17615fe234fba688bcc0198470a56317dec8b0302c4ca0ff75d04c",
+      "file_type": ".txt",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/rules/__init__.py",
+      "file_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/rules/crop_rules.yaml",
+      "file_size": 3187,
+      "sha256": "5df964240a69ffe30133a1fed387e6d7956ade9bbb2efc9e6b7be15c12f01491",
+      "file_type": ".yaml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/rules/fertilizer_rules.yaml",
+      "file_size": 134022,
+      "sha256": "4e9b87bb0adfe97d00807da5504451d9f04a1fa24b3e8a613909ca0b40c3e53f",
+      "file_type": ".yaml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/rules/membership_functions.py",
+      "file_size": 3976,
+      "sha256": "8b2eb390636f63e6de0729dcf12660ff35da27352ba029b0aa70b8d23414f822",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/rules/output_memberships.py",
+      "file_size": 839,
+      "sha256": "63c38a252ffc136ad4c6d125fe89526707aac9ec867118d0a29ee01c5c162bcb",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/utils/__init__.py",
+      "file_size": 351,
+      "sha256": "c3a3e9e4f0f83dafe57d9acd46e7f7a741bd8147add829c1b6db26c8c31ab2fd",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/utils/io_utils.py",
+      "file_size": 4923,
+      "sha256": "819af6bbdb1ba255c23bcecd6eb29f062610b777f431ce3f4852bff1f2731b50",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "agri_ai_agent/utils/logging_utils.py",
+      "file_size": 958,
+      "sha256": "1dbd7b28705b42250db2d7ba0067ecb1081df7e5613f6d63be75253e60df5571",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "baseline/legacy_monolith_v1.sha256.json",
+      "file_size": 13778,
+      "sha256": "8766b4f8524044187261433421f85b82e8576360d4711a7714a2baa6a6883a74",
+      "file_type": ".json",
+      "role": "baseline",
+      "protected_status": true
+    },
+    {
+      "relative_path": "benchmarks/__init__.py",
+      "file_size": 54,
+      "sha256": "df0458dffe3fb50229ec8193a4103a26f60ed9f1c513fff132faadf71699a76f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "benchmarks/gold_standard_bellpepper.py",
+      "file_size": 2555,
+      "sha256": "ba1f05e154447ff99b45594a323bcc6b7c0f877ad74724124c7793ada72778f9",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "benchmarks/gold_standard_blackwheat.py",
+      "file_size": 2562,
+      "sha256": "2f3ec5128afd8291e663f46a949e106640d88735617db00b23575f006d9f36fb",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "benchmarks/run_benchmarks.py",
+      "file_size": 6785,
+      "sha256": "1cc24cc95cd50885323c9ac1420aea389daac6f0d4e8f0b46f4a39a682596c33",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/__init__.py",
+      "file_size": 24,
+      "sha256": "a9b6f5657b2dc63f78d215e4672172a5126ee09fea2bf9b4cf734e58eaea36bf",
+      "file_type": ".py",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/api_config.yaml",
+      "file_size": 1540,
+      "sha256": "6fe738ab44df7f449ebf2cd27fa636bc3ce8944718305bc7231dad6e9e74a1d4",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/api_keys.env",
+      "file_size": 2044,
+      "sha256": "2e3eec664692aa6be8676c02a158f423e9fc322bcd372a04f17bca61f324ed2a",
+      "file_type": ".env",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/apis.yaml",
+      "file_size": 2201,
+      "sha256": "0466ed8f068ebe90293f12fa423909559e5d02ac684993318f3cfe999538acb7",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/benchmark.yaml",
+      "file_size": 883,
+      "sha256": "91436e2c8070ea7e15ab440b9118d092f3649e7a0754674fc08731f6f1352dbe",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/connector_limits.yaml",
+      "file_size": 2194,
+      "sha256": "34100086756a5d0da8cb87604a7c4718096fb1e545e8adec6ec1949c0df426bf",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/continuous_learning.yaml",
+      "file_size": 9019,
+      "sha256": "b3469c112dad08667f5e80bfae277b8153382788f13e958c5c396407bad4811c",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/dashboard.yaml",
+      "file_size": 1242,
+      "sha256": "fb2bf7f399057e0c031473d623a70f37709abb27e79bb9f9b9cc3417879161a0",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/explainability.yaml",
+      "file_size": 924,
+      "sha256": "57232ce749a0be788994b5c04a506334eb8219e5f9d7af3b2d2dd10d058c645d",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/extraction_rules.yaml",
+      "file_size": 1091,
+      "sha256": "eddda5bc0cc4988e8690d0c22b8b63b2be9678b28690212abcb93204d9d9cb8e",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/literature_sources.yaml",
+      "file_size": 1938,
+      "sha256": "46533b842db39f0b9f5ea3ec571a19ae0c1a9235de795a8f7e2a0f44f9285255",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/model_config.yaml",
+      "file_size": 2092,
+      "sha256": "220b0088cfeadd6ac3d24a8b36262d6d59f9f77cc87f7167328140cde2600b42",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/phase19.yaml",
+      "file_size": 7361,
+      "sha256": "b14fb86a340742564c8aa874cc372352a1f71d4b288868abe6b3d9cc077554b9",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/phase20.yaml",
+      "file_size": 8907,
+      "sha256": "b06ef42d7d27a2f1c9f2fa330009aa8ccc598e6e8edb6d268f39b9d65ee5315e",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/quality_thresholds.yaml",
+      "file_size": 615,
+      "sha256": "452ac3301d14dc4378b73d64fe08039b1e492f1809eaf798f3a140115e6c8280",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/rag.yaml",
+      "file_size": 2594,
+      "sha256": "17219a186dbf42c65901a29eab1227fa2db3c72f447bf84cff4257265dbe8f4a",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/scheduler.yaml",
+      "file_size": 712,
+      "sha256": "1fef737f8358a310dcc682fce0ec85f444c8101dd81fb101accd0e151febfa4e",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/schema_mapping.yaml",
+      "file_size": 1314,
+      "sha256": "f59211bfda0069b8546d6d11a15206f228ee3d83ee848e8de0c9cd882f1285ef",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/training_rules.yaml",
+      "file_size": 1266,
+      "sha256": "dba0f681cdb9b0826893f9c06419b5b4b63b5f6180c2d7fc50f9767871849db8",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/uams_mapping.yaml",
+      "file_size": 7689,
+      "sha256": "4957c954eae43939a3a09e69bbd3054c6b6538e50430cb6710e4503e228d1af6",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/validation_config.yaml",
+      "file_size": 1226,
+      "sha256": "8e0d7302c517a242778ab6399762429adc3002535f1f4d288385dc062b5d29ea",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "config/verification.yaml",
+      "file_size": 3245,
+      "sha256": "8b5ba1b92479eb79b445c2887e6198a0b91be99764af7ae7f9c847d3702c1ef3",
+      "file_type": ".yaml",
+      "role": "configuration",
+      "protected_status": false
+    },
+    {
+      "relative_path": "contracts/claim.schema.json",
+      "file_size": 2601,
+      "sha256": "5d0103927a1f0fe5304b60799540fffba23d34482b759a00aacd57db7943e00a",
+      "file_type": ".json",
+      "role": "schema_contract",
+      "protected_status": true
+    },
+    {
+      "relative_path": "contracts/evidence.schema.json",
+      "file_size": 2762,
+      "sha256": "44d1a4af7ee09c538074567e49871e388dfa8d801ef1c37064244a9bdd637754",
+      "file_type": ".json",
+      "role": "schema_contract",
+      "protected_status": true
+    },
+    {
+      "relative_path": "contracts/provenance.schema.json",
+      "file_size": 6245,
+      "sha256": "98aa85f04181fc0e99c5d3446eee82f963ab57178a317c5c17059ce2f32bba27",
+      "file_type": ".json",
+      "role": "schema_contract",
+      "protected_status": true
+    },
+    {
+      "relative_path": "contracts/validation.schema.json",
+      "file_size": 2484,
+      "sha256": "6e018ecb59740d15ebe87407d83c44771266d72560e3e9a4bbf9ba0190307e71",
+      "file_type": ".json",
+      "role": "schema_contract",
+      "protected_status": true
+    },
+    {
+      "relative_path": "docs/CI_FIX_REPORT.md",
+      "file_size": 7977,
+      "sha256": "1da8e903b784ccfca160e12f24030766e29bff19372ede90c602b9a9082c99d9",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "docs/architecture.md",
+      "file_size": 13803,
+      "sha256": "7498c1b182e039eddafabfe501478eeadde40e2242c9be319273547761629b9e",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "docs/flowchart.md",
+      "file_size": 4914,
+      "sha256": "5ae43bb112ae6a40f784fbb067e21cf368b6cb8d0bf75e2b6cf10dad5f8019d6",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "docs/info-flow/llm_extraction.md",
+      "file_size": 2737,
+      "sha256": "e2a14ef669ffcb5f197846b4d3a882ced74251fabb7d7adeef81eb1383f9f33f",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "enhanced_extraction.py",
+      "file_size": 17051,
+      "sha256": "638bd1b6206778b5beab80d743abeafdfa702944e680d208ec34a9158eaae839",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "environment.yml",
+      "file_size": 222,
+      "sha256": "62c6105123628ddb50d131514ae05db494cb6a9398e28d6fc9022551d71bbd2a",
+      "file_type": ".yml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/__init__.py",
+      "file_size": 75,
+      "sha256": "e7cccd40cf8db7cb9af35bf09067d853dcd14fbd4c7ec320884cb6062d713de6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/agent_benchmark.py",
+      "file_size": 3625,
+      "sha256": "ea7f0dc2c2ead8933edd09e7a7f76c0c3549ca249dff85a0be1cb6ff964f90b9",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/dashboard.py",
+      "file_size": 12367,
+      "sha256": "4f6fef6d7d67f5bf79e51a17a74c4eab9aa5d1307d2e9a2695e2dd0ee9755400",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/dataset_quality_score.py",
+      "file_size": 7905,
+      "sha256": "56a27f1d30c0bc95915fa5582991e988c0f839bab564e7452ec4098edfbdf384",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/e2e_performance.py",
+      "file_size": 3327,
+      "sha256": "f33a66942b46ebe0c8fb2872ef8cd337b9551e80afc6173de8da1819e62e940f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/model_benchmark.py",
+      "file_size": 9063,
+      "sha256": "0a88d5a1811b378a05fcbf45de0a14fa278eb2481c5802329dd2f0cc5202dcbf",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/output_validation.py",
+      "file_size": 4621,
+      "sha256": "b1381fef9c8cae0e917471e0d325fa7bf3f35195bc8d2d98e4dc756d71469527",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/01_Ingestion_Report.md",
+      "file_size": 4732,
+      "sha256": "7f3d3b9479b2eecba98b92cfeb707b4608e818faec05842ebb19ab88dd746e5d",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/02_Extraction_Report.md",
+      "file_size": 6318,
+      "sha256": "03be4d872496ed0fafcbebc282e81634241e83783a3cff5dab0d6ad02ba02a25",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/03_Ontology_Report.md",
+      "file_size": 772,
+      "sha256": "30666ed842380e4db3cf731f90cb8a42201cde8d0349adadef9abfbed2d4ef34",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/04_Schema_Report.md",
+      "file_size": 1480,
+      "sha256": "64cbaad9393a590b181c7c73fa6f3db0bdf9b25b8ced207ffb1df2297bddff03",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/05_Unit_Report.md",
+      "file_size": 940,
+      "sha256": "82cdf0c6a64046cb3628e286e6b7daef04297bcd41c0ea8aeb1f79198b5192db",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/06_QA_Report.md",
+      "file_size": 851,
+      "sha256": "1dc03bef6095a827ee8d5113d5fefd49690cc117aea93a687e69b0a47b70198b",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/07_Feature_Report.md",
+      "file_size": 1215,
+      "sha256": "c1ed666a8033afb1056b2146d3d3732de553fdb7b6eb4e6659dd3b1ad8b11910",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/08_Leakage_Report.md",
+      "file_size": 976,
+      "sha256": "b0ccbf0dab905bd8547d771b5a3d0a96361048c25e5070671c05aeb29916a73f",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/09_Statistics_Report.md",
+      "file_size": 1938,
+      "sha256": "2da57cd2f6868dadd06ffdbb77c4753fe7db1bdcc7e4b8a1ed83ddcc0c08e8b5",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/10_Model_Readiness.md",
+      "file_size": 455,
+      "sha256": "6ec57d0c4e88acef867095f0c46b9001cad466434562e22f2859ba690e221381",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/11_Documentation_Report.md",
+      "file_size": 2845,
+      "sha256": "df7d611fb07b7e4e5e95812311dc7e182c535ac79186c1c0c14e3616704ec72a",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Agent_Benchmark.csv",
+      "file_size": 800,
+      "sha256": "75208d822a2ceafcf1cb9cce7545a21afc1ad7aebd4b88370f5fabc1074ada78",
+      "file_type": ".csv",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Agent_Benchmark_Summary.md",
+      "file_size": 1559,
+      "sha256": "5f9742055550504bd628e5e87e5abb2c0fc6d1a1deaaf8ccf3d46acd3fa045a5",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Benchmark_Report.md",
+      "file_size": 867,
+      "sha256": "c6fdc6cc2cbd064d2d68da48a2792bf025f00a43589b989f4b000a10971ae4f1",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Benchmark_Results.csv",
+      "file_size": 400,
+      "sha256": "dacf16b18742e137656f1f37310697ff88e5d08ba6658eb01a1632d745e8af46",
+      "file_type": ".csv",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Dataset_Quality_Score.md",
+      "file_size": 1522,
+      "sha256": "7f110adbace8e97d7a6c043bf88015c27b90efa14c9111cea8e0745e878c5668",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Evaluation_Dashboard.html",
+      "file_size": 9228,
+      "sha256": "8de265ffc8643b83ecee079a31b20dfd278bf2824ea0532103bb5610c85d2eed",
+      "file_type": ".html",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Executive_Summary.md",
+      "file_size": 525,
+      "sha256": "508c369e923b5d8739509e03889855d9a9de78d7eb149e3c783d11fe019c3677",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Model_Benchmark.md",
+      "file_size": 53,
+      "sha256": "75d489f47a4c23ff5dd03ef040af2aaaee6e5887d09507631bafaebad66c2eff",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Model_Benchmark_Summary.md",
+      "file_size": 53,
+      "sha256": "75d489f47a4c23ff5dd03ef040af2aaaee6e5887d09507631bafaebad66c2eff",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Output_Validation.md",
+      "file_size": 61,
+      "sha256": "fcca2cf71c6ad1d4423de5f4ae114f92883686144cc1d682dda6e384f1f2b956",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Pipeline_Benchmark.csv",
+      "file_size": 236,
+      "sha256": "ea23ef5543c1861957a02cb5db974202916d191ccbff1895d324b1ef54b7e3cb",
+      "file_type": ".csv",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Pipeline_Performance.md",
+      "file_size": 1451,
+      "sha256": "3fbe999342f9da8a60ea80ce4e69d261116451e90908fe738ccd799631735b4a",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/reports/Repository_Scorecard.md",
+      "file_size": 972,
+      "sha256": "0e5e20b72ace868082490b5f8225e5eb4a1c6f98a4231e74b380b2507e62fbfe",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/run_evaluation.py",
+      "file_size": 10635,
+      "sha256": "fa9a6c8b63a7e3b330a8da7ffdb45484379c11d8ec25c98d1bdb7ee9d06c1142",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage01_ingestion.py",
+      "file_size": 5193,
+      "sha256": "f6eaf7a76d58cddc366550463cf40e98df409a9018f2fc159f4b281ed75984f0",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage02_extraction.py",
+      "file_size": 8319,
+      "sha256": "0100a682efcefa69fcead9db67aafad6fe2efe27e9a8ac326d7b7a8b1205c5f2",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage03_ontology.py",
+      "file_size": 3190,
+      "sha256": "b9cd60e1d08b5c0c0a0d2906d3840ee4bcc3b865bfb2fc020284042294c25378",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage04_schema.py",
+      "file_size": 6158,
+      "sha256": "629998b8cd2a4de48d697904c4ee29a20e189d39947264b05ff3c13252694d9a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage05_unit.py",
+      "file_size": 2786,
+      "sha256": "8a98439a1321a52bea7bb85966f53438f69eb3a7474f67a1db91799d50ed54b6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage06_quality.py",
+      "file_size": 3558,
+      "sha256": "e0b53649611d541c1ab5b80ebb3f14fd3d0e662915087ea132276267e33c42cb",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage07_feature.py",
+      "file_size": 3587,
+      "sha256": "6ac5a531c3ddb3b80225a02851a64c983c04f9f77c8805af5693d761cf18ea91",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage08_leakage.py",
+      "file_size": 4471,
+      "sha256": "f8667d17e244e0391874ee47ec23c8a67ce225476a9a314c344447360f2799be",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage09_statistics.py",
+      "file_size": 5241,
+      "sha256": "2e583ba45b319fd881abad2ff7c77b3db01d1a93bb3e82f7499343ee7e06b30e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage10_model_readiness.py",
+      "file_size": 5903,
+      "sha256": "5de7db158c68ce20cdb77008914aef239fc1bf54ee45b269052927f3083520c8",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/stage11_documentation.py",
+      "file_size": 4272,
+      "sha256": "647a85fe908b21f322fd3a0601f8a8f7e6d51e6fb3bbc837cc1b11549fc9557f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "evaluation/utils.py",
+      "file_size": 6577,
+      "sha256": "c99a67eb2e51a73ab0b2263e378911b735b0f7f5c541c99a4d7376227fca7e55",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "export_all_results.py",
+      "file_size": 29147,
+      "sha256": "1cc8861456c4d56efbc10cad839b985bf8f84978dc86b022e23b8a11b2c7a86d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "fuzzy_logic/fertilizer_rules.yaml",
+      "file_size": 134022,
+      "sha256": "4e9b87bb0adfe97d00807da5504451d9f04a1fa24b3e8a613909ca0b40c3e53f",
+      "file_type": ".yaml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "fuzzy_logic/fuzzy_report.md",
+      "file_size": 19978,
+      "sha256": "3537f3497657d057afd2cd804f9270932080961bf82aeb84a34c68471150e5c2",
+      "file_type": ".md",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "generate_fuzzy_rules.py",
+      "file_size": 36659,
+      "sha256": "2499088e04f2b5d4be266f2e9b789f953992c109130ee5b7c881e28864d25908",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "layer_efficiency_analysis.py",
+      "file_size": 18018,
+      "sha256": "7eb57f35e705aefdcc66db164baa70b9bc797bbdb22c3ea646328e0c10577501",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "models/best_model_Plant_Height_cm.pkl",
+      "file_size": 117782,
+      "sha256": "7d006730eaa6ca3fd0cd3d5e648ad2f098def5c523ee5c2db5d5861b285f77e2",
+      "file_type": ".pkl",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/best_model_SPAD.pkl",
+      "file_size": 112273,
+      "sha256": "933e87560655debaf08e1a8c914bf1605380baf13c53b75435a150a120431d5c",
+      "file_type": ".pkl",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/best_model_Shoot_Biomass_g.pkl",
+      "file_size": 2771,
+      "sha256": "ebc0c5dad3a02fed2dcd5d58880cf2a3bcb95343e8806666c16cd13aa72b47de",
+      "file_type": ".pkl",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/best_model_Yield_per_Hectare.pkl",
+      "file_size": 2403,
+      "sha256": "57abaed63ede1985d64b814666f84ea70e6b35f36bcfa8ec44fb3adc5c2eb9ef",
+      "file_type": ".pkl",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/best_model_Yield_per_Plot.pkl",
+      "file_size": 889,
+      "sha256": "a63bd11aaea12671fa5810206daa862cda9094e4cd5451f8a82785ebc7843dd3",
+      "file_type": ".pkl",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/best_model_target_yield.joblib",
+      "file_size": 270049,
+      "sha256": "264063310a29cb05d66450ac09ef75c090c9c89bf105916373219373af81412d",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/best_model_yield_per_hectare.joblib",
+      "file_size": 609,
+      "sha256": "a918e5f190ff794b6a221a7b18d687ea9fc00f135286ce55ab8f8c92469eb805",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/linear_regression_target_yield.joblib",
+      "file_size": 3739,
+      "sha256": "38e4c1d3633bf8475fda61051800cdb72f30eb41b92fb3aa47aa2b85ba507c37",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/linear_regression_yield_per_hectare.joblib",
+      "file_size": 4211,
+      "sha256": "8218a7220982c030c64d57223d1a45615621c2307b0d3e8631402523d5c060cc",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/random_forest_target_yield.joblib",
+      "file_size": 42042,
+      "sha256": "ee220aa3377dd7c239ba845faa15edc9923c45e00c7d6375aaeaa57f3aa2ecfb",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/random_forest_yield_per_hectare.joblib",
+      "file_size": 104570,
+      "sha256": "bf501d84676578de03ef532f792e5f4b42493e8c13df320884a7993009687f5e",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/xgboost_target_yield.joblib",
+      "file_size": 81521,
+      "sha256": "0cc13af0f71a044cf8deedbdfe2254091063beb43c755cbb65478452f40c6824",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/xgboost_yield_per_hectare.joblib",
+      "file_size": 119939,
+      "sha256": "67edcefef52a2c84ed75f496ed16773d7f9f7fb29d6509afbd8018b3c1150581",
+      "file_type": ".joblib",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "models/yield_model.pkl",
+      "file_size": 4211,
+      "sha256": "8218a7220982c030c64d57223d1a45615621c2307b0d3e8631402523d5c060cc",
+      "file_type": ".pkl",
+      "role": "frozen_model",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/AAIF_Final_Report.html",
+      "file_size": 7432,
+      "sha256": "2000ad6dd8cddf3f63fda8e92184d8608dbf08c983fd736ec1d41e85604a6934",
+      "file_type": ".html",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Agricultural_Model_Efficiency_Report.docx",
+      "file_size": 37788,
+      "sha256": "eb2e897c9f83d38c07cbadbbfe121a09d9c59c9b8bce37924ffe7e007ddc2d8a",
+      "file_type": ".docx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Architecture.md",
+      "file_size": 1391,
+      "sha256": "0e3b21dd3c6e1f3675b374aba113826fcc7e43f5e19f645d9894b9d7b35379e8",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Audit_Report_Improvements.docx",
+      "file_size": 41261,
+      "sha256": "d6340214fd6bca4b9753d81907f34f53a3de80e465000a84440a01bc66e82bc2",
+      "file_type": ".docx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Correlation_Matrix.csv",
+      "file_size": 232037,
+      "sha256": "a04c67c993a2026338be872cc41f9ce2a9e32f849acc3ef424bbedda072d10f5",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Data_Validation_Report.md",
+      "file_size": 9003,
+      "sha256": "9fe5aaea09dc7070bf08c823907c9f20243b57b5a7a5758fc1131395814b7864",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Dataset_Card.md",
+      "file_size": 847,
+      "sha256": "4ca47246ab6a5c162a0da2fa7236daf68643f038da6358cd7346238b0f5c3598",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Developer_Guide.md",
+      "file_size": 682,
+      "sha256": "2fff92b1ea11a952b0b0ad1539900ed1e6ab3d61f0f39d7506f74fac45742bd8",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Document_Structures.json",
+      "file_size": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Encoding_Map.csv",
+      "file_size": 108,
+      "sha256": "b1933137a949708fafa8aba5e1aefc0dc17b1f50aba0ea5440dc219a59acb648",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Evidence_Traceability.csv",
+      "file_size": 448,
+      "sha256": "70aac64db1156fcc3d1b707d137b9d3cd3acc53967a6d6c70c2076fcf6a0ffa9",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Evidence_Validation_Report.md",
+      "file_size": 206,
+      "sha256": "42f01ea68f182d4f936d77f3f66d3069f510d9b966e6d4dca21863cd0006e0c4",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Extraction_Report.md",
+      "file_size": 1459,
+      "sha256": "0e92b9453fb303b711a05fe4bcfc691fb3d56f3c7be7f5e8d74d8043edfca7d9",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/FAIR_Compliance_Report.md",
+      "file_size": 633,
+      "sha256": "8b24e3ee1cd3c07aaec8d2556c6f4bff9dc88c6e788f1205ab0e6ff2de117bb3",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Feature_Availability_Check.csv",
+      "file_size": 5307,
+      "sha256": "02354198b9913153c0d2aca37be4bf18dc8cd22b651d957a417c2c202edaecdc",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Feature_Dictionary.csv",
+      "file_size": 24641,
+      "sha256": "efe9cde1145a31cc445b9f110044475e8360f956ac2e4ed22b271deec23d3f8c",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Feature_Engineering_Report.md",
+      "file_size": 727,
+      "sha256": "219525a5d87303d87c1942fa21fb8af5ab5d05ad63178989a627ee463ead3105",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Leakage_Report.csv",
+      "file_size": 583,
+      "sha256": "2ee061aa390e18c501142cc44913562ae6cde25f82cd61e6e03fb6d28d90c4bf",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/MachineLearning_Dataset.csv",
+      "file_size": 12531,
+      "sha256": "a03e81f33f84a6864509a8a1e5586cdb5e51860ec0e77ea71acb2a5e32538ab3",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Missing_Data_Report.md",
+      "file_size": 4740,
+      "sha256": "2617a738244448442cf805543258d63129cf62223adf14ec7a2e071c8fb99c72",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Missing_Value_Profile.csv",
+      "file_size": 4285,
+      "sha256": "b64cafaacf49edbace64e453ff49d711f2000090395d670af7971a6256b97203",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Model_Readiness_Report.md",
+      "file_size": 2362,
+      "sha256": "861ee1d8875e533f7fa83938886ff51377bf7ff2df1b45ff516e6826eb61d0da",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Ontology_Coverage_Report.md",
+      "file_size": 591,
+      "sha256": "70a25a0ae6c26b3b48fcc99e544d4ed937b99edfbaafab4a56c7b260af107d16",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Ontology_Dictionary.md",
+      "file_size": 599,
+      "sha256": "9b40707735ece3f2256b42fe73f36f1fbfa0e2e9ba930cc713cf8c723baf892e",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Ontology_Mapping.csv",
+      "file_size": 174,
+      "sha256": "9ad5197574e893f299d9b64f168e0b2f3036364995e8e0c0fa0278c3bdd3c040",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Outlier_Profile.csv",
+      "file_size": 4,
+      "sha256": "b42f2099187886def637d6aa840022266e05cb6c987a9394e708e23cd505eb46",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Pipeline_Log.md",
+      "file_size": 1051,
+      "sha256": "388081f6bc4778d4ebb3a4ed5a9e0278b2d78af4ae85507624ac7cafb531c490",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Pipeline_Provenance.json",
+      "file_size": 2958,
+      "sha256": "9f6f8c64cfeb658d4c6bb2c3eea5c841308f3b32b90da695f7f07c9da3b8da1d",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Provenance_Registry.json",
+      "file_size": 1222,
+      "sha256": "ff35f49591392252d2e458761016eb4b31ec90d29486c29be9c1df05f1d6b841",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Publication_Checklist.md",
+      "file_size": 869,
+      "sha256": "57f5a484c56556c1a2886441ccd3187bacac5db117edbae2c15e2c9059df15ba",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Quality_Report.md",
+      "file_size": 448,
+      "sha256": "c743f74ad8d10d45e5545da5b29fcb51a614e3a8ed3c613aae44a540e8cae399",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Ready_Reckoner.html",
+      "file_size": 63697,
+      "sha256": "d15b9ac8b417ef442ccedabd4e8f479f3773addd565f534ad241c8ee9899721e",
+      "file_type": ".html",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Ready_Reckoner.xlsx",
+      "file_size": 73780,
+      "sha256": "bd2d2c5d1a87e4298bd5294025622d9e9c3943acbc9c409fca32d42d4ac49490",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Reproducibility_Report.md",
+      "file_size": 958,
+      "sha256": "e351058f352fb2d8f2ea52340ed9d76d7527a799aa930fc00350133bfaa10c47",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Schema_Mapping_Report.md",
+      "file_size": 380,
+      "sha256": "5ed34def7addcc6bc4f2a5423c4741ae1cc878a28b2b3cc174d67b69e598000d",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Schema_Metadata.json",
+      "file_size": 10792,
+      "sha256": "8464f13e43f8cb55283c624dc67f66202d5667cb80991ff551dae95956dcdec9",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Scientific_Extractions.json",
+      "file_size": 2,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Statistical_Profile.csv",
+      "file_size": 365,
+      "sha256": "fb964646bc629adb7a93a9b97f35552c0b60deb661ecdad678f586b27eba396a",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Unit_Conversion_Report.md",
+      "file_size": 365,
+      "sha256": "86ccc82a071c65f34409cdb1e52f172cf8dc0fe62cd46940fe5a4be81b6e73e3",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Universal_Agricultural_ML_Master.csv",
+      "file_size": 12531,
+      "sha256": "a03e81f33f84a6864509a8a1e5586cdb5e51860ec0e77ea71acb2a5e32538ab3",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Universal_Agricultural_Schema.csv",
+      "file_size": 184064,
+      "sha256": "457b26a89fa219754bdde8b33b82cc8db2dda18be49a19caa2b856202bff0795",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Universal_Agricultural_Schema.xlsx",
+      "file_size": 304693,
+      "sha256": "2806ce126d2aee8b1bc3032649e6e0a586f7558743efd207617e90d4ea9cfa3f",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Unmapped_Columns.csv",
+      "file_size": 30,
+      "sha256": "385f76869bc8ff505651e8b78b35bc7e4d5ac7990146a5ad4413ba5bc1585c6f",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/VIF_Report.csv",
+      "file_size": 157,
+      "sha256": "bf17c78ce788216969b423bb109e2f2b1c9c380f2c66ee105712589a5f3d9122",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Validated_Extractions.json",
+      "file_size": 460193,
+      "sha256": "9b294364ca5da1d4be6ef8a0fec8101c75c45221091d9f382b34418bb977b24e",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Validation_Report.csv",
+      "file_size": 4703,
+      "sha256": "31e30bdb713a28c7c2db3fe625f23b7c6740ad26ecc5014da6c29c4b42cb2630",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Validation_Report.xlsx",
+      "file_size": 14404,
+      "sha256": "dc828d71016d5880ae80d156174df949e3ed3a7e5bdcb9340d2d4687bee43f95",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/Variable_Mapping.csv",
+      "file_size": 83,
+      "sha256": "e03f52157e312ea4230ed6000febcdaf373837eecf732408826ceaad439dee83",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/evaluation/Extraction_Method_Comparison.csv",
+      "file_size": 1012,
+      "sha256": "2abc9b4b0a817f9ad6c42a6efaf8c882f1dcf83725026cf0f819efd5b89b1df5",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/evaluation/Feature_Report.csv",
+      "file_size": 796,
+      "sha256": "640f2599d257fc023eb25511faf68caf08dadd88697dfa999f9a4ef4cd986c3d",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/evaluation/Schema_Validation_Report.csv",
+      "file_size": 1180,
+      "sha256": "decc0e7ae30206c4589786576feea857484e6278b72b6f572374bafaef1bc9e3",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/export/AAIF_All_Results.xlsx",
+      "file_size": 65565,
+      "sha256": "ae9fef4b28a45640e7d7f0161804006e0dd28cc1e9102d0e9768c3d9c827d6f1",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/export/AAIF_Model_Report.docx",
+      "file_size": 40849,
+      "sha256": "6422e48fc1e8d4b7279e62c19cae467e968123d33fc627e9138ef79a48d392ec",
+      "file_type": ".docx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/export/AAIF_Regression_Report.docx",
+      "file_size": 37438,
+      "sha256": "ddc6dc83e7c30d05a6b656b4be031bd6789f49ff9ac41c3e5db0190e49b95036",
+      "file_type": ".docx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/extraction_test.xlsx",
+      "file_size": 5646,
+      "sha256": "3fb7db7a0e48eb22f7d79840280b0f4b236396e23f0898516f51162235c3160c",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/feature_importance.csv",
+      "file_size": 9914,
+      "sha256": "0f5e6255165725c9e21de27dee9eb5a7d59532765af5ba20de59703c8bab2cdc",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/feature_importance_Plant_Height_cm.csv",
+      "file_size": 141,
+      "sha256": "ce9e24db54f7ff68ee65204a434df2870fb833f041817dcdb5494fc7d58db903",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/feature_importance_SPAD.csv",
+      "file_size": 99,
+      "sha256": "b0d21c6c2659d0f26fad62a9511f6f95daf5adbce85b8cc96df666ed2521007f",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/feature_importance_Shoot_Biomass_g.csv",
+      "file_size": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/feature_importance_Yield_per_Hectare.csv",
+      "file_size": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/features_dataset.csv",
+      "file_size": 8562,
+      "sha256": "b07839352056a449d2edb50e8b9bf2d67779536724329a9fce158f295ba489eb",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/framework_report.pdf",
+      "file_size": 42600,
+      "sha256": "6be44a3b25db63e7c1d440967b17edfdec4ae4b3718aaa75fe3b3dc6811d8c05",
+      "file_type": ".pdf",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/hybrid/extraction_report.csv",
+      "file_size": 1167,
+      "sha256": "fa40c524143d047afe985f87d7f79f4e20c61ddab30ec3f27c99086b540ce48c",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/hybrid/hybrid_extraction_results.xlsx",
+      "file_size": 7559,
+      "sha256": "7a171e08c8719ae00cf410d01c7bf8afed5f559856aca5f2516cf44f0706c9b6",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/ingestion_report.csv",
+      "file_size": 2495,
+      "sha256": "4483d8622cc5d7c36cee689c8f1c2c22b17833f9f68080133bd9e723180e3560",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/ingestion_report.xlsx",
+      "file_size": 6398,
+      "sha256": "a395fd7d3c516d6128b6486c38b33e1db741fa606e6b479e46bf00ce4e23fcd8",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/ingestion_test.xlsx",
+      "file_size": 6537,
+      "sha256": "b814a8bd16ee3c32caec5c938e6a22c131580beafba7dd065f7195c28a3772ae",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/master_datasets_combined.csv",
+      "file_size": 23310,
+      "sha256": "37532f327741a1fd539d875043e826e12d56714e728675312ae83facce226525",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/model_metrics.xlsx",
+      "file_size": 5466,
+      "sha256": "7c1ca0e4f40551f58d624fc576f6e106287acb482f7b4140ee310b7d9ac4cb56",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/pdfplumber_extraction.xlsx",
+      "file_size": 10224,
+      "sha256": "00f4a6ede7be33b26b536a51d4e9a34f72991a5066499d2092a425c52720a380",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/ready_reckoner.json",
+      "file_size": 88406,
+      "sha256": "aafebfc256ae073d93bee927a8d7f57a730335afcd1822ba3e4550b5f88f6fcc",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/ready_reckoner.md",
+      "file_size": 44897,
+      "sha256": "3a88bf50eaec1ecae56e1f9ba1290c3749d9965eda8cf4df4dc3266132f9ce62",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/recommendation_dashboard.html",
+      "file_size": 6600,
+      "sha256": "09e4cf75e35a20894d77c0c216658a397f639eb9bfd04b4b34cdaa0876a52a2a",
+      "file_type": ".html",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/recommendation_report.html",
+      "file_size": 1588,
+      "sha256": "c5a030b7fc763abb5f4c93ae4be1ce5fea6bc8c3617195288da9ce6970f5f1f3",
+      "file_type": ".html",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/recommendations/fertilizer_recommendations.csv",
+      "file_size": 7677,
+      "sha256": "12ddd7e1375b7e891afec730af0562b25a00d9eed0009331864408fdc494fb87",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/recommendations/fertilizer_recommendations.xlsx",
+      "file_size": 7955,
+      "sha256": "f2e32e3b827bc4315226229aac9255ef1e83ad6a2c50d15156a5979115323126",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/recommendations/recommendation_report.csv",
+      "file_size": 305,
+      "sha256": "b91532975655832b9463c483c0000706db731348af7fad9606507cf8f55e773c",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/summary_stats.json",
+      "file_size": 913,
+      "sha256": "d2e9808e56f39e1f53c0010548ce08b65ab88eb4be9622e2c09842b9d2f14ba0",
+      "file_type": ".json",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/tables/Model_Performance_Assessment.csv",
+      "file_size": 1266,
+      "sha256": "3b5650d4050c595cb790610906b3f6976294783af02e1f5a914b0b827ea78a24",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/tables/Model_Performance_Assessment.xlsx",
+      "file_size": 6172,
+      "sha256": "43b2bd0e7f5194f6e7aa4ad6de0adc9c92c1f9e0ab2f7a353301673bdab9a944",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/tables/Multi_Regression_Results.csv",
+      "file_size": 321,
+      "sha256": "0db173b26ea1eaebb7337f15a53e5a17769461a971ea64faaa652682f5fa4bc3",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/tables/Multi_Regression_Results.xlsx",
+      "file_size": 5961,
+      "sha256": "13e55da708c8b34f0c452a59902834ebdb240e2e706556bb7bde82d527da348b",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/training_blockers.md",
+      "file_size": 931,
+      "sha256": "f95d475be0ebc22127bfe96e2c30f43622b81f3aa6defa23a0cdde1503765272",
+      "file_type": ".md",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/treatment_level_extraction.csv",
+      "file_size": 28614,
+      "sha256": "4b3521a3489cfc24f085f1b553a7f79ebd83ee161a37e25c4a8271f7491b8f2d",
+      "file_type": ".csv",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "outputs/treatment_level_extraction.xlsx",
+      "file_size": 11578,
+      "sha256": "cca476fdce1e86a644859df6b4c94a70f5145eb84900f7229bd2bc32019ae20e",
+      "file_type": ".xlsx",
+      "role": "frozen_output",
+      "protected_status": true
+    },
+    {
+      "relative_path": "pdfplumber_extraction.py",
+      "file_size": 16991,
+      "sha256": "352743020de3ef626af0b82346e65b859a9817b3fe1e2a6dc07b34f69ec6fffa",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "post_pipeline_analysis.py",
+      "file_size": 20910,
+      "sha256": "e8e9d1e765df9bcacb78f9103ef6ed73e0a7df358c92ee35203fe3e736ffffd7",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "production_run.py",
+      "file_size": 60820,
+      "sha256": "01b997d22bbf9de6229ee418988050b976db6dea8b54c9bd3ac7ba0ea2eab4bb",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "pyproject.toml",
+      "file_size": 1704,
+      "sha256": "ef6ce30922cb1dc4385e212d63f17d85c8f76f27b56f535bdad83f9e1388a106",
+      "file_type": ".toml",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "requirements-dev.txt",
+      "file_size": 69,
+      "sha256": "3d6ab1e032cbdc1bbf4b1ed04d9202ba3f1b65ccc629c77192240eb0b2b10e61",
+      "file_type": ".txt",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "requirements-lock.txt",
+      "file_size": 386,
+      "sha256": "d0aeb8b78d9c4c2e29f34479768fd4a0f4723fd568a3fb1cede7b5c60c346641",
+      "file_type": ".txt",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "requirements.txt",
+      "file_size": 279,
+      "sha256": "3983fb12f18eae597588349da7c3a986c2ea7bf639966359505366e4e6a83174",
+      "file_type": ".txt",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "run_aaf_pipeline.py",
+      "file_size": 95027,
+      "sha256": "a4cf1a9327c4934ed9a879b1a03f1f3e304f9e33365f92707493afdfe8d49819",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "run_benchmark.py",
+      "file_size": 12952,
+      "sha256": "319f708e56828ad2a54098cc49d5528c2d75d1144ba9093c283a3de8033a03af",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "run_enrichment.py",
+      "file_size": 8775,
+      "sha256": "c8e2134c0fc5c93c68e6e4c39d81bf34cd3b50e437c6ae515c411b5ebb6f7fb5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "run_eval.py",
+      "file_size": 3425,
+      "sha256": "ef4a9e3c23a25bc47e5ee0c7094a69fbf7eef9977e24bf269f064f1df53be595",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "run_literature.py",
+      "file_size": 3168,
+      "sha256": "72b30952f85f4cc7184cd08a50e69b5019699712e31f361570a3bc1fa250c9e1",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/environment_check.py",
+      "file_size": 2412,
+      "sha256": "c765ab16a327a2b67833c6c2141a990025bb857b9e79e5e1caefb1a756d32d23",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/extract_oa_corpus.py",
+      "file_size": 11248,
+      "sha256": "e6545a2f136df2b413957ed3b1166a8fa8757fdf20126b458da67f450e70a194",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/gen_ontology_docs.py",
+      "file_size": 4123,
+      "sha256": "a2690627c1b6ac11a32bf055ded5202df73643908420f42e420233f7b8990917",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/pilot_oa_corpus.py",
+      "file_size": 15841,
+      "sha256": "1d2c95e7e95c838fe9d31493747490118d511b476a1d0b888b3222d5208e1d94",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/repair_ontology.py",
+      "file_size": 6252,
+      "sha256": "1ef8cc0e5d1e89dde632ad7461ae9ca1a1003b092ba9b5d1ce95e94182eafa34",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/smoke_llm_extract.py",
+      "file_size": 1520,
+      "sha256": "a0265529e1cae35d99602a9a8dcce1d737e22196f9dfec08b20c1ec419fba60d",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/uaasop_gate.py",
+      "file_size": 9245,
+      "sha256": "7d71125a787496b645745cd51af2aab271bb397d8e6e36d163ef6ca6e860e477",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "scripts/validate_ontology.py",
+      "file_size": 6293,
+      "sha256": "95506b12cd2aea80d47e948e8695976e02fb311db7c6ac4934f3b503e50a8e12",
+      "file_type": ".py",
+      "role": "script",
+      "protected_status": false
+    },
+    {
+      "relative_path": "spec/Data_Contracts.md",
+      "file_size": 7709,
+      "sha256": "d493c48a95152516f3ab90c5004c524d715afe70f7b381ccc4819421cc8ca560",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/Derived_Features.md",
+      "file_size": 6949,
+      "sha256": "7ed97bf2a5166df376ed0d0824e68b0d5729de9d80cfb4d03b72ee709301d3e8",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/Encoding_Scheme.md",
+      "file_size": 2995,
+      "sha256": "473c88a3d4ebaf4209cfcebaf6db3ce6816585ab7f8c778698504f3eaff12f8e",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/Ontology_Registry.md",
+      "file_size": 26709,
+      "sha256": "99a8c6a1aa4d419de4adf0d52d5b5f14129939e84b03ab94492ac3714f0b62ee",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/README.md",
+      "file_size": 4336,
+      "sha256": "c6b79d28f14c9437cbd39e34f0ed70a7ab5b60458c54895efd676f5784ca2cd9",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/UAMS_ChangeLog.md",
+      "file_size": 5789,
+      "sha256": "bce489a2d967e8b77f7b300c47b4a86c2f741c59972918cc01ce2c5bed4d5fab",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/UAMS_QuickReference.md",
+      "file_size": 4511,
+      "sha256": "6b7b18bf8f12d734c9fe66e85500c00aca5ef72368d3c94f04718241201762f8",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/UAMS_Specification.md",
+      "file_size": 17458,
+      "sha256": "ec985140a70baf603a25873fcd19626808c94f65eeed47792f0eebd116e7cad8",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/Validation_Rules.md",
+      "file_size": 5625,
+      "sha256": "f4310be93c2bc3be53184133dd24fbabb3d3bb0bd3364219c6c6562b8f02cb5f",
+      "file_type": ".md",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/ontology_labels.json",
+      "file_size": 1218,
+      "sha256": "ab70f1baf937d182591299256d17e96169aac85ff72fafe795fbf5f8eeb7273e",
+      "file_type": ".json",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "spec/uams_ontology.yaml",
+      "file_size": 62226,
+      "sha256": "477694909ef27cca73d93a5ed6a5a04a75e91abb475875d881831987d5f663cb",
+      "file_type": ".yaml",
+      "role": "specification",
+      "protected_status": true
+    },
+    {
+      "relative_path": "src/__init__.py",
+      "file_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/__init__.py",
+      "file_size": 1836,
+      "sha256": "879a54ae0eedec99939c8c22708bb4ecdbb6767d58420ef17745efbd77fb120a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/cache.py",
+      "file_size": 3919,
+      "sha256": "31a55f16f08b0d7aa11f1f9537327e0f3f3a0c332e250f9c1551515b25a7cc4f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/config_loader.py",
+      "file_size": 1200,
+      "sha256": "425e97782d7e92b1a3787ac9ee604e8993001f54835914787a0177389742bfbe",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/http_client.py",
+      "file_size": 9671,
+      "sha256": "a648bf4dd5ba50a9b2cd7d5867417a1716af5bd42b898a985a6be050daf10d3a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/integration.py",
+      "file_size": 3406,
+      "sha256": "d61b2dfa4769875cb313bd184100d84ae0f32e7783f250cc4836e2ac9b48ad4d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/storage.py",
+      "file_size": 3408,
+      "sha256": "6ba03f7b0554fa629d047e2702af9c6a6d974a96ac1a14687a656a191758437e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/data_sources/sync.py",
+      "file_size": 2826,
+      "sha256": "e51ab3eba40257b81ca562c2626204d37d6429b99e8eff6ede9df9ed72a78514",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/__init__.py",
+      "file_size": 1672,
+      "sha256": "f5c8a8938d86dfd4dd32fb563763cc4d79496ba3e2829935f24d0e860f6445a0",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/agricultural_features/__init__.py",
+      "file_size": 298,
+      "sha256": "bc7c633ee2f828f0605e94f0ee91aad1d30761d6a3340efda6e31855971de1d4",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/agricultural_features/climate_indices.py",
+      "file_size": 4711,
+      "sha256": "d3806f77b78b0b46274f55a5d3f35a605cfb4579b59d1e860fa1ade2376b5832",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/agricultural_features/crop_interaction.py",
+      "file_size": 5521,
+      "sha256": "5f85d5b01e8c0141cfdfa4e9354315b92e90fada9b29a3c2be7baa052c503f89",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/agricultural_features/soil_indices.py",
+      "file_size": 5950,
+      "sha256": "5bbe0d1d2453e8e0fd9a2348e4e40b422f2aeb6a5551efa90ab8425715b381f5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/auto_training_pipeline.py",
+      "file_size": 20638,
+      "sha256": "70f8cca8d9437c5a34c16097d5051a405885b640aae6d25c3be3dda651c6a196",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/data_quality/__init__.py",
+      "file_size": 111,
+      "sha256": "418a0155e7d213b9ae73199ba0678d9ccee750b560465b30f43d36fc4c6b854a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/data_quality/scoring.py",
+      "file_size": 7317,
+      "sha256": "dc01a7daf33f7dc48f77769ee97ddc787985d5fb3c5e8447a8b617074ef2895d",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/ensemble/__init__.py",
+      "file_size": 182,
+      "sha256": "b17875467f4c40ba66fdfc665d2497f333cf6ea8b3bc59e7790f69ac6b944e7e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/ensemble/stacking.py",
+      "file_size": 3556,
+      "sha256": "3797f68485bd21975e768872e76534fdb8af4788e51e5f6dc1d3c8764be03895",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/ensemble/weighted_average.py",
+      "file_size": 3782,
+      "sha256": "f1854f858c203974befcaed500d994cf2703238a15bce458edfb6d27dd6d849a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/experiment_tracker.py",
+      "file_size": 11208,
+      "sha256": "7d0d5798413e80120a78e176405cd7b7d495aa38d75cd10f42ebcba58cb9fb2b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/feature_analysis/__init__.py",
+      "file_size": 408,
+      "sha256": "2e22d758ae20773fef378f1476690b13134ab2a18112592b572ef18a5b9d9f4e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/feature_analysis/correlation_analysis.py",
+      "file_size": 3996,
+      "sha256": "bad2c2aaa3c91103cd71250406b9c17b7415d2a91b6dd2a8cf8a3ee01227422f",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/feature_analysis/feature_importance.py",
+      "file_size": 7326,
+      "sha256": "c0d585103c30a690fc76eb5584208195d0120225ed3eb1c0bda47283be9a4e87",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/feature_analysis/feature_selector.py",
+      "file_size": 10582,
+      "sha256": "2d0b86253ee8ef2952fb1bc90fa10197cbfc23a2c91caa57cfddf56dda2b5708",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/feature_analysis/shap_analysis.py",
+      "file_size": 5244,
+      "sha256": "4b328c3feae4e9edd1ba3c7e74e9486055516d975839cb20f915174ffdf1aca5",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/hyperparameter_optimizer.py",
+      "file_size": 10327,
+      "sha256": "97ab9da33b7e07d27d654abf5b99954c653cfb5d57adca16bc32948fa00045fa",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/model_benchmark.py",
+      "file_size": 11905,
+      "sha256": "0af740e8dca30fb8e1431ae7c1f6cb049366c6129fe7863ef3719dcfeb385b99",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/model_validation/__init__.py",
+      "file_size": 202,
+      "sha256": "c3115d885ced0fd004a21bb79030be4fbc146a9a4d8e8c76d40a8ac67592ac7a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/model_validation/cross_validation.py",
+      "file_size": 4672,
+      "sha256": "180a8cf983cbced671216e5c89b360e0dcf307a6a47400a76a3b2afad9f42048",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/model_validation/leakage_detector.py",
+      "file_size": 6715,
+      "sha256": "7fdd44033ceb3097ce862e047669a07779488e3af8a26ce368ae4a97d3011b6a",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/performance_report.py",
+      "file_size": 6887,
+      "sha256": "8e4fb8cd4e7e5820d6cc6cacd00d25255aa1c359f0dbf8b4b791b46f646b2edc",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/pre_training_checks.py",
+      "file_size": 10762,
+      "sha256": "b4cb90d3104fe076e080f2ef6f87d35d25ba113fdbc575a168d160dc3375ebe6",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/ml/prediction_confidence.py",
+      "file_size": 4724,
+      "sha256": "6c30e94a5c14ad5cba4a88d1b04f15698128743377c1f6308cb7dbd6be6a3fa9",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/provenance/__init__.py",
+      "file_size": 280,
+      "sha256": "542c72a0bd4223136c06958cc5cd4b2e6136e36883ee63ce04ba9661f18d2315",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/provenance/lineage_tracker.py",
+      "file_size": 11376,
+      "sha256": "7990a2c45392fde22dfc4b73b269429dce37eede94c2d27f4bc56684693c3961",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/utils/logging_config.py",
+      "file_size": 7244,
+      "sha256": "baa3a7e8ad409b1c5d28df5020484058010554672d62886c341ebf2468080df4",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/validation/__init__.py",
+      "file_size": 552,
+      "sha256": "cfb8e6fdc7279805cc58f42f7e679717ccc32d48db2f46ef137a17d8380ffc19",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/validation/data_quality.py",
+      "file_size": 2950,
+      "sha256": "469fe958d264fc01ea55c05c9d24ad94c15c64b01cedd5c61448848523daa60b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/validation/provenance_validator.py",
+      "file_size": 4251,
+      "sha256": "ae5b637656519bb079062eee8cede1f4535735a5fe9d181ebb3706b16d9fc27e",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/validation/range_validator.py",
+      "file_size": 6634,
+      "sha256": "19b54f0b3a16cccee297dc23f93b117e497cfbfb272276b46896438bf5bf7690",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/validation/reports.py",
+      "file_size": 7136,
+      "sha256": "9e2359bc52423b49dcf3768f61548b317d91827ca0ce21dba6c7bbad6ffce12b",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "src/validation/schema_validator.py",
+      "file_size": 3076,
+      "sha256": "c76fa726bd07200f294a1fb2c04d692c09f7fdab10c0c8ec6f7d216bcd5f43ec",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/__init__.py",
+      "file_size": 15,
+      "sha256": "eb524fbb292ded7e99ccc49499e59a72f09d78b9faea5d791e309906312669a2",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/conftest.py",
+      "file_size": 1925,
+      "sha256": "d71add8ad4997edfb44914caf1da143d2319a7a8ce5ca5f9775ae072f23f3618",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/governance/__init__.py",
+      "file_size": 84,
+      "sha256": "b69e1b078db91a524515f3b9cdc0ce906889200b0a5b9a083aa721fcb098696d",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/governance/conftest.py",
+      "file_size": 9877,
+      "sha256": "aa9ef372c0c9dfb412e0c5dd2935dac39d1807766644089f6aa6e603899cebb8",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/governance/test_uaasop_integration.py",
+      "file_size": 14484,
+      "sha256": "7fb378e15f416616347fb96eddeca945bd109142f300ce03e6897865314c598b",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/__init__.py",
+      "file_size": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/conftest.py",
+      "file_size": 514,
+      "sha256": "5fbed4b1f67dea8468bb5ebf0f9090a55d245150f5cd20e1b9184d5fa834e003",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_agri.py",
+      "file_size": 5836,
+      "sha256": "8f8fbd4e6f3460195528f65a3c3e61480d238fc486f78f1d31e970158306c2d8",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_connector_parsing.py",
+      "file_size": 8826,
+      "sha256": "97d96c8f9339252dc0b4e6ff41fec45ba7ac49f23437fdef80a189885eac2c23",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_dashboard.py",
+      "file_size": 2774,
+      "sha256": "1df3ca5b5ec90d0c41bc2235468d15aabc15384457e7535a4ed65ef4c7e7b3d0",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_dedupe.py",
+      "file_size": 4024,
+      "sha256": "a52afd451ec7f8b6d7ef970b347810cbd8d1b0fdf4902ae67f7d9edc9fb44aac",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_external_config.py",
+      "file_size": 3638,
+      "sha256": "a56fc7b3a4a8cf49e720654e76f50d32bd9f0db43387176408740dfb86745f22",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_pdf_report.py",
+      "file_size": 1660,
+      "sha256": "cb8d8a476c96bb6cca18a81a1bc9d9f24c9592bb60cd70314a458f7c1214bfa5",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_query_and_classify.py",
+      "file_size": 6076,
+      "sha256": "cc159a7d4c167fe6b3fa82a8e912797a129db915f4c77d6bae65cc33f3a88f93",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/literature/test_state.py",
+      "file_size": 2850,
+      "sha256": "38c0c92d624e6ab25c23957d8987842d02aa2478df0ee44e9b5e8ef1316b556e",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/conftest.py",
+      "file_size": 1022,
+      "sha256": "08c7872d8913c39fa8792653c96d4f581bbd41ddd42b4be77a8ad706e56dd7c8",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_agricultural_features.py",
+      "file_size": 4764,
+      "sha256": "10e5898227b715624a5ba5b41b5cfceeb1144edc13c7bfa8227e9f0896d4296c",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_data_quality.py",
+      "file_size": 2702,
+      "sha256": "9e99098bef99e1d0d68aaae0a502931dd7051530c763889464f9450d54573c91",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_ensemble.py",
+      "file_size": 2838,
+      "sha256": "18bdabc99937ef8d5e1abee3b8265a00a90787cdd1b76263dccae8e73816cfa7",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_feature_selection.py",
+      "file_size": 4734,
+      "sha256": "5b5f65ac208f210052f7fd3edeff3613d0bdde1bcd956b60c05664dec7bd2bc9",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_model_validation.py",
+      "file_size": 3474,
+      "sha256": "c15603a064d5ee4c5f697b22a8432d8e00ee555f730eb4e7900729ba188d22ba",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_optimizer.py",
+      "file_size": 2188,
+      "sha256": "473a6d33bd07e4afe2e24707be237b5a274bf0b0bf5ecac9b4b0a3ecb7065f03",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_prediction_confidence.py",
+      "file_size": 2801,
+      "sha256": "56500880464eaae36088b49ca935d8679c6b5d97491a7f98c4c5748ae0409865",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/ml/test_shap_analysis.py",
+      "file_size": 1862,
+      "sha256": "c2747a3b61eb217ba63e0a2e33659930ef1ffefa24536f3ba231241c59922bf2",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_agent_layer_efficiency.py",
+      "file_size": 22887,
+      "sha256": "de12247f1cbd2de62129426d5ac33cceb5dda4a50d8b024c4c515eb1e2a6cf11",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_base_agent.py",
+      "file_size": 883,
+      "sha256": "7e60ee9fb686406a04cd774880f73030be2e11b1dc4a101585e7340ba9fd9203",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_benchmark_agent.py",
+      "file_size": 6795,
+      "sha256": "67fb824e323589e12f07ebf9a72fcbc0a72283aee27867311be6c3f2f970d85e",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_cli_extract.py",
+      "file_size": 1374,
+      "sha256": "0eb33ef77b0964719360931635446cd8d718e1052fd403e821b769db50438e3b",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_continuous_learning_agent_v2.py",
+      "file_size": 13292,
+      "sha256": "a418af1382f439255267ed6147432d1ac2788550e9211fc440d94c70fd2c7d35",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_dataset_normalization_rows.py",
+      "file_size": 2346,
+      "sha256": "b1703070ce2357a3d1e38b31cc753483a943cc51f113415dacefd68c6c4eda3d",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_docs_claims.py",
+      "file_size": 1364,
+      "sha256": "098b4572f4cc666e4a04a30175ed33883fce92c1ad6ff9eacf03c8ecce8ce80a",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_evaluation_dashboard.py",
+      "file_size": 7282,
+      "sha256": "dd9de55c0f795cb0726084d92ddde9ccedebd48eeaf362d6e7227682d5a480c2",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_evidence_fusion_agent.py",
+      "file_size": 8146,
+      "sha256": "5aece8cb38b5ad986a5b0d7c637980d2c91340f9e9cb3b03b2d1c49263616d08",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_explainability_agent.py",
+      "file_size": 10684,
+      "sha256": "6d5272d314805a9cd116663a51e71f3eaeb86bafdd56b071a7e098895dd6d740",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_extractor_tables.py",
+      "file_size": 9475,
+      "sha256": "f9cff7e233c0c13b932946cd6bcd7e1fc068079ddfcb999b22cca8ec7ae8acac",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_extractor_units.py",
+      "file_size": 2835,
+      "sha256": "ba36566717f019d22e7dbe7d3ac2dd584ffc9ff6ac58bcc1f2ced569cd102748",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_feature_agent_v2.py",
+      "file_size": 4368,
+      "sha256": "433ffa52d8d2ecdc73ae0876c05c0bd5816057532476c3cdada2d21abeaf65f8",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_fuzzy_expanded.py",
+      "file_size": 6134,
+      "sha256": "7409d055bb1941ad9af64a8a6f3d2df22f21f598e282cb39686915311fb041a9",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_golden_baseline.py",
+      "file_size": 1614,
+      "sha256": "c8f407694eeb06e9d10bfeed04b4f58252b2567ae63efa79e6a67a0c594ad47a",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_http_client.py",
+      "file_size": 5010,
+      "sha256": "a454a93f223a5e7fed77bc4bcc10b940f1562991098ac7f487aa0fd2ab783dfb",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_knowledge_graph.py",
+      "file_size": 9346,
+      "sha256": "f92a16c7c479bf7623a4822c8e3e71d0a0af639773f580c902c469f877ab7bec",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_knowledge_integration_agent.py",
+      "file_size": 5725,
+      "sha256": "c68d9a9d98aca083575c55e3c3ddb2b36508d890a86b87f5fa6c2df7fb9703c7",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_leakage_stage_contract.py",
+      "file_size": 2160,
+      "sha256": "7c119874f734deb5bfbc4fe0b51e1be5c9d574cdc4c1a81ccc0a1622da312e1c",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_literature_agent.py",
+      "file_size": 3405,
+      "sha256": "5eb51ef658677eee0abef9bdd4d588f944ed533d10221ea3f3f2f89e1298750f",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_llm_extraction.py",
+      "file_size": 4704,
+      "sha256": "031b497ba18b6070e50151190959816e99a26865df72b075f015d44351f41fc1",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_logging_config.py",
+      "file_size": 4271,
+      "sha256": "5eda368c29d6ff3e6c26a208d73f2c14afc23f172c7c0af679507cce56806d40",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_ml_evaluation.py",
+      "file_size": 3913,
+      "sha256": "de2a5a5615ce8ea44367fffae221ad75efdc15153532f1f046661b7ed74a086a",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_ml_leakage.py",
+      "file_size": 5314,
+      "sha256": "a5a25ea66e3b7b872d035158b0740a07f4a2e699bb7da6f9c513e066ad112493",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_model_selection_agent.py",
+      "file_size": 5131,
+      "sha256": "4ee12cab51ba6a193e82047151eb0abd328667e44d77e9812de1c346f31d68b7",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_ontology_agent.py",
+      "file_size": 5277,
+      "sha256": "ca7994dd62b1c90d22db1de5f24111954437a27ed8f9cc31cd290de46aa8420d",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_ontology_registry.py",
+      "file_size": 6595,
+      "sha256": "4839525caef6f71dd4a47c2024f9de9e22269f86d69ad6eaad51e7d9486b4307",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_orchestrator_e2e.py",
+      "file_size": 3279,
+      "sha256": "e2aa838fccfeccc434ee0febfa5166d018aabbe6ff343c945ca18ca2bd8574ae",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_performance_targets.py",
+      "file_size": 5199,
+      "sha256": "64d615c286d11ce813b7abde660386498935da796786a93db72988d5335c733f",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase14_5a_rag.py",
+      "file_size": 11500,
+      "sha256": "6f7185691ed36a25d4426938b4d24389cbd367fc000759df5613f7addd0d9dd1",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase14_5b_verification.py",
+      "file_size": 8690,
+      "sha256": "ebe4d3c76f4dafea48d8458d39e677e72632a617a4fad29a7e36bd45e44ba8bd",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase14_evidence.py",
+      "file_size": 7750,
+      "sha256": "fd94f2dea4541cc0bd25eaadcfb4b709013120c35ed00d087a0fe50055df47fa",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase16_1_discovery.py",
+      "file_size": 17267,
+      "sha256": "b8e869a80f9506eab3fcee505cf03056085abdc8376fd9b17402e84d50d6d251",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase16_2_recovery.py",
+      "file_size": 37293,
+      "sha256": "713f5760d9ba0eb411144df1ec0f62b730c090ffa578936216698b742d103941",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase16_learning.py",
+      "file_size": 9370,
+      "sha256": "907592326296a7b0aa215adfdd3dd4b139b062aecd17cb95faef233c3a75c325",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase17.py",
+      "file_size": 8196,
+      "sha256": "b78916e5f5fb6a99ffb6c3c2fc50304eb02aaf0b5d674648d7b1ae2979aa4bed",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase18.py",
+      "file_size": 6847,
+      "sha256": "cf13d7c788de85bdc970109c6f8d33fb4d5e28965b567ca8cee1f0b8638d4d46",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase19.py",
+      "file_size": 8297,
+      "sha256": "a397524cd50538c4d31abc5a127dd71fb2de1b2b62f234bae553988233be5481",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_phase20.py",
+      "file_size": 12846,
+      "sha256": "8f39ebca5dddf18128b5e5b2d4170ff1818d1b896bc752fe17cc6e0fcb235f84",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_pilot_table_parser.py",
+      "file_size": 2575,
+      "sha256": "8bfd461a940e0468101c4c14423c74933b92345a3505615550618ef5bc251bd4",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_pre_training_checks.py",
+      "file_size": 4044,
+      "sha256": "b15e7898d1310b8b0699e66c3bb4d300f9e4fed4677c39dc18046e9cfc4eaa1c",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_provenance.py",
+      "file_size": 5645,
+      "sha256": "498327ac00bb2355c21d740b40c81d0686a6ec9eeb1410acd96e63d797fed8c5",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_provenance_agent.py",
+      "file_size": 7039,
+      "sha256": "5faa7e5dd80cdf468aa71fdb52ee044f1ef792298e23b7cc29799638a45a3c67",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_ready_reckoner_v2.py",
+      "file_size": 5232,
+      "sha256": "d78e3dc7e4fcedf9beae9339bd628ccbf3b89f6327188728811264e968697764",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_recommendation_agent_v2.py",
+      "file_size": 5505,
+      "sha256": "1658e1b3871dd8ad30e64bb3aecd6f7edf6d1cb3e336dcbef6dc802de010f809",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_recommendation_honesty.py",
+      "file_size": 4055,
+      "sha256": "332a44f0efc49e02b95f4a55188a47724d7310d2b8d9baf18cc2f775679b036f",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_schema_population_agent.py",
+      "file_size": 6315,
+      "sha256": "c6e141dc98aa229c72748ea2de79d61fe30518ba3a3b952860270fd9abdd0e17",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_table_intelligence_agent.py",
+      "file_size": 6735,
+      "sha256": "20c6cd0753af60dea51b05cbe01072ed46d0fbdeb0786409de93105f8f7f9582",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_training_agent_grouping.py",
+      "file_size": 2185,
+      "sha256": "93806c12a032fc77bc3507a1915fa917f70ca25c4068ca3694649069fef55e3f",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_validation_agent_v2.py",
+      "file_size": 4963,
+      "sha256": "7ef5de685b704a4d5f524e024f9c4f7c250c79bc2b64d268bc611eddeb24fb1d",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_validation_data_quality.py",
+      "file_size": 2342,
+      "sha256": "65b3d1592716dbaedc2db5773a17fecbf7d8093376f6478a6a9efac57bb2fcf7",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_validation_range.py",
+      "file_size": 2738,
+      "sha256": "7181470543ff0c77d100c87a5c2e767b18583ff531badb124649d15d3c6cf12f",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_validation_reports.py",
+      "file_size": 3389,
+      "sha256": "7b2fab252a83b757f5c00a2f56abf5e6ccac2d196fdaf355eb32e1298eb91916",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_validation_schema.py",
+      "file_size": 3318,
+      "sha256": "08ad7ded65e2f44a45c17a1c86bd47061cd4e928f7e71548094f2d2ccbcf1fa6",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "tests/test_yield_unit_extraction.py",
+      "file_size": 1619,
+      "sha256": "48762d35a76f1dd456a2ab11bb614107913bee708e3fc74ddb6ce3e3ea60ff23",
+      "file_type": ".py",
+      "role": "test",
+      "protected_status": false
+    },
+    {
+      "relative_path": "universal_schema_generator.py",
+      "file_size": 10254,
+      "sha256": "cbb3cb1321b2ddb2b7c233a3073b20a2955a5898106d0627fde929642d2818a2",
+      "file_type": ".py",
+      "role": "source",
+      "protected_status": false
+    }
+  ]
+}

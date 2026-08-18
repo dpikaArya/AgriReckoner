@@ -1,11 +1,20 @@
 from __future__ import annotations
 
+import logging
 import re
 from difflib import SequenceMatcher
 
 import pandas as pd
 
 from agri_ai_agent.config.schema import UAMS_COLUMNS, VARIANT_MAP
+from agri_ai_agent.extractors.nutrients import (
+    CONVERT,
+    REFUSE,
+    elemental_column,
+    plan_conversions,
+)
+
+log = logging.getLogger(__name__)
 
 KNOWN_SOURCE_MAPS: dict[str, dict[str, str]] = {
     "NASA_POWER": {
@@ -139,6 +148,9 @@ def map_column(source: str, col_name: str) -> str | None:
         return source_map[norm]
     if norm in _normalized_uams:
         return _normalized_uams[norm]
+    oxide_target = elemental_column(col_name)
+    if oxide_target is not None:
+        return oxide_target
     best_match: str | None = None
     best_score = 0.0
     for uams_norm, uams_col in _normalized_uams.items():
@@ -151,6 +163,43 @@ def map_column(source: str, col_name: str) -> str | None:
     return None
 
 
+def to_elemental_basis(df: pd.DataFrame, renamed: dict[str, str]) -> pd.DataFrame:
+    """Put oxide-reported nutrient columns onto the elemental basis UAMS stores.
+
+    Must run BEFORE the rename: the basis is declared by the source label, which the rename
+    throws away. ``renamed`` is edited in place -- a column whose basis cannot be read loses
+    its mapping rather than entering a nutrient column on an assumed basis.
+    """
+    result = df.copy()
+    plan = plan_conversions(renamed)
+    for position, label in enumerate(result.columns):
+        action, factor, reason = plan.get(label, (None, 1.0, ""))
+        if action == CONVERT:
+            result.isetitem(position, _scaled(result.iloc[:, position], factor, label))
+            log.info("Nutrient basis: %s converted, %s", label, reason)
+        elif action == REFUSE:
+            renamed.pop(label, None)
+            log.warning("Nutrient basis: %s not mapped to a UAMS column - %s", label, reason)
+    return result
+
+
+def _scaled(column: pd.Series, factor: float, label: str) -> pd.Series:
+    """Multiply a column by a basis factor, keeping values the conversion cannot read.
+
+    A cell that will not parse as a number cannot be converted, so it is left as it was
+    rather than coerced to NaN: dropping it would destroy data the elemental path keeps.
+    """
+    numeric = pd.to_numeric(column, errors="coerce")
+    unreadable = numeric.isna() & column.notna()
+    if unreadable.any():
+        log.warning(
+            "Nutrient basis: %d value(s) in %s are not numeric and were left unconverted",
+            int(unreadable.sum()),
+            label,
+        )
+    return (numeric * factor).where(~unreadable, column)
+
+
 def map_dataframe(source: str, df: pd.DataFrame, drop_unmapped: bool = True) -> pd.DataFrame:
     renamed: dict[str, str] = {}
     unmapped: list[str] = []
@@ -160,7 +209,9 @@ def map_dataframe(source: str, df: pd.DataFrame, drop_unmapped: bool = True) -> 
             renamed[col] = mapped
         else:
             unmapped.append(col)
-    result = df.rename(columns=renamed)
+    converted = to_elemental_basis(df, renamed)
+    unmapped.extend(c for c in df.columns if c not in renamed and c not in unmapped)
+    result = converted.rename(columns=renamed)
     if drop_unmapped and unmapped:
         result = result.drop(columns=[c for c in unmapped if c in result.columns], errors="ignore")
     return result

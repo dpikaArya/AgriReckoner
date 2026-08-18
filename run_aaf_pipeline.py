@@ -46,6 +46,8 @@ from agri_ai_agent.config.schema import (  # noqa: E402
     UAMS_COLUMNS,
 )
 from agri_ai_agent.config.settings import AgriAISettings  # noqa: E402
+from agri_ai_agent.external_data.column_mapper import to_elemental_basis  # noqa: E402
+from agri_ai_agent.extractors.nutrients import to_elemental  # noqa: E402
 
 settings = AgriAISettings()
 settings.ensure_dirs()
@@ -478,7 +480,9 @@ def phase0_load_master_datasets() -> pd.DataFrame:
     combined = pd.concat(all_dfs, ignore_index=True)
     log(f"Combined master datasets: {len(combined)} rows, {len(combined.columns)} cols")
 
-    mapped = combined.rename(columns=MASTER_COLUMN_MAP, errors="ignore")
+    rename_map = {c: MASTER_COLUMN_MAP[c] for c in combined.columns if c in MASTER_COLUMN_MAP}
+    combined = to_elemental_basis(combined, rename_map)
+    mapped = combined.rename(columns=rename_map, errors="ignore")
     mapped = mapped.loc[:, ~mapped.columns.duplicated()]
 
     for col in UAMS_COLUMNS:
@@ -609,6 +613,37 @@ def phase1_ingestion() -> pd.DataFrame:
     return ingestion_df
 
 
+_UNIT_TAIL_CHARS = 24
+_CLAUSE_BREAK = re.compile(r"[,;.]|\band\b|\bwith\b|\bplus\b", re.IGNORECASE)
+
+
+def _unit_tail(text: str, end: int) -> str:
+    """Return the unit written just after a number, stopped before the next clause.
+
+    "phosphorus 60 kg P2O5 ha-1" states the basis in the unit rather than the term, so the
+    unit has to be read too. The clause stop keeps a later "and K2O 40" out of this value.
+    """
+    tail = text[end : end + _UNIT_TAIL_CHARS]
+    stop = _CLAUSE_BREAK.search(tail)
+    return tail[: stop.start()] if stop else tail
+
+
+def _elemental_values(pattern: str, text: str) -> list[float]:
+    """Return every number ``pattern`` finds in ``text``, on the elemental nutrient basis.
+
+    The pattern must capture the nutrient term first and the number second, so that
+    "P2O5 60" is told apart from "phosphorus 60" instead of both landing in one column.
+    A term whose basis cannot be read is skipped rather than assumed.
+    """
+    values: list[float] = []
+    for match in re.finditer(pattern, text, re.IGNORECASE):
+        term = f"{match.group(1)} {_unit_tail(text, match.end(2))}"
+        value, ok, _ = to_elemental(float(match.group(2)), term)
+        if ok:
+            values.append(value)
+    return values
+
+
 # =====================================================================
 # PHASE 2-3 — AI EXTRACTION + UNIVERSAL SCHEMA
 # =====================================================================
@@ -722,22 +757,14 @@ def phase2_3_extraction(ingestion_df: pd.DataFrame) -> pd.DataFrame:
                     re.IGNORECASE,
                 )
             ]
-        p_vals = [
-            float(m.group(1))
-            for m in re.finditer(
-                r"(?:available\s*phosphorus|phosphorus|phosphorous|p2o5)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
-                text,
-                re.IGNORECASE,
-            )
-        ]
-        k_vals = [
-            float(m.group(1))
-            for m in re.finditer(
-                r"(?:available\s*potassium|potassium|k2o)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
-                text,
-                re.IGNORECASE,
-            )
-        ]
+        p_vals = _elemental_values(
+            r"(available\s*phosphorus|phosphorus|phosphorous|p\s*2\s*o\s*5|p₂o₅)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
+            text,
+        )
+        k_vals = _elemental_values(
+            r"(available\s*potassium|potassium|k\s*2\s*o|k₂o)\s*[:=]?\s*((?:\d+\.?\d*|\.\d+))\s*(?:kg/ha|kg|ppm|mg)?",
+            text,
+        )
         tmax_vals = [
             float(m.group(1))
             for m in re.finditer(

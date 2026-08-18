@@ -445,17 +445,22 @@ columns:
       curie: AGROVOC:c_5804
       label: phosphorus
     unit_ucum: kg/ha
+    basis: elemental
     synonyms:
     - available phosphorus
     - available_p
     - available_p_kg_ha
     - p
-    - p2o5
-    - p2o5_kg_ha
     - p_kg_ha
-    - phosphate
     - phosphorous
     - total_p
+    # Reported on the oxide basis. Multiplied by 0.4364 on ingest, never stored as-is.
+    oxide_synonyms:
+    - p2o5
+    - p2o5_kg_ha
+    # The term does not say which basis it is. Refused on ingest rather than assumed.
+    ambiguous_synonyms:
+    - phosphate
     validation:
       min: 0.0
       max: 500.0
@@ -466,16 +471,21 @@ columns:
       curie: AGROVOC:c_6139
       label: potassium
     unit_ucum: kg/ha
+    basis: elemental
     synonyms:
     - available potassium
     - available_k
     - available_k_kg_ha
     - k
+    - k_kg_ha
+    - total_k
+    # Reported on the oxide basis. Multiplied by 0.8302 on ingest, never stored as-is.
+    oxide_synonyms:
     - k2o
     - k2o_kg_ha
-    - k_kg_ha
+    # The term does not say which basis it is. Refused on ingest rather than assumed.
+    ambiguous_synonyms:
     - potash
-    - total_k
     validation:
       min: 0.0
       max: 1000.0
@@ -483,6 +493,8 @@ columns:
     group: E. Soil Properties
     terms: []
     unit_ucum: mg/kg
+    basis: elemental
+    # An SO3 figure is multiplied by 0.4005 on ingest, never stored as-is.
     synonyms:
     - s
     - sulfur
@@ -551,6 +563,8 @@ columns:
       curie: AGROVOC:c_1196
       label: calcium
     unit_ucum: mg/kg
+    basis: elemental
+    # An CaO figure is multiplied by 0.7147 on ingest, never stored as-is.
     synonyms:
     - ca
     validation:
@@ -563,6 +577,8 @@ columns:
       curie: AGROVOC:c_4517
       label: magnesium
     unit_ucum: mg/kg
+    basis: elemental
+    # An MgO figure is multiplied by 0.6030 on ingest, never stored as-is.
     synonyms:
     - mg
     validation:
@@ -1693,6 +1709,8 @@ columns:
     group: E. Soil Properties
     terms: []
     unit_ucum: mg/kg
+    basis: elemental
+    # An Na2O figure is multiplied by 0.7419 on ingest, never stored as-is.
     synonyms:
     - sodium
     - soil_sodium

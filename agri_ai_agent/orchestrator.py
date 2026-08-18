@@ -131,7 +131,7 @@ class Orchestrator:
                 self.dataframe = self._load_checkpoint(step_key)
                 continue
 
-                self.state.current_agent = step_key
+            self.state.current_agent = step_key
             self.log.info("[STEP] %s (%s)", step_name, step_key)
 
             try:

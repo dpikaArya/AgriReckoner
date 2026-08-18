@@ -28,6 +28,7 @@ dependencies = [
     "datasets>=2.14",
     "huggingface-hub>=0.20",
     "requests>=2.31",
+    "python-dotenv>=1.0",
 ]
 
 [project.optional-dependencies]
