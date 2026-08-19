@@ -55,7 +55,10 @@ def scheduled_run_due(
         if last_run_at.tzinfo is None:
             last_run_at = last_run_at.replace(tzinfo=timezone.utc)
         if (now - last_run_at) < timedelta(seconds=interval_sec):
-            return False, f"last run {last_run_at.isoformat()} within interval ({interval_sec:.0f}s)"
+            return (
+                False,
+                f"last run {last_run_at.isoformat()} within interval ({interval_sec:.0f}s)",
+            )
 
     run_at = cfg.get("run_at")
     if run_at:

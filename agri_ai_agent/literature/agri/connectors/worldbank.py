@@ -60,10 +60,7 @@ class WorldBankConnector(AgriculturalDataConnector):
         )
 
     def _descriptors(self) -> list[DatasetDescriptor]:
-        return [
-            self._descriptor(ind, var)
-            for ind, (var, _unit) in _INDICATORS.items()
-        ]
+        return [self._descriptor(ind, var) for ind, (var, _unit) in _INDICATORS.items()]
 
     # ------------------------------------------------------------------ #
     # required interface
@@ -103,12 +100,18 @@ class WorldBankConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(pages), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         pages = json.loads(download_path.read_text(encoding="utf-8"))
         descriptor = self.fetch_metadata(dataset_id)
-        variable, unit = _INDICATORS.get(dataset_id, (descriptor.variable, None))[:2] if descriptor else (None, None)
+        variable, unit = (
+            _INDICATORS.get(dataset_id, (descriptor.variable, None))[:2]
+            if descriptor
+            else (None, None)
+        )
         records: list[AgriculturalRecord] = []
         for payload in pages or []:
             if not isinstance(payload, list) or len(payload) < 2:

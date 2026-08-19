@@ -203,7 +203,9 @@ class BibliographyDB:
             )
             # authors
             for order, author in enumerate(record.authors):
-                author_id = _author_id(author.full_name or f"{author.given_name} {author.family_name}")
+                author_id = _author_id(
+                    author.full_name or f"{author.given_name} {author.family_name}"
+                )
                 conn.execute(
                     """
                     INSERT INTO authors (author_id, full_name, given_name, family_name, orcid, affiliation)
@@ -633,18 +635,11 @@ class _PdfDocument:
         header = "  |  ".join(f"{_truncate(c, w)}" for c, w in zip(df.columns, widths, strict=True))
         self.add_line(header, size=8, gap=10)
         for _, row in head.iterrows():
-            cells = [
-                "" if pd.isna(v) else str(v)
-                for v in row.values
-            ]
-            line = "  |  ".join(
-                f"{_truncate(c, w)}" for c, w in zip(cells, widths, strict=True)
-            )
+            cells = ["" if pd.isna(v) else str(v) for v in row.values]
+            line = "  |  ".join(f"{_truncate(c, w)}" for c, w in zip(cells, widths, strict=True))
             self.add_line(line, size=8, gap=7)
         if len(df) > self.MAX_TABLE_ROWS:
-            self.add_line(
-                f"... {len(df) - self.MAX_TABLE_ROWS} more rows omitted", size=8
-            )
+            self.add_line(f"... {len(df) - self.MAX_TABLE_ROWS} more rows omitted", size=8)
 
     @staticmethod
     def _column_widths(df: pd.DataFrame) -> list[int]:
@@ -699,11 +694,11 @@ class _PdfDocument:
 
         objects = [
             self._catalog_object(pages_obj),  # 1
-            self._pages_object(page_objs),    # 2
-            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",        # 3
-            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",   # 4
-            *content_objs,                                                    # 5..4+N
-            *page_objs,                                                       # 5+N..4+2N
+            self._pages_object(page_objs),  # 2
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",  # 3
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",  # 4
+            *content_objs,  # 5..4+N
+            *page_objs,  # 5+N..4+2N
         ]
 
         out = bytearray(b"%PDF-1.4\n")
@@ -730,12 +725,16 @@ class _PdfDocument:
         y = self.PAGE_HEIGHT - self.MARGIN - 14
         for text, size, gap in items:
             font = "/F2" if size >= 14 else "/F1"
-            lines.append(f"BT {font} {size} Tf 1 0 0 1 {self.MARGIN} {y:.2f} Tm ({_pdf_escape(text)}) Tj ET")
+            lines.append(
+                f"BT {font} {size} Tf 1 0 0 1 {self.MARGIN} {y:.2f} Tm ({_pdf_escape(text)}) Tj ET"
+            )
             y -= size + gap
             if y < self.MARGIN:
                 y = self.PAGE_HEIGHT - self.MARGIN - 14
         stream = "\n".join(lines)
-        return f"<< /Length {len(stream.encode('latin-1'))} >>\nstream\n{stream}\nendstream".encode()
+        return (
+            f"<< /Length {len(stream.encode('latin-1'))} >>\nstream\n{stream}\nendstream".encode()
+        )
 
     def _page_object(self, content_obj: int) -> bytes:
         return (

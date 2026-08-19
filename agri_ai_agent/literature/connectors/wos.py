@@ -29,14 +29,14 @@ class WosConnector(LiteratureConnector):
         doi = normalize_doi(identifiers.get("doi"))
         authors = [
             Author(
-                full_name=" ".join(
-                    x for x in (a.get("firstName", ""), a.get("lastName", "")) if x
-                )
+                full_name=" ".join(x for x in (a.get("firstName", ""), a.get("lastName", "")) if x)
                 or a.get("fullName", ""),
                 given_name=a.get("firstName"),
                 family_name=a.get("lastName"),
                 orcid=(a.get("orcid", "") or None),
-                affiliation=(a.get("addresses") or [{}])[0].get("country") if a.get("addresses") else None,
+                affiliation=(a.get("addresses") or [{}])[0].get("country")
+                if a.get("addresses")
+                else None,
             )
             for a in record.get("authors", []) or []
         ]
@@ -74,7 +74,8 @@ class WosConnector(LiteratureConnector):
 
     def lookup_doi(self, doi: str) -> LiteratureRecord | None:
         payload = self.http.get_json(
-            "", params={"q": f'DO:{normalize_doi(doi)}', "limit": 1, "page": 1},
+            "",
+            params={"q": f"DO:{normalize_doi(doi)}", "limit": 1, "page": 1},
         )
         if not isinstance(payload, dict):
             return None
@@ -82,7 +83,7 @@ class WosConnector(LiteratureConnector):
         return self._to_record(hits[0]) if hits else None
 
     def fetch_metadata(self, source_id: str) -> LiteratureRecord | None:
-        payload = self.http.get_json("", params={"q": f'UT:{source_id}', "limit": 1, "page": 1})
+        payload = self.http.get_json("", params={"q": f"UT:{source_id}", "limit": 1, "page": 1})
         if not isinstance(payload, dict):
             return None
         hits = payload.get("hits", []) or []

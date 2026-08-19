@@ -46,7 +46,9 @@ class CgiarHuggingFaceConnector(AgriculturalDataConnector):
             title=ds_id,
             url=url,
             description=(ds.get("description") or "")[:500],
-            license=ds.get("cardData", {}).get("license") if isinstance(ds.get("cardData"), dict) else None,
+            license=ds.get("cardData", {}).get("license")
+            if isinstance(ds.get("cardData"), dict)
+            else None,
             variable=None,
             files=[],
             metadata={"downloads": ds.get("downloads"), "likes": ds.get("likes")},
@@ -80,7 +82,9 @@ class CgiarHuggingFaceConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(descriptor.to_dict(), indent=2), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         descriptor = json.loads(download_path.read_text(encoding="utf-8"))

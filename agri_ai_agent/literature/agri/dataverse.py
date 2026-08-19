@@ -90,7 +90,9 @@ class DataverseConnector(AgriculturalDataConnector):
         return DatasetDescriptor(
             dataset_id=dataset_id,
             title=title or dataset_id,
-            url=f"https://doi.org/{dataset_id[4:]}" if dataset_id.startswith("doi:") else dataset_id,
+            url=f"https://doi.org/{dataset_id[4:]}"
+            if dataset_id.startswith("doi:")
+            else dataset_id,
             description="",
             files=files,
             metadata=data,

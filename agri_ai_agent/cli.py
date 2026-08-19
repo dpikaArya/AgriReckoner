@@ -64,14 +64,14 @@ def main():
     )
     lit_parser.add_argument("--terms", "-t", nargs="+", help="Boolean search terms")
     lit_parser.add_argument(
-        "--full", action="store_true", help="Re-process all cached records (ignore expansion cursor)"
+        "--full",
+        action="store_true",
+        help="Re-process all cached records (ignore expansion cursor)",
     )
     lit_parser.add_argument(
         "--max-verify-pdfs", type=int, default=200, help="Cap for PDF HEAD verifications"
     )
-    lit_parser.add_argument(
-        "--skip-agri", action="store_true", help="Skip agricultural data sync"
-    )
+    lit_parser.add_argument("--skip-agri", action="store_true", help="Skip agricultural data sync")
     lit_parser.add_argument(
         "--connector", help="Run only this literature connector (by source_name)"
     )

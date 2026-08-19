@@ -79,7 +79,12 @@ class DoajConnector(LiteratureConnector):
     def lookup_doi(self, doi: str) -> LiteratureRecord | None:
         payload = self.http.get_json(
             "/search/articles/",
-            params={"query": f"doi:{normalize_doi(doi)}", "pageSize": 1, "page": 1, "source": "docs"},
+            params={
+                "query": f"doi:{normalize_doi(doi)}",
+                "pageSize": 1,
+                "page": 1,
+                "source": "docs",
+            },
         )
         if not isinstance(payload, dict):
             return None

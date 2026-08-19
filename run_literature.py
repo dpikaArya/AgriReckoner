@@ -37,10 +37,16 @@ DEFAULT_TERMS = (
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="AAIF Literature Intelligence Module")
-    parser.add_argument("--terms", "-t", nargs="+", default=list(DEFAULT_TERMS), help="Boolean search terms")
+    parser.add_argument(
+        "--terms", "-t", nargs="+", default=list(DEFAULT_TERMS), help="Boolean search terms"
+    )
     parser.add_argument("--full", action="store_true", help="Re-process all cached records")
-    parser.add_argument("--skip-agri", action="store_true", help="Skip agricultural data connectors")
-    parser.add_argument("--max-verify-pdfs", type=int, default=200, help="Cap for PDF HEAD verifications")
+    parser.add_argument(
+        "--skip-agri", action="store_true", help="Skip agricultural data connectors"
+    )
+    parser.add_argument(
+        "--max-verify-pdfs", type=int, default=200, help="Cap for PDF HEAD verifications"
+    )
     parser.add_argument("--dry-run", action="store_true", help="Print connector plan and exit")
     parser.add_argument("--connector", help="Run only one literature connector (source_name)")
     args = parser.parse_args()

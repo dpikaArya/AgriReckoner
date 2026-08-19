@@ -43,9 +43,7 @@ class GoogleEarthEngineConnector(AgriculturalDataConnector):
         except ImportError:
             self._ee_available = False
             self.enabled = False
-            self.logger.warning(
-                "Google_Earth_Engine disabled: the 'ee' package is not installed"
-            )
+            self.logger.warning("Google_Earth_Engine disabled: the 'ee' package is not installed")
 
     # ------------------------------------------------------------------ #
     # required interface
@@ -103,7 +101,9 @@ class GoogleEarthEngineConnector(AgriculturalDataConnector):
             self.logger.warning("GEE download failed: %s", exc)
             return None
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         info = json.loads(download_path.read_text(encoding="utf-8"))

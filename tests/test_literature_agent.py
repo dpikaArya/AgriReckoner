@@ -32,9 +32,9 @@ class _StubPipeline:
 
     def run(self, **kwargs):
         self.config.output_dir.mkdir(parents=True, exist_ok=True)
-        pd.DataFrame(
-            [{"Paper_ID": "p1", "DOI": "10.1/x", "Journal": "FCR", "Year": 2021}]
-        ).to_csv(self.config.output_dir / "universal_schema.csv", index=False)
+        pd.DataFrame([{"Paper_ID": "p1", "DOI": "10.1/x", "Journal": "FCR", "Year": 2021}]).to_csv(
+            self.config.output_dir / "universal_schema.csv", index=False
+        )
         return SimpleNamespace(
             run_id="RUN-STUB",
             total_papers=1,
@@ -53,9 +53,7 @@ class _StubPipeline:
 
 @pytest.fixture
 def patch_literature(monkeypatch, tmp_path):
-    monkeypatch.setattr(
-        "agri_ai_agent.literature.pipeline.LiteraturePipeline", _StubPipeline
-    )
+    monkeypatch.setattr("agri_ai_agent.literature.pipeline.LiteraturePipeline", _StubPipeline)
     monkeypatch.setattr(
         "agri_ai_agent.literature.config.LiteratureConfig.from_env",
         classmethod(lambda cls, **kw: _fake_config(tmp_path)),

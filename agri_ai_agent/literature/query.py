@@ -71,9 +71,11 @@ def build_simple_queries(
     context_terms: tuple[str, ...] = CONTEXT_TERMS,
 ) -> list[str]:
     """Simpler queries for providers that choke on long Boolean strings."""
-    return [f"{_quoted(study)} AND {_quoted(context)}"
-            for study in study_terms
-            for context in context_terms]
+    return [
+        f"{_quoted(study)} AND {_quoted(context)}"
+        for study in study_terms
+        for context in context_terms
+    ]
 
 
 def default_search_terms(config_search_terms: tuple[str, ...] = ()) -> tuple[str, ...]:

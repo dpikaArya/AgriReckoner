@@ -49,7 +49,9 @@ class AgriculturalDataManager:
         self.connectors: list[AgriculturalDataConnector] = []
         self.health: dict[str, ConnectorHealth] = {}
 
-    def build_connectors(self, classes: list[type[AgriculturalDataConnector]] | None = None) -> None:
+    def build_connectors(
+        self, classes: list[type[AgriculturalDataConnector]] | None = None
+    ) -> None:
         for cls in classes or discover_agricultural_connectors():
             try:
                 connector = cls(self.config, self.state)

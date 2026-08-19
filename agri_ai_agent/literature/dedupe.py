@@ -220,7 +220,9 @@ _DEFAULT_QUALITY_WEIGHTS: dict[str, float] = {
 }
 
 
-def compute_quality_score(record: LiteratureRecord, weights: dict[str, float] | None = None) -> float:
+def compute_quality_score(
+    record: LiteratureRecord, weights: dict[str, float] | None = None
+) -> float:
     """Quality score in [0, 1] favouring metadata completeness and
     experimental signal.  ``weights`` overrides the default weight table
     (externalized via ``config/quality_thresholds.yaml``)."""

@@ -57,7 +57,9 @@ class NasaPowerConnector(AgriculturalDataConnector):
 
     auth = ConnectorAuth(env_vars=(), required=False)
 
-    def _descriptor(self, lat: float, lon: float, label: str, start: str, end: str) -> DatasetDescriptor:
+    def _descriptor(
+        self, lat: float, lon: float, label: str, start: str, end: str
+    ) -> DatasetDescriptor:
         url = (
             f"{_API}?parameters=T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,RH2M,WS2M,"
             f"ALLSKY_SFC_SW_DWN&community=AG&longitude={lon}&latitude={lat}"
@@ -139,7 +141,9 @@ class NasaPowerConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         import json

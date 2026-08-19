@@ -93,9 +93,7 @@ class PubMedConnector(LiteratureConnector):
         title = article_el.findtext("ArticleTitle") if article_el is not None else None
         abstract = None
         if article_el is not None:
-            abstract_parts = [
-                (a.text or "") for a in article_el.findall("Abstract/AbstractText")
-            ]
+            abstract_parts = [(a.text or "") for a in article_el.findall("Abstract/AbstractText")]
             abstract = " ".join(p.strip() for p in abstract_parts if p.strip()) or None
         year = None
         if article_el is not None:
@@ -103,7 +101,11 @@ class PubMedConnector(LiteratureConnector):
             if date_el is not None:
                 year = _int(date_el.findtext("Year") or date_el.findtext("MedlineDate") or "")
         journal = article_el.findtext("Journal/Title") if article_el is not None else None
-        pub_type = article_el.findtext("PublicationTypeList/PublicationType") if article_el is not None else None
+        pub_type = (
+            article_el.findtext("PublicationTypeList/PublicationType")
+            if article_el is not None
+            else None
+        )
 
         authors: list[Author] = []
         if article_el is not None:
@@ -216,10 +218,7 @@ class PubMedConnector(LiteratureConnector):
             return []
         try:
             linksets = payload["linksets"][0]
-            return [
-                item["id"]
-                for item in linksets.get("linksetdbs", [])[0].get("links", []) or []
-            ]
+            return [item["id"] for item in linksets.get("linksetdbs", [])[0].get("links", []) or []]
         except (KeyError, IndexError):
             return []
 

@@ -79,7 +79,7 @@ def normalize_unit(unit: str | None) -> str | None:
     if not unit:
         return None
     u = unit.strip().lower()
-    for (src, canon) in UNIT_CONVERSIONS:
+    for src, canon in UNIT_CONVERSIONS:
         if u == src or u == src.lower():
             return canon
     return unit.strip()
@@ -168,7 +168,9 @@ class AgriculturalDataConnector(ABC):
         """Download the dataset (or its metadata) to ``target_dir``."""
 
     @abstractmethod
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         """Parse a downloaded dataset into normalized AgriculturalRecords."""
 
     def validate_record(self, record: AgriculturalRecord) -> list[str]:
@@ -205,7 +207,10 @@ class AgriculturalDataConnector(ABC):
                     if downloaded >= max_datasets:
                         break
                     key = f"downloaded::{descriptor.dataset_id}"
-                    if self.state.get_cursor(self.source_name, key) and not self.config.incremental_mode:
+                    if (
+                        self.state.get_cursor(self.source_name, key)
+                        and not self.config.incremental_mode
+                    ):
                         continue
                     target = self.config.data_dir / "datasets" / self.source_name
                     target.mkdir(parents=True, exist_ok=True)

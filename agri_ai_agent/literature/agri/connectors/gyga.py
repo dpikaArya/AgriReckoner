@@ -102,7 +102,9 @@ class GygaConnector(AgriculturalDataConnector):
         path.write_bytes(data)
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         df = _load_tabular(download_path)

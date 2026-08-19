@@ -34,7 +34,9 @@ class ZenodoConnector(LiteratureConnector):
         ]
         pdf_locations: list[PdfLocation] = []
         for file_ in hit.get("files", []) or []:
-            if (file_.get("key") or "").lower().endswith(".pdf") and file_.get("links", {}).get("self"):
+            if (file_.get("key") or "").lower().endswith(".pdf") and file_.get("links", {}).get(
+                "self"
+            ):
                 pdf_locations.append(
                     PdfLocation(
                         url=file_["links"]["self"],
@@ -59,7 +61,9 @@ class ZenodoConnector(LiteratureConnector):
             authors=authors,
             publication_type=metadata.get("resource_type", {}).get("type"),
             language=metadata.get("language"),
-            subjects=[(s.get("term") or "") for s in metadata.get("subjects", []) or [] if s.get("term")],
+            subjects=[
+                (s.get("term") or "") for s in metadata.get("subjects", []) or [] if s.get("term")
+            ],
             keywords=metadata.get("keywords", []) or [],
             related_ids=related_ids,
             pdf_locations=pdf_locations,
@@ -82,7 +86,9 @@ class ZenodoConnector(LiteratureConnector):
         return [self._to_record(hit) for hit in payload.get("hits", {}).get("hits", []) or []]
 
     def lookup_doi(self, doi: str) -> LiteratureRecord | None:
-        payload = self.http.get_json("/records", params={"q": f'doi:"{normalize_doi(doi)}"', "size": 1})
+        payload = self.http.get_json(
+            "/records", params={"q": f'doi:"{normalize_doi(doi)}"', "size": 1}
+        )
         if not isinstance(payload, dict):
             return None
         hits = payload.get("hits", {}).get("hits", []) or []

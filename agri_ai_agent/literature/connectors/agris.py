@@ -48,7 +48,9 @@ class AgrisConnector(LiteratureConnector):
         elif from_date:
             params["from"] = from_date
         xml = self.http.get_text(
-            "/oai", params=params, use_cache=False,
+            "/oai",
+            params=params,
+            use_cache=False,
         )
         if not xml:
             return [], None
@@ -186,7 +188,9 @@ class AgrisConnector(LiteratureConnector):
         terms: tuple[str, ...] | None = None,
     ) -> SyncResult:
         result = SyncResult(connector=self.source_name)
-        budget = max_records or (self.config.max_results_per_query * self.config.max_queries_per_connector)
+        budget = max_records or (
+            self.config.max_results_per_query * self.config.max_queries_per_connector
+        )
         from_date = self.get_cursor("last_from_date")
         current_from = from_date or "1995-01-01"
         token = self.get_cursor("resumption_token")

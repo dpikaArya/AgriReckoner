@@ -96,15 +96,17 @@ class NassConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         payload = json.loads(download_path.read_text(encoding="utf-8"))
         data = payload.get("data", []) or []
         commodity = (payload.get("source_desc", "") or "").split(" ")[0]
         descriptor = self.fetch_metadata(dataset_id)
-        commodity = (descriptor.metadata["commodity"] if descriptor else commodity)
-        statistic = (descriptor.metadata["statisticcat_desc"] if descriptor else "YIELD")
+        commodity = descriptor.metadata["commodity"] if descriptor else commodity
+        statistic = descriptor.metadata["statisticcat_desc"] if descriptor else "YIELD"
         variable = _STAT_TO_VARIABLE.get(statistic, "yield_per_hectare")
         records: list[AgriculturalRecord] = []
         for row in data[:5000]:

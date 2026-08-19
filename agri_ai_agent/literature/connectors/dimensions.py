@@ -55,7 +55,10 @@ class DimensionsConnector(LiteratureConnector):
     def _run_query(self, query: str, limit: int, skip: int) -> list[dict[str, Any]]:
         payload = self.http.post_json(
             "",
-            payload={"query": _SEARCH_QUERY, "variables": {"query": query, "limit": limit, "skip": skip}},
+            payload={
+                "query": _SEARCH_QUERY,
+                "variables": {"query": query, "limit": limit, "skip": skip},
+            },
             headers=self._headers(),
         )
         if not isinstance(payload, dict):

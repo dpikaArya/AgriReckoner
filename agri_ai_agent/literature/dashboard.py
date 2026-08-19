@@ -115,7 +115,15 @@ class HealthMetrics:
                 "rate_limit_per_minute": self.cfg.limit(
                     c.source_name, "rate_limit_per_minute", self.cfg.rate_limit_per_minute
                 ),
-                **{k: stats.get(k) for k in ("cache_hits", "cache_misses", "total_requests", "avg_response_time_ms")},
+                **{
+                    k: stats.get(k)
+                    for k in (
+                        "cache_hits",
+                        "cache_misses",
+                        "total_requests",
+                        "avg_response_time_ms",
+                    )
+                },
             }
             http_rows.append(row)
             for key, src in (
@@ -129,9 +137,7 @@ class HealthMetrics:
                 totals["latency"] += float(latency)
                 totals["n"] += 1
         m["http"] = http_rows
-        m["api_avg_latency_ms"] = (
-            round(totals["latency"] / totals["n"], 2) if totals["n"] else None
-        )
+        m["api_avg_latency_ms"] = round(totals["latency"] / totals["n"], 2) if totals["n"] else None
         m["api_requests"] = totals["requests"]
         m["cache_hits"] = totals["cache_hits"]
         m["cache_misses"] = totals["cache_misses"]
@@ -146,9 +152,7 @@ class HealthMetrics:
         m["validated_dois"] = self.report.validated_dois
         m["failed_pdfs"] = self.report.failed_pdfs
         m["agri_records"] = self.report.agri_records
-        m["duplicate_rate_pct"] = _pct(
-            self.report.duplicates / max(self.report.total_fetched, 1)
-        )
+        m["duplicate_rate_pct"] = _pct(self.report.duplicates / max(self.report.total_fetched, 1))
         m["errors_list"] = list(self.report.errors)
         m["errors_list"] += [
             f"{r.connector}: {e}" for r in self.report.sync_results for e in r.errors
@@ -333,11 +337,11 @@ footer {{ text-align: center; color: #8a978d; font-size: .75rem; padding: 1.5rem
 <body>
 <header>
   <h1>{title}</h1>
-  <p>Run {_fmt(metrics['run_id'])} &middot; started {_fmt(metrics['started_at'])} &middot; completed {_fmt(metrics['completed_at'])} &middot; duration {_fmt(metrics['duration_sec'])}s</p>
+  <p>Run {_fmt(metrics["run_id"])} &middot; started {_fmt(metrics["started_at"])} &middot; completed {_fmt(metrics["completed_at"])} &middot; duration {_fmt(metrics["duration_sec"])}s</p>
 </header>
 <main>
   <div class="grid">
-    {''.join(_render_card(c) for c in cards)}
+    {"".join(_render_card(c) for c in cards)}
   </div>
 
   <h2>Connector Health &amp; Authentication</h2>
@@ -364,12 +368,18 @@ def _metric_cards(metrics: dict[str, Any], thresholds: dict) -> list[dict[str, A
         _card("Papers Discovered", metrics["papers_discovered"]),
         _card("Verified Original Experiments", metrics["verified_original_experiments"]),
         _card("PDFs Verified", metrics["pdfs_downloaded"]),
-        _card("Tables / Figures Extracted", metrics["tables_figures_extracted"],
-              "Phase 5 (main pipeline)"),
+        _card(
+            "Tables / Figures Extracted",
+            metrics["tables_figures_extracted"],
+            "Phase 5 (main pipeline)",
+        ),
         _card("Experimental Observations", metrics["experimental_observations"]),
         _card("Agri Data Records", metrics["agri_records"]),
-        _card("Schema Completeness", f"{metrics['schema_completeness_pct']}%",
-              f"{metrics['schema_columns_present']}/{metrics['schema_columns_total']} UAMS columns"),
+        _card(
+            "Schema Completeness",
+            f"{metrics['schema_completeness_pct']}%",
+            f"{metrics['schema_columns_present']}/{metrics['schema_columns_total']} UAMS columns",
+        ),
         _card("Duplicate Rate", f"{metrics['duplicate_rate_pct']}%"),
         _card("Missing Values", f"{metrics['missing_value_pct']}%"),
         _card("Training Dataset Size", metrics["training_dataset_size"], "rows"),
@@ -393,8 +403,9 @@ def _render_card(card: dict[str, Any]) -> str:
     return (
         '<div class="card"><div class="label">{label}</div>'
         '<div class="value">{value}</div>'
-        '{sub}</div>'.format(
-            label=card["label"], value=card["value"],
+        "{sub}</div>".format(
+            label=card["label"],
+            value=card["value"],
             sub=f'<div class="sub">{card["sub"]}</div>' if card.get("sub") else "",
         )
     )

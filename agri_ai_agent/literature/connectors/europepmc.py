@@ -30,7 +30,7 @@ class EuropePmcConnector(LiteratureConnector):
             for a in result.get("authorList", {}).get("author", []) or []
         ]
         pdf_locations: list[PdfLocation] = []
-        for item in (result.get("fullTextUrlList", {}).get("fullTextUrl", []) or []):
+        for item in result.get("fullTextUrlList", {}).get("fullTextUrl", []) or []:
             if item.get("documentStyle") == "pdf" and item.get("url"):
                 pdf_locations.append(
                     PdfLocation(
@@ -63,7 +63,11 @@ class EuropePmcConnector(LiteratureConnector):
             authors=authors,
             publication_type=result.get("pubType"),
             language=result.get("language"),
-            keywords=[kw.get("keyword") for kw in (result.get("keywordList", {}).get("keyword", []) or []) if kw.get("keyword")][:20],
+            keywords=[
+                kw.get("keyword")
+                for kw in (result.get("keywordList", {}).get("keyword", []) or [])
+                if kw.get("keyword")
+            ][:20],
             citations_count=result.get("citedByCount"),
             pdf_locations=pdf_locations,
             license=result.get("license"),
@@ -80,7 +84,9 @@ class EuropePmcConnector(LiteratureConnector):
     # ------------------------------------------------------------------ #
     def search(self, query: str, max_results: int = 25, **kwargs: Any) -> list[LiteratureRecord]:
         page = int(kwargs.get("page", 0))
-        payload = self.http.get_json("/search", params=self._search_params(query, max_results, page))
+        payload = self.http.get_json(
+            "/search", params=self._search_params(query, max_results, page)
+        )
         if not isinstance(payload, dict):
             return []
         return [self._to_record(r) for r in payload.get("resultList", {}).get("result", []) or []]
@@ -102,7 +108,7 @@ class EuropePmcConnector(LiteratureConnector):
             source, _id = "MED", source_id
         payload = self.http.get_json(
             "/search",
-            params={"query": f'SRC:{source} AND EXT_ID:{_id}', "format": "json", "pageSize": 1},
+            params={"query": f"SRC:{source} AND EXT_ID:{_id}", "format": "json", "pageSize": 1},
         )
         if not isinstance(payload, dict):
             return None

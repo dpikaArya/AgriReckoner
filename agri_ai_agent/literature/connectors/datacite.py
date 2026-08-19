@@ -30,19 +30,21 @@ class DataCiteConnector(LiteratureConnector):
                 or c.get("name", ""),
                 given_name=c.get("givenName"),
                 family_name=c.get("familyName"),
-                orcid=(c.get("nameIdentifiers") or [{}])[0].get("nameIdentifier", "").replace("https://orcid.org/", "")
-                if c.get("nameIdentifiers") else None,
-                affiliation=(c.get("affiliation") or [{}])[0].get("name") if c.get("affiliation") else None,
+                orcid=(c.get("nameIdentifiers") or [{}])[0]
+                .get("nameIdentifier", "")
+                .replace("https://orcid.org/", "")
+                if c.get("nameIdentifiers")
+                else None,
+                affiliation=(c.get("affiliation") or [{}])[0].get("name")
+                if c.get("affiliation")
+                else None,
             )
             for c in creators
         ]
         related: list[str] = []
         for rel in attrs.get("relatedIdentifiers", []) or []:
             if rel.get("relatedIdentifier"):
-                related.append(
-                    normalize_doi(rel["relatedIdentifier"])
-                    or rel["relatedIdentifier"]
-                )
+                related.append(normalize_doi(rel["relatedIdentifier"]) or rel["relatedIdentifier"])
         url = attrs.get("url")
         pdf_locations: list[PdfLocation] = []
         if url and ".pdf" in (url or "").lower():
@@ -64,11 +66,17 @@ class DataCiteConnector(LiteratureConnector):
             publisher=attrs.get("publisher"),
             authors=authors,
             publication_type=types.get("resourceTypeGeneral"),
-            subjects=[(s.get("subject") or "") for s in attrs.get("subjects", []) or [] if s.get("subject")],
+            subjects=[
+                (s.get("subject") or "")
+                for s in attrs.get("subjects", []) or []
+                if s.get("subject")
+            ],
             references=[r for r in related if r],
             related_ids=[r for r in related if r],
             pdf_locations=pdf_locations,
-            license=(attrs.get("rightsList") or [{}])[0].get("rights") if attrs.get("rightsList") else None,
+            license=(attrs.get("rightsList") or [{}])[0].get("rights")
+            if attrs.get("rightsList")
+            else None,
             landing_page=url,
             raw=item,
         )

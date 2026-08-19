@@ -9,7 +9,7 @@ single absolute PROJECT_ROOT. The module refuses to construct or access paths
 outside it and never scans other drives.
 
 PROJECT_ROOT is pinned to the confirmed project path (task title):
-    F:\\Agentic AI Frameworks\\Agriculture AI Framework\\Agriculture Intelligence Framework3
+    F:\\Agentic AI Frameworks\\Agriculture AI Framework\\Agriculture Intelligence Framework4
 On machines where that pinned path is absent (e.g. CI runners), the repository
 root is discovered from this module's location (<root>/.opencode_tmp/phase20/).
 """
@@ -30,7 +30,7 @@ import pandas as pd
 import yaml
 
 PINNED_ROOT = Path(
-    r"F:\Agentic AI Frameworks\Agriculture AI Framework\Agriculture Intelligence Framework3"
+    r"F:\Agentic AI Frameworks\Agriculture AI Framework\Agriculture Intelligence Framework4"
 ).resolve()
 
 
@@ -53,7 +53,7 @@ PROJECT_ROOT = PINNED_ROOT if PINNED_ROOT.exists() else _discover_project_root()
 assert PROJECT_ROOT.is_dir(), f"PROJECT_ROOT not a directory: {PROJECT_ROOT}"
 if PROJECT_ROOT == PINNED_ROOT:
     assert PROJECT_ROOT.drive.upper() == "F:", f"PROJECT_ROOT not on F: drive: {PROJECT_ROOT}"
-    assert PROJECT_ROOT.name == "Agriculture Intelligence Framework3", (
+    assert PROJECT_ROOT.name == "Agriculture Intelligence Framework4", (
         f"PROJECT_ROOT name mismatch: {PROJECT_ROOT.name}"
     )
 

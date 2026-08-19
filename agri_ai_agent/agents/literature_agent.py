@@ -61,7 +61,8 @@ class LiteratureAgent(BaseAgent):
                     combined = pd.concat([df, uams], ignore_index=True, sort=False)
                     self.log.info(
                         "Merged %d literature UAMS rows into %d-row dataframe",
-                        len(uams), len(df),
+                        len(uams),
+                        len(df),
                     )
                     return combined
                 return df

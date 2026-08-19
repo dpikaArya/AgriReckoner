@@ -173,9 +173,7 @@ class LiteraturePipeline:
         self._build_literature_connectors()
 
         self.agri_manager = AgriculturalDataManager(self.config, self.state)
-        self.agri_manager.build_connectors(
-            self._agri_connector_classes or None
-        )
+        self.agri_manager.build_connectors(self._agri_connector_classes or None)
 
     # ------------------------------------------------------------------ #
     # setup
@@ -211,7 +209,9 @@ class LiteraturePipeline:
         max_verify_pdfs: int | None = None,
         skip_agri: bool = False,
     ) -> PipelineReport:
-        report = PipelineReport(run_id=run_id or f"{datetime.now(timezone.utc):%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:6]}")
+        report = PipelineReport(
+            run_id=run_id or f"{datetime.now(timezone.utc):%Y%m%dT%H%M%S}-{uuid.uuid4().hex[:6]}"
+        )
         started = time.monotonic()
 
         if terms:
@@ -250,9 +250,7 @@ class LiteraturePipeline:
             paper.canonical_title = paper.title
             paper.canonical_doi = normalize_doi(paper.doi) or paper.canonical_doi
         for (source, source_id), pid in list(source_to_paper.items()):
-            source_to_paper[(source, source_id)] = (
-                self._resolve_paper_id(canonical, pid)
-            )
+            source_to_paper[(source, source_id)] = self._resolve_paper_id(canonical, pid)
         for record in records:
             record.paper_id = source_to_paper.get((record.source, record.source_id))
         report.duplicates = sum(1 for r in records if r.duplicate_of)
@@ -288,7 +286,8 @@ class LiteraturePipeline:
         experiment_df = build_experiment_graph(canonical)
 
         verified = [
-            p for p in canonical
+            p
+            for p in canonical
             if p.is_original_study and (p.quality_score or 0) >= self.config.quality_min_score
         ]
         report.verified_papers = len(verified)
@@ -463,17 +462,32 @@ class LiteraturePipeline:
         meta_df = records_to_dataframe(records)
         if not meta_df.empty:
             meta_df = meta_df.drop(columns=["raw"], errors="ignore")
-        outputs["literature_metadata.parquet"] = write_parquet(meta_df, out / "literature_metadata.parquet")
+        outputs["literature_metadata.parquet"] = write_parquet(
+            meta_df, out / "literature_metadata.parquet"
+        )
 
         # --- verified papers ------------------------------------------- #
         verified_df = records_to_dataframe(verified)
         if not verified_df.empty:
             keep = [
-                c for c in (
-                    "paper_id", "canonical_doi", "title", "year", "journal", "authors",
-                    "country", "crop_terms", "experimental_design", "study_variables",
-                    "quality_score", "valid_doi", "citations_count", "pdf_locations",
-                ) if c in verified_df.columns
+                c
+                for c in (
+                    "paper_id",
+                    "canonical_doi",
+                    "title",
+                    "year",
+                    "journal",
+                    "authors",
+                    "country",
+                    "crop_terms",
+                    "experimental_design",
+                    "study_variables",
+                    "quality_score",
+                    "valid_doi",
+                    "citations_count",
+                    "pdf_locations",
+                )
+                if c in verified_df.columns
             ]
             verified_df = verified_df[keep]
         outputs["verified_papers.csv"] = write_csv(verified_df, out / "verified_papers.csv")
@@ -488,7 +502,8 @@ class LiteraturePipeline:
                 "doi": r.doi,
                 "title": r.title,
             }
-            for r in records if r.duplicate_of
+            for r in records
+            if r.duplicate_of
         ]
         outputs["duplicate_records.csv"] = write_csv(
             pd.DataFrame(dup_rows), out / "duplicate_records.csv"
@@ -514,20 +529,24 @@ class LiteraturePipeline:
         )
 
         # --- graphs ----------------------------------------------------- #
-        outputs["citation_graph.parquet"] = write_parquet(citation_df, out / "citation_graph.parquet")
+        outputs["citation_graph.parquet"] = write_parquet(
+            citation_df, out / "citation_graph.parquet"
+        )
         outputs["author_graph.parquet"] = write_parquet(author_df, out / "author_graph.parquet")
-        outputs["experiment_graph.parquet"] = write_parquet(experiment_df, out / "experiment_graph.parquet")
+        outputs["experiment_graph.parquet"] = write_parquet(
+            experiment_df, out / "experiment_graph.parquet"
+        )
 
         # --- training dataset ------------------------------------------ #
         train_df = self._training_dataset(verified)
-        outputs["training_dataset.parquet"] = write_parquet(train_df, out / "training_dataset.parquet")
+        outputs["training_dataset.parquet"] = write_parquet(
+            train_df, out / "training_dataset.parquet"
+        )
 
         # --- UAMS schema update ---------------------------------------- #
         uams_df = self._updated_schema(verified, agri_records)
         outputs["updated_schema.csv"] = write_csv(uams_df, out / "updated_schema.csv")
-        outputs["universal_schema.csv"] = write_csv(
-            uams_df, out / "universal_schema.csv"
-        )
+        outputs["universal_schema.csv"] = write_csv(uams_df, out / "universal_schema.csv")
 
         # --- quality scores -------------------------------------------- #
         outputs["quality_scores.csv"] = write_csv(
@@ -545,15 +564,23 @@ class LiteraturePipeline:
         )
 
         # --- framework reports ----------------------------------------- #
-        html_sections = self._report_sections(report, canonical, verified, citation_df, author_df, experiment_df)
+        html_sections = self._report_sections(
+            report, canonical, verified, citation_df, author_df, experiment_df
+        )
         outputs["framework_report.html"] = write_html_report(
-            out / "framework_report.html", "AAIF Literature Intelligence Framework Report", html_sections
+            out / "framework_report.html",
+            "AAIF Literature Intelligence Framework Report",
+            html_sections,
         )
         outputs["framework_report.docx"] = write_docx_report(
-            out / "framework_report.docx", "AAIF Literature Intelligence Framework Report", html_sections
+            out / "framework_report.docx",
+            "AAIF Literature Intelligence Framework Report",
+            html_sections,
         )
         outputs["framework_report.pdf"] = write_pdf_report(
-            out / "framework_report.pdf", "AAIF Literature Intelligence Framework Report", html_sections
+            out / "framework_report.pdf",
+            "AAIF Literature Intelligence Framework Report",
+            html_sections,
         )
 
         # --- framework health dashboard -------------------------------- #
@@ -601,11 +628,7 @@ class LiteraturePipeline:
             df = pd.concat(
                 [
                     df,
-                    pd.DataFrame(
-                        [
-                            self._uams_row(paper)
-                        ]
-                    ),
+                    pd.DataFrame([self._uams_row(paper)]),
                 ],
                 ignore_index=True,
             )
@@ -649,21 +672,29 @@ class LiteraturePipeline:
 
         crop_design_rows = [
             {"crop": crop, "experimental_design": design}
-            for p in verified for crop in (p.crop_terms or ["(unspecified)"])
+            for p in verified
+            for crop in (p.crop_terms or ["(unspecified)"])
             for design in (p.experimental_design or ["(unspecified)"])
         ]
-        crop_design = pd.DataFrame(crop_design_rows).groupby(
-            ["crop", "experimental_design"], dropna=False
-        ).size().reset_index(name="papers")
+        crop_design = (
+            pd.DataFrame(crop_design_rows)
+            .groupby(["crop", "experimental_design"], dropna=False)
+            .size()
+            .reset_index(name="papers")
+        )
 
         var_rows = [
             {"crop": crop, "study_variable": var}
-            for p in verified for crop in (p.crop_terms or ["(unspecified)"])
+            for p in verified
+            for crop in (p.crop_terms or ["(unspecified)"])
             for var in (p.study_variables or [])
         ]
-        crop_var = pd.DataFrame(var_rows).groupby(
-            ["crop", "study_variable"], dropna=False
-        ).size().reset_index(name="papers")
+        crop_var = (
+            pd.DataFrame(var_rows)
+            .groupby(["crop", "study_variable"], dropna=False)
+            .size()
+            .reset_index(name="papers")
+        )
 
         agri_df = pd.DataFrame([r.to_dict() for r in agri_records])
         if not agri_df.empty:
@@ -679,9 +710,7 @@ class LiteraturePipeline:
                     {
                         "source": c.source_name,
                         "enabled": c.enabled,
-                        "records": sum(
-                            1 for r in records if r.source == c.source_name
-                        ),
+                        "records": sum(1 for r in records if r.source == c.source_name),
                     }
                     for c in self.connectors
                 ]
@@ -732,13 +761,20 @@ class LiteraturePipeline:
                     {"year": y, "papers": n}
                     for y, n in pd.Series(
                         [p.year for p in canonical if p.is_original_study and p.year]
-                    ).value_counts().sort_index().items()
+                    )
+                    .value_counts()
+                    .sort_index()
+                    .items()
                 ]
             ),
             "Graph_Stats": pd.DataFrame(
                 [
-                    {"metric": "citation_edges", "value": report.outputs.get("citation_graph.parquet").stat().st_size
-                     if report.outputs.get("citation_graph.parquet") else 0},
+                    {
+                        "metric": "citation_edges",
+                        "value": report.outputs.get("citation_graph.parquet").stat().st_size
+                        if report.outputs.get("citation_graph.parquet")
+                        else 0,
+                    },
                 ]
             ),
         }
@@ -747,7 +783,9 @@ class LiteraturePipeline:
         bins = [(0.0, 0.3), (0.3, 0.5), (0.5, 0.7), (0.7, 0.9), (0.9, 1.01)]
         counts = []
         for lo, hi in bins:
-            n = sum(1 for p in canonical if p.quality_score is not None and lo <= p.quality_score < hi)
+            n = sum(
+                1 for p in canonical if p.quality_score is not None and lo <= p.quality_score < hi
+            )
             counts.append({"score_bin": f"{lo:.1f}-{hi:.1f}", "papers": n})
         return pd.DataFrame(counts)
 
@@ -785,27 +823,36 @@ class LiteraturePipeline:
         author_df: pd.DataFrame,
         experiment_df: pd.DataFrame,
     ) -> list[tuple[str, Any]]:
-        conn_health = [
-            {"source": c.source_name, "enabled": c.enabled}
-            for c in self.connectors
-        ]
+        conn_health = [{"source": c.source_name, "enabled": c.enabled} for c in self.connectors]
         return [
-            ("Executive Summary", {
-                "run_id": report.run_id,
-                "completed_at": report.completed_at,
-                "duration_sec": report.duration_sec,
-                "papers": report.total_papers,
-                "verified_papers": report.verified_papers,
-                "duplicates_merged": report.duplicates,
-                "new_records": report.new_records,
-                "agri_records": report.agri_records,
-                "outputs": len(report.outputs),
-            }),
+            (
+                "Executive Summary",
+                {
+                    "run_id": report.run_id,
+                    "completed_at": report.completed_at,
+                    "duration_sec": report.duration_sec,
+                    "papers": report.total_papers,
+                    "verified_papers": report.verified_papers,
+                    "duplicates_merged": report.duplicates,
+                    "new_records": report.new_records,
+                    "agri_records": report.agri_records,
+                    "outputs": len(report.outputs),
+                },
+            ),
             ("Connector Health", conn_health),
             ("Verified Papers", self._training_dataset(verified)),
-            ("Citation Graph (sample)", citation_df.head(200) if not citation_df.empty else pd.DataFrame()),
-            ("Author Graph (top 50 by shared papers)", author_df.head(50) if not author_df.empty else pd.DataFrame()),
-            ("Experiment Graph (sample)", experiment_df.head(200) if not experiment_df.empty else pd.DataFrame()),
+            (
+                "Citation Graph (sample)",
+                citation_df.head(200) if not citation_df.empty else pd.DataFrame(),
+            ),
+            (
+                "Author Graph (top 50 by shared papers)",
+                author_df.head(50) if not author_df.empty else pd.DataFrame(),
+            ),
+            (
+                "Experiment Graph (sample)",
+                experiment_df.head(200) if not experiment_df.empty else pd.DataFrame(),
+            ),
             ("Errors", report.errors or ["(none)"]),
         ]
 

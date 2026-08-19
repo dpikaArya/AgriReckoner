@@ -19,7 +19,10 @@ class CrossrefConnector(LiteratureConnector):
     auth = ConnectorAuth(env_vars=("CROSSREF_MAILTO",), required=False)
 
     def _headers(self) -> dict[str, str]:
-        return {"User-Agent": self.config.contact_email or "AAIF/1.0 (mailto:aaif@agriculture.intelligence)"}
+        return {
+            "User-Agent": self.config.contact_email
+            or "AAIF/1.0 (mailto:aaif@agriculture.intelligence)"
+        }
 
     # ------------------------------------------------------------------ #
     # record mapping
@@ -33,14 +36,16 @@ class CrossrefConnector(LiteratureConnector):
                     full_name=" ".join(x for x in (a.get("given", ""), a.get("family", "")) if x),
                     given_name=a.get("given"),
                     family_name=a.get("family"),
-                    orcid=(a.get("ORCID", "") or "").replace("http://orcid.org/", "").replace("https://orcid.org/", "") or None,
+                    orcid=(a.get("ORCID", "") or "")
+                    .replace("http://orcid.org/", "")
+                    .replace("https://orcid.org/", "")
+                    or None,
                     affiliation=(a.get("affiliation") or [{}])[0].get("name"),
                 )
             )
 
         refs = [
-            (r.get("DOI") or r.get("unstructured") or "")
-            for r in work.get("reference", []) or []
+            (r.get("DOI") or r.get("unstructured") or "") for r in work.get("reference", []) or []
         ]
         refs = [normalize_doi(r) or r for r in refs if r]
 
@@ -54,7 +59,9 @@ class CrossrefConnector(LiteratureConnector):
                         license=_license_from_work(work),
                         content_type="application/pdf",
                         doi=doi,
-                        source_repository=work.get("container-title") and work["container-title"][0] or "Crossref",
+                        source_repository=work.get("container-title")
+                        and work["container-title"][0]
+                        or "Crossref",
                     )
                 )
         license_url = None

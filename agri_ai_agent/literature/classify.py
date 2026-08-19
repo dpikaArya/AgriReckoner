@@ -182,7 +182,8 @@ def enrich_record(record: LiteratureRecord) -> LiteratureRecord:
     record.study_variables = detect_study_variables(record)
     record.crop_terms = detect_crops(record)
     record.experimental_keywords = [
-        kw for kw in EXPERIMENTAL_KEYWORDS if kw in (record.title or "").lower()
-        or kw in (record.abstract or "").lower()
+        kw
+        for kw in EXPERIMENTAL_KEYWORDS
+        if kw in (record.title or "").lower() or kw in (record.abstract or "").lower()
     ]
     return record

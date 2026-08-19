@@ -129,7 +129,9 @@ class CDSConnector(AgriculturalDataConnector):
             metadata=entry,
         )
 
-    def _request_payload(self, year: int, month: int, day: int, variables: list[str]) -> dict[str, Any]:
+    def _request_payload(
+        self, year: int, month: int, day: int, variables: list[str]
+    ) -> dict[str, Any]:
         payload = dict(CDS_DATASETS[self.cds_dataset]["request_keys"])
         payload.update(
             {

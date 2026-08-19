@@ -52,9 +52,7 @@ def test_convert_unit():
 # ---------------------------------------------------------------------- #
 def test_agri_validate_record(tmp_path):
     connector = _make_connector(WorldBankConnector, tmp_path)
-    good = AgriculturalRecord(
-        source="World_Bank", dataset_id="X", variable="yield", value=3.1
-    )
+    good = AgriculturalRecord(source="World_Bank", dataset_id="X", variable="yield", value=3.1)
     assert connector.validate_record(good) == []
 
     bad = AgriculturalRecord(source="", dataset_id="", variable="", value=None)
@@ -70,9 +68,24 @@ def test_worldbank_to_records(tmp_path):
     payload = [
         {"page": 1, "pages": 1},
         [
-            {"date": "2023", "country": {"value": "India"}, "countryiso3code": "IND", "value": 153868700.0},
-            {"date": "2023", "country": {"value": "India"}, "countryiso3code": "IND", "value": None},
-            {"date": "2022", "country": {"value": "India"}, "countryiso3code": "IND", "value": 154027533.3},
+            {
+                "date": "2023",
+                "country": {"value": "India"},
+                "countryiso3code": "IND",
+                "value": 153868700.0,
+            },
+            {
+                "date": "2023",
+                "country": {"value": "India"},
+                "countryiso3code": "IND",
+                "value": None,
+            },
+            {
+                "date": "2022",
+                "country": {"value": "India"},
+                "countryiso3code": "IND",
+                "value": 154027533.3,
+            },
         ],
     ]
     path.write_text(json.dumps([payload]), encoding="utf-8")

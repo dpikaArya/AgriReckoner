@@ -32,7 +32,11 @@ class SemanticScholarConnector(LiteratureConnector):
         authors = [
             Author(
                 full_name=a.get("name", ""),
-                orcid=((a.get("authorId", "") or "") if a.get("authorId", "").startswith(("0000-", "http")) else None),
+                orcid=(
+                    (a.get("authorId", "") or "")
+                    if a.get("authorId", "").startswith(("0000-", "http"))
+                    else None
+                ),
                 affiliation=a.get("affiliation"),
             )
             for a in paper.get("authors", []) or []

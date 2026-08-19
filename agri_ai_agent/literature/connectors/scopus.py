@@ -31,9 +31,13 @@ class ScopusConnector(LiteratureConnector):
         return headers
 
     def _to_record(self, entry: dict[str, Any]) -> LiteratureRecord:
-        doi = normalize_doi(entry.get("dc:identifier") and _doi_from_scopus_id(entry["dc:identifier"]) or entry.get("prism:doi"))
+        doi = normalize_doi(
+            entry.get("dc:identifier")
+            and _doi_from_scopus_id(entry["dc:identifier"])
+            or entry.get("prism:doi")
+        )
         authors: list[Author] = []
-        for a in (entry.get("author", []) or []):
+        for a in entry.get("author", []) or []:
             given = a.get("given-name")
             family = a.get("surname")
             authors.append(
@@ -55,7 +59,9 @@ class ScopusConnector(LiteratureConnector):
             publisher=entry.get("dc:publisher"),
             authors=authors,
             publication_type=entry.get("subtypeDescription"),
-            keywords=[k for k in (entry.get("authkeywords", "") or "").split("|") if k.strip()][:20],
+            keywords=[k for k in (entry.get("authkeywords", "") or "").split("|") if k.strip()][
+                :20
+            ],
             citations_count=_int(entry.get("citedby-count")),
             license=entry.get("openaccess", None) and "open-access" or None,
             landing_page=entry.get("link") and _link_href(entry["link"], "scopus"),
@@ -97,7 +103,7 @@ class ScopusConnector(LiteratureConnector):
         payload = self.http.get_json(
             "",
             params={
-                "query": f'SCP({source_id})',
+                "query": f"SCP({source_id})",
                 "count": 1,
                 "start": 0,
                 "view": "STANDARD",

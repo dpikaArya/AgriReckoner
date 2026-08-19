@@ -177,32 +177,20 @@ class LiteratureConfig:
         cfg = cls(
             data_dir=data_dir,
             output_dir=output_dir,
-            state_db=(
-                Path(os.getenv("AGRI_LIT_STATE_DB", str(data_dir / "state.sqlite")))
-            ),
+            state_db=(Path(os.getenv("AGRI_LIT_STATE_DB", str(data_dir / "state.sqlite")))),
             bibliography_db=(
-                Path(
-                    os.getenv(
-                        "AGRI_LIT_BIBLIOGRAPHY_DB", str(data_dir / "bibliography.db")
-                    )
-                )
+                Path(os.getenv("AGRI_LIT_BIBLIOGRAPHY_DB", str(data_dir / "bibliography.db")))
             ),
             cache_dir=Path(os.getenv("AGRI_LIT_CACHE_DIR", str(data_dir / "cache"))),
-            max_results_per_query=int(
-                os.getenv("AGRI_LIT_MAX_RESULTS_PER_QUERY", "25")
-            ),
-            max_queries_per_connector=int(
-                os.getenv("AGRI_LIT_MAX_QUERIES_PER_CONNECTOR", "8")
-            ),
+            max_results_per_query=int(os.getenv("AGRI_LIT_MAX_RESULTS_PER_QUERY", "25")),
+            max_queries_per_connector=int(os.getenv("AGRI_LIT_MAX_QUERIES_PER_CONNECTOR", "8")),
             incremental_mode=os.getenv("AGRI_LIT_INCREMENTAL", "1") not in {"0", "false", "False"},
             fetch_references=os.getenv("AGRI_LIT_FETCH_REFERENCES", "1")
             not in {"0", "false", "False"},
             fetch_citations=os.getenv("AGRI_LIT_FETCH_CITATIONS", "1")
             not in {"0", "false", "False"},
-            fetch_related=os.getenv("AGRI_LIT_FETCH_RELATED", "1")
-            not in {"0", "false", "False"},
-            verify_pdfs=os.getenv("AGRI_LIT_VERIFY_PDFS", "1")
-            not in {"0", "false", "False"},
+            fetch_related=os.getenv("AGRI_LIT_FETCH_RELATED", "1") not in {"0", "false", "False"},
+            verify_pdfs=os.getenv("AGRI_LIT_VERIFY_PDFS", "1") not in {"0", "false", "False"},
             timeout_sec=int(os.getenv("AGRI_LIT_TIMEOUT_SEC", "45")),
             retry_max=int(os.getenv("AGRI_LIT_RETRY_MAX", "3")),
             retry_base_delay_sec=float(os.getenv("AGRI_LIT_RETRY_BASE_DELAY", "1.5")),
@@ -219,9 +207,7 @@ class LiteratureConfig:
                     str(quality.get("verified_original", {}).get("min_quality_score", 0)),
                 )
             ),
-            retrain_min_verified_papers=int(
-                os.getenv("AGRI_LIT_RETRAIN_MIN_VERIFIED", "50")
-            ),
+            retrain_min_verified_papers=int(os.getenv("AGRI_LIT_RETRAIN_MIN_VERIFIED", "50")),
             retrain_min_new_papers=int(os.getenv("AGRI_LIT_RETRAIN_MIN_NEW", "10")),
             auto_retrain=os.getenv("AGRI_LIT_AUTO_RETRAIN", "0") not in {"0", "false", "False"},
             retrain_command=os.getenv("AGRI_LIT_RETRAIN_COMMAND"),
@@ -239,9 +225,7 @@ class LiteratureConfig:
         )
         if os.getenv("AGRI_LIT_SEARCH_TERMS"):
             cfg.search_terms = tuple(
-                t.strip()
-                for t in os.getenv("AGRI_LIT_SEARCH_TERMS", "").split(",")
-                if t.strip()
+                t.strip() for t in os.getenv("AGRI_LIT_SEARCH_TERMS", "").split(",") if t.strip()
             )
         cfg.ensure_dirs()
         return cfg

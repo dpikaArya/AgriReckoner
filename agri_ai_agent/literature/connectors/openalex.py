@@ -37,11 +37,11 @@ class OpenAlexConnector(LiteratureConnector):
             affiliation = ""
             if a.get("institutions"):
                 affiliation = "; ".join(
-                    inst.get("display_name", "") for inst in a["institutions"] if inst.get("display_name")
+                    inst.get("display_name", "")
+                    for inst in a["institutions"]
+                    if inst.get("display_name")
                 )
-            authors.append(
-                Author(full_name=raw_name, orcid=orcid, affiliation=affiliation or None)
-            )
+            authors.append(Author(full_name=raw_name, orcid=orcid, affiliation=affiliation or None))
 
         subjects = [
             (c.get("display_name") or c.get("name") or "")
@@ -57,7 +57,9 @@ class OpenAlexConnector(LiteratureConnector):
         open_access = work.get("open_access") or {}
         oa_url = open_access.get("oa_url")
         best_location = work.get("best_oa_location") or {}
-        pdf_url = best_location.get("pdf_url") or (oa_url if oa_url and ".pdf" in (oa_url or "").lower() else None)
+        pdf_url = best_location.get("pdf_url") or (
+            oa_url if oa_url and ".pdf" in (oa_url or "").lower() else None
+        )
 
         pdf_locations: list[PdfLocation] = []
         if pdf_url:
@@ -125,9 +127,7 @@ class OpenAlexConnector(LiteratureConnector):
     # ------------------------------------------------------------------ #
     def search(self, query: str, max_results: int = 25, **kwargs: Any) -> list[LiteratureRecord]:
         page = int(kwargs.get("page", 0))
-        payload = self.http.get_json(
-            "/works", params=self._search_params(query, max_results, page)
-        )
+        payload = self.http.get_json("/works", params=self._search_params(query, max_results, page))
         if not isinstance(payload, dict):
             return []
         return [self._to_record(w) for w in payload.get("results", []) or []]
@@ -152,13 +152,18 @@ class OpenAlexConnector(LiteratureConnector):
 
     def fetch_citations(self, record: LiteratureRecord) -> list[str]:
         # OpenAlex: works that cite this work via the cites filter.
-        oa_id = f"https://openalex.org/W{record.source_id}" if not record.source_id.startswith("W") else f"https://openalex.org/{record.source_id}"
-        payload = self.http.get_json(
-            "/works", params={"filter": f"cites:{oa_id}", "per-page": 25}
+        oa_id = (
+            f"https://openalex.org/W{record.source_id}"
+            if not record.source_id.startswith("W")
+            else f"https://openalex.org/{record.source_id}"
         )
+        payload = self.http.get_json("/works", params={"filter": f"cites:{oa_id}", "per-page": 25})
         if not isinstance(payload, dict):
             return []
-        return [str(w.get("doi", "")).replace("https://doi.org/", "") or w.get("id") for w in payload.get("results", []) or []]
+        return [
+            str(w.get("doi", "")).replace("https://doi.org/", "") or w.get("id")
+            for w in payload.get("results", []) or []
+        ]
 
     def fetch_related_articles(self, record: LiteratureRecord) -> list[str]:
         return record.related_ids or []

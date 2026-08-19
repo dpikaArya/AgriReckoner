@@ -12,9 +12,7 @@ from agri_ai_agent.literature.models import Author, LiteratureRecord, PdfLocatio
 
 
 def _rec(source: str, source_id: str, doi: str | None = None, title: str | None = None, **kw):
-    return LiteratureRecord(
-        source=source, source_id=source_id, doi=doi, title=title, **kw
-    )
+    return LiteratureRecord(source=source, source_id=source_id, doi=doi, title=title, **kw)
 
 
 # ---------------------------------------------------------------------- #
@@ -34,7 +32,9 @@ def test_title_similarity_punctuation():
 # ---------------------------------------------------------------------- #
 def test_dedupe_by_doi_merges():
     primary = _rec(
-        "OpenAlex", "W1", doi="10.1000/wheat",
+        "OpenAlex",
+        "W1",
+        doi="10.1000/wheat",
         title="Wheat yield response to nitrogen",
         authors=[Author(full_name="A. Kumar")],
         abstract="A long abstract " + "x" * 200,
@@ -42,7 +42,9 @@ def test_dedupe_by_doi_merges():
         references=["10.1000/ref"],
     )
     duplicate = _rec(
-        "Crossref", "cr-1", doi="HTTP://DOI.ORG/10.1000/wheat",
+        "Crossref",
+        "cr-1",
+        doi="HTTP://DOI.ORG/10.1000/wheat",
         title="Wheat yield response to nitrogen",
         citations_count=42,
     )
@@ -78,9 +80,12 @@ def test_dedupe_distinct_papers_kept():
 # ---------------------------------------------------------------------- #
 def test_quality_score_bounds():
     rich = _rec(
-        "A", "a1", doi="10.1000/x",
+        "A",
+        "a1",
+        doi="10.1000/x",
         title="A sufficiently long title about field experiments",
-        year=2020, journal="Field Crops Research",
+        year=2020,
+        journal="Field Crops Research",
         authors=[Author(full_name="A")],
         abstract="An abstract that is definitely longer than one hundred characters in total length here.",
         pdf_locations=[PdfLocation(url="https://x/y.pdf", source_kind="publisher")],

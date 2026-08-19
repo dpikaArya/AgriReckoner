@@ -55,7 +55,11 @@ class GbifConnector(AgriculturalDataConnector):
             return None
         payload = self.http.get_json(
             "/occurrence/search",
-            params={"q": descriptor.metadata["q"], "country": descriptor.metadata["country"], "limit": 25},
+            params={
+                "q": descriptor.metadata["q"],
+                "country": descriptor.metadata["country"],
+                "limit": 25,
+            },
         )
         if not isinstance(payload, dict):
             return None
@@ -64,7 +68,9 @@ class GbifConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         payload = json.loads(download_path.read_text(encoding="utf-8"))

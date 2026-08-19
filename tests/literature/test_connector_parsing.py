@@ -92,9 +92,7 @@ _CROSSREF_WORK = {
     "type": "journal-article",
     "is-referenced-by-count": 7,
     "reference": [{"DOI": "10.1000/ref1"}, {"unstructured": "Some reference"}],
-    "link": [
-        {"URL": "https://doi.org/10.1000/example.123.pdf", "content-type": "application/pdf"}
-    ],
+    "link": [{"URL": "https://doi.org/10.1000/example.123.pdf", "content-type": "application/pdf"}],
     "license": [{"URL": "https://creativecommons.org/licenses/by/4.0", "content-version": "vor"}],
 }
 

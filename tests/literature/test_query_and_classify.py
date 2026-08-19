@@ -57,7 +57,23 @@ def test_build_boolean_queries_count():
 
 def test_build_simple_queries_count():
     queries = build_simple_queries()
-    assert len(queries) == len(("field experiments", "field trials", "RCBD", "randomized complete block", "split plot", "split-split plot", "factorial experiments", "strip plot", "latin square")) * 6
+    assert (
+        len(queries)
+        == len(
+            (
+                "field experiments",
+                "field trials",
+                "RCBD",
+                "randomized complete block",
+                "split plot",
+                "split-split plot",
+                "factorial experiments",
+                "strip plot",
+                "latin square",
+            )
+        )
+        * 6
+    )
     assert all("AND" in q for q in queries)
 
 
@@ -93,8 +109,11 @@ def _record(abstract: str = "", ptype: str | None = None) -> LiteratureRecord:
 
 def test_review_excluded():
     rec = LiteratureRecord(
-        source="test", source_id="2", title="This review of wheat yields",
-        abstract="We review the literature.", publication_type="journal-article",
+        source="test",
+        source_id="2",
+        title="This review of wheat yields",
+        abstract="We review the literature.",
+        publication_type="journal-article",
     )
     assert is_original_experimental_study(rec) is False
 
@@ -109,7 +128,9 @@ def test_patent_excluded():
 
 def test_simulation_only_excluded():
     rec = LiteratureRecord(
-        source="test", source_id="3", title="A computational model of wheat growth",
+        source="test",
+        source_id="3",
+        title="A computational model of wheat growth",
         abstract="We simulated yield under climate scenarios using APSIM.",
         publication_type="journal-article",
     )
@@ -118,7 +139,9 @@ def test_simulation_only_excluded():
 
 def test_simulation_with_experiment_accepted():
     rec = LiteratureRecord(
-        source="test", source_id="4", title="Field trial and modelling of wheat",
+        source="test",
+        source_id="4",
+        title="Field trial and modelling of wheat",
         abstract="We calibrated a model with data from replicated field experiments.",
         publication_type="journal-article",
     )
@@ -135,7 +158,8 @@ def test_field_experiment_accepted():
 
 def test_detect_designs_variables_crops():
     rec = LiteratureRecord(
-        source="test", source_id="5",
+        source="test",
+        source_id="5",
         title="Effects of nitrogen and irrigation on rice yield in a split plot design",
         abstract="",
     )
@@ -148,7 +172,8 @@ def test_detect_designs_variables_crops():
 
 def test_enrich_record():
     rec = LiteratureRecord(
-        source="test", source_id="6",
+        source="test",
+        source_id="6",
         title="Nitrogen response of maize in randomized complete block field trials",
         abstract="",
         publication_type="journal article",

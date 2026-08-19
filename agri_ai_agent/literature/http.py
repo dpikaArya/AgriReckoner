@@ -74,9 +74,7 @@ class ConnectorHttpClient:
         )
         if resp is None or resp.status_code >= 400:
             if resp is not None and resp.status_code >= 400:
-                logger.debug(
-                    "GET %s -> %d %s", endpoint, resp.status_code, resp.text[:200]
-                )
+                logger.debug("GET %s -> %d %s", endpoint, resp.status_code, resp.text[:200])
             return None
         try:
             return resp.json()
@@ -119,7 +117,9 @@ class ConnectorHttpClient:
         if headers:
             merged.update(headers)
         resp = self._client.get(
-            url, headers=merged or None, timeout=timeout or self._default_timeout,
+            url,
+            headers=merged or None,
+            timeout=timeout or self._default_timeout,
             use_cache=False,
         )
         if resp is None or resp.status_code >= 400:

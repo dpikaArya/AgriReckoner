@@ -114,7 +114,9 @@ class MendeleyDataConnector(LiteratureConnector):
             publication_type="dataset",
             language=dataset.get("language"),
             subjects=dataset.get("subject_areas", []) or [],
-            keywords=[k.get("name") for k in dataset.get("keywords", []) or [] if k.get("name")][:20],
+            keywords=[k.get("name") for k in dataset.get("keywords", []) or [] if k.get("name")][
+                :20
+            ],
             pdf_locations=pdf_locations,
             license=dataset.get("license"),
             landing_page=dataset.get("link"),

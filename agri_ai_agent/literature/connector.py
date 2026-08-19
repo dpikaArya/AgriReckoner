@@ -105,7 +105,8 @@ class LiteratureConnector(ABC):
             api_key=None,
             headers=self._auth_headers(),
             rate_limit_per_minute=config.limit(
-                source_name, "rate_limit_per_minute",
+                source_name,
+                "rate_limit_per_minute",
                 config.rate_limit_per_minute or self.default_rate_per_minute,
             ),
             timeout_sec=config.limit(source_name, "timeout_sec", config.timeout_sec),

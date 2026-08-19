@@ -70,7 +70,9 @@ class GeoglamConnector(AgriculturalDataConnector):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
-    def to_records(self, dataset_id: str, download_path: Path | None = None) -> list[AgriculturalRecord]:
+    def to_records(
+        self, dataset_id: str, download_path: Path | None = None
+    ) -> list[AgriculturalRecord]:
         if download_path is None or not download_path.exists():
             return []
         payload = json.loads(download_path.read_text(encoding="utf-8"))
@@ -102,7 +104,14 @@ class GeoglamConnector(AgriculturalDataConnector):
 
 
 def _condition_score(condition: str) -> float:
-    mapping = {"favourable": 5.0, "favorable": 5.0, "good": 4.0, "watch": 3.0, "poor": 2.0, "severe": 1.0}
+    mapping = {
+        "favourable": 5.0,
+        "favorable": 5.0,
+        "good": 4.0,
+        "watch": 3.0,
+        "poor": 2.0,
+        "severe": 1.0,
+    }
     return mapping.get(condition.strip().lower(), None)
 
 

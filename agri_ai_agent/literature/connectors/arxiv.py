@@ -52,9 +52,7 @@ class ArxivConnector(LiteratureConnector):
             for a in entry.findall(f"{_ATOM}author")
         ]
         subjects = [
-            (c.get("term") or "")
-            for c in entry.findall(f"{_ATOM}category")
-            if c.get("term")
+            (c.get("term") or "") for c in entry.findall(f"{_ATOM}category") if c.get("term")
         ]
         doi = None
         pdf_url = None
@@ -105,7 +103,7 @@ class ArxivConnector(LiteratureConnector):
         return records[0] if records else None
 
     def fetch_metadata(self, source_id: str) -> LiteratureRecord | None:
-        records = self._query(f'id:{source_id}', 1, 0)
+        records = self._query(f"id:{source_id}", 1, 0)
         return records[0] if records else None
 
     def fetch_pdf_location(self, record: LiteratureRecord) -> list[PdfLocation]:

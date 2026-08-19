@@ -22,7 +22,7 @@ class FigshareConnector(LiteratureConnector):
         authors = [
             Author(
                 full_name=a.get("full_name", "") if isinstance(a, dict) else str(a),
-                orcid=(((a.get("orcid_id") or "")) or None) if isinstance(a, dict) else None,
+                orcid=((a.get("orcid_id") or "") or None) if isinstance(a, dict) else None,
             )
             for a in article.get("authors", []) or []
         ]

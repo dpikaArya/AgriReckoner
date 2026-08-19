@@ -17,10 +17,7 @@ from agri_ai_agent.literature.models import LiteratureRecord
 def test_load_env_file_applies_and_does_not_overwrite(tmp_path):
     env = tmp_path / "api_keys.env"
     env.write_text(
-        "# comment\n\n"
-        "AGRI_TEST_ONE=hello\n"
-        "AGRI_TEST_TWO=\"quoted\"\n"
-        "AGRI_TEST_THREE='single'\n",
+        "# comment\n\nAGRI_TEST_ONE=hello\nAGRI_TEST_TWO=\"quoted\"\nAGRI_TEST_THREE='single'\n",
         encoding="utf-8",
     )
     os.environ.pop("AGRI_TEST_ONE", None)
