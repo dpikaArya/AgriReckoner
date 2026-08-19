@@ -170,7 +170,8 @@ if __name__ == "__main__":
     assert reg.expand_curie("AGROVOC:c_5192").endswith("agrovoc/c_5192")
     assert reg.expand_curie("CO_320:0000005").endswith("CO_320:0000005")
     # c_5192 is "nitrogen"; c_5188, asserted here previously, is "nitric acid".
-    assert reg.term_iri("Nitrogen").endswith("c_5192"), reg.term_iri("Nitrogen")
+    nitrogen_iri = reg.term_iri("Nitrogen")
+    assert nitrogen_iri is not None and nitrogen_iri.endswith("c_5192"), nitrogen_iri
     assert reg.term_iri("Paper_ID") is None
     assert reg.canonical_unit("Rainfall") == "mm"
     assert reg.validation_range("Soil_pH") == (3.0, 10.0)

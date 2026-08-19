@@ -161,3 +161,31 @@ def test_no_mapping_claims_exact_match_without_verification(registry):
         for term in block.get("terms") or []:
             if term.get("verified") is False:
                 assert term["predicate"] != "skos:exactMatch", (column, term)
+
+
+def test_term_iri_returns_string_for_mapped_column(registry):
+    """term_iri returns a non-None string for columns with ontology terms."""
+    iri = registry.term_iri("Nitrogen")
+    assert isinstance(iri, str)
+    assert iri.endswith("c_5192")
+
+
+def test_term_iri_returns_none_for_unmapped_column(registry):
+    """term_iri returns None for columns without ontology terms."""
+    assert registry.term_iri("Paper_ID") is None
+    assert registry.term_iri("DOI") is None
+
+
+def test_term_iri_none_does_not_have_endswith():
+    """Regression: calling .endswith() on None must not crash.
+
+    This covers the mypy-reported union-attr issue at registry.py:173.
+    """
+    from agri_ai_agent.ontology.registry import Registry
+
+    reg = Registry.load()
+    result = reg.term_iri("Paper_ID")
+    assert result is None
+    # The fix ensures this pattern is handled safely:
+    if result is not None:
+        result.endswith("x")  # should not be reached
